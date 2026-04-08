@@ -54,7 +54,7 @@ export default function HomePage() {
         contactPoint: {
           "@type": "ContactPoint",
           contactType: "sales",
-          email: "hello@yourgift.pt",
+          email: "gera@yourgift.pt",
           availableLanguage: "Portuguese",
         },
         aggregateRating: {

@@ -8,7 +8,7 @@ export const siteConfig = {
   links: {
     linkedin: "https://linkedin.com/company/yourgift",
     instagram: "https://instagram.com/yourgift.pt",
-    email: "hello@yourgift.pt",
+    email: "gera@yourgift.pt",
     phone: "+351 210 000 000",
   },
   company: {

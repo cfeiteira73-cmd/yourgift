@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
         },
         body: JSON.stringify({
           from: "yourgift.pt <noreply@yourgift.pt>",
-          to: ["hello@yourgift.pt"],
+          to: ["gera@yourgift.pt"],
           reply_to: email,
           subject: `[yourgift.pt] ${subjectLabels[subject] ?? subject} — ${name}`,
           html: emailHtml,
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
     );
   } catch {
     return NextResponse.json(
-      { error: "Erro interno. Tenta novamente ou contacta hello@yourgift.pt." },
+      { error: "Erro interno. Tenta novamente ou contacta gera@yourgift.pt." },
       { status: 500 }
     );
   }

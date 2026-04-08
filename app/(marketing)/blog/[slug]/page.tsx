@@ -944,7 +944,7 @@ export default async function BlogPostPage({
                   Pedir proposta
                 </Link>
                 <a
-                  href="https://wa.me/351000000000?text=Olá! Gostaria de saber mais sobre os vossos serviços."
+                  href="https://wa.me/351919948986?text=Olá! Gostaria de saber mais sobre os vossos serviços."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 border border-white/[0.1] text-white/60 hover:text-white hover:border-white/25 px-4 py-2.5 rounded-xl text-sm transition-all"

@@ -48,7 +48,7 @@ async function sendConfirmationEmail(rfq: RFQInput) {
     const resend = new Resend(resendKey);
 
     await resend.emails.send({
-      from: `yourgift <${process.env.RESEND_FROM_EMAIL || "hello@yourgift.pt"}>`,
+      from: `yourgift <${process.env.RESEND_FROM_EMAIL || "gera@yourgift.pt"}>`,
       to: rfq.email,
       subject: "Recebemos o teu pedido de proposta — yourgift.pt",
       html: `
@@ -66,7 +66,7 @@ async function sendConfirmationEmail(rfq: RFQInput) {
           </div>
           <p style="color: rgba(245,247,251,0.5); font-size: 13px;">
             Questões? Responde a este email ou contacta-nos em
-            <a href="mailto:hello@yourgift.pt" style="color: #4DA3FF;">hello@yourgift.pt</a>
+            <a href="mailto:gera@yourgift.pt" style="color: #4DA3FF;">gera@yourgift.pt</a>
           </p>
         </div>
       `,
@@ -85,8 +85,8 @@ async function sendInternalNotification(rfq: RFQInput) {
     const resend = new Resend(resendKey);
 
     await resend.emails.send({
-      from: `yourgift Sistema <${process.env.RESEND_FROM_EMAIL || "hello@yourgift.pt"}>`,
-      to: process.env.RESEND_FROM_EMAIL || "hello@yourgift.pt",
+      from: `yourgift Sistema <${process.env.RESEND_FROM_EMAIL || "gera@yourgift.pt"}>`,
+      to: process.env.RESEND_FROM_EMAIL || "gera@yourgift.pt",
       subject: `Nova RFQ: ${rfq.company} — ${rfq.budget}`,
       html: `
         <h2>Nova proposta recebida</h2>

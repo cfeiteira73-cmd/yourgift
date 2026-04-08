@@ -28,7 +28,7 @@ export default function ContactPage() {
           </div>
           <div className="space-y-6">
             {[
-              { icon: <Mail className="h-5 w-5" />, label: "Email", value: "hello@yourgift.pt", href: "mailto:hello@yourgift.pt" },
+              { icon: <Mail className="h-5 w-5" />, label: "Email", value: "gera@yourgift.pt", href: "mailto:gera@yourgift.pt" },
               { icon: <Phone className="h-5 w-5" />, label: "Telefone", value: "+351 210 000 000", href: "tel:+351210000000" },
               { icon: <MapPin className="h-5 w-5" />, label: "Localização", value: "Lisboa, Portugal", href: undefined },
               { icon: <Clock className="h-5 w-5" />, label: "Horário", value: "Segunda–Sexta, 9h–18h", href: undefined },

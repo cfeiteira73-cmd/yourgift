@@ -66,10 +66,10 @@ export default function RFQPage() {
                 A nossa equipa está disponível de segunda a sexta, 9h–18h.
               </p>
               <a
-                href="mailto:hello@yourgift.pt"
+                href="mailto:gera@yourgift.pt"
                 className="text-sm text-[#4DA3FF] hover:text-[#74E7FF] transition-colors font-medium"
               >
-                hello@yourgift.pt →
+                gera@yourgift.pt →
               </a>
             </div>
 

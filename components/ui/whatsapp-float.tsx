@@ -7,7 +7,7 @@ export function WhatsAppFloat() {
 
   return (
     <a
-      href="https://wa.me/351000000000?text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20os%20vossos%20servi%C3%A7os."
+      href="https://wa.me/351919948986?text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20os%20vossos%20servi%C3%A7os."
       target="_blank"
       rel="noopener noreferrer"
       onMouseEnter={() => setHovered(true)}

@@ -146,7 +146,7 @@ Para efeitos de resolução alternativa de litígios de consumo, pode ser utiliz
     title: "12. Contactos",
     content: `Para questões sobre estes Termos de Serviço:
 
-Email geral: hello@yourgift.pt
+Email geral: gera@yourgift.pt
 Questões jurídicas: legal@yourgift.pt
 Telefone: +351 210 000 000 (dias úteis, 9h–18h)
 

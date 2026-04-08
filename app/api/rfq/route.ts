@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
       // Client confirmation
       await resend.emails.send({
-        from: "yourgift.pt <hello@yourgift.pt>",
+        from: "yourgift.pt <gera@yourgift.pt>",
         to: data.email,
         subject: "Recebemos o teu pedido de proposta — yourgift.pt",
         html: `
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
               <tr><td style="padding: 8px 0; color: #666;">Prazo pretendido</td><td style="padding: 8px 0;">${data.deadline}</td></tr>
             </table>
             <p>A nossa equipa analisará o teu pedido e entrará em contacto em <strong>até 24 horas úteis</strong>.</p>
-            <p style="color: #666; font-size: 13px;">yourgift.pt · Lisboa, Portugal · <a href="mailto:hello@yourgift.pt">hello@yourgift.pt</a></p>
+            <p style="color: #666; font-size: 13px;">yourgift.pt · Lisboa, Portugal · <a href="mailto:gera@yourgift.pt">gera@yourgift.pt</a></p>
           </div>
         `,
       });
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
       // Internal notification
       const internalTo = process.env.INTERNAL_NOTIFICATION_EMAIL || "rfq@yourgift.pt";
       await resend.emails.send({
-        from: "yourgift.pt <hello@yourgift.pt>",
+        from: "yourgift.pt <gera@yourgift.pt>",
         to: internalTo,
         subject: `[RFQ] Novo pedido de ${data.name} — ${data.company}`,
         html: `
