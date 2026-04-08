@@ -1,0 +1,14 @@
+{
+  "node_modules\\@clerk\\nextjs\\dist\\esm\\app-router\\client\\ClerkProvider.js -> ./keyless-creator-reader.js": {
+    "id": 809,
+    "files": [
+      "static/chunks/809.6e8b5aa85cd852fb.js"
+    ]
+  },
+  "node_modules\\@clerk\\nextjs\\dist\\esm\\app-router\\client\\keyless-cookie-sync.js -> ../keyless-actions.js": {
+    "id": 7001,
+    "files": [
+      "static/chunks/7001.e8d6f5fe6892aa09.js"
+    ]
+  }
+}

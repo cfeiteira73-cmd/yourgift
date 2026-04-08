@@ -1,0 +1,404 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================================
+// AUTH & USERS
+// ============================================================
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  companyMembers CompanyMember[]
+  rfqs           RFQ[]
+  orders         Order[]
+  assets         Asset[]
+
+  @@map("users")
+}
+
+// ============================================================
+// COMPANIES
+// ============================================================
+
+model Company {
+  id        String      @id @default(cuid())
+  slug      String      @unique
+  name      String
+  legalName String?
+  vat       String?
+  logo      String?
+  plan      CompanyPlan @default(STARTER)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  members      CompanyMember[]
+  addresses    Address[]
+  rfqs         RFQ[]
+  orders       Order[]
+  companyStore CompanyStore?
+  assets       Asset[]
+
+  @@map("companies")
+}
+
+model CompanyMember {
+  id        String     @id @default(cuid())
+  role      MemberRole @default(VIEWER)
+  department String?
+  createdAt DateTime   @default(now())
+
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String
+
+  @@unique([userId, companyId])
+  @@map("company_members")
+}
+
+model Address {
+  id         String  @id @default(cuid())
+  label      String
+  name       String
+  line1      String
+  line2      String?
+  city       String
+  postalCode String
+  country    String  @default("PT")
+  phone      String?
+  isDefault  Boolean @default(false)
+
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?
+
+  @@map("addresses")
+}
+
+// ============================================================
+// PRODUCTS
+// ============================================================
+
+model Product {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  name             String
+  shortDescription String
+  description      String
+  category         String
+  subcategory      String?
+  images           String[]
+  moq              Int      @default(50)
+  leadTimeDays     Int      @default(15)
+  priceFrom        Float?
+  sustainable      Boolean  @default(false)
+  featured         Boolean  @default(false)
+  popular          Boolean  @default(false)
+  newArrival       Boolean  @default(false)
+  active           Boolean  @default(true)
+  tags             String[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  variants        ProductVariant[]
+  brandingOptions BrandingOption[]
+  rfqItems        RFQItem[]
+  orderItems      OrderItem[]
+  storeItems      StoreCatalogItem[]
+
+  @@map("products")
+}
+
+model ProductVariant {
+  id            String   @id @default(cuid())
+  name          String
+  sku           String?
+  color         String?
+  size          String?
+  priceModifier Float?
+  stock         Int?
+  image         String?
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+
+  @@map("product_variants")
+}
+
+model BrandingOption {
+  id           String  @id @default(cuid())
+  method       String
+  label        String
+  description  String
+  pricePerUnit Float
+  minQuantity  Int
+  setupFee     Float?
+  areas        String[]
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+
+  @@map("branding_options")
+}
+
+// ============================================================
+// RFQs
+// ============================================================
+
+model RFQ {
+  id        String    @id @default(cuid())
+  reference String    @unique @default(cuid())
+  status    RFQStatus @default(SUBMITTED)
+
+  name      String
+  email     String
+  phone     String?
+  role      String?
+  vat       String?
+
+  objective      String
+  budget         String
+  deadline       String
+  quantity       Int
+  brandingMethod String?
+  notes          String?
+  files          String[]
+
+  deliveryAddress String?
+  deliveryCity    String?
+  deliveryCountry String    @default("PT")
+
+  acceptMarketing Boolean @default(false)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  quotedAt    DateTime?
+  respondedAt DateTime?
+
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?
+
+  items   RFQItem[]
+
+  @@map("rfqs")
+}
+
+model RFQItem {
+  id            String  @id @default(cuid())
+  productName   String
+  quantity      Int
+  brandingMethod String?
+  notes         String?
+  estimatedPrice Float?
+
+  rfq       RFQ     @relation(fields: [rfqId], references: [id])
+  rfqId     String
+  product   Product? @relation(fields: [productId], references: [id])
+  productId String?
+
+  @@map("rfq_items")
+}
+
+// ============================================================
+// ORDERS
+// ============================================================
+
+model Order {
+  id          String      @id @default(cuid())
+  reference   String      @unique @default(cuid())
+  status      OrderStatus @default(PENDING)
+  totalAmount Float?
+  currency    String      @default("EUR")
+  notes       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?
+
+  items     OrderItem[]
+  invoices  Invoice[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id             String  @id @default(cuid())
+  quantity       Int
+  unitPrice      Float
+  brandingMethod String?
+  notes          String?
+
+  order     Order   @relation(fields: [orderId], references: [id])
+  orderId   String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+
+  @@map("order_items")
+}
+
+model Invoice {
+  id          String        @id @default(cuid())
+  reference   String        @unique
+  amount      Float
+  currency    String        @default("EUR")
+  status      InvoiceStatus @default(PENDING)
+  dueDate     DateTime?
+  paidAt      DateTime?
+  stripeId    String?
+  createdAt   DateTime      @default(now())
+
+  order   Order  @relation(fields: [orderId], references: [id])
+  orderId String
+
+  @@map("invoices")
+}
+
+// ============================================================
+// COMPANY STORES
+// ============================================================
+
+model CompanyStore {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  name           String
+  logo           String?
+  primaryColor   String?
+  welcomeMessage String?
+  active         Boolean  @default(true)
+  allowedDomains String[]
+  createdAt      DateTime @default(now())
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String  @unique
+
+  catalogItems StoreCatalogItem[]
+
+  @@map("company_stores")
+}
+
+model StoreCatalogItem {
+  id          String  @id @default(cuid())
+  customPrice Float?
+  visible     Boolean @default(true)
+  sortOrder   Int     @default(0)
+
+  store     CompanyStore @relation(fields: [storeId], references: [id])
+  storeId   String
+  product   Product      @relation(fields: [productId], references: [id])
+  productId String
+
+  @@unique([storeId, productId])
+  @@map("store_catalog_items")
+}
+
+// ============================================================
+// ASSETS
+// ============================================================
+
+model Asset {
+  id        String    @id @default(cuid())
+  name      String
+  type      AssetType
+  url       String
+  size      Int?
+  mimeType  String?
+  createdAt DateTime  @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?
+
+  @@map("assets")
+}
+
+// ============================================================
+// BLOG
+// ============================================================
+
+model BlogPost {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  excerpt     String
+  content     String
+  coverImage  String?
+  category    String?
+  tags        String[]
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("blog_posts")
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum CompanyPlan {
+  STARTER
+  GROWTH
+  ENTERPRISE
+}
+
+enum MemberRole {
+  OWNER
+  ADMIN
+  BUYER
+  VIEWER
+}
+
+enum RFQStatus {
+  DRAFT
+  SUBMITTED
+  REVIEWING
+  QUOTED
+  APPROVED
+  IN_PRODUCTION
+  COMPLETED
+  CANCELLED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  IN_PRODUCTION
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum AssetType {
+  LOGO
+  BRANDBOOK
+  REFERENCE
+  MOCKUP
+  PROOF
+  OTHER
+}
