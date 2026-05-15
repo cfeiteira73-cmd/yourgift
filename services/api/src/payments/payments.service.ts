@@ -14,7 +14,7 @@ export class PaymentsService {
     private events: EventBusService,
   ) {
     this.stripe = new Stripe(this.config.getOrThrow('STRIPE_KEY'), {
-      apiVersion: '2024-06-20',
+      apiVersion: '2023-10-16',
     });
 
     this.events.on('order.created', this.createCheckoutSession.bind(this));
