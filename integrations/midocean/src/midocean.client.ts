@@ -22,7 +22,7 @@ export class MidoceanClient {
     this.apiKey = apiKey;
   }
 
-  private get headers(): HeadersInit {
+  private get headers(): Record<string, string> {
     return {
       'x-Gateway-APIKey': this.apiKey,
       'Content-Type': 'application/json',
