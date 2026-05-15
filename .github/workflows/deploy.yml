@@ -1,0 +1,90 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  AWS_REGION: eu-west-1
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-1.amazonaws.com
+
+jobs:
+  test:
+    name: Test & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm lint
+
+  build-and-push:
+    name: Build & Push to ECR
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push API image
+        run: |
+          docker build -f docker/api.Dockerfile -t $ECR_REGISTRY/yourgift-api:${{ github.sha }} .
+          docker push $ECR_REGISTRY/yourgift-api:${{ github.sha }}
+          docker tag $ECR_REGISTRY/yourgift-api:${{ github.sha }} $ECR_REGISTRY/yourgift-api:latest
+          docker push $ECR_REGISTRY/yourgift-api:latest
+
+      - name: Build and push Web image
+        run: |
+          docker build -f docker/web.Dockerfile -t $ECR_REGISTRY/yourgift-web:${{ github.sha }} .
+          docker push $ECR_REGISTRY/yourgift-web:${{ github.sha }}
+          docker tag $ECR_REGISTRY/yourgift-web:${{ github.sha }} $ECR_REGISTRY/yourgift-web:latest
+          docker push $ECR_REGISTRY/yourgift-web:latest
+
+  deploy:
+    name: Deploy to ECS
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy API to ECS
+        run: |
+          aws ecs update-service \
+            --cluster yourgift-production \
+            --service yourgift-api \
+            --force-new-deployment
+
+      - name: Wait for API deployment
+        run: |
+          aws ecs wait services-stable \
+            --cluster yourgift-production \
+            --services yourgift-api
+
+      - name: Notify deployment
+        run: echo "Deployed commit ${{ github.sha }} to production"

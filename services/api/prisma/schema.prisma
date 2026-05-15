@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String
+  company      String?
+  nif          String?
+  passwordHash String?
+  tier         String   @default("standard")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  orders       Order[]
+
+  @@map("clients")
+}
+
+model Product {
+  id          String           @id @default(uuid())
+  title       String
+  description String
+  category    String
+  supplier    String
+  supplierRef String
+  basePrice   Float
+  images      String[]
+  printAreas  Json
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  variants    ProductVariant[]
+  orderItems  OrderItem[]
+
+  @@map("products")
+}
+
+model ProductVariant {
+  id        String      @id @default(uuid())
+  productId String
+  sku       String      @unique
+  color     String?
+  size      String?
+  stock     Int         @default(0)
+  price     Float
+  product   Product     @relation(fields: [productId], references: [id])
+  orderItems OrderItem[]
+
+  @@map("product_variants")
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  ref             String      @unique
+  clientId        String
+  status          String      @default("pending")
+  shippingAddress Json
+  totalAmount     Float?
+  supplier        String?
+  supplierOrderId String?
+  stripeSessionId String?
+  stripePaymentId String?
+  trackingNumber  String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  client          Client      @relation(fields: [clientId], references: [id])
+  items           OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String         @id @default(uuid())
+  orderId   String
+  productId String
+  variantId String
+  quantity  Int
+  unitPrice Float
+  order     Order          @relation(fields: [orderId], references: [id])
+  product   Product        @relation(fields: [productId], references: [id])
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
+
+  @@map("order_items")
+}
