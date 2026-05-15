@@ -1,0 +1,24 @@
+name: Nightly Midocean Sync
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    name: Sync Midocean Catalogue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger sync via API
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${{ secrets.API_URL }}/api/v1/admin/suppliers/midocean/sync" \
+            -H "Authorization: Bearer ${{ secrets.ADMIN_API_TOKEN }}" \
+            -H "Content-Type: application/json")
+          echo "HTTP status: $response"
+          if [ "$response" -ne 201 ] && [ "$response" -ne 200 ]; then
+            echo "Sync failed with status $response"
+            exit 1
+          fi
+          echo "Midocean sync triggered successfully"

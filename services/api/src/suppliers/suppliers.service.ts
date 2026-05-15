@@ -18,11 +18,11 @@ export class SuppliersService {
     this.events.on('payment.confirmed', this.routeToSupplier.bind(this));
   }
 
-  /** Sync all 2428 Midocean products into the database */
+  /** Sync all 2428 Midocean products into the database and log the result */
   async syncMidocean() {
     const syncer = new MidoceanSyncService(this.config.getOrThrow('MIDOCEAN_KEY'));
 
-    return syncer.sync(async (data) => {
+    const result = await syncer.sync(async (data) => {
       const product = await this.prisma.product.upsert({
         where: { supplierRef: data.supplierRef },
         create: {
@@ -42,6 +42,7 @@ export class SuppliersService {
           basePrice: data.basePrice,
           images: data.images,
           printAreas: data.printAreas,
+          updatedAt: new Date(),
         },
       });
 
@@ -52,16 +53,37 @@ export class SuppliersService {
             productId: product.id,
             sku: v.sku,
             color: v.color,
+            colorGroup: v.colorGroup,
+            colorCode: v.colorCode,
+            gtin: v.gtin,
             price: v.price,
             stock: v.stock,
+            images: v.images,
+            categoryLevel1: v.categoryLevel1,
+            categoryLevel2: v.categoryLevel2,
+            categoryLevel3: v.categoryLevel3,
           },
           update: {
             price: v.price,
             stock: v.stock,
+            images: v.images,
           },
         });
       }
     });
+
+    await this.prisma.syncLog.create({
+      data: {
+        supplier: 'midocean',
+        productsUpserted: result.productsUpserted,
+        variantsUpserted: result.variantsUpserted,
+        stockUpdated: result.stockUpdated,
+        errors: result.errors,
+        durationMs: result.durationMs,
+      },
+    });
+
+    return result;
   }
 
   /** Route confirmed order to the correct supplier */

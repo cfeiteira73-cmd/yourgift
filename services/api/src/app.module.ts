@@ -10,13 +10,15 @@ import { SuppliersModule } from './suppliers/suppliers.module';
 import { ArtworkModule } from './artwork/artwork.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { EventBusModule } from './events/event-bus.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
     PrismaModule,
     EventBusModule,
+    HealthModule,
     AuthModule,
     ProductsModule,
     OrdersModule,

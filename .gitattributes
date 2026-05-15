@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.ts linguist-language=TypeScript
+*.tsx linguist-language=TypeScript
+*.tf linguist-language=HCL
+*.prisma linguist-detectable=true
+*.yml linguist-language=YAML
+Dockerfile linguist-detectable=true
