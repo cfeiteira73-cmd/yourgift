@@ -2,12 +2,128 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   YOURGIFT.PT — DESIGN TOKENS
+   ============================================================ */
+
 :root {
-  --brand: #9333ea;
+  --bg: 7 17 31;
+  --surface: 11 21 38;
+  --surface-2: 16 28 49;
+  --text: 245 247 251;
+  --muted-text: 170 180 198;
+  --border: 255 255 255;
+
+  --accent-blue: 77 163 255;
+  --accent-cyan: 116 231 255;
+  --accent-emerald: 99 230 190;
+
+  --danger: 239 68 68;
+  --warning: 245 158 11;
+  --success: 34 197 94;
+  --info: 56 189 248;
+
+  --radius-xs: 10px;
+  --radius-sm: 14px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius: 14px;
+
+  --background: 214 56% 7%;
+  --foreground: 220 20% 96%;
+  --card: 215 50% 9%;
+  --card-foreground: 220 20% 96%;
+  --popover: 215 52% 10%;
+  --popover-foreground: 220 20% 96%;
+  --primary: 213 100% 65%;
+  --primary-foreground: 220 20% 96%;
+  --secondary: 215 40% 14%;
+  --secondary-foreground: 220 20% 90%;
+  --muted: 215 40% 14%;
+  --muted-foreground: 220 12% 66%;
+  --accent: 215 40% 14%;
+  --accent-foreground: 220 20% 96%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 220 20% 96%;
+  --border-hsl: 215 35% 18%;
+  --input: 215 35% 18%;
+  --ring: 213 100% 65%;
+
+  --section-y: 5rem;
+  --section-y-lg: 7rem;
+  --section-y-sm: 3.5rem;
+
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* legacy brand color kept for /products, /dashboard pages */
+  --brand-600: #9333ea;
 }
 
-* {
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: rgb(var(--bg));
+  color: rgb(var(--text));
+  line-height: 1.6;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgb(var(--surface)); }
+::-webkit-scrollbar-thumb { background: rgba(77,163,255,0.4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(77,163,255,0.6); }
+
+::selection { background: rgba(77,163,255,0.28); color: rgb(var(--text)); }
+
+:focus-visible { outline: 2px solid rgb(var(--accent-blue)); outline-offset: 3px; border-radius: 4px; }
+
+.yg-container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+@media (min-width: 768px) { .yg-container { padding: 0 2rem; } }
+
+.yg-section { padding: var(--section-y) 0; }
+.yg-section-lg { padding: var(--section-y-lg) 0; }
+.yg-section-sm { padding: var(--section-y-sm) 0; }
+
+.yg-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(12px);
+}
+
+.yg-card-hover {
+  transition: border-color var(--transition-base), transform var(--transition-base), box-shadow var(--transition-base);
+}
+.yg-card-hover:hover {
+  border-color: rgba(77,163,255,0.28);
+  transform: translateY(-2px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+}
+
+.yg-badge { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.yg-badge-blue { background: rgba(77,163,255,0.14); color: rgb(77,163,255); border: 1px solid rgba(77,163,255,0.22); }
+.yg-badge-cyan { background: rgba(116,231,255,0.12); color: rgb(116,231,255); border: 1px solid rgba(116,231,255,0.2); }
+.yg-badge-emerald { background: rgba(99,230,190,0.12); color: rgb(99,230,190); border: 1px solid rgba(99,230,190,0.2); }
+
+.yg-gradient-text {
+  background: linear-gradient(135deg, rgb(77,163,255), rgb(116,231,255), rgb(99,230,190));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.shadow-glow-blue { box-shadow: 0 0 20px rgba(77,163,255,0.3); }
+.shadow-soft { box-shadow: 0 4px 24px rgba(0,0,0,0.18); }
+.shadow-heavy { box-shadow: 0 8px 40px rgba(0,0,0,0.32); }

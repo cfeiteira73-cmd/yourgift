@@ -17,6 +17,10 @@
     "swr": "^2.2.5",
     "clsx": "^2.1.1",
     "tailwind-merge": "^2.3.0",
+    "framer-motion": "^11.11.11",
+    "lucide-react": "^0.462.0",
+    "class-variance-authority": "^0.7.1",
+    "tailwindcss-animate": "^1.0.7",
     "@supabase/supabase-js": "^2.45.0",
     "@supabase/ssr": "^0.5.0"
   },

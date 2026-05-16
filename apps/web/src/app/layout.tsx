@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { Header } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
+import { WhatsAppFloat } from '@/components/ui/whatsapp-float';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -26,7 +29,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt">
       <body className={inter.className}>
-        {children}
+        <Header />
+        <main>{children}</main>
+        <Footer />
+        <WhatsAppFloat />
       </body>
     </html>
   );
