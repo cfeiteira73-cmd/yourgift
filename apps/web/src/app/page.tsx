@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { formatPrice } from '@yourgift/shared';
 import { getProducts, getCategories } from '@/lib/catalog';
 
 async function getFeaturedProducts() {
@@ -96,8 +95,6 @@ export default async function HomePage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
             {featured.slice(0, 8).map((product) => {
-              const prices = product.variants?.map((v) => v.price).filter((p) => p > 0) ?? [];
-              const minPrice = prices.length ? Math.min(...prices) : 0;
               const image = product.images?.[0];
               return (
                 <Link key={product.id} href={`/products/${product.id}`} className="group bg-gray-50 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300">
@@ -111,9 +108,7 @@ export default async function HomePage() {
                   <div className="p-4">
                     <p className="text-xs text-gray-400 mb-1 truncate">{product.category}</p>
                     <h3 className="text-sm font-semibold text-gray-900 leading-tight mb-2 line-clamp-2">{product.title}</h3>
-                    <p className="text-brand-700 font-bold text-sm">
-                      {minPrice > 0 ? `A partir de ${formatPrice(minPrice)}` : 'Consultar preço'}
-                    </p>
+                    <p className="text-brand-700 font-bold text-sm">Consultar preço</p>
                   </div>
                 </Link>
               );

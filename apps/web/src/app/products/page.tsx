@@ -55,14 +55,11 @@ export default async function ProductsPage({ searchParams }: { searchParams: Rec
           <>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-10">
               {products.map((product) => {
-                const prices = product.variants?.map((v) => v.price).filter((p) => p > 0) ?? [];
-                const minPrice = prices.length ? Math.min(...prices) : 0;
-                const image = product.images?.[0] ?? product.variants?.[0]?.images?.[0];
-                const inStock = product.variants?.some((v) => v.stock > 0) ?? false;
+                const image = product.images?.[0];
                 return (
                   <Link key={product.id} href={`/products/${product.id}`}
                     className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-md hover:border-brand-200 transition-all duration-200">
-                    <div className="aspect-square bg-gray-50 overflow-hidden relative">
+                    <div className="aspect-square bg-gray-50 overflow-hidden">
                       {image ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -74,18 +71,11 @@ export default async function ProductsPage({ searchParams }: { searchParams: Rec
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-3xl text-gray-200">🎁</div>
                       )}
-                      {!inStock && (
-                        <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
-                          <span className="text-xs font-semibold text-gray-400 bg-white px-2 py-1 rounded-full">Sem stock</span>
-                        </div>
-                      )}
                     </div>
                     <div className="p-3">
                       <p className="text-xs text-gray-400 truncate mb-0.5">{product.supplierRef}</p>
                       <h3 className="text-xs font-semibold text-gray-900 leading-snug mb-2 line-clamp-2">{product.title}</h3>
-                      <p className="text-brand-700 font-bold text-sm">
-                        {minPrice > 0 ? formatPrice(minPrice) : 'Sob consulta'}
-                      </p>
+                      <p className="text-brand-700 font-bold text-sm">Sob consulta</p>
                     </div>
                   </Link>
                 );

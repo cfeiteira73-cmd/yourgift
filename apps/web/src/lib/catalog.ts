@@ -92,10 +92,10 @@ export interface ProductFilters {
   limit?: number;
 }
 
+// No embedded variants in the listing — avoids join row expansion that inflates Content-Range count
 const PRODUCT_SELECT = [
   'id', 'supplier_ref', 'title', 'description', 'category',
   'supplier', 'base_price', 'images',
-  'product_variants(id,sku,color,color_group,price,stock,images)',
 ].join(',');
 
 function normalizeProduct(row: Record<string, unknown>): Product {
