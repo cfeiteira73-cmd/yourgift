@@ -1,30 +1,10 @@
 import Link from 'next/link';
 import { formatPrice } from '@yourgift/shared';
+import { getProducts, getCategories } from '@/lib/catalog';
 
 async function getFeaturedProducts() {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/products/featured`,
-      { next: { revalidate: 3600 } },
-    );
-    if (!res.ok) return [];
-    return res.json();
-  } catch {
-    return [];
-  }
-}
-
-async function getCategories() {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/products/categories`,
-      { next: { revalidate: 86400 } },
-    );
-    if (!res.ok) return [];
-    return res.json();
-  } catch {
-    return [];
-  }
+  const result = await getProducts({ sort: 'newest', limit: 8 });
+  return result.data.filter((p) => p.images?.length > 0);
 }
 
 const STATS = [
@@ -42,7 +22,7 @@ const TECHNIQUES = [
 ];
 
 export default async function HomePage() {
-  const [featured, categories] = await Promise.all([getFeaturedProducts(), getCategories()]);
+  const [featured, categoriesData] = await Promise.all([getFeaturedProducts(), getCategories()]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -115,14 +95,16 @@ export default async function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-            {featured.slice(0, 8).map((product: any) => {
-              const minPrice = product.variants?.[0]?.price ?? product.basePrice;
+            {featured.slice(0, 8).map((product) => {
+              const prices = product.variants?.map((v) => v.price).filter((p) => p > 0) ?? [];
+              const minPrice = prices.length ? Math.min(...prices) : 0;
               const image = product.images?.[0];
               return (
                 <Link key={product.id} href={`/products/${product.id}`} className="group bg-gray-50 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300">
                   <div className="aspect-square bg-gray-100 overflow-hidden">
                     {image
-                      ? <img src={image} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      // eslint-disable-next-line @next/next/no-img-element
+                      ? <img src={image} alt={product.title} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       : <div className="w-full h-full flex items-center justify-center text-4xl text-gray-300">🎁</div>
                     }
                   </div>
@@ -141,14 +123,14 @@ export default async function HomePage() {
       )}
 
       {/* CATEGORIES */}
-      {categories.length > 0 && (
+      {categoriesData.length > 0 && (
         <section className="py-12 px-6 max-w-7xl mx-auto">
           <h2 className="text-2xl font-black text-gray-900 mb-6">Navegar por categoria</h2>
           <div className="flex flex-wrap gap-3">
-            {categories.slice(0, 24).map((cat: string) => (
-              <Link key={cat} href={`/products?category=${encodeURIComponent(cat)}`}
+            {categoriesData.map((cat) => (
+              <Link key={cat.id} href={`/products?categoryGroup=${cat.id}`}
                 className="px-4 py-2 bg-gray-100 hover:bg-brand-50 hover:text-brand-700 text-gray-600 text-sm rounded-lg font-medium transition-colors">
-                {cat}
+                {cat.label} <span className="text-gray-400 text-xs">({cat.count})</span>
               </Link>
             ))}
           </div>
