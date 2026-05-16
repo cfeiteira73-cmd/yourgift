@@ -16,13 +16,13 @@ export interface SyncResult {
 }
 
 function extractImages(assets: MidoceanProduct['digital_assets']): string[] {
-  return assets
+  return (assets ?? [])
     .filter((a) => a.type === 'image')
     .map((a) => a.url_highress ?? a.url);
 }
 
 function variantImages(variant: MidoceanVariant): string[] {
-  return variant.digital_assets
+  return (variant.digital_assets ?? [])
     .filter((a) => a.type === 'image')
     .map((a) => a.url_highress ?? a.url);
 }
@@ -51,7 +51,7 @@ export function transformProduct(
       positions: parseInt(p.number_of_print_positions, 10) || 1,
       printable: p.printable === 'yes',
     },
-    variants: p.variants
+    variants: (p.variants ?? [])
       .filter((v) => v.plc_status_description === 'COLLECTION') // active only
       .map((v) => ({
         sku: v.sku,
