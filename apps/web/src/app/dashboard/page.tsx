@@ -106,7 +106,7 @@ export default async function DashboardPage() {
           <div className="space-y-3">
             {orders.map((order) => {
               const statusInfo = STATUS_LABELS[order.status] ?? STATUS_LABELS.pending;
-              const firstProduct = order.order_items?.[0]?.products as { title: string; images: string[] } | null;
+              const firstProduct = (order.order_items?.[0]?.products as unknown) as { title: string; images: string[] } | null;
               const thumb = firstProduct?.images?.[0];
               return (
                 <div key={order.id} className="bg-white rounded-2xl border border-gray-100 p-5 flex items-center gap-5">
