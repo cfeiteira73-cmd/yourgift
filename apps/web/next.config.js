@@ -4,7 +4,7 @@ const nextConfig = {
     domains: ['cdn.yourgift.pt', 'www.midocean.com', 'cdn1.midocean.com'],
   },
   experimental: {
-    serverActions: { allowedOrigins: ['localhost:3000', 'yourgift.pt'] },
+    serverActions: { allowedOrigins: ['localhost:3000', 'yourgift.pt', 'www.yourgift.pt'] },
   },
 };
 

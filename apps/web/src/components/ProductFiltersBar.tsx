@@ -3,8 +3,14 @@
 import { useRouter } from 'next/navigation';
 import { useCallback, useTransition } from 'react';
 
+interface CategoryGroup {
+  id: string;
+  label: string;
+  count: number;
+}
+
 interface Props {
-  categories: string[];
+  categories: CategoryGroup[];
   searchParams: Record<string, string>;
 }
 
@@ -42,34 +48,36 @@ export function ProductFiltersBar({ categories, searchParams }: Props) {
       />
 
       <select
-        value={searchParams.category ?? ''}
-        onChange={(e) => update('category', e.target.value)}
+        value={searchParams.categoryGroup ?? ''}
+        onChange={(e) => update('categoryGroup', e.target.value)}
         className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
       >
         <option value="">Todas as categorias</option>
         {categories.map((c) => (
-          <option key={c} value={c}>{c}</option>
+          <option key={c.id} value={c.id}>{c.label} ({c.count})</option>
         ))}
       </select>
 
       <select
-        value={searchParams.supplier ?? ''}
-        onChange={(e) => update('supplier', e.target.value)}
+        value={searchParams.sort ?? ''}
+        onChange={(e) => update('sort', e.target.value)}
         className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
       >
-        <option value="">Todos os fornecedores</option>
-        <option value="midocean">Midocean</option>
-        <option value="pf_concept">PF Concept</option>
+        <option value="">Ordenar por</option>
+        <option value="newest">Mais recentes</option>
+        <option value="price_asc">Preço ↑</option>
+        <option value="price_desc">Preço ↓</option>
+        <option value="name_asc">Nome A–Z</option>
       </select>
 
-      <label className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 bg-white select-none">
+      <label className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 text-sm cursor-pointer hover:bg-green-50 hover:border-green-300 bg-white select-none transition-colors">
         <input
           type="checkbox"
-          checked={searchParams.inStock === 'true'}
-          onChange={(e) => update('inStock', e.target.checked ? 'true' : '')}
-          className="accent-brand-600"
+          checked={searchParams.eco === 'true'}
+          onChange={(e) => update('eco', e.target.checked ? 'true' : '')}
+          className="accent-green-600"
         />
-        Em stock
+        <span className="text-green-700">🌱 Eco</span>
       </label>
 
       {hasFilters && (
