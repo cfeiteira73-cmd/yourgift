@@ -1,0 +1,6 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "pnpm --filter @yourgift/shared run build && pnpm --filter web run build",
+  "outputDirectory": "apps/web/.next",
+  "installCommand": "pnpm install"
+}
