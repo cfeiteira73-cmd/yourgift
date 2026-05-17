@@ -1,12 +1,11 @@
-import type { Config } from 'tailwindcss';
-import animate from 'tailwindcss-animate';
+/** @type {import('tailwindcss').Config} */
+const animate = require('tailwindcss-animate');
 
-const config: Config = {
+module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
     extend: {
       colors: {
-        // yourgift dark design system
         bg: 'rgb(var(--bg) / <alpha-value>)',
         surface: 'rgb(var(--surface) / <alpha-value>)',
         'surface-2': 'rgb(var(--surface-2) / <alpha-value>)',
@@ -16,7 +15,6 @@ const config: Config = {
         'accent-blue': 'rgb(var(--accent-blue) / <alpha-value>)',
         'accent-cyan': 'rgb(var(--accent-cyan) / <alpha-value>)',
         'accent-emerald': 'rgb(var(--accent-emerald) / <alpha-value>)',
-        // legacy brand (used by /products, /dashboard, /auth)
         brand: {
           50: '#fdf4ff',
           100: '#fae8ff',
@@ -46,5 +44,3 @@ const config: Config = {
   },
   plugins: [animate],
 };
-
-export default config;
