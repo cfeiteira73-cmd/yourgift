@@ -45,8 +45,14 @@ RUN apk add --no-cache dumb-init
 
 WORKDIR /app
 
-# Root node_modules (pnpm .pnpm store + hoisted packages)
+# Root node_modules (pnpm .pnpm store + hoisted packages + workspace symlinks)
 COPY --from=builder /app/node_modules ./node_modules
+
+# Workspace packages — pnpm symlinks in node_modules point to these paths.
+# @yourgift/shared:  /app/node_modules/@yourgift/shared → /app/packages/shared
+# @yourgift/midocean: /app/node_modules/@yourgift/midocean → /app/integrations/midocean
+COPY --from=builder /app/packages/shared ./packages/shared
+COPY --from=builder /app/integrations/midocean ./integrations/midocean
 
 # Keep api in its ORIGINAL path so pnpm symlinks resolve correctly:
 # Node resolves modules from /app/services/api/dist/main.js upward:
