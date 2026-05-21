@@ -5,5 +5,6 @@ import { ArtworkController } from './artwork.controller';
 @Module({
   providers: [ArtworkService],
   controllers: [ArtworkController],
+  exports: [ArtworkService],
 })
 export class ArtworkModule {}

@@ -8,6 +8,10 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// ─────────────────────────────────────────────
+// CLIENTS & COMPANIES
+// ─────────────────────────────────────────────
+
 model Client {
   id           String   @id @default(uuid())
   email        String   @unique
@@ -15,13 +19,60 @@ model Client {
   company      String?
   nif          String?
   passwordHash String?  @map("password_hash")
-  tier         String   @default("standard")
+  tier         String   @default("standard") // standard | premium | enterprise
+  companyId    String?  @map("company_id")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
+
   orders       Order[]
+  quotes       Quote[]
+  approvals    Approval[]
+  companyRef   Company?   @relation(fields: [companyId], references: [id])
 
   @@map("clients")
 }
+
+model Company {
+  id              String    @id @default(uuid())
+  name            String
+  nif             String?   @unique
+  domain          String?   @unique
+  logoUrl         String?   @map("logo_url")
+  primaryColor    String?   @map("primary_color")
+  tier            String    @default("standard") // standard | premium | enterprise
+  billingEmail    String?   @map("billing_email")
+  shippingAddress Json?     @map("shipping_address")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  clients         Client[]
+  departments     Department[]
+  budgets         Budget[]
+  companyStores   CompanyStore[]
+  campaigns       Campaign[]
+  orders          Order[]
+
+  @@map("companies")
+}
+
+model Department {
+  id        String   @id @default(uuid())
+  companyId String   @map("company_id")
+  name      String
+  headEmail String?  @map("head_email")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  company   Company  @relation(fields: [companyId], references: [id])
+  budgets   Budget[]
+  orders    Order[]
+
+  @@index([companyId])
+  @@map("departments")
+}
+
+// ─────────────────────────────────────────────
+// PRODUCTS & CATALOG
+// ─────────────────────────────────────────────
 
 model Product {
   id          String           @id @default(uuid())
@@ -29,14 +80,19 @@ model Product {
   title       String
   description String
   category    String
-  supplier    String
+  supplier    String           // midocean | pf_concept | stricker
   basePrice   Float            @default(0) @map("base_price")
   images      String[]
   printAreas  Json             @default("{}") @map("print_areas")
+  isActive    Boolean          @default(true) @map("is_active")
   createdAt   DateTime         @default(now()) @map("created_at")
   updatedAt   DateTime         @updatedAt @map("updated_at")
-  variants    ProductVariant[]
-  orderItems  OrderItem[]
+
+  variants          ProductVariant[]
+  orderItems        OrderItem[]
+  quoteItems        QuoteItem[]
+  campaignItems     CampaignItem[]
+  companyStoreItems CompanyStoreProduct[]
 
   @@index([category])
   @@index([supplier])
@@ -59,12 +115,295 @@ model ProductVariant {
   categoryLevel2 String?     @map("category_level2")
   categoryLevel3 String?     @map("category_level3")
   updatedAt      DateTime    @updatedAt @map("updated_at")
-  product        Product     @relation(fields: [productId], references: [id])
-  orderItems     OrderItem[]
+
+  product    Product     @relation(fields: [productId], references: [id])
+  orderItems OrderItem[]
+  quoteItems QuoteItem[]
 
   @@index([stock])
   @@map("product_variants")
 }
+
+// ─────────────────────────────────────────────
+// QUOTES / RFQ
+// ─────────────────────────────────────────────
+
+model Quote {
+  id              String    @id @default(uuid())
+  ref             String    @unique
+  clientId        String    @map("client_id")
+  companyId       String?   @map("company_id")
+  departmentId    String?   @map("department_id")
+  status          String    @default("draft")
+  // draft | submitted | pricing | approved | rejected | converted
+  eventDate       DateTime? @map("event_date")
+  deliveryDate    DateTime? @map("delivery_date")
+  notes           String?
+  artworkUrl      String?   @map("artwork_url")
+  pricingSnapshot Json?     @map("pricing_snapshot")
+  totalAmount     Float?    @map("total_amount")
+  marginAmount    Float?    @map("margin_amount")
+  convertedOrderId String?  @unique @map("converted_order_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  client   Client      @relation(fields: [clientId], references: [id])
+  items    QuoteItem[]
+  order    Order?      @relation(fields: [convertedOrderId], references: [id])
+
+  @@index([clientId])
+  @@index([status])
+  @@map("quotes")
+}
+
+model QuoteItem {
+  id          String   @id @default(uuid())
+  quoteId     String   @map("quote_id")
+  productId   String   @map("product_id")
+  variantId   String?  @map("variant_id")
+  quantity    Int
+  technique   String?  // embroidery | dtf | laser | pad | screen
+  unitCost    Float?   @map("unit_cost")
+  unitPrice   Float?   @map("unit_price")
+  notes       String?
+
+  quote   Quote          @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  product Product        @relation(fields: [productId], references: [id])
+  variant ProductVariant? @relation(fields: [variantId], references: [id])
+
+  @@map("quote_items")
+}
+
+// ─────────────────────────────────────────────
+// ORDERS
+// ─────────────────────────────────────────────
+
+model Order {
+  id              String    @id @default(uuid())
+  ref             String    @unique
+  clientId        String    @map("client_id")
+  companyId       String?   @map("company_id")
+  departmentId    String?   @map("department_id")
+  campaignId      String?   @map("campaign_id")
+  status          String    @default("created")
+  // created | paid | approved | producing | shipped | delivered | cancelled
+  shippingAddress Json      @map("shipping_address")
+  pricingSnapshot Json?     @map("pricing_snapshot")
+  totalAmount     Float?    @map("total_amount")
+  marginAmount    Float?    @map("margin_amount")
+  supplier        String?
+  supplierOrderId String?   @map("supplier_order_id")
+  stripeSessionId String?   @map("stripe_session_id")
+  stripePaymentId String?   @map("stripe_payment_id")
+  trackingNumber  String?   @map("tracking_number")
+  approvedAt      DateTime? @map("approved_at")
+  approvedById    String?   @map("approved_by_id")
+  shippedAt       DateTime? @map("shipped_at")
+  deliveredAt     DateTime? @map("delivered_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  client      Client      @relation(fields: [clientId], references: [id])
+  company     Company?    @relation(fields: [companyId], references: [id])
+  department  Department? @relation(fields: [departmentId], references: [id])
+  campaign    Campaign?   @relation(fields: [campaignId], references: [id])
+  items       OrderItem[]
+  artworks    Artwork[]
+  approvals   Approval[]
+  eventLogs   EventLog[]
+  quote       Quote?
+
+  @@index([clientId])
+  @@index([companyId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String   @map("order_id")
+  productId   String   @map("product_id")
+  variantId   String   @map("variant_id")
+  quantity    Int
+  unitCost    Float    @default(0) @map("unit_cost")
+  unitPrice   Float    @map("unit_price")
+  printCost   Float    @default(0) @map("print_cost")
+  technique   String?
+
+  order   Order          @relation(fields: [orderId], references: [id])
+  product Product        @relation(fields: [productId], references: [id])
+  variant ProductVariant @relation(fields: [variantId], references: [id])
+
+  @@map("order_items")
+}
+
+// ─────────────────────────────────────────────
+// ARTWORK & PROOFS
+// ─────────────────────────────────────────────
+
+model Artwork {
+  id          String    @id @default(uuid())
+  orderId     String    @map("order_id")
+  filename    String
+  originalUrl String    @map("original_url")
+  s3Key       String    @map("s3_key")
+  mimeType    String    @map("mime_type")
+  sizeBytes   Int       @map("size_bytes")
+  width       Int?
+  height      Int?
+  mockupUrl   String?   @map("mockup_url")
+  status      String    @default("pending")
+  // pending | approved | rejected | revision_requested
+  reviewNotes String?   @map("review_notes")
+  reviewedAt  DateTime? @map("reviewed_at")
+  reviewedById String?  @map("reviewed_by_id")
+  uploadedAt  DateTime  @default(now()) @map("uploaded_at")
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
+  @@map("artworks")
+}
+
+// ─────────────────────────────────────────────
+// BUDGETS
+// ─────────────────────────────────────────────
+
+model Budget {
+  id             String    @id @default(uuid())
+  companyId      String    @map("company_id")
+  departmentId   String?   @map("department_id")
+  name           String
+  period         String    // monthly | quarterly | yearly | custom
+  periodStart    DateTime  @map("period_start")
+  periodEnd      DateTime  @map("period_end")
+  limitAmount    Float     @map("limit_amount")
+  spentAmount    Float     @default(0) @map("spent_amount")
+  alertThreshold Float     @default(0.8) @map("alert_threshold") // 80% default
+  alertSent      Boolean   @default(false) @map("alert_sent")
+  isActive       Boolean   @default(true) @map("is_active")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  company    Company     @relation(fields: [companyId], references: [id])
+  department Department? @relation(fields: [departmentId], references: [id])
+
+  @@index([companyId])
+  @@index([departmentId])
+  @@map("budgets")
+}
+
+// ─────────────────────────────────────────────
+// APPROVALS
+// ─────────────────────────────────────────────
+
+model Approval {
+  id           String    @id @default(uuid())
+  orderId      String    @map("order_id")
+  requestedById String   @map("requested_by_id")
+  stage        String    // hr | manager | finance
+  status       String    @default("pending") // pending | approved | rejected
+  approvedById String?   @map("approved_by_id")
+  notes        String?
+  requestedAt  DateTime  @default(now()) @map("requested_at")
+  resolvedAt   DateTime? @map("resolved_at")
+
+  order       Order  @relation(fields: [orderId], references: [id])
+  requestedBy Client @relation(fields: [requestedById], references: [id])
+
+  @@index([orderId])
+  @@index([status])
+  @@map("approvals")
+}
+
+// ─────────────────────────────────────────────
+// CAMPAIGNS
+// ─────────────────────────────────────────────
+
+model Campaign {
+  id          String    @id @default(uuid())
+  companyId   String    @map("company_id")
+  name        String
+  type        String    // onboarding_kit | event_kit | marketing_kit | custom
+  description String?
+  status      String    @default("draft") // draft | active | paused | completed
+  startDate   DateTime? @map("start_date")
+  endDate     DateTime? @map("end_date")
+  budget      Float?
+  totalOrders Int       @default(0) @map("total_orders")
+  totalSpent  Float     @default(0) @map("total_spent")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  company Company        @relation(fields: [companyId], references: [id])
+  items   CampaignItem[]
+  orders  Order[]
+
+  @@index([companyId])
+  @@index([status])
+  @@map("campaigns")
+}
+
+model CampaignItem {
+  id         String  @id @default(uuid())
+  campaignId String  @map("campaign_id")
+  productId  String  @map("product_id")
+  quantity   Int
+  unitPrice  Float?  @map("unit_price")
+  notes      String?
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id])
+
+  @@map("campaign_items")
+}
+
+// ─────────────────────────────────────────────
+// COMPANY STORES
+// ─────────────────────────────────────────────
+
+model CompanyStore {
+  id              String    @id @default(uuid())
+  companyId       String    @map("company_id")
+  name            String
+  slug            String    @unique
+  logoUrl         String?   @map("logo_url")
+  primaryColor    String?   @map("primary_color")
+  secondaryColor  String?   @map("secondary_color")
+  bannerUrl       String?   @map("banner_url")
+  welcomeMessage  String?   @map("welcome_message")
+  isActive        Boolean   @default(true) @map("is_active")
+  allowedEmails   String[]  @map("allowed_emails") // domain whitelist
+  monthlyBudget   Float?    @map("monthly_budget")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  company  Company             @relation(fields: [companyId], references: [id])
+  products CompanyStoreProduct[]
+
+  @@index([companyId])
+  @@map("company_stores")
+}
+
+model CompanyStoreProduct {
+  id             String  @id @default(uuid())
+  storeId        String  @map("store_id")
+  productId      String  @map("product_id")
+  customPrice    Float?  @map("custom_price")
+  isAvailable    Boolean @default(true) @map("is_available")
+  sortOrder      Int     @default(0) @map("sort_order")
+
+  store   CompanyStore @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  product Product      @relation(fields: [productId], references: [id])
+
+  @@unique([storeId, productId])
+  @@map("company_store_products")
+}
+
+// ─────────────────────────────────────────────
+// SUPPLIER SYNC LOGS
+// ─────────────────────────────────────────────
 
 model SyncLog {
   id               String   @id @default(uuid())
@@ -80,36 +419,26 @@ model SyncLog {
   @@map("sync_logs")
 }
 
-model Order {
-  id              String      @id @default(uuid())
-  ref             String      @unique
-  clientId        String      @map("client_id")
-  status          String      @default("pending")
-  shippingAddress Json        @map("shipping_address")
-  totalAmount     Float?      @map("total_amount")
-  supplier        String?
-  supplierOrderId String?     @map("supplier_order_id")
-  stripeSessionId String?     @map("stripe_session_id")
-  stripePaymentId String?     @map("stripe_payment_id")
-  trackingNumber  String?     @map("tracking_number")
-  createdAt       DateTime    @default(now()) @map("created_at")
-  updatedAt       DateTime    @updatedAt @map("updated_at")
-  client          Client      @relation(fields: [clientId], references: [id])
-  items           OrderItem[]
+// ─────────────────────────────────────────────
+// EVENT LOG (AUDIT TRAIL)
+// ─────────────────────────────────────────────
 
-  @@map("orders")
-}
+model EventLog {
+  id        String   @id @default(uuid())
+  orderId   String?  @map("order_id")
+  entity    String   // order | quote | approval | budget | campaign | store
+  entityId  String   @map("entity_id")
+  event     String   // order.created | order.paid | order.approved | etc.
+  actorId   String?  @map("actor_id")
+  actorType String?  @map("actor_type") // client | admin | system
+  payload   Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
 
-model OrderItem {
-  id        String         @id @default(uuid())
-  orderId   String         @map("order_id")
-  productId String         @map("product_id")
-  variantId String         @map("variant_id")
-  quantity  Int
-  unitPrice Float          @map("unit_price")
-  order     Order          @relation(fields: [orderId], references: [id])
-  product   Product        @relation(fields: [productId], references: [id])
-  variant   ProductVariant @relation(fields: [variantId], references: [id])
+  order Order? @relation(fields: [orderId], references: [id])
 
-  @@map("order_items")
+  @@index([orderId])
+  @@index([entity, entityId])
+  @@index([event])
+  @@index([createdAt])
+  @@map("event_logs")
 }

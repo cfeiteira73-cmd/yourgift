@@ -11,6 +11,12 @@ import { ArtworkModule } from './artwork/artwork.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { EventBusModule } from './events/event-bus.module';
 import { HealthModule } from './health/health.module';
+import { QuotesModule } from './quotes/quotes.module';
+import { ApprovalsModule } from './approvals/approvals.module';
+import { BudgetsModule } from './budgets/budgets.module';
+import { CampaignsModule } from './campaigns/campaigns.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { CompanyStoresModule } from './company-stores/company-stores.module';
 
 @Module({
   imports: [
@@ -26,6 +32,12 @@ import { HealthModule } from './health/health.module';
     PaymentsModule,
     SuppliersModule,
     ArtworkModule,
+    QuotesModule,
+    ApprovalsModule,
+    BudgetsModule,
+    CampaignsModule,
+    AnalyticsModule,
+    CompanyStoresModule,
   ],
 })
 export class AppModule {}
