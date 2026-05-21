@@ -25,11 +25,10 @@ COPY tsconfig.base.json ./
 RUN pnpm --filter @yourgift/shared run build
 
 # Generate Prisma client (must happen before nest build)
-RUN pnpm --filter @yourgift/api exec prisma generate || \
-    cd services/api && npx prisma generate || true
+RUN cd services/api && npx prisma generate --schema ./prisma/schema.prisma || true
 
 # Build NestJS API
-RUN pnpm --filter @yourgift/api run build
+RUN pnpm --filter api run build
 
 # ── Stage 2: production ──────────────────────────────────────────────────────
 FROM node:20-alpine AS production
