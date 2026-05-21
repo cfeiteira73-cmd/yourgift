@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { EventBusService } from '../events/event-bus.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { MidoceanClient, MidoceanSyncService, transformProduct } from '@yourgift/midocean';
+type SyncableProduct = ReturnType<typeof transformProduct>;
 
 @Injectable()
 export class SuppliersService {
@@ -22,7 +23,7 @@ export class SuppliersService {
   async syncMidocean() {
     const syncer = new MidoceanSyncService(this.config.getOrThrow('MIDOCEAN_KEY'));
 
-    const result = await syncer.sync(async (data) => {
+    const result = await syncer.sync(async (data: SyncableProduct) => {
       const product = await this.prisma.product.upsert({
         where: { supplierRef: data.supplierRef },
         create: {

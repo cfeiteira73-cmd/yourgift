@@ -11,6 +11,7 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 
 # Copy workspace package manifests
 COPY packages/shared/package.json ./packages/shared/
+COPY integrations/midocean/package.json ./integrations/midocean/
 COPY services/api/package.json ./services/api/
 
 # Install all dependencies (frozen to match lockfile exactly)
@@ -18,11 +19,15 @@ RUN pnpm install --frozen-lockfile
 
 # Copy full source
 COPY packages/shared ./packages/shared
+COPY integrations/midocean ./integrations/midocean
 COPY services/api ./services/api
 COPY tsconfig.base.json ./
 
-# Build shared package first (api depends on it)
+# Build shared package first (midocean and api depend on it)
 RUN pnpm --filter @yourgift/shared run build
+
+# Build midocean integration (api depends on it)
+RUN pnpm --filter @yourgift/midocean run build
 
 # Generate Prisma client (must happen before nest build)
 RUN cd services/api && npx prisma generate --schema ./prisma/schema.prisma || true
