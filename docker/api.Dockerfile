@@ -41,7 +41,9 @@ FROM node:20-alpine AS production
 ENV NODE_ENV=production
 
 # Install dumb-init for proper signal handling in containers
-RUN apk add --no-cache dumb-init
+# Install openssl so Prisma can detect OpenSSL 3.x version at runtime
+# (without it, Prisma defaults to openssl-1.1.x and fails to load the engine)
+RUN apk add --no-cache dumb-init openssl
 
 WORKDIR /app
 
