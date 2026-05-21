@@ -1,0 +1,6 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "cd ../.. && pnpm --filter @yourgift/shared run build && pnpm --filter web run build",
+  "outputDirectory": ".next",
+  "installCommand": "cd ../.. && pnpm install --no-frozen-lockfile"
+}

@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+*.log
+.env
+.env.*
+dist
+coverage
+**/*.test.ts
+**/*.spec.ts
+.turbo
+.github
+infra
+docker
+README.md

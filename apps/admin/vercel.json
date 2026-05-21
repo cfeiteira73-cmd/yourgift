@@ -1,4 +1,8 @@
 {
+  "framework": "nextjs",
+  "buildCommand": "cd ../.. && pnpm --filter @yourgift/shared run build && pnpm --filter admin run build",
+  "outputDirectory": ".next",
+  "installCommand": "cd ../.. && pnpm install --no-frozen-lockfile",
   "crons": [
     {
       "path": "/api/cron/process-workers",

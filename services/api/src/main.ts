@@ -14,9 +14,12 @@ async function bootstrap() {
       'http://localhost:3001',
       'https://yourgift.pt',
       'https://www.yourgift.pt',
+      'https://admin.yourgift.pt',
     ],
     credentials: true,
   });
+
+  app.enableShutdownHooks();
 
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true })
