@@ -1,19 +1,13 @@
-name: Deploy to AWS
+name: Deploy to Production
 
 on:
   push:
     branches: [main, master]
-  pull_request:
-    branches: [main, master]
-
-env:
-  AWS_REGION: eu-west-1
-  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-1.amazonaws.com
 
 jobs:
-  # ── Test & Lint ──────────────────────────────────────────────────────────────
-  test:
-    name: Test & Lint
+  # ── Type Check & Build ──────────────────────────────────────────────────────
+  ci:
+    name: CI — Type Check & Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,27 +22,45 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build shared package
+        run: pnpm --filter @yourgift/shared run build
 
       - name: Generate Prisma client
-        run: pnpm --filter @yourgift/api exec prisma generate
+        working-directory: services/api
+        run: pnpm exec prisma generate
 
-      - name: Build all packages
-        run: pnpm build
+      - name: Type check API
+        working-directory: services/api
+        run: pnpm exec tsc --noEmit
 
-      - name: Lint
-        run: pnpm lint
+      - name: Build API
+        working-directory: services/api
+        run: pnpm run build
 
-  # ── Build & Push to ECR ──────────────────────────────────────────────────────
-  build-and-push:
-    name: Build & Push to ECR
-    needs: test
+  # ── Deploy API → Railway ─────────────────────────────────────────────────────
+  deploy-api:
+    name: Deploy API → Railway
+    needs: ci
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    outputs:
-      api_image: ${{ steps.meta-api.outputs.image }}
-      web_image: ${{ steps.meta-web.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
 
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy API to Railway
+        working-directory: services/api
+        run: railway up --service yourgift-api --detach
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+  # ── Deploy Web → Vercel ──────────────────────────────────────────────────────
+  deploy-web:
+    name: Deploy Web → Vercel
+    needs: ci
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -61,144 +73,44 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Generate Prisma client before build
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm --filter @yourgift/api exec prisma generate
-
-      - name: Build and push API image
-        id: meta-api
-        run: |
-          IMAGE=$ECR_REGISTRY/yourgift-api:${{ github.sha }}
-          docker build \
-            -f docker/api.Dockerfile \
-            -t $IMAGE \
-            -t $ECR_REGISTRY/yourgift-api:latest \
-            .
-          docker push $IMAGE
-          docker push $ECR_REGISTRY/yourgift-api:latest
-          echo "image=$IMAGE" >> $GITHUB_OUTPUT
-
-      - name: Build and push Web image
-        id: meta-web
-        run: |
-          IMAGE=$ECR_REGISTRY/yourgift-web:${{ github.sha }}
-          docker build \
-            -f docker/web.Dockerfile \
-            -t $IMAGE \
-            -t $ECR_REGISTRY/yourgift-web:latest \
-            .
-          docker push $IMAGE
-          docker push $ECR_REGISTRY/yourgift-web:latest
-          echo "image=$IMAGE" >> $GITHUB_OUTPUT
-
-  # ── Run Prisma Migrations ────────────────────────────────────────────────────
-  migrate:
-    name: Run Database Migrations
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 9
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+      - name: Install Vercel CLI
+        run: npm install -g vercel
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
-      - name: Fetch DATABASE_URL from Secrets Manager
-        id: get-secret
-        run: |
-          SECRET=$(aws secretsmanager get-secret-value \
-            --secret-id yourgift/production/api \
-            --query SecretString \
-            --output text)
-          DATABASE_URL=$(echo $SECRET | jq -r '.DATABASE_URL')
-          echo "::add-mask::$DATABASE_URL"
-          echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_ENV
-
-      - name: Run Prisma migrations
-        run: pnpm --filter @yourgift/api exec prisma migrate deploy
+      - name: Deploy Web to Vercel
+        run: vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
         env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_PROJECT_ID }}
 
-  # ── Deploy to ECS ─────────────────────────────────────────────────────────────
-  deploy:
-    name: Deploy to ECS
-    needs: [build-and-push, migrate]
+  # ── Deploy Admin → Vercel ────────────────────────────────────────────────────
+  deploy-admin:
+    name: Deploy Admin → Vercel
+    needs: ci
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-
     steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          version: 9
 
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
 
-      - name: Update ECS task definition with new image tag
-        run: |
-          # Fetch current task definition
-          TASK_DEF=$(aws ecs describe-task-definition \
-            --task-definition yourgift-api \
-            --query taskDefinition)
+      - name: Install Vercel CLI
+        run: npm install -g vercel
 
-          # Inject new image into container definition
-          NEW_IMAGE="$ECR_REGISTRY/yourgift-api:${{ github.sha }}"
-          NEW_TASK_DEF=$(echo $TASK_DEF | jq \
-            --arg IMAGE "$NEW_IMAGE" \
-            '.containerDefinitions[0].image = $IMAGE |
-             del(.taskDefinitionArn, .revision, .status, .requiresAttributes,
-                 .compatibilities, .registeredAt, .registeredBy)')
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
 
-          # Register updated task definition
-          aws ecs register-task-definition \
-            --cli-input-json "$NEW_TASK_DEF"
-
-      - name: Deploy API to ECS (force new deployment)
-        run: |
-          aws ecs update-service \
-            --cluster yourgift-production \
-            --service yourgift-api \
-            --force-new-deployment
-
-      - name: Wait for API deployment to stabilise
-        run: |
-          aws ecs wait services-stable \
-            --cluster yourgift-production \
-            --services yourgift-api
-
-      - name: Notify deployment complete
-        run: |
-          echo "Deployed commit ${{ github.sha }} to production"
-          echo "API image: $ECR_REGISTRY/yourgift-api:${{ github.sha }}"
+      - name: Deploy Admin to Vercel
+        working-directory: apps/admin
+        run: vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_ADMIN_PROJECT_ID }}

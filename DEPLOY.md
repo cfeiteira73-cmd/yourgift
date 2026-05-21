@@ -1,171 +1,171 @@
-# YourGift OS — Deploy Guide
+# YourGift OS — Deploy Guide (Railway + Vercel)
 
-## Pré-requisitos
-
-- Conta AWS com permissões de administrador
-- AWS CLI instalado e configurado (`aws configure`)
-- Terraform >= 1.6
-- pnpm >= 8
+Stack: **Railway** (API) · **Vercel** (Web + Admin) · **Supabase** (DB — já configurado)  
+Custo estimado: ~15€/mês total
 
 ---
 
-## 1. Bootstrap AWS (uma vez)
+## Arquitectura
 
-### Criar bucket S3 para Terraform state
-```bash
-aws s3 mb s3://yourgift-terraform-state --region eu-west-1
-aws s3api put-bucket-versioning \
-  --bucket yourgift-terraform-state \
-  --versioning-configuration Status=Enabled
 ```
-
-### Configurar OIDC para GitHub Actions (uma vez)
-```bash
-# Criar OIDC provider para GitHub
-aws iam create-open-id-connect-provider \
-  --url https://token.actions.githubusercontent.com \
-  --client-id-list sts.amazonaws.com \
-  --thumbprint-list 6938fd4d98bab03faadb97b34396831e3780aea1
+yourgift.pt        api.yourgift.pt      admin.yourgift.pt
+(Vercel)      →    (Railway)       ←    (Vercel)
+     │                  │
+     └──────────────────┴──── Supabase (PostgreSQL)
 ```
 
 ---
 
-## 2. Provisionar Infraestrutura com Terraform
+## 1. Railway — API NestJS
 
-```bash
-cd infra/terraform
+### 1.1 Criar projecto Railway
 
-# Inicializar
-terraform init
+1. Vai a [railway.app](https://railway.app) → **New Project**
+2. **Deploy from GitHub repo** → selecciona `cfeiteira73-cmd/yourgift`
+3. Quando pedir o **Root Directory** → define como `/services/api`
+4. Railway detecta o `railway.toml` e usa Nixpacks
 
-# Preview
-terraform plan -var="env=production" -var="api_image_tag=latest"
+### 1.2 Variáveis de ambiente Railway
 
-# Aplicar
-terraform apply -var="env=production" -var="api_image_tag=latest"
+No painel Railway → **Variables**, adiciona:
+
+```env
+DATABASE_URL=postgresql://postgres:PASSWORD@db.SUPABASE_REF.supabase.co:5432/postgres
+DIRECT_URL=postgresql://postgres:PASSWORD@db.SUPABASE_REF.supabase.co:5432/postgres
+JWT_SECRET=gera_com_openssl_rand_base64_32
+JWT_EXPIRY=7d
+STRIPE_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+MIDOCEAN_KEY=...
+PF_CONCEPT_KEY=...
+S3_BUCKET=yourgift-assets
+CLOUDFRONT_URL=https://cdn.yourgift.pt
+RESEND_KEY=re_...
+ADMIN_API_TOKEN=gera_com_openssl_rand_hex_32
+PORT=3001
+NODE_ENV=production
 ```
 
-Outputs importantes após apply:
-- `ecr_api_url` → copiar para GitHub Secret `ECR_REGISTRY`
-- `alb_dns_name` → configurar no DNS como CNAME para api.yourgift.pt
-- `cloudfront_domain` → configurar no DNS como CNAME para cdn.yourgift.pt
-- `rds_endpoint` → usar em DATABASE_URL
+> **DATABASE_URL e DIRECT_URL**: vai ao Supabase → Settings → Database → Connection String → URI
+
+### 1.3 Domínio personalizado
+
+Railway → **Settings** → **Domains** → **Custom Domain**  
+Adiciona: `api.yourgift.pt`  
+Copia o CNAME que o Railway te dá → adiciona no teu DNS
 
 ---
 
-## 3. Configurar Secrets no AWS Secrets Manager
+## 2. Vercel — Web Portal
+
+### 2.1 Criar projecto Vercel (Web)
 
 ```bash
-aws secretsmanager update-secret \
-  --secret-id yourgift/production/api \
-  --secret-string '{
-    "DATABASE_URL": "postgresql://postgres:PASSWORD@RDS_ENDPOINT:5432/yourgift",
-    "DIRECT_URL": "postgresql://postgres:PASSWORD@RDS_ENDPOINT:5432/yourgift",
-    "JWT_SECRET": "GERA_UM_SECRET_LONGO_AQUI",
-    "STRIPE_KEY": "sk_live_...",
-    "STRIPE_WEBHOOK_SECRET": "whsec_...",
-    "MIDOCEAN_KEY": "...",
-    "PF_CONCEPT_KEY": "...",
-    "S3_BUCKET": "yourgift-assets-production",
-    "CLOUDFRONT_URL": "https://cdn.yourgift.pt",
-    "RESEND_KEY": "re_..."
-  }'
+# No terminal, na raiz do repo
+npx vercel --prod
 ```
 
----
+Quando perguntar:
+- **Root directory**: `.` (raiz do monorepo)
+- O `vercel.json` já está configurado para builds o `apps/web`
 
-## 4. Configurar GitHub Secrets
+### 2.2 Variáveis de ambiente Vercel (Web)
 
-Vai a: **GitHub → yourgift repo → Settings → Secrets and variables → Actions**
-
-Adiciona estes secrets:
-
-| Secret | Valor |
-|--------|-------|
-| `AWS_ACCOUNT_ID` | ID da tua conta AWS (12 dígitos) |
-| `AWS_ACCESS_KEY_ID` | Access key de um IAM user com permissões ECS/ECR |
-| `AWS_SECRET_ACCESS_KEY` | Secret key correspondente |
-| `API_URL` | https://api.yourgift.pt |
-| `ADMIN_API_TOKEN` | Token seguro para o cron de sync (gera com `openssl rand -hex 32`) |
-
----
-
-## 5. Aplicar Migração DB
-
-```bash
-# Com acesso direto ao RDS (via bastion ou VPN)
-cd services/api
-pnpm prisma migrate deploy --schema prisma/schema.prisma
-
-# OU via Supabase MCP (já feito - 18 tabelas criadas)
+```env
+NEXT_PUBLIC_API_URL=https://api.yourgift.pt
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
 ```
 
+### 2.3 Domínio
+
+Vercel → **Domains** → Adiciona `yourgift.pt`
+
 ---
 
-## 6. Trigger Deploy Manual
+## 3. Vercel — Admin Dashboard
+
+### 3.1 Criar projecto Vercel (Admin)
 
 ```bash
-# Push para master dispara o workflow automaticamente
-git push origin master
-
-# OU trigger manual no GitHub
-# Actions → "Deploy to Production" → Run workflow
+# Na pasta apps/admin
+cd apps/admin
+npx vercel --prod
 ```
 
+Quando perguntar:
+- Selecciona "existing project" ou cria novo
+
+### 3.2 Variáveis de ambiente Vercel (Admin)
+
+```env
+NEXT_PUBLIC_API_URL=https://api.yourgift.pt
+ADMIN_API_TOKEN=mesmo_token_que_o_railway
+```
+
+### 3.3 Domínio
+
+Vercel → **Domains** → Adiciona `admin.yourgift.pt`
+
 ---
 
-## 7. Verificar Deploy
+## 4. GitHub Secrets (para CI/CD automático)
+
+Vai a: **GitHub → yourgift → Settings → Secrets and variables → Actions**
+
+| Secret | Como obter |
+|--------|-----------|
+| `RAILWAY_TOKEN` | Railway → Account Settings → Tokens → New Token |
+| `VERCEL_TOKEN` | Vercel → Account Settings → Tokens → Create |
+| `VERCEL_ORG_ID` | Vercel → Account Settings → `id` no JSON |
+| `VERCEL_WEB_PROJECT_ID` | Vercel → Web Project → Settings → `id` |
+| `VERCEL_ADMIN_PROJECT_ID` | Vercel → Admin Project → Settings → `id` |
+
+> Com estes 5 secrets, qualquer push para `master` faz deploy automático.
+
+---
+
+## 5. Verificar Deploy
 
 ```bash
-# Status do serviço ECS
-aws ecs describe-services \
-  --cluster yourgift-production \
-  --services yourgift-api-production \
-  --region eu-west-1
-
-# Logs em tempo real
-aws logs tail /ecs/yourgift-api-production --follow
-
-# Health check
+# Health check API
 curl https://api.yourgift.pt/api/v1/health
+
+# Logs Railway (em tempo real)
+railway logs --service yourgift-api
+
+# Status Railway
+railway status
 ```
 
 ---
 
-## Arquitectura Final
+## 6. Stripe Webhook
 
-```
-                    ┌─────────────────┐
-                    │   CloudFront    │
-                    │  cdn.yourgift.pt│
-                    └────────┬────────┘
-                             │
-                    ┌────────▼────────┐
-                    │   S3 Bucket     │
-                    │ yourgift-assets │
-                    └─────────────────┘
-
-┌──────────────┐    ┌────────────────┐    ┌─────────────────┐
-│  yourgift.pt │    │      ALB       │    │   ECS Fargate   │
-│  (Vercel)    │───▶│api.yourgift.pt │───▶│  NestJS API     │
-└──────────────┘    └────────────────┘    │  (2 tasks)      │
-                                          └────────┬────────┘
-┌──────────────┐                                   │
-│  admin.      │                          ┌────────▼────────┐
-│  yourgift.pt │                          │  RDS PostgreSQL  │
-│  (Vercel)    │                          │  + Redis Cache  │
-└──────────────┘                          └─────────────────┘
-```
+No Stripe Dashboard → **Webhooks** → **Add endpoint**:
+- URL: `https://api.yourgift.pt/api/v1/payments/webhook`
+- Events: `checkout.session.completed`, `payment_intent.succeeded`
+- Copia o `whsec_...` → adiciona como `STRIPE_WEBHOOK_SECRET` no Railway
 
 ---
 
-## Custos Estimados (produção)
+## Custos Estimados
 
 | Serviço | Custo/mês |
 |---------|-----------|
-| ECS Fargate (2 tasks) | ~80€ |
-| RDS t3.medium | ~60€ |
-| ALB | ~20€ |
-| S3 + CloudFront | ~15€ |
-| Secrets Manager | ~5€ |
-| **TOTAL** | **~180€/mês** |
+| Railway (Hobby) | ~5€ |
+| Vercel (Hobby) | Grátis |
+| Supabase (Free tier) | Grátis |
+| Resend (3k emails/mês) | Grátis |
+| **TOTAL** | **~5€/mês** |
+
+> Quando escalares: Railway Pro (~20€) + Supabase Pro (~25€) = ~50€/mês
+
+---
+
+## Upgrade path → AWS (quando necessário)
+
+Se precisares de escalar para AWS ECS (>10k orders/mês):
+1. `aws configure` com credenciais IAM
+2. `cd infra/terraform && terraform init && terraform apply`
+3. Actualiza GitHub secrets com credenciais AWS
+4. Muda `deploy.yml` de volta para ECR + ECS

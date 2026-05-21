@@ -1,0 +1,18 @@
+# Railway builds from repo root when rootDirectory is set to "/"
+# These commands run from the monorepo root
+
+[phases.setup]
+nixPkgs = ["nodejs_20", "nodePackages.pnpm"]
+
+[phases.install]
+cmds = ["pnpm install --no-frozen-lockfile"]
+
+[phases.build]
+cmds = [
+  "pnpm --filter @yourgift/shared run build",
+  "pnpm --filter api exec prisma generate",
+  "pnpm --filter api run build"
+]
+
+[start]
+cmd = "pnpm --filter api exec prisma migrate deploy && pnpm --filter api run start"
