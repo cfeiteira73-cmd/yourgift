@@ -45,16 +45,21 @@ RUN apk add --no-cache dumb-init
 
 WORKDIR /app
 
-# Copy only the compiled output and runtime dependencies
-COPY --from=builder /app/services/api/dist ./dist
+# Root node_modules (pnpm .pnpm store + hoisted packages)
 COPY --from=builder /app/node_modules ./node_modules
+
+# Keep api in its ORIGINAL path so pnpm symlinks resolve correctly:
+# Node resolves modules from /app/services/api/dist/main.js upward:
+#   → /app/services/api/node_modules  (api direct deps)
+#   → /app/node_modules               (pnpm .pnpm store)
+COPY --from=builder /app/services/api/dist ./services/api/dist
 COPY --from=builder /app/services/api/node_modules ./services/api/node_modules
-COPY --from=builder /app/services/api/package.json ./package.json
+COPY --from=builder /app/services/api/package.json ./services/api/package.json
 
 # Copy Prisma schema + generated client (needed at runtime)
-COPY --from=builder /app/services/api/prisma ./prisma
+COPY --from=builder /app/services/api/prisma ./services/api/prisma
 
-# Copy startup script
+# Copy startup script at root for convenience
 COPY --from=builder /app/services/api/start.sh ./start.sh
 RUN chmod +x ./start.sh
 

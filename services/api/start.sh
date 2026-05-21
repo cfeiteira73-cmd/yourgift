@@ -2,15 +2,13 @@
 set -e
 
 echo "→ Running Prisma migrations..."
-# Use the locally installed prisma binary to avoid npx downloading a newer version
-# Prisma is hoisted by pnpm to /app/node_modules/.bin/prisma
+# Use locally installed prisma binary (pnpm hoisted to root node_modules)
 if [ -f "/app/node_modules/.bin/prisma" ]; then
-  /app/node_modules/.bin/prisma migrate deploy --schema /app/prisma/schema.prisma && echo "✓ Migrations applied" || echo "⚠ Migrations skipped (no pending or error)"
-elif [ -f "./node_modules/.bin/prisma" ]; then
-  ./node_modules/.bin/prisma migrate deploy --schema ./prisma/schema.prisma && echo "✓ Migrations applied" || echo "⚠ Migrations skipped"
+  /app/node_modules/.bin/prisma migrate deploy --schema /app/services/api/prisma/schema.prisma && \
+    echo "✓ Migrations applied" || echo "⚠ Migrations skipped (no pending or error)"
 else
   echo "⚠ Prisma binary not found — skipping migrations (schema already up to date)"
 fi
 
 echo "→ Starting YourGift API..."
-exec node dist/main
+exec node /app/services/api/dist/main
