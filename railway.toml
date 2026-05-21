@@ -1,0 +1,12 @@
+# Railway configuration for YourGift API
+# Set Railway service rootDirectory to "/" (repo root)
+
+[build]
+builder = "dockerfile"
+dockerfilePath = "docker/api.Dockerfile"
+
+[deploy]
+healthcheckPath = "/api/v1/health"
+healthcheckTimeout = 60
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

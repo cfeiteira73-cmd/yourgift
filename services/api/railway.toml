@@ -1,3 +1,7 @@
+# Railway config when rootDirectory = services/api
+# NOTE: Use rootDirectory = "/" (repo root) + root railway.toml for Dockerfile builds
+# This file is a fallback for nixpacks standalone builds
+
 [build]
 builder = "nixpacks"
 
