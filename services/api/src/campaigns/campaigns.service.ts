@@ -1,7 +1,9 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
+  OnModuleInit,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -24,11 +26,32 @@ export interface CampaignAnalytics {
 }
 
 @Injectable()
-export class CampaignsService {
+export class CampaignsService implements OnModuleInit {
+  private readonly logger = new Logger(CampaignsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly events: EventBusService,
   ) {}
+
+  onModuleInit() {
+    this.events.on('employee.onboarded', async (data: {
+      companyId?: string;
+      name: string;
+      email: string;
+      department?: string;
+      jobTitle?: string;
+    }) => {
+      if (!data.companyId) {
+        this.logger.log(`Onboarding trigger for ${data.name} — no matching company found, skipping`);
+        return;
+      }
+      // Log the onboarding trigger — in production this creates or suggests an order
+      this.logger.log(`Onboarding trigger for ${data.name} at company ${data.companyId}`);
+      // Emit for Slack notification and further downstream processing
+      this.events.emit('onboarding.kit.triggered', data);
+    });
+  }
 
   // ── Public API ────────────────────────────────────────────────────────────
 

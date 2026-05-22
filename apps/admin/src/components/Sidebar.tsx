@@ -80,6 +80,17 @@ const NAV_ITEMS: NavItem[] = [
       </svg>
     ),
   },
+  {
+    href: '/companies',
+    label: 'Empresas',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="1" y="5" width="14" height="10" rx="1" />
+        <path d="M4 5V3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+        <path d="M6 9h4M8 7v4" />
+      </svg>
+    ),
+  },
 ];
 
 const SECONDARY_ITEMS: NavItem[] = [
@@ -134,11 +145,33 @@ const SECONDARY_ITEMS: NavItem[] = [
     ),
   },
   {
+    href: '/inventory',
+    label: 'Inventário',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+        <rect x="2" y="4" width="12" height="9" rx="1.5" />
+        <path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" />
+        <path d="M5 8.5h6M5 11h4" />
+      </svg>
+    ),
+  },
+  {
     href: '/ai',
     label: 'AI Center',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
         <path d="M8 1l1.6 4H14l-3.2 2.3L12 12 8 9.5 4 12l1.2-4.7L2 5h4.4z" />
+      </svg>
+    ),
+  },
+  {
+    href: '/webhooks',
+    label: 'Webhooks',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+        <circle cx="8" cy="8" r="2.5" />
+        <path d="M8 5.5V2M8 14v-2.5M5.5 8H2M14 8h-2.5" />
+        <path d="M10.24 5.76l1.77-1.77M3.99 12.01l1.77-1.77M10.24 10.24l1.77 1.77M3.99 3.99l1.77 1.77" />
       </svg>
     ),
   },

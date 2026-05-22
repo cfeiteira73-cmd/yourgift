@@ -94,6 +94,7 @@ model Product {
   quoteItems        QuoteItem[]
   campaignItems     CampaignItem[]
   companyStoreItems CompanyStoreProduct[]
+  inventoryAlerts   InventoryAlert[]
 
   @@index([category])
   @@index([supplier])
@@ -117,9 +118,10 @@ model ProductVariant {
   categoryLevel3 String?     @map("category_level3")
   updatedAt      DateTime    @updatedAt @map("updated_at")
 
-  product    Product     @relation(fields: [productId], references: [id])
-  orderItems OrderItem[]
-  quoteItems QuoteItem[]
+  product         Product          @relation(fields: [productId], references: [id])
+  orderItems      OrderItem[]
+  quoteItems      QuoteItem[]
+  inventoryAlerts InventoryAlert[]
 
   @@index([stock])
   @@map("product_variants")
@@ -464,6 +466,94 @@ model Job {
   @@index([status, scheduledAt])
   @@index([type])
   @@map("jobs")
+}
+
+// ─────────────────────────────────────────────
+// INVENTORY ALERTS
+// ─────────────────────────────────────────────
+
+model InventoryAlert {
+  id           String    @id @default(uuid())
+  variantId    String    @map("variant_id")
+  productId    String    @map("product_id")
+  alertType    String    @map("alert_type") // low_stock | out_of_stock | reorder_triggered
+  threshold    Int       @default(10)
+  currentStock Int       @map("current_stock")
+  resolved     Boolean   @default(false)
+  resolvedAt   DateTime? @map("resolved_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  variant ProductVariant @relation(fields: [variantId], references: [id])
+  product Product        @relation(fields: [productId], references: [id])
+
+  @@index([variantId])
+  @@index([resolved])
+  @@map("inventory_alerts")
+}
+
+// ─────────────────────────────────────────────
+// PRICING RULES
+// ─────────────────────────────────────────────
+
+model PricingRule {
+  id            String   @id @default(uuid())
+  name          String
+  ruleType      String   @map("rule_type") // volume | tier | client | product | category | supplier
+  targetId      String?  @map("target_id")   // productId, clientId, category, supplier
+  minQuantity   Int      @default(1) @map("min_quantity")
+  maxQuantity   Int?     @map("max_quantity")
+  discountType  String   @map("discount_type") // percentage | fixed | multiplier
+  discountValue Float    @map("discount_value")
+  marginMin     Float?   @map("margin_min")    // minimum margin % to enforce
+  clientTier    String?  @map("client_tier")   // standard | premium | enterprise
+  isActive      Boolean  @default(true) @map("is_active")
+  priority      Int      @default(0)           // higher = applied first
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([ruleType, isActive])
+  @@index([clientTier])
+  @@map("pricing_rules")
+}
+
+// ─────────────────────────────────────────────
+// OUTBOUND WEBHOOKS
+// ─────────────────────────────────────────────
+
+model WebhookEndpoint {
+  id          String   @id @default(uuid())
+  companyId   String?  @map("company_id")
+  url         String
+  secret      String
+  events      String[] // ["order.created", "order.paid", etc.]
+  isActive    Boolean  @default(true) @map("is_active")
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  deliveries WebhookDelivery[]
+
+  @@index([companyId])
+  @@map("webhook_endpoints")
+}
+
+model WebhookDelivery {
+  id           String    @id @default(uuid())
+  endpointId   String    @map("endpoint_id")
+  event        String
+  payload      Json
+  statusCode   Int?      @map("status_code")
+  responseBody String?   @map("response_body")
+  success      Boolean   @default(false)
+  attempts     Int       @default(0)
+  deliveredAt  DateTime? @map("delivered_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  endpoint WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+
+  @@index([endpointId])
+  @@index([event])
+  @@map("webhook_deliveries")
 }
 
 // ─────────────────────────────────────────────

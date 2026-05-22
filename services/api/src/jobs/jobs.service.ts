@@ -17,7 +17,7 @@ export class JobsService implements OnModuleInit, OnModuleDestroy {
   onModuleInit(): void {
     // Poll every 10 seconds for pending jobs
     this.timer = setInterval(() => void this.processNext(), 10_000);
-    this.logger.log('Job queue started (10s polling)');
+    this.logger.log('Job queue started (10s polling, SKIP LOCKED)');
   }
 
   onModuleDestroy(): void {
@@ -36,52 +36,88 @@ export class JobsService implements OnModuleInit, OnModuleDestroy {
     return job.id;
   }
 
-  private async processNext(): Promise<void> {
-    const jobs = await this.prisma.job.findMany({
+  /**
+   * Idempotent enqueue — if a job with the same type + idempotencyKey already
+   * exists in pending/processing/completed state, return its id without creating
+   * a duplicate. Failed jobs are re-queued.
+   */
+  async enqueueIdempotent(
+    type: JobType,
+    payload: Record<string, unknown>,
+    idempotencyKey: string,
+    scheduledAt?: Date,
+  ): Promise<string | null> {
+    const existing = await this.prisma.job.findFirst({
       where: {
-        status: 'pending',
-        scheduledAt: { lte: new Date() },
-        attempts: { lt: 3 },
+        type,
+        status: { in: ['pending', 'processing', 'completed'] },
+        payload: { path: ['idempotencyKey'], equals: idempotencyKey },
       },
-      orderBy: { scheduledAt: 'asc' },
-      take: 5,
     });
+    if (existing) return existing.id;
+    return this.enqueue(type, { ...payload, idempotencyKey }, scheduledAt);
+  }
 
-    for (const job of jobs) {
-      await this.prisma.job.update({
-        where: { id: job.id },
-        data: {
-          status: 'processing',
-          startedAt: new Date(),
-          attempts: { increment: 1 },
-        },
-      });
+  private async processNext(): Promise<void> {
+    // Use SKIP LOCKED for concurrent worker safety — PostgreSQL feature.
+    // Multiple API instances can poll simultaneously without claiming the same job.
+    const jobs = await this.prisma.$queryRaw<Array<{
+      id: string;
+      type: string;
+      payload: string;
+      attempts: number;
+    }>>`
+      UPDATE jobs
+      SET status = 'processing', started_at = NOW(), attempts = attempts + 1
+      WHERE id IN (
+        SELECT id FROM jobs
+        WHERE status = 'pending'
+          AND scheduled_at <= NOW()
+          AND attempts < max_attempts
+        ORDER BY scheduled_at ASC
+        LIMIT 5
+        FOR UPDATE SKIP LOCKED
+      )
+      RETURNING id, type, payload::text, attempts
+    `;
 
-      try {
-        await this.executeJob(job.type as JobType, job.payload as Record<string, unknown>);
-        await this.prisma.job.update({
-          where: { id: job.id },
-          data: { status: 'completed', completedAt: new Date() },
-        });
-        this.logger.log(`Job completed: ${job.type} [${job.id}]`);
-      } catch (err) {
-        const error = err instanceof Error ? err.message : String(err);
-        const isLastAttempt = job.attempts + 1 >= 3;
-        await this.prisma.job.update({
-          where: { id: job.id },
-          data: {
-            status: isLastAttempt ? 'failed' : 'pending',
-            error,
-            ...(isLastAttempt
-              ? {}
-              : {
-                  scheduledAt: new Date(Date.now() + 60_000 * (job.attempts + 1)),
-                }),
-          },
-        });
-        this.logger.error(`Job failed: ${job.type} [${job.id}] — ${error}`);
-      }
-    }
+    if (!jobs.length) return;
+
+    await Promise.allSettled(
+      jobs.map(async (job) => {
+        try {
+          const payload =
+            typeof job.payload === 'string'
+              ? (JSON.parse(job.payload) as Record<string, unknown>)
+              : (job.payload as Record<string, unknown>);
+
+          await this.executeJob(job.type as JobType, payload);
+
+          await this.prisma.$executeRaw`
+            UPDATE jobs SET status = 'completed', completed_at = NOW() WHERE id = ${job.id}::uuid
+          `;
+          this.logger.log(`✓ Job completed: ${job.type} [${job.id}]`);
+        } catch (err) {
+          const error = err instanceof Error ? err.message : String(err);
+          const isLastAttempt = job.attempts >= 3;
+          const retryDelay = job.attempts * 60; // seconds
+
+          if (isLastAttempt) {
+            await this.prisma.$executeRaw`
+              UPDATE jobs SET status = 'failed', error = ${error} WHERE id = ${job.id}::uuid
+            `;
+            this.logger.error(`✗ Job failed (dead-letter): ${job.type} [${job.id}]`);
+          } else {
+            await this.prisma.$executeRaw`
+              UPDATE jobs SET status = 'pending', error = ${error},
+                scheduled_at = NOW() + (${retryDelay} || ' seconds')::interval
+              WHERE id = ${job.id}::uuid
+            `;
+            this.logger.warn(`↻ Job retry ${job.attempts}/3: ${job.type} [${job.id}]`);
+          }
+        }
+      }),
+    );
   }
 
   private async executeJob(

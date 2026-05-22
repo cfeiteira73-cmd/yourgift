@@ -24,6 +24,11 @@ import { SlackModule } from './slack/slack.module';
 import { JobsModule } from './jobs/jobs.module';
 import { HubSpotModule } from './hubspot/hubspot.module';
 import { NotionModule } from './notion/notion.module';
+import { InventoryModule } from './inventory/inventory.module';
+import { ClientsModule } from './clients/clients.module';
+import { CompaniesModule } from './companies/companies.module';
+import { BambooHRModule } from './bamboohr/bamboohr.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -65,6 +70,11 @@ import { APP_GUARD } from '@nestjs/core';
     JobsModule,
     HubSpotModule,
     NotionModule,
+    InventoryModule,
+    ClientsModule,
+    CompaniesModule,
+    BambooHRModule,
+    WebhooksModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
