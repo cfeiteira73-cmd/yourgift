@@ -44,6 +44,9 @@ import { AutomationModule } from './automation/automation.module';
 import { TenantsModule } from './tenants/tenants.module';
 import { FinancialIntelligenceModule } from './financial-intelligence/financial-intelligence.module';
 import { WorkflowsModule } from './workflows/workflows.module';
+import { AIDesignModule } from './ai-design/ai-design.module';
+import { EventPlatformModule } from './event-platform/event-platform.module';
+import { FinancialConsolidationModule } from './financial-consolidation/financial-consolidation.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -105,6 +108,9 @@ import { APP_GUARD } from '@nestjs/core';
     TenantsModule,
     FinancialIntelligenceModule,
     WorkflowsModule,
+    AIDesignModule,
+    EventPlatformModule,
+    FinancialConsolidationModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
