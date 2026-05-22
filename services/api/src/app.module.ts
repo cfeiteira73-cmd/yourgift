@@ -41,6 +41,9 @@ import { IntelligenceModule } from './intelligence/intelligence.module';
 import { ProjectionsModule } from './projections/projections.module';
 import { LedgerModule } from './ledger/ledger.module';
 import { AutomationModule } from './automation/automation.module';
+import { TenantsModule } from './tenants/tenants.module';
+import { FinancialIntelligenceModule } from './financial-intelligence/financial-intelligence.module';
+import { WorkflowsModule } from './workflows/workflows.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -99,6 +102,9 @@ import { APP_GUARD } from '@nestjs/core';
     ProjectionsModule,
     LedgerModule,
     AutomationModule,
+    TenantsModule,
+    FinancialIntelligenceModule,
+    WorkflowsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

@@ -22,6 +22,7 @@ model Client {
   passwordHash String?  @map("password_hash")
   tier         String   @default("standard") // standard | premium | enterprise
   companyId    String?  @map("company_id")
+  tenantId     String   @default("default") @map("tenant_id")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
@@ -30,6 +31,7 @@ model Client {
   approvals    Approval[]
   companyRef   Company?   @relation(fields: [companyId], references: [id])
 
+  @@index([tenantId])
   @@map("clients")
 }
 
@@ -43,6 +45,7 @@ model Company {
   tier            String    @default("standard") // standard | premium | enterprise
   billingEmail    String?   @map("billing_email")
   shippingAddress Json?     @map("shipping_address")
+  tenantId        String    @default("default") @map("tenant_id")
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
 
@@ -53,6 +56,7 @@ model Company {
   campaigns       Campaign[]
   orders          Order[]
 
+  @@index([tenantId])
   @@map("companies")
 }
 
@@ -205,6 +209,7 @@ model Order {
   approvedById    String?   @map("approved_by_id")
   shippedAt       DateTime? @map("shipped_at")
   deliveredAt     DateTime? @map("delivered_at")
+  tenantId        String    @default("default") @map("tenant_id")
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
 
@@ -222,6 +227,7 @@ model Order {
   @@index([companyId])
   @@index([status])
   @@index([createdAt])
+  @@index([tenantId])
   @@map("orders")
 }
 
@@ -1000,4 +1006,144 @@ model SupplierRoutingMatrix {
 
   @@index([category])
   @@map("supplier_routing_matrix")
+}
+
+// ─────────────────────────────────────────────
+// TENANTS (multi-tenant isolation)
+// ─────────────────────────────────────────────
+
+model Tenant {
+  id                  String   @id @default(uuid())
+  slug                String   @unique
+  name                String
+  plan                String   @default("starter")
+  isActive            Boolean  @default(true) @map("is_active")
+  maxUsers            Int      @default(10) @map("max_users")
+  maxOrdersPerMonth   Int      @default(500) @map("max_orders_per_month")
+  settings            Json     @default("{}")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  memberships         TenantMembership[]
+  @@map("tenants")
+}
+
+model TenantMembership {
+  id         String    @id @default(uuid())
+  tenantId   String    @map("tenant_id")
+  userId     String    @map("user_id")
+  role       String    @default("member")
+  isActive   Boolean   @default(true) @map("is_active")
+  invitedBy  String?   @map("invited_by")
+  joinedAt   DateTime? @map("joined_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  tenant     Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  @@unique([tenantId, userId])
+  @@map("tenant_memberships")
+}
+
+model AccrualEntry {
+  id              String    @id @default(uuid())
+  tenantId        String    @default("default") @map("tenant_id")
+  referenceType   String    @map("reference_type")
+  referenceId     String    @map("reference_id")
+  entryType       String    @map("entry_type")
+  amount          Decimal   @db.Decimal(14, 2)
+  currency        String    @default("EUR")
+  recognitionDate DateTime? @map("recognition_date") @db.Date
+  recognizedAt    DateTime? @map("recognized_at")
+  settledAt       DateTime? @map("settled_at")
+  description     String?
+  metadata        Json      @default("{}")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  @@index([referenceType, referenceId])
+  @@index([tenantId])
+  @@map("accrual_entries")
+}
+
+model CostAllocation {
+  id               String   @id @default(uuid())
+  tenantId         String   @default("default") @map("tenant_id")
+  orderId          String?  @map("order_id")
+  department       String?
+  costType         String   @map("cost_type")
+  allocatedAmount  Decimal  @db.Decimal(14, 2) @map("allocated_amount")
+  baseAmount       Decimal  @db.Decimal(14, 2) @map("base_amount")
+  allocationRate   Decimal  @default(1.0) @db.Decimal(6, 4) @map("allocation_rate")
+  currency         String   @default("EUR")
+  periodStart      DateTime @map("period_start") @db.Date
+  periodEnd        DateTime @map("period_end") @db.Date
+  metadata         Json     @default("{}")
+  createdAt        DateTime @default(now()) @map("created_at")
+  @@index([tenantId])
+  @@index([orderId])
+  @@map("cost_allocations")
+}
+
+model WorkflowDefinition {
+  id              String   @id @default(uuid())
+  name            String   @unique
+  description     String?
+  version         Int      @default(1)
+  triggerEvent    String   @map("trigger_event")
+  dag             Json     @default("[]")
+  isActive        Boolean  @default(true) @map("is_active")
+  timeoutSeconds  Int      @default(3600) @map("timeout_seconds")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  instances       WorkflowInstance[]
+  @@map("workflow_definitions")
+}
+
+model WorkflowInstance {
+  id              String   @id @default(uuid())
+  definitionId    String   @map("definition_id")
+  definitionName  String   @map("definition_name")
+  triggerPayload  Json     @default("{}") @map("trigger_payload")
+  status          String   @default("running")
+  currentStep     String?  @map("current_step")
+  context         Json     @default("{}")
+  startedAt       DateTime @default(now()) @map("started_at")
+  completedAt     DateTime? @map("completed_at")
+  error           String?
+  definition      WorkflowDefinition @relation(fields: [definitionId], references: [id])
+  steps           WorkflowStepState[]
+  @@index([definitionId])
+  @@index([status])
+  @@map("workflow_instances")
+}
+
+model WorkflowStepState {
+  id           String    @id @default(uuid())
+  instanceId   String    @map("instance_id")
+  stepId       String    @map("step_id")
+  stepName     String    @map("step_name")
+  status       String    @default("pending")
+  attempt      Int       @default(1)
+  maxAttempts  Int       @default(3) @map("max_attempts")
+  input        Json      @default("{}")
+  output       Json      @default("{}")
+  error        String?
+  startedAt    DateTime? @map("started_at")
+  completedAt  DateTime? @map("completed_at")
+  instance     WorkflowInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  @@unique([instanceId, stepId])
+  @@map("workflow_step_states")
+}
+
+model LearningOutcome {
+  id              String    @id @default(uuid())
+  outcomeType     String    @map("outcome_type")
+  referenceType   String    @map("reference_type")
+  referenceId     String    @map("reference_id")
+  supplierId      String?   @map("supplier_id")
+  metricName      String    @map("metric_name")
+  actualValue     Decimal   @db.Decimal(10, 4) @map("actual_value")
+  expectedValue   Decimal?  @db.Decimal(10, 4) @map("expected_value")
+  delta           Decimal?  @db.Decimal(10, 4)
+  weight          Decimal   @default(1.0) @db.Decimal(4, 3)
+  incorporatedAt  DateTime? @map("incorporated_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  @@index([supplierId])
+  @@index([outcomeType])
+  @@map("learning_outcomes")
 }
