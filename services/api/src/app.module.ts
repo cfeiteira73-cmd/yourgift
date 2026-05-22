@@ -28,11 +28,16 @@ import { InventoryModule } from './inventory/inventory.module';
 import { ClientsModule } from './clients/clients.module';
 import { CompaniesModule } from './companies/companies.module';
 import { BambooHRModule } from './bamboohr/bamboohr.module';
+import { RetentionModule } from './retention/retention.module';
+import { HiBobModule } from './hibob/hibob.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { StorePortalModule } from './store-portal/store-portal.module';
 import { EventLogModule } from './event-log/event-log.module';
+import { EventSourcingModule } from './event-sourcing/event-sourcing.module';
 import { CurrencyModule } from './currency/currency.module';
 import { TeamsModule } from './teams/teams.module';
+import { FinancialModule } from './financial/financial.module';
+import { IntelligenceModule } from './intelligence/intelligence.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -81,8 +86,13 @@ import { APP_GUARD } from '@nestjs/core';
     WebhooksModule,
     StorePortalModule,
     EventLogModule,
+    EventSourcingModule,
     CurrencyModule,
     TeamsModule,
+    FinancialModule,
+    RetentionModule,
+    HiBobModule,
+    IntelligenceModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

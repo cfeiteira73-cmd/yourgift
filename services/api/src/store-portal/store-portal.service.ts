@@ -7,9 +7,9 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventBusService } from '../events/event-bus.service';
+import { AllowanceLedgerService } from './allowance-ledger.service';
 import { CreateEmployeeDto, UpdateEmployeeDto } from './dto/create-employee.dto';
 import { PlaceOrderDto } from './dto/place-order.dto';
 
@@ -68,6 +68,7 @@ export class StorePortalService {
     private readonly events: EventBusService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly ledger: AllowanceLedgerService,
   ) {}
 
   // ── employee login ────────────────────────────────────────────────────────
@@ -247,33 +248,29 @@ export class StorePortalService {
     }
 
     const totalAmount = unitPrice * dto.quantity;
-    const remaining = employee.allowance - employee.spent;
 
-    if (employee.allowance > 0 && totalAmount > remaining) {
-      throw new BadRequestException(
-        `Saldo insuficiente. Disponível: €${remaining.toFixed(2)}, Encomenda: €${totalAmount.toFixed(2)}`,
-      );
-    }
+    // Create the employee order record first
+    const order = await this.prisma.employeeOrder.create({
+      data: {
+        employeeId,
+        storeId: employee.storeId,
+        productId: dto.productId,
+        variantId: dto.variantId ?? null,
+        quantity: dto.quantity,
+        totalAmount,
+        status: 'pending',
+        notes: dto.notes ?? null,
+      },
+    });
 
-    // Create order and deduct spent in a transaction
-    const [order] = await this.prisma.$transaction([
-      this.prisma.employeeOrder.create({
-        data: {
-          employeeId,
-          storeId: employee.storeId,
-          productId: dto.productId,
-          variantId: dto.variantId ?? null,
-          quantity: dto.quantity,
-          totalAmount,
-          status: 'pending',
-          notes: dto.notes ?? null,
-        },
-      }),
-      this.prisma.storeEmployee.update({
-        where: { id: employeeId },
-        data: { spent: { increment: totalAmount } },
-      }),
-    ]);
+    // Debit allowance via ledger (atomic, balance-checked, append-only)
+    await this.ledger.debit(
+      employeeId,
+      employee.storeId,
+      totalAmount,
+      order.id,
+      `Order ${order.id} — ${storeProduct.product.title} x${dto.quantity}`,
+    );
 
     this.events.emit('employee_order.created', {
       orderId: order.id,
@@ -361,6 +358,50 @@ export class StorePortalService {
         ...(dto.isActive !== undefined && { isActive: dto.isActive }),
       },
     });
+  }
+
+  // ── admin: credit employee allowance ─────────────────────────────────────
+
+  async creditAllowance(
+    slug: string,
+    employeeId: string,
+    amount: number,
+    description: string,
+    actorId?: string,
+  ) {
+    const store = await this.assertStoreBySlug(slug);
+
+    const employee = await this.prisma.storeEmployee.findUnique({
+      where: { id: employeeId },
+    });
+    if (!employee || employee.storeId !== store.id) {
+      throw new NotFoundException('Colaborador não encontrado');
+    }
+
+    const newBalance = await this.ledger.credit(
+      employeeId,
+      store.id,
+      amount,
+      description,
+      actorId,
+    );
+
+    return { employeeId, newBalance };
+  }
+
+  // ── employee/admin: get ledger history ────────────────────────────────────
+
+  async getLedgerHistory(slug: string, employeeId: string, limit = 50) {
+    const store = await this.assertStoreBySlug(slug);
+
+    const employee = await this.prisma.storeEmployee.findUnique({
+      where: { id: employeeId },
+    });
+    if (!employee || employee.storeId !== store.id) {
+      throw new NotFoundException('Colaborador não encontrado');
+    }
+
+    return this.ledger.getHistory(employeeId, limit);
   }
 
   // ── private helpers ───────────────────────────────────────────────────────

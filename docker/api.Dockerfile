@@ -12,6 +12,7 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 # Copy workspace package manifests
 COPY packages/shared/package.json ./packages/shared/
 COPY integrations/midocean/package.json ./integrations/midocean/
+COPY integrations/pf/package.json ./integrations/pf/
 COPY services/api/package.json ./services/api/
 
 # Install all dependencies (frozen to match lockfile exactly)
@@ -20,6 +21,7 @@ RUN pnpm install --frozen-lockfile
 # Copy full source
 COPY packages/shared ./packages/shared
 COPY integrations/midocean ./integrations/midocean
+COPY integrations/pf ./integrations/pf
 COPY services/api ./services/api
 COPY tsconfig.base.json ./
 
@@ -28,6 +30,9 @@ RUN pnpm --filter @yourgift/shared run build
 
 # Build midocean integration (api depends on it)
 RUN pnpm --filter @yourgift/midocean run build
+
+# Build pf-concept integration (api depends on it)
+RUN pnpm --filter @yourgift/pf-concept run build
 
 # Generate Prisma client (must happen before nest build)
 RUN cd services/api && npx prisma generate --schema ./prisma/schema.prisma || true
@@ -53,8 +58,10 @@ COPY --from=builder /app/node_modules ./node_modules
 # Workspace packages — pnpm symlinks in node_modules point to these paths.
 # @yourgift/shared:  /app/node_modules/@yourgift/shared → /app/packages/shared
 # @yourgift/midocean: /app/node_modules/@yourgift/midocean → /app/integrations/midocean
+# @yourgift/pf-concept: /app/node_modules/@yourgift/pf-concept → /app/integrations/pf
 COPY --from=builder /app/packages/shared ./packages/shared
 COPY --from=builder /app/integrations/midocean ./integrations/midocean
+COPY --from=builder /app/integrations/pf ./integrations/pf
 
 # Keep api in its ORIGINAL path so pnpm symlinks resolve correctly:
 # Node resolves modules from /app/services/api/dist/main.js upward:

@@ -242,7 +242,7 @@ function CompanyDetailModal({
 
   const TABS: { id: DetailTab; label: string }[] = [
     { id: 'overview', label: 'Overview' },
-    { id: 'clients', label: `Clientes ${detail ? `(${detail._count?.clients ?? detail.clients?.length ?? 0})` : ''}` },
+    { id: 'clients', label: `Clientes ${detail ? `(${(detail as CompanyDetail & { _count?: { clients?: number } })._count?.clients ?? detail.clients?.length ?? 0})` : ''}` },
     { id: 'departments', label: 'Dep.' },
     { id: 'stores', label: 'Lojas' },
     { id: 'budgets', label: 'Budgets' },

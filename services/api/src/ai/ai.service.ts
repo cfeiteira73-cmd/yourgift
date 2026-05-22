@@ -199,7 +199,7 @@ export class AiService {
           where: {
             category: { in: topCategories },
             id: { notIn: [...purchasedProductIds] },
-            active: true,
+            isActive: true,
           },
           take: 10,
           select: { id: true, title: true, category: true },

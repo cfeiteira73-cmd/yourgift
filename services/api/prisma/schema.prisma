@@ -405,8 +405,9 @@ model StoreEmployee {
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
-  store  CompanyStore  @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  orders EmployeeOrder[]
+  store         CompanyStore           @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orders        EmployeeOrder[]
+  ledgerEntries AllowanceLedgerEntry[]
 
   @@unique([storeId, email])
   @@index([storeId])
@@ -535,6 +536,53 @@ model InventoryAlert {
 }
 
 // ─────────────────────────────────────────────
+// ALLOWANCE LEDGER (append-only)
+// ─────────────────────────────────────────────
+
+model AllowanceLedgerEntry {
+  id          String   @id @default(uuid())
+  employeeId  String   @map("employee_id")
+  storeId     String   @map("store_id")
+  amount      Float                       // positive = credit (top-up), negative = debit (spend)
+  balance     Float                       // running balance AFTER this entry
+  entryType   String   @map("entry_type") // credit | debit | adjustment | refund | reset
+  referenceId String?  @map("reference_id") // orderId, adminActionId, etc.
+  description String
+  actorId     String?  @map("actor_id")   // who performed the action
+  actorType   String?  @map("actor_type") // employee | admin | system
+  createdAt   DateTime @default(now()) @map("created_at")
+  // IMMUTABLE: no updatedAt, no soft delete — this is append-only
+
+  employee StoreEmployee @relation(fields: [employeeId], references: [id])
+
+  @@index([employeeId, createdAt])
+  @@index([storeId])
+  @@map("allowance_ledger")
+}
+
+// ─────────────────────────────────────────────
+// PROCUREMENT EVENTS (event-sourcing stream)
+// ─────────────────────────────────────────────
+
+model ProcurementEvent {
+  id          String   @id @default(uuid())
+  streamId    String   @map("stream_id")    // entityId (orderId, quoteId, etc.)
+  streamType  String   @map("stream_type")  // order | quote | campaign | employee_order
+  eventType   String   @map("event_type")   // e.g. "order.status_changed"
+  sequenceNum Int      @map("sequence_num") // monotonic per stream
+  payload     Json     @default("{}")
+  metadata    Json     @default("{}")       // actorId, actorType, correlationId, etc.
+  appliedAt   DateTime @default(now()) @map("applied_at")
+  // APPEND-ONLY: no updates, no deletes
+
+  @@unique([streamId, sequenceNum])
+  @@index([streamId, appliedAt])
+  @@index([streamType, eventType])
+  @@index([appliedAt])
+  @@map("procurement_events")
+}
+
+// ─────────────────────────────────────────────
 // EXCHANGE RATES
 // ─────────────────────────────────────────────
 
@@ -629,4 +677,142 @@ model AdminUser {
   updatedAt    DateTime @updatedAt @map("updated_at")
 
   @@map("admin_users")
+}
+
+// ─────────────────────────────────────────────
+// FINANCIAL INTELLIGENCE
+// ─────────────────────────────────────────────
+
+model ClientFinancialSnapshot {
+  id               String   @id @default(uuid())
+  clientId         String   @map("client_id")
+  companyId        String?  @map("company_id")
+  periodMonth      String   @map("period_month")   // 'YYYY-MM'
+  totalRevenue     Float    @default(0) @map("total_revenue")
+  totalCost        Float    @default(0) @map("total_cost")
+  grossMargin      Float    @default(0) @map("gross_margin")
+  grossMarginPct   Float    @default(0) @map("gross_margin_pct")
+  orderCount       Int      @default(0) @map("order_count")
+  avgOrderValue    Float    @default(0) @map("avg_order_value")
+  ltvCumulative    Float    @default(0) @map("ltv_cumulative")
+  cacProxy         Float    @default(0) @map("cac_proxy")
+  cohortMonth      String   @map("cohort_month")   // 'YYYY-MM' of first order
+  computedAt       DateTime @default(now()) @map("computed_at")
+
+  @@unique([clientId, periodMonth])
+  @@index([clientId])
+  @@index([companyId])
+  @@index([periodMonth])
+  @@index([cohortMonth])
+  @@map("client_financial_snapshots")
+}
+
+model CompanyCohortAnalysis {
+  id                   String   @id @default(uuid())
+  companyId            String   @map("company_id")
+  cohortMonth          String   @map("cohort_month")
+  periodMonth          String   @map("period_month")
+  activeClients        Int      @default(0) @map("active_clients")
+  totalOrders          Int      @default(0) @map("total_orders")
+  totalRevenue         Float    @default(0) @map("total_revenue")
+  avgRevenuePerClient  Float    @default(0) @map("avg_revenue_per_client")
+  computedAt           DateTime @default(now()) @map("computed_at")
+
+  @@unique([companyId, cohortMonth, periodMonth])
+  @@index([companyId])
+  @@index([periodMonth])
+  @@map("company_cohort_analysis")
+}
+
+// ─────────────────────────────────────────────
+// RETENTION LOOP ENGINE
+// ─────────────────────────────────────────────
+
+model ClientProcurementCycle {
+  id                   String    @id @default(uuid())
+  clientId             String    @unique @map("client_id")
+  companyId            String?   @map("company_id")
+  firstOrderAt         DateTime? @map("first_order_at")
+  lastOrderAt          DateTime? @map("last_order_at")
+  orderCount           Int       @default(0) @map("order_count")
+  avgDaysBetweenOrders Float?    @map("avg_days_between_orders")
+  predictedNextOrderAt DateTime? @map("predicted_next_order_at")
+  churnRiskScore       Float     @default(0) @map("churn_risk_score")
+  churnRiskLevel       String    @default("low") @map("churn_risk_level")
+  daysSinceLastOrder   Int?      @map("days_since_last_order")
+  onboardingCompleted  Boolean   @default(false) @map("onboarding_completed")
+  updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([clientId])
+  @@index([companyId])
+  @@index([churnRiskLevel])
+  @@map("client_procurement_cycles")
+}
+
+model DemandForecast {
+  id               String   @id @default(uuid())
+  entityType       String   @map("entity_type")  // product | category | company
+  entityId         String   @map("entity_id")
+  forecastMonth    String   @map("forecast_month")  // 'YYYY-MM'
+  predictedQty     Int      @default(0) @map("predicted_quantity")
+  predictedRevenue Float    @default(0) @map("predicted_revenue")
+  confidenceScore  Float    @default(0.5) @map("confidence_score")
+  historicalOrders Int      @default(0) @map("historical_orders")
+  computedAt       DateTime @default(now()) @map("computed_at")
+
+  @@unique([entityType, entityId, forecastMonth])
+  @@index([entityType, entityId])
+  @@index([forecastMonth])
+  @@map("demand_forecasts")
+}
+
+model HibobSyncEvent {
+  id            String   @id @default(uuid())
+  employeeId    String   @map("employee_id")
+  employeeEmail String   @map("employee_email")
+  eventType     String   @map("event_type")  // employee.onboarded | employee.updated | employee.offboarded
+  payload       Json     @default("{}")
+  processedAt   DateTime @default(now()) @map("processed_at")
+
+  @@index([employeeEmail])
+  @@map("hibob_sync_events")
+}
+
+// ─────────────────────────────────────────────
+// SUPPLIER INTELLIGENCE (self-improving)
+// ─────────────────────────────────────────────
+
+model SupplierPerformance {
+  id                String    @id @default(uuid())
+  supplier          String    @unique
+  totalOrders       Int       @default(0) @map("total_orders")
+  onTimeDeliveries  Int       @default(0) @map("on_time_deliveries")
+  lateDeliveries    Int       @default(0) @map("late_deliveries")
+  cancelledOrders   Int       @default(0) @map("cancelled_orders")
+  avgDeliveryDays   Float?    @map("avg_delivery_days")
+  reliabilityScore  Float     @default(1.0) @map("reliability_score")
+  lastOrderAt       DateTime? @map("last_order_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@index([supplier])
+  @@index([reliabilityScore])
+  @@map("supplier_performance")
+}
+
+model ProcurementIntelligence {
+  id             String   @id @default(uuid())
+  entityType     String   @map("entity_type")   // product | category | supplier
+  entityId       String   @map("entity_id")
+  signalType     String   @map("signal_type")   // trending_up | trending_down | popular | seasonal
+  score          Float    @default(0)
+  orderCount30d  Int      @default(0) @map("order_count_30d")
+  orderCount7d   Int      @default(0) @map("order_count_7d")
+  revenue30d     Float    @default(0) @map("revenue_30d")
+  computedAt     DateTime @default(now()) @map("computed_at")
+
+  @@unique([entityType, entityId])
+  @@index([entityType, entityId])
+  @@index([signalType])
+  @@index([score(sort: Desc)])
+  @@map("procurement_intelligence")
 }

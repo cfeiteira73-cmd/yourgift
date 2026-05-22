@@ -145,6 +145,28 @@ const SECONDARY_ITEMS: NavItem[] = [
     ),
   },
   {
+    href: '/financial',
+    label: 'Financial Intel',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="1" y="9" width="3" height="5" rx="0.5" />
+        <rect x="6" y="5" width="3" height="9" rx="0.5" />
+        <rect x="11" y="2" width="3" height="12" rx="0.5" />
+      </svg>
+    ),
+  },
+  {
+    href: '/intelligence',
+    label: 'Intelligence',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="8" cy="6" r="3.5" />
+        <path d="M5.5 9.5L4 14M10.5 9.5L12 14M6 14h4" />
+        <path d="M6.5 4.5c0-.5.5-1.5 1.5-1.5s1.5 1 1.5 1.5" />
+      </svg>
+    ),
+  },
+  {
     href: '/inventory',
     label: 'Inventário',
     icon: (
@@ -185,6 +207,28 @@ const SECONDARY_ITEMS: NavItem[] = [
         <circle cx="4" cy="14" r="1.25" fill="currentColor" stroke="none" />
         <circle cx="12" cy="14" r="1.25" fill="currentColor" stroke="none" />
         <path d="M1 9h10" />
+      </svg>
+    ),
+  },
+  {
+    href: '/retention',
+    label: 'Retention',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 2a6 6 0 1 1-4.243 1.757" />
+        <path d="M2 2h3v3" />
+        <path d="M8 5v3.5l2 1.5" />
+      </svg>
+    ),
+  },
+  {
+    href: '/pricing',
+    label: 'Preços',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 10l4-8 4 8" />
+        <path d="M3.5 7.5h5" />
+        <path d="M11 5.5c0 0 1.5-1.5 3 0s-1.5 3 0 4.5" />
       </svg>
     ),
   },

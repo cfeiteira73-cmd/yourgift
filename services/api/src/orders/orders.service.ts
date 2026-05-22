@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventBusService } from '../events/event-bus.service';
+import { EventSourcingService } from '../event-sourcing/event-sourcing.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import {
   OrderStatus,
@@ -46,6 +47,7 @@ export class OrdersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly events: EventBusService,
+    private readonly eventSourcing: EventSourcingService,
   ) {}
 
   // ─── CREATE ────────────────────────────────────────────────────────────────
@@ -84,6 +86,14 @@ export class OrdersService {
         payload: { ref: order.ref, status: 'created' },
       },
     });
+
+    await this.eventSourcing.append(
+      order.id,
+      'order',
+      'order.created',
+      { orderId: order.id, ref: order.ref, clientId, status: 'created' },
+      { actorId: clientId, actorType: 'client' },
+    );
 
     this.events.emit('order.created', order);
     return order;
@@ -176,6 +186,14 @@ export class OrdersService {
       },
     });
 
+    await this.eventSourcing.append(
+      id,
+      'order',
+      'order.status_changed',
+      { orderId: id, previousStatus: from, newStatus: status, actorId: actorId ?? null },
+      { actorId: actorId ?? undefined, actorType: 'admin' },
+    );
+
     this.events.emit(`order.${status}`, order);
     return order;
   }
@@ -242,6 +260,14 @@ export class OrdersService {
       },
     });
 
+    await this.eventSourcing.append(
+      id,
+      'order',
+      'order.cancelled',
+      { orderId: id, reason, previousStatus: existing.status, actorId },
+      { actorId, actorType: 'admin' },
+    );
+
     this.events.emit('order.cancelled', { ...order, reason });
     return order;
   }
@@ -276,6 +302,14 @@ export class OrdersService {
         payload: { from, to },
       },
     });
+
+    await this.eventSourcing.append(
+      id,
+      'order',
+      'order.fulfillment_started',
+      { orderId: id, previousStatus: from, newStatus: to, actorId },
+      { actorId, actorType: 'admin' },
+    );
 
     this.events.emit('order.fulfillment_started', order);
     return order;

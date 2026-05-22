@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
   HttpCode,
@@ -101,5 +102,43 @@ export class StorePortalController {
     @Body() dto: UpdateEmployeeDto,
   ) {
     return this.portal.updateEmployee(slug, employeeId, dto);
+  }
+
+  // ── POST /api/v1/stores/:slug/employees/:id/credit — admin auth ───────────
+
+  @Post('employees/:employeeId/credit')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Admin: top-up employee allowance (appends to ledger)' })
+  creditAllowance(
+    @Param('slug') slug: string,
+    @Param('employeeId') employeeId: string,
+    @Body() body: { amount: number; description: string; actorId?: string },
+  ) {
+    return this.portal.creditAllowance(
+      slug,
+      employeeId,
+      body.amount,
+      body.description,
+      body.actorId,
+    );
+  }
+
+  // ── GET /api/v1/stores/:slug/employees/:id/ledger — admin auth ────────────
+
+  @Get('employees/:employeeId/ledger')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Admin: view employee allowance ledger history' })
+  getLedgerHistory(
+    @Param('slug') slug: string,
+    @Param('employeeId') employeeId: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.portal.getLedgerHistory(
+      slug,
+      employeeId,
+      limit !== undefined ? parseInt(limit, 10) : 50,
+    );
   }
 }

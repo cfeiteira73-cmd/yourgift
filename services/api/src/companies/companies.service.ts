@@ -220,7 +220,7 @@ export class CompaniesService {
         primaryColor: dto.primaryColor ?? null,
         tier: dto.tier ?? 'standard',
         billingEmail: dto.billingEmail ?? null,
-        shippingAddress: dto.shippingAddress ?? undefined,
+        shippingAddress: (dto.shippingAddress as object | undefined) ?? undefined,
       },
     });
   }
@@ -246,7 +246,7 @@ export class CompaniesService {
           billingEmail: dto.billingEmail ?? null,
         }),
         ...(dto.shippingAddress !== undefined && {
-          shippingAddress: dto.shippingAddress,
+          shippingAddress: dto.shippingAddress as object,
         }),
       },
     });

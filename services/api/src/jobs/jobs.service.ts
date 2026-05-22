@@ -30,7 +30,7 @@ export class JobsService implements OnModuleInit, OnModuleDestroy {
     scheduledAt?: Date,
   ): Promise<string> {
     const job = await this.prisma.job.create({
-      data: { type, payload, scheduledAt: scheduledAt ?? new Date() },
+      data: { type, payload: payload as object, scheduledAt: scheduledAt ?? new Date() },
     });
     this.logger.log(`Job enqueued: ${type} [${job.id}]`);
     return job.id;
