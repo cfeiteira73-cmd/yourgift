@@ -29,6 +29,10 @@ import { ClientsModule } from './clients/clients.module';
 import { CompaniesModule } from './companies/companies.module';
 import { BambooHRModule } from './bamboohr/bamboohr.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
+import { StorePortalModule } from './store-portal/store-portal.module';
+import { EventLogModule } from './event-log/event-log.module';
+import { CurrencyModule } from './currency/currency.module';
+import { TeamsModule } from './teams/teams.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -75,6 +79,10 @@ import { APP_GUARD } from '@nestjs/core';
     CompaniesModule,
     BambooHRModule,
     WebhooksModule,
+    StorePortalModule,
+    EventLogModule,
+    CurrencyModule,
+    TeamsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowRight, CheckCircle, Upload } from 'lucide-react';
 import type { Metadata } from 'next';
+import { type Lang, t } from '@/lib/i18n';
 
 // Note: metadata export is not supported in Client Components.
 // Define it in a parent server component or move to a separate layout if needed.
@@ -109,6 +110,12 @@ export default function QuotePage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lang, setLang] = useState<Lang>('pt');
+
+  useEffect(() => {
+    const match = document.cookie.match(/lang=(pt|en)/);
+    if (match) setLang(match[1] as Lang);
+  }, []);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
@@ -152,7 +159,7 @@ export default function QuotePage() {
 
       setSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro inesperado. Tente novamente.');
+      setError(err instanceof Error ? err.message : t(lang, 'common.error'));
     } finally {
       setLoading(false);
     }
@@ -192,12 +199,10 @@ export default function QuotePage() {
               marginBottom: '0.75rem',
             }}
           >
-            Pedido recebido!
+            {lang === 'en' ? 'Request received!' : 'Pedido recebido!'}
           </h1>
           <p style={{ color: 'rgb(120,130,150)', lineHeight: 1.6, fontSize: '0.95rem' }}>
-            Entraremos em contacto em{' '}
-            <span style={{ color: 'rgb(99,230,190)', fontWeight: 600 }}>24–48 horas</span>{' '}
-            com uma proposta personalizada.
+            {t(lang, 'quote.success')}
           </p>
           <p style={{ color: 'rgb(100,110,130)', fontSize: '0.82rem', marginTop: '0.75rem' }}>
             Confirmaremos por e-mail para <strong style={{ color: 'rgb(170,180,198)' }}>{form.email}</strong>.
@@ -266,7 +271,7 @@ export default function QuotePage() {
               marginBottom: '0.75rem',
             }}
           >
-            Solicitar Proposta
+            {t(lang, 'quote.title')}
           </h1>
           <p
             style={{
@@ -542,10 +547,10 @@ export default function QuotePage() {
             }}
           >
             {loading ? (
-              'A enviar...'
+              t(lang, 'common.loading')
             ) : (
               <>
-                Solicitar Proposta
+                {t(lang, 'quote.submit')}
                 <ArrowRight style={{ width: 18, height: 18 }} />
               </>
             )}

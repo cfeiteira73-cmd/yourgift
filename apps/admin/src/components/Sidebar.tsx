@@ -175,6 +175,39 @@ const SECONDARY_ITEMS: NavItem[] = [
       </svg>
     ),
   },
+  {
+    href: '/suppliers',
+    label: 'Fornecedores',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="1" y="6" width="10" height="8" rx="1" />
+        <path d="M11 9h2.5a1 1 0 0 1 .9.55l1 2A1 1 0 0 1 15 12v2a1 1 0 0 1-1 1h-3" />
+        <circle cx="4" cy="14" r="1.25" fill="currentColor" stroke="none" />
+        <circle cx="12" cy="14" r="1.25" fill="currentColor" stroke="none" />
+        <path d="M1 9h10" />
+      </svg>
+    ),
+  },
+  {
+    href: '/audit',
+    label: 'Auditoria',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z" />
+        <path d="M8 5v3.5l2.5 1.5" />
+      </svg>
+    ),
+  },
+  {
+    href: '/settings',
+    label: 'Definições',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="8" cy="8" r="2" />
+        <path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M3.05 12.95l1.06-1.06M11.89 4.11l1.06-1.06" />
+      </svg>
+    ),
+  },
 ];
 
 function NavLink({ item }: { item: NavItem }) {

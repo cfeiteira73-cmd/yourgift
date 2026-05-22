@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { formatCurrency, API_BASE, getAdminToken } from '@/lib/utils';
 
 interface Store {
@@ -44,7 +45,7 @@ function slugify(str: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-function StoreCard({ store, onManage }: { store: Store; onManage: (s: Store) => void }) {
+function StoreCard({ store, onManage, onEmployees }: { store: Store; onManage: (s: Store) => void; onEmployees: (s: Store) => void }) {
   const color = store.primaryColor ?? '#4da3ff';
   return (
     <div className="rounded-xl border border-[#1a2f48] bg-[#0b1526] overflow-hidden hover:border-[#4da3ff]/30 transition-all group">
@@ -108,12 +109,17 @@ function StoreCard({ store, onManage }: { store: Store; onManage: (s: Store) => 
           >
             Gerir
           </button>
-          <a
-            href={`/stores/${store.id}`}
-            className="flex-1 px-3 py-1.5 rounded-lg border border-[#1a2f48] text-[#8ba8c7] text-xs font-semibold text-center hover:bg-[#102131] hover:text-white transition-colors"
+          <button
+            type="button"
+            onClick={() => onEmployees(store)}
+            className="flex-1 px-3 py-1.5 rounded-lg border border-[#1a2f48] text-[#8ba8c7] text-xs font-semibold text-center hover:bg-[#102131] hover:text-white transition-colors flex items-center justify-center gap-1"
           >
-            Ver
-          </a>
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+              <circle cx="6" cy="5" r="2.5" />
+              <path d="M1 13c0-2.8 2.2-5 5-5h.5M13 11v4M11 13h4" />
+            </svg>
+            Colaboradores
+          </button>
         </div>
       </div>
     </div>
@@ -141,6 +147,7 @@ function SkeletonCard() {
 const SELECT_CHEVRON = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5l3 3 3-3' stroke='%234d6a87' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`;
 
 export default function StoresPage() {
+  const router = useRouter();
   const [stores, setStores] = useState<Store[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -237,6 +244,10 @@ export default function StoresPage() {
     alert(`Gestão da loja "${store.name}" — em breve`);
   }
 
+  function handleEmployees(store: Store) {
+    router.push(`/stores/${store.id}/employees`);
+  }
+
   return (
     <div>
       {/* Header */}
@@ -314,7 +325,7 @@ export default function StoresPage() {
             </div>
           )
           : filtered.map((store) => (
-            <StoreCard key={store.id} store={store} onManage={handleManage} />
+            <StoreCard key={store.id} store={store} onManage={handleManage} onEmployees={handleEmployees} />
           ))
         }
       </div>

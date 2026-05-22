@@ -138,6 +138,7 @@ model Quote {
   companyId       String?   @map("company_id")
   departmentId    String?   @map("department_id")
   status          String    @default("draft")
+  currency        String    @default("EUR")
   // draft | submitted | pricing | approved | rejected | converted
   eventDate       DateTime? @map("event_date")
   deliveryDate    DateTime? @map("delivery_date")
@@ -189,6 +190,7 @@ model Order {
   departmentId    String?   @map("department_id")
   campaignId      String?   @map("campaign_id")
   status          String    @default("created")
+  currency        String    @default("EUR")
   // created | paid | approved | producing | shipped | delivered | cancelled
   shippingAddress Json      @map("shipping_address")
   pricingSnapshot Json?     @map("pricing_snapshot")
@@ -382,11 +384,52 @@ model CompanyStore {
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
 
-  company  Company             @relation(fields: [companyId], references: [id])
-  products CompanyStoreProduct[]
+  company   Company              @relation(fields: [companyId], references: [id])
+  products  CompanyStoreProduct[]
+  employees StoreEmployee[]
 
   @@index([companyId])
   @@map("company_stores")
+}
+
+model StoreEmployee {
+  id          String    @id @default(uuid())
+  storeId     String    @map("store_id")
+  email       String
+  name        String
+  department  String?
+  allowance   Float     @default(0)
+  spent       Float     @default(0)
+  isActive    Boolean   @default(true) @map("is_active")
+  lastLoginAt DateTime? @map("last_login_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  store  CompanyStore  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orders EmployeeOrder[]
+
+  @@unique([storeId, email])
+  @@index([storeId])
+  @@map("store_employees")
+}
+
+model EmployeeOrder {
+  id          String   @id @default(uuid())
+  employeeId  String   @map("employee_id")
+  storeId     String   @map("store_id")
+  productId   String   @map("product_id")
+  variantId   String?  @map("variant_id")
+  quantity    Int
+  totalAmount Float    @map("total_amount")
+  status      String   @default("pending")
+  notes       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  employee StoreEmployee @relation(fields: [employeeId], references: [id])
+
+  @@index([employeeId])
+  @@index([storeId])
+  @@map("employee_orders")
 }
 
 model CompanyStoreProduct {
@@ -489,6 +532,21 @@ model InventoryAlert {
   @@index([variantId])
   @@index([resolved])
   @@map("inventory_alerts")
+}
+
+// ─────────────────────────────────────────────
+// EXCHANGE RATES
+// ─────────────────────────────────────────────
+
+model ExchangeRate {
+  id           String   @id @default(uuid())
+  fromCurrency String   @map("from_currency")
+  toCurrency   String   @map("to_currency")
+  rate         Float
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@unique([fromCurrency, toCurrency])
+  @@map("exchange_rates")
 }
 
 // ─────────────────────────────────────────────

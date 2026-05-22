@@ -165,6 +165,36 @@ export class SuppliersService {
     return result;
   }
 
+  /** Get recent sync logs (last N, optionally filtered by supplier) */
+  async getSyncLogs(limit = 50, supplier?: string) {
+    return this.prisma.syncLog.findMany({
+      where: supplier ? { supplier } : undefined,
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
+  }
+
+  /** Get product/variant counts per supplier */
+  async getStats() {
+    const suppliers = ['midocean', 'pf_concept', 'stricker'];
+    const results = await Promise.all(
+      suppliers.map(async (s) => {
+        const [products, variants, lastSync] = await Promise.all([
+          this.prisma.product.count({ where: { supplier: s } }),
+          this.prisma.productVariant.count({
+            where: { product: { supplier: s } },
+          }),
+          this.prisma.syncLog.findFirst({
+            where: { supplier: s },
+            orderBy: { createdAt: 'desc' },
+          }),
+        ]);
+        return { supplier: s, products, variants, lastSync };
+      }),
+    );
+    return results;
+  }
+
   /** Route confirmed order to the correct supplier */
   private async routeToSupplier({ orderId }: { orderId: string }) {
     const order = await this.prisma.order.findUniqueOrThrow({
