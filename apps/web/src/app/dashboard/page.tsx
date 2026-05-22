@@ -318,7 +318,7 @@ export default async function DashboardPage() {
                 ))}
               </div>
 
-              {(orders as Array<{
+              {(orders as unknown as Array<{
                 id: string;
                 ref: string;
                 status: string;
