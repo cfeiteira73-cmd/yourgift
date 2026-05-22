@@ -119,6 +119,15 @@ const SECONDARY_ITEMS: NavItem[] = [
       </svg>
     ),
   },
+  {
+    href: '/ai',
+    label: 'AI Center',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+        <path d="M8 1l1.6 4H14l-3.2 2.3L12 12 8 9.5 4 12l1.2-4.7L2 5h4.4z" />
+      </svg>
+    ),
+  },
 ];
 
 function NavLink({ item }: { item: NavItem }) {

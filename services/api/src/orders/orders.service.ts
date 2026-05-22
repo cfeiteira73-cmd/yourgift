@@ -246,6 +246,41 @@ export class OrdersService {
     return order;
   }
 
+  // ─── FULFILL ──────────────────────────────────────────────────────────────
+
+  async fulfillOrder(id: string, actorId: string) {
+    const existing = await this.prisma.order.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`Order ${id} not found`);
+
+    const from = existing.status as OrderStatus;
+    const to: OrderStatus = 'producing';
+
+    if (!validateTransition(from, to)) {
+      throw new BadRequestException(
+        `Invalid status transition: ${from} → ${to}. Order must be in "approved" status to start fulfillment.`,
+      );
+    }
+
+    const order = await this.prisma.order.update({
+      where: { id },
+      data: { status: to },
+      include: { items: true },
+    });
+
+    await this.prisma.eventLog.create({
+      data: {
+        entity: 'order',
+        entityId: id,
+        event: 'order.fulfillment_started',
+        actorId,
+        payload: { from, to },
+      },
+    });
+
+    this.events.emit('order.fulfillment_started', order);
+    return order;
+  }
+
   // ─── ANALYTICS ────────────────────────────────────────────────────────────
 
   async getAnalytics(filters: AnalyticsFilters) {

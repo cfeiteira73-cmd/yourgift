@@ -8,6 +8,7 @@ import {
   Query,
   UseGuards,
   Request,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -100,6 +101,16 @@ export class OrdersController {
     @Body() dto: UpdateOrderStatusDto,
   ) {
     return this.orders.updateStatus(id, dto.status, dto.actorId ?? req.user.id);
+  }
+
+  // ─── POST /orders/:id/fulfill ─────────────────────────────────────────────
+
+  @Post(':id/fulfill')
+  fulfillOrder(@Request() req: AuthRequest, @Param('id') id: string) {
+    if (req.user.role !== 'admin') {
+      throw new ForbiddenException('Admin role required');
+    }
+    return this.orders.fulfillOrder(id, req.user.id);
   }
 
   // ─── POST /orders/:id/cancel ───────────────────────────────────────────────

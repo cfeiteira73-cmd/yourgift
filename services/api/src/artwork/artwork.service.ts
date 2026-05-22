@@ -207,6 +207,40 @@ export class ArtworkService {
     return updated;
   }
 
+  // ── processArtwork ────────────────────────────────────────────────────────
+  // Admin worker endpoint: transitions artwork from pending → approved
+
+  async processArtwork(artworkId: string, reviewerId: string) {
+    const artwork = await this.assertArtwork(artworkId);
+
+    if (artwork.status !== 'pending') {
+      throw new BadRequestException(
+        `Artwork ${artworkId} must be in "pending" status to process, current status is "${artwork.status}"`,
+      );
+    }
+
+    const updated = await this.prisma.artwork.update({
+      where: { id: artworkId },
+      data: {
+        status: 'approved',
+        reviewedAt: new Date(),
+        reviewedById: reviewerId,
+      },
+    });
+
+    await this.logEvent(artworkId, 'artwork.processed', reviewerId, {
+      orderId: artwork.orderId,
+      from: 'pending',
+      to: 'approved',
+    });
+    this.events.emit('artwork.approved', updated);
+
+    // Check if all artworks for the order are now approved
+    await this.checkOrderArtworkCompletion(artwork.orderId);
+
+    return updated;
+  }
+
   // ── saveMockup ────────────────────────────────────────────────────────────
 
   async saveMockup(artworkId: string, mockupUrl: string) {

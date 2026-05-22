@@ -64,7 +64,7 @@ export class PaymentsService {
       if (orderId) {
         await this.prisma.order.update({
           where: { id: orderId },
-          data: { status: 'payment_confirmed', stripePaymentId: session.payment_intent as string },
+          data: { status: 'paid', stripePaymentId: session.payment_intent as string },
         });
         this.events.emit('payment.confirmed', { orderId });
       }

@@ -6,6 +6,7 @@ import {
   Param,
   UseGuards,
   Request,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IsString, IsNumber, IsPositive, IsInt, Min } from 'class-validator';
@@ -126,5 +127,16 @@ export class ArtworkController {
   @ApiOperation({ summary: 'Save a mockup URL for an artwork' })
   saveMockup(@Param('id') id: string, @Body() dto: MockupDto) {
     return this.artwork.saveMockup(id, dto.mockupUrl);
+  }
+
+  // ── POST /artwork/:id/process ─────────────────────────────────────────────
+
+  @Post(':id/process')
+  @ApiOperation({ summary: 'Admin: process artwork — transitions pending → approved' })
+  processArtwork(@Request() req: AuthRequest, @Param('id') id: string) {
+    if (req.user.role !== 'admin') {
+      throw new ForbiddenException('Admin role required');
+    }
+    return this.artwork.processArtwork(id, req.user.id);
   }
 }

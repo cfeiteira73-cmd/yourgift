@@ -17,6 +17,8 @@ import { BudgetsModule } from './budgets/budgets.module';
 import { CampaignsModule } from './campaigns/campaigns.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { CompanyStoresModule } from './company-stores/company-stores.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { CompanyStoresModule } from './company-stores/company-stores.module';
     CampaignsModule,
     AnalyticsModule,
     CompanyStoresModule,
+    NotificationsModule,
+    AiModule,
   ],
 })
 export class AppModule {}
