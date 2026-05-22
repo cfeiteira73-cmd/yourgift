@@ -15,4 +15,10 @@ export class SuppliersController {
   syncMidocean() {
     return this.suppliers.syncMidocean();
   }
+
+  /** Trigger full PF Concept catalogue sync */
+  @Post('pf-concept/sync')
+  syncPfConcept() {
+    return this.suppliers.syncPfConcept();
+  }
 }

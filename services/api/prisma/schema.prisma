@@ -443,3 +443,20 @@ model EventLog {
   @@index([createdAt])
   @@map("event_logs")
 }
+
+// ─────────────────────────────────────────────
+// ADMIN USERS
+// ─────────────────────────────────────────────
+
+model AdminUser {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String
+  passwordHash String   @map("password_hash")
+  role         String   @default("manager") // admin | manager | viewer
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("admin_users")
+}

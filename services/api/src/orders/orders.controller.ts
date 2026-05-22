@@ -9,7 +9,10 @@ import {
   UseGuards,
   Request,
   ForbiddenException,
+  Header,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { OrdersService, AnalyticsFilters, OrderFilters } from './orders.service';
@@ -83,6 +86,15 @@ export class OrdersController {
       filters.dateRange = { from: new Date(from), to: new Date(to) };
     }
     return this.orders.findAll(req.user.id, filters);
+  }
+
+  // ─── GET /orders/:id/invoice ───────────────────────────────────────────────
+
+  @Get(':id/invoice')
+  @Header('Content-Type', 'text/html; charset=utf-8')
+  async getInvoice(@Param('id') id: string, @Res() res: Response) {
+    const html = await this.orders.generateInvoiceHtml(id);
+    res.send(html);
   }
 
   // ─── GET /orders/:id ───────────────────────────────────────────────────────

@@ -19,6 +19,8 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { CompanyStoresModule } from './company-stores/company-stores.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { AiModule } from './ai/ai.module';
+import { AdminAuthModule } from './admin-auth/admin-auth.module';
+import { SlackModule } from './slack/slack.module';
 
 @Module({
   imports: [
@@ -42,6 +44,8 @@ import { AiModule } from './ai/ai.module';
     CompanyStoresModule,
     NotificationsModule,
     AiModule,
+    AdminAuthModule,
+    SlackModule,
   ],
 })
 export class AppModule {}

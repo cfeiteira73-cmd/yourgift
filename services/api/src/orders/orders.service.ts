@@ -384,6 +384,125 @@ export class OrdersService {
     };
   }
 
+  // ─── INVOICE HTML ─────────────────────────────────────────────────────────
+
+  async generateInvoiceHtml(orderId: string): Promise<string> {
+    const order = await this.prisma.order.findUniqueOrThrow({
+      where: { id: orderId },
+      include: {
+        client: true,
+        items: { include: { product: true, variant: true } },
+        company: true,
+      },
+    });
+
+    const items = order.items.map(item => `
+    <tr>
+      <td>${item.product?.title ?? 'Produto'}</td>
+      <td>${item.variant?.sku ?? '-'}</td>
+      <td style="text-align:center">${item.quantity}</td>
+      <td style="text-align:right">€${item.unitPrice.toFixed(2)}</td>
+      <td style="text-align:right">€${(item.quantity * item.unitPrice).toFixed(2)}</td>
+    </tr>
+  `).join('');
+
+    const total = order.totalAmount ?? order.items.reduce((s, i) => s + i.quantity * i.unitPrice, 0);
+    const addr = order.shippingAddress as Record<string, string>;
+    const createdAt = new Date(order.createdAt).toLocaleDateString('pt-PT');
+
+    return `<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Fatura ${order.ref}</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #1a1a2e; padding: 40px; max-width: 800px; margin: 0 auto; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
+  .logo { font-size: 28px; font-weight: 800; color: #07111f; }
+  .logo span { color: #4da3ff; }
+  .invoice-info { text-align: right; }
+  .invoice-info h1 { font-size: 22px; color: #07111f; margin-bottom: 4px; }
+  .invoice-info .ref { font-size: 18px; color: #4da3ff; font-weight: 700; }
+  .addresses { display: flex; gap: 40px; margin-bottom: 32px; }
+  .address-box { flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; }
+  .address-box h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 8px; }
+  .address-box p { color: #1e293b; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  thead tr { background: #07111f; color: white; }
+  thead th { padding: 12px 16px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  tbody tr:nth-child(even) { background: #f8fafc; }
+  tbody td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; }
+  .totals { margin-left: auto; width: 280px; }
+  .totals table { margin: 0; }
+  .totals td { padding: 8px 16px; }
+  .totals .total-row { background: #07111f; color: white; font-weight: 700; font-size: 16px; }
+  .footer { margin-top: 40px; padding-top: 24px; border-top: 1px solid #e2e8f0; text-align: center; color: #64748b; font-size: 12px; }
+  .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: #dcfce7; color: #16a34a; }
+  @media print {
+    body { padding: 0; }
+    .no-print { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo">Your<span>Gift</span></div>
+  <div class="invoice-info">
+    <h1>FATURA / RECIBO</h1>
+    <div class="ref">${order.ref}</div>
+    <p style="color:#64748b;margin-top:4px;">Data: ${createdAt}</p>
+    <span class="status-badge">${order.status}</span>
+  </div>
+</div>
+<div class="addresses">
+  <div class="address-box">
+    <h3>De</h3>
+    <p><strong>YourGift Lda.</strong><br>
+    NIF: 510 000 000<br>
+    Rua do Comércio, 1<br>
+    1000-001 Lisboa, Portugal<br>
+    geral@yourgift.pt</p>
+  </div>
+  <div class="address-box">
+    <h3>Para</h3>
+    <p><strong>${order.client?.name ?? 'Cliente'}</strong><br>
+    ${order.company?.name ? order.company.name + '<br>' : ''}
+    ${order.client?.email ?? ''}<br>
+    ${addr?.street ? addr.street + '<br>' : ''}
+    ${addr?.postalCode ?? ''} ${addr?.city ?? ''}<br>
+    ${addr?.country ?? ''}</p>
+  </div>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>Produto</th>
+      <th>SKU / Referência</th>
+      <th style="text-align:center">Qtd</th>
+      <th style="text-align:right">Preço Unit.</th>
+      <th style="text-align:right">Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${items}
+  </tbody>
+</table>
+<div class="totals">
+  <table>
+    <tr><td>Subtotal</td><td style="text-align:right">€${total.toFixed(2)}</td></tr>
+    <tr><td>IVA (23%)</td><td style="text-align:right">€${(total * 0.23).toFixed(2)}</td></tr>
+    <tr class="total-row"><td>TOTAL</td><td style="text-align:right">€${(total * 1.23).toFixed(2)}</td></tr>
+  </table>
+</div>
+<div class="footer">
+  <p>YourGift Lda. | NIF 510 000 000 | IBAN PT50 0000 0000 0000 0000 0000 0 | geral@yourgift.pt</p>
+  <p style="margin-top:4px">Documento gerado automaticamente por YourGift OS · ${new Date().toISOString()}</p>
+</div>
+</body>
+</html>`;
+  }
+
   // ─── DASHBOARD KPIs ───────────────────────────────────────────────────────
 
   async getDashboardKpis() {

@@ -1,8 +1,22 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
+
+interface AdminUser {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+}
+
+const ROLE_LABELS: Record<string, string> = {
+  admin: 'Admin',
+  manager: 'Manager',
+  viewer: 'Viewer',
+};
 
 interface NavItem {
   href: string;
@@ -161,6 +175,29 @@ function NavLink({ item }: { item: NavItem }) {
 }
 
 export default function Sidebar() {
+  const router = useRouter();
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('adminUser');
+      if (raw) {
+        setAdminUser(JSON.parse(raw) as AdminUser);
+      }
+    } catch {
+      // ignore parse errors
+    }
+  }, []);
+
+  function handleLogout() {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminUser');
+    // Clear cookie
+    document.cookie =
+      'adminToken=; path=/; max-age=0; samesite=strict';
+    router.replace('/login');
+  }
+
   return (
     <aside className="fixed left-0 top-0 h-full w-56 bg-[#0b1526] border-r border-[#1a2f48] flex flex-col z-40">
       {/* Logo */}
@@ -196,7 +233,8 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-3 py-4 border-t border-[#1a2f48]">
+      <div className="px-3 py-4 border-t border-[#1a2f48] space-y-1">
+        {/* API Docs link */}
         <a
           href={`${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'}/docs`}
           target="_blank"
@@ -212,6 +250,39 @@ export default function Sidebar() {
             <path d="M2 8l6-6M8 8V2H2" />
           </svg>
         </a>
+
+        {/* User info + logout */}
+        {adminUser && (
+          <div className="mt-2 px-3 py-2.5 rounded-lg bg-[#07111f] border border-[#1a2f48]">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#4da3ff] to-[#74e7ff] flex items-center justify-center text-[#07111f] font-bold text-xs flex-shrink-0">
+                {adminUser.name.charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-white truncate leading-none">
+                  {adminUser.name}
+                </p>
+                <p className="text-[10px] text-[#4d6a87] truncate mt-0.5">
+                  {adminUser.email}
+                </p>
+              </div>
+              <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-[#4da3ff]/10 text-[#4da3ff] border border-[#4da3ff]/20">
+                {ROLE_LABELS[adminUser.role] ?? adminUser.role}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-[#f87171] hover:bg-[#f87171]/10 transition-colors"
+            >
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                <path d="M5 6.5h6M9 4.5l2 2-2 2" />
+                <path d="M8 2.5H2.5a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1H8" />
+              </svg>
+              Sair
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

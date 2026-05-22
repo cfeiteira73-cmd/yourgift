@@ -76,6 +76,17 @@ export default function AdminOrdersPage() {
     [filtered]
   );
 
+  const openInvoice = async (orderId: string) => {
+    const token = getAdminToken();
+    const res = await fetch(`${API_BASE}/api/v1/orders/${orderId}/invoice`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    const html = await res.text();
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  };
+
   const columns: Column<Order>[] = [
     {
       key: 'ref',
@@ -142,12 +153,25 @@ export default function AdminOrdersPage() {
       label: '',
       align: 'right',
       render: (row) => (
-        <Link
-          href={`/orders/${row.id}`}
-          className="text-xs text-[#4d6a87] hover:text-[#4da3ff] font-medium transition-colors"
-        >
-          Ver →
-        </Link>
+        <div className="flex items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => openInvoice(row.id)}
+            title="Download invoice"
+            className="text-[#4d6a87] hover:text-[#4da3ff] transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="1" width="10" height="12" rx="1" />
+              <path d="M4 4h6M4 6.5h6M4 9h4" />
+            </svg>
+          </button>
+          <Link
+            href={`/orders/${row.id}`}
+            className="text-xs text-[#4d6a87] hover:text-[#4da3ff] font-medium transition-colors"
+          >
+            Ver →
+          </Link>
+        </div>
       ),
     },
   ];
