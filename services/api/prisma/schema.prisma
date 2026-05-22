@@ -816,3 +816,188 @@ model ProcurementIntelligence {
   @@index([score(sort: Desc)])
   @@map("procurement_intelligence")
 }
+
+// ─────────────────────────────────────────────
+// PROJECTION LAYER (read models rebuilt from events)
+// ─────────────────────────────────────────────
+
+model OrderProjection {
+  id              String    @id                              // same as orderId
+  tenantId        String    @default("default") @map("tenant_id")
+  ref             String
+  clientId        String    @map("client_id")
+  companyId       String?   @map("company_id")
+  departmentId    String?   @map("department_id")
+  campaignId      String?   @map("campaign_id")
+  status          String    @default("created")
+  currency        String    @default("EUR")
+  supplier        String?
+  supplierOrderId String?   @map("supplier_order_id")
+  totalAmount     Float?    @map("total_amount")
+  marginAmount    Float?    @map("margin_amount")
+  itemCount       Int       @default(0) @map("item_count")
+  shippingAddress Json?     @map("shipping_address")
+  trackingNumber  String?   @map("tracking_number")
+  approvedAt      DateTime? @map("approved_at")
+  shippedAt       DateTime? @map("shipped_at")
+  deliveredAt     DateTime? @map("delivered_at")
+  lastEventType   String?   @map("last_event_type")
+  lastEventAt     DateTime? @map("last_event_at")
+  eventSequence   Int       @default(0) @map("event_sequence")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@index([clientId])
+  @@index([companyId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([tenantId])
+  @@map("order_projections")
+}
+
+model AggregateSnapshot {
+  id               String   @id @default(uuid())
+  aggregateId      String   @map("aggregate_id")
+  aggregateType    String   @map("aggregate_type")  // order | quote | employee | client
+  snapshotVersion  Int      @default(1) @map("snapshot_version")
+  state            Json     @default("{}")
+  lastSequenceNum  Int      @default(0) @map("last_sequence_num")
+  takenAt          DateTime @default(now()) @map("taken_at")
+
+  @@unique([aggregateId, aggregateType])
+  @@index([aggregateId, aggregateType])
+  @@map("aggregate_snapshots")
+}
+
+model ProjectionRebuildLog {
+  id               String    @id @default(uuid())
+  projectionName   String    @map("projection_name")
+  status           String    @default("running")  // running | completed | failed
+  eventsProcessed  Int       @default(0) @map("events_processed")
+  startedAt        DateTime  @default(now()) @map("started_at")
+  completedAt      DateTime? @map("completed_at")
+  error            String?
+
+  @@index([projectionName])
+  @@map("projection_rebuild_logs")
+}
+
+// ─────────────────────────────────────────────
+// DOUBLE-ENTRY FINANCIAL LEDGER (SAP FI/CO simplified)
+// ─────────────────────────────────────────────
+
+model LedgerAccount {
+  id            String   @id @default(uuid())
+  code          String   @unique
+  name          String
+  accountType   String   @map("account_type")   // asset | liability | revenue | expense | equity
+  normalBalance String   @map("normal_balance")  // debit | credit
+  description   String?
+  isSystem      Boolean  @default(true) @map("is_system")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("ledger_accounts")
+}
+
+model LedgerTransaction {
+  id            String   @id @default(uuid())
+  description   String
+  referenceType String?  @map("reference_type")
+  referenceId   String?  @map("reference_id")
+  totalAmount   Float    @map("total_amount")
+  currency      String   @default("EUR")
+  tenantId      String   @default("default") @map("tenant_id")
+  postedAt      DateTime @default(now()) @map("posted_at")
+
+  entries LedgerEntry[]
+
+  @@index([referenceType, referenceId])
+  @@map("ledger_transactions")
+}
+
+model LedgerEntry {
+  id              String   @id @default(uuid())
+  transactionId   String   @map("transaction_id")
+  accountCode     String   @map("account_code")
+  entryType       String   @map("entry_type")   // debit | credit
+  amount          Float
+  currency        String   @default("EUR")
+  description     String
+  referenceType   String?  @map("reference_type")
+  referenceId     String?  @map("reference_id")
+  tenantId        String   @default("default") @map("tenant_id")
+  postedAt        DateTime @default(now()) @map("posted_at")
+  // IMMUTABLE: no updatedAt, append-only
+
+  transaction LedgerTransaction @relation(fields: [transactionId], references: [id])
+
+  @@index([transactionId])
+  @@index([accountCode])
+  @@index([referenceType, referenceId])
+  @@index([postedAt])
+  @@index([tenantId])
+  @@map("ledger_entries")
+}
+
+// ─────────────────────────────────────────────
+// AUTOMATION GRAVITY ENGINE
+// ─────────────────────────────────────────────
+
+model AutomationRule {
+  id             String    @id @default(uuid())
+  tenantId       String    @default("default") @map("tenant_id")
+  name           String
+  description    String?
+  triggerEvent   String    @map("trigger_event")
+  conditions     Json      @default("{}")
+  actionType     String    @map("action_type")
+  actionConfig   Json      @default("{}") @map("action_config")
+  isActive       Boolean   @default(true) @map("is_active")
+  priority       Int       @default(0)
+  executionCount Int       @default(0) @map("execution_count")
+  lastExecutedAt DateTime? @map("last_executed_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  executions AutomationExecution[]
+
+  @@index([triggerEvent])
+  @@map("automation_rules")
+}
+
+model AutomationExecution {
+  id             String   @id @default(uuid())
+  ruleId         String   @map("rule_id")
+  triggerEvent   String   @map("trigger_event")
+  triggerPayload Json     @default("{}") @map("trigger_payload")
+  status         String   @default("success")
+  result         Json     @default("{}")
+  error          String?
+  executedAt     DateTime @default(now()) @map("executed_at")
+
+  rule AutomationRule @relation(fields: [ruleId], references: [id])
+
+  @@index([ruleId])
+  @@index([executedAt])
+  @@map("automation_executions")
+}
+
+model SupplierRoutingMatrix {
+  id               String   @id @default(uuid())
+  supplierId       String   @map("supplier_id")
+  supplierName     String   @map("supplier_name")
+  category         String
+  baseScore        Decimal  @default(50) @map("base_score") @db.Decimal(5, 2)
+  reliabilityScore Decimal  @default(50) @map("reliability_score") @db.Decimal(5, 2)
+  priceScore       Decimal  @default(50) @map("price_score") @db.Decimal(5, 2)
+  leadTimeDays     Int      @default(7) @map("lead_time_days")
+  minOrderValue    Decimal  @default(0) @map("min_order_value") @db.Decimal(12, 2)
+  maxOrderValue    Decimal? @map("max_order_value") @db.Decimal(12, 2)
+  supportedRegions String[] @map("supported_regions")
+  isActive         Boolean  @default(true) @map("is_active")
+  lastUpdated      DateTime @default(now()) @map("last_updated")
+
+  @@index([category])
+  @@map("supplier_routing_matrix")
+}

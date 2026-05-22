@@ -112,7 +112,7 @@ export class SuppliersService {
           category: data.category,
           basePrice: data.basePrice,
           images: data.images,
-          printAreas: data.printAreas,
+          printAreas: data.printAreas as object,
         },
         update: {
           title: data.title,
@@ -120,7 +120,7 @@ export class SuppliersService {
           category: data.category,
           basePrice: data.basePrice,
           images: data.images,
-          printAreas: data.printAreas,
+          printAreas: data.printAreas as object,
           updatedAt: new Date(),
         },
       });

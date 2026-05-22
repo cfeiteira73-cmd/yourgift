@@ -156,6 +156,25 @@ const SECONDARY_ITEMS: NavItem[] = [
     ),
   },
   {
+    href: '/ledger',
+    label: 'Ledger',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="2" width="12" height="12" rx="1.5" />
+        <path d="M8 2v12M2 8h12" />
+      </svg>
+    ),
+  },
+  {
+    href: '/automation',
+    label: 'Automation',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 2L5 9h6l-4 5" />
+      </svg>
+    ),
+  },
+  {
     href: '/intelligence',
     label: 'Intelligence',
     icon: (
@@ -163,6 +182,17 @@ const SECONDARY_ITEMS: NavItem[] = [
         <circle cx="8" cy="6" r="3.5" />
         <path d="M5.5 9.5L4 14M10.5 9.5L12 14M6 14h4" />
         <path d="M6.5 4.5c0-.5.5-1.5 1.5-1.5s1.5 1 1.5 1.5" />
+      </svg>
+    ),
+  },
+  {
+    href: '/projections',
+    label: 'Projections',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <ellipse cx="8" cy="4" rx="6" ry="2" />
+        <path d="M2 4v3c0 1.1 2.686 2 6 2s6-.9 6-2V4" />
+        <path d="M2 7v3c0 1.1 2.686 2 6 2s6-.9 6-2V7" />
       </svg>
     ),
   },

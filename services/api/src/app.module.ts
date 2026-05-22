@@ -38,6 +38,9 @@ import { CurrencyModule } from './currency/currency.module';
 import { TeamsModule } from './teams/teams.module';
 import { FinancialModule } from './financial/financial.module';
 import { IntelligenceModule } from './intelligence/intelligence.module';
+import { ProjectionsModule } from './projections/projections.module';
+import { LedgerModule } from './ledger/ledger.module';
+import { AutomationModule } from './automation/automation.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -93,6 +96,9 @@ import { APP_GUARD } from '@nestjs/core';
     RetentionModule,
     HiBobModule,
     IntelligenceModule,
+    ProjectionsModule,
+    LedgerModule,
+    AutomationModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
