@@ -21,11 +21,27 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { AiModule } from './ai/ai.module';
 import { AdminAuthModule } from './admin-auth/admin-auth.module';
 import { SlackModule } from './slack/slack.module';
+import { JobsModule } from './jobs/jobs.module';
+import { HubSpotModule } from './hubspot/hubspot.module';
+import { NotionModule } from './notion/notion.module';
+import { ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1000,   // 1 second
+        limit: 20,   // 20 requests/second
+      },
+      {
+        name: 'long',
+        ttl: 60_000, // 1 minute
+        limit: 200,  // 200 requests/minute
+      },
+    ]),
     PrismaModule,
     EventBusModule,
     HealthModule,
@@ -46,6 +62,12 @@ import { SlackModule } from './slack/slack.module';
     AiModule,
     AdminAuthModule,
     SlackModule,
+    JobsModule,
+    HubSpotModule,
+    NotionModule,
+  ],
+  providers: [
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
 export class AppModule {}

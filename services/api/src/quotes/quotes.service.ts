@@ -7,6 +7,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventBusService } from '../events/event-bus.service';
 import { CreateQuoteDto } from './dto/create-quote.dto';
+import { RequestQuoteDto } from './dto/request-quote.dto';
 import {
   buildPricingBreakdown,
   estimatePrintCost,
@@ -263,6 +264,75 @@ export class QuotesService {
 
     this.events.emit('quote.converted', { quoteId: id, orderId: order.id, order });
     return { orderId: order.id, orderRef: order.ref };
+  }
+
+  // ─── PUBLIC QUOTE REQUEST (no auth required) ─────────────────────────────
+
+  async requestQuote(dto: RequestQuoteDto): Promise<{ success: true; message: string; ref: string }> {
+    const ref = generateQuoteRef();
+
+    // Find or create client by email
+    let client = await this.prisma.client.findUnique({ where: { email: dto.email } });
+    if (!client) {
+      client = await this.prisma.client.create({
+        data: {
+          email: dto.email,
+          name: dto.name,
+          company: dto.company,
+        },
+      });
+    }
+
+    // Build notes combining all free-text fields
+    const combinedNotes = [
+      dto.occasion ? `Ocasião: ${dto.occasion}` : null,
+      dto.quantity ? `Quantidade estimada: ${dto.quantity}` : null,
+      dto.eventDate ? `Data do evento: ${dto.eventDate}` : null,
+      dto.budget ? `Orçamento: €${dto.budget}` : null,
+      dto.phone ? `Telefone: ${dto.phone}` : null,
+      dto.products ? `\nProdutos pretendidos:\n${dto.products}` : null,
+      dto.customization ? `\nPersonalização:\n${dto.customization}` : null,
+      dto.notes ? `\nNotas adicionais:\n${dto.notes}` : null,
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    const quote = await this.prisma.quote.create({
+      data: {
+        ref,
+        clientId: client.id,
+        status: 'submitted',
+        eventDate: dto.eventDate ? new Date(dto.eventDate) : undefined,
+        notes: combinedNotes || undefined,
+        items: { create: [] },
+      },
+      include: { client: true },
+    });
+
+    await this.logEvent('quote', quote.id, 'quote.requested', client.id, 'client', {
+      ref: quote.ref,
+      occasion: dto.occasion,
+      quantity: dto.quantity,
+      budget: dto.budget,
+    } as Prisma.InputJsonValue);
+
+    this.events.emit('quote.requested', {
+      id: quote.id,
+      ref: quote.ref,
+      name: dto.name,
+      email: dto.email,
+      company: dto.company,
+      phone: dto.phone,
+      occasion: dto.occasion,
+      quantity: dto.quantity,
+      eventDate: dto.eventDate,
+      budget: dto.budget,
+      products: dto.products,
+      customization: dto.customization,
+      notes: dto.notes,
+    });
+
+    return { success: true, message: 'Pedido recebido!', ref: quote.ref };
   }
 
   // ── helpers ──────────────────────────────────────────────────────────────

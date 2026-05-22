@@ -445,6 +445,28 @@ model EventLog {
 }
 
 // ─────────────────────────────────────────────
+// JOB QUEUE
+// ─────────────────────────────────────────────
+
+model Job {
+  id          String    @id @default(uuid())
+  type        String    // order.fulfill | artwork.process | notification.send | product.sync
+  payload     Json      @default("{}")
+  status      String    @default("pending") // pending | processing | completed | failed
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(3) @map("max_attempts")
+  error       String?
+  scheduledAt DateTime  @default(now()) @map("scheduled_at")
+  startedAt   DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@index([status, scheduledAt])
+  @@index([type])
+  @@map("jobs")
+}
+
+// ─────────────────────────────────────────────
 // ADMIN USERS
 // ─────────────────────────────────────────────
 

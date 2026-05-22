@@ -32,6 +32,69 @@ export class CampaignsService {
 
   // ── Public API ────────────────────────────────────────────────────────────
 
+  async findAll(status?: string) {
+    return this.prisma.campaign.findMany({
+      where: status ? { status } : undefined,
+      include: {
+        items: { include: { product: true } },
+        company: { select: { id: true, name: true } },
+        _count: { select: { orders: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async updateStatus(id: string, status: string) {
+    const campaign = await this.prisma.campaign.findUnique({ where: { id } });
+    if (!campaign) throw new NotFoundException(`Campaign ${id} not found`);
+
+    const updated = await this.prisma.campaign.update({
+      where: { id },
+      data: { status },
+      include: {
+        items: { include: { product: true } },
+        company: { select: { id: true, name: true } },
+      },
+    });
+
+    await this.logEvent('campaign', id, 'campaign.status_updated', 'system', 'system', {
+      from: campaign.status,
+      to: status,
+    });
+
+    this.events.emit('campaign.status_updated', updated);
+    return updated;
+  }
+
+  async addItem(
+    campaignId: string,
+    dto: { productId: string; quantity: number; unitPrice?: number; notes?: string },
+  ) {
+    const campaign = await this.prisma.campaign.findUnique({ where: { id: campaignId } });
+    if (!campaign) throw new NotFoundException(`Campaign ${campaignId} not found`);
+
+    return this.prisma.campaignItem.create({
+      data: {
+        campaignId,
+        productId: dto.productId,
+        quantity: dto.quantity,
+        unitPrice: dto.unitPrice ?? null,
+        notes: dto.notes ?? null,
+      },
+      include: { product: true },
+    });
+  }
+
+  async removeItem(campaignId: string, itemId: string) {
+    const item = await this.prisma.campaignItem.findFirst({
+      where: { id: itemId, campaignId },
+    });
+    if (!item) throw new NotFoundException(`Item ${itemId} not found in campaign ${campaignId}`);
+
+    await this.prisma.campaignItem.delete({ where: { id: itemId } });
+    return { deleted: true, itemId };
+  }
+
   async create(dto: CreateCampaignDto) {
     const campaign = await this.prisma.campaign.create({
       data: {

@@ -1,36 +1,41 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
-import { formatCurrency, formatDateTime, API_BASE, getAdminToken } from '@/lib/utils';
-import StatusBadge from '@/components/StatusBadge';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { formatCurrency, formatDateTime, timeAgo, API_BASE, getAdminToken } from '@/lib/utils';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-interface ApprovalOrder {
-  id: string;
-  ref: string;
-  status: string;
-  totalAmount: number;
-  createdAt: string;
-  paidAt?: string;
-  client?: { name?: string; email?: string; company?: string };
-  items?: { productTitle?: string; quantity: number; imageUrl?: string }[];
-  approvalStage?: 'HR' | 'MANAGER' | 'FINANCE';
-  approvalNotes?: string;
-}
+type ApprovalStatus = 'pending' | 'approved' | 'rejected';
+type HistoryTab = 'approved' | 'rejected';
 
-type Tab = 'pending' | 'approved' | 'rejected';
+interface ApprovalRecord {
+  id: string;
+  stage: string;
+  status: ApprovalStatus;
+  notes: string | null;
+  requestedAt: string;
+  resolvedAt: string | null;
+  approvedById: string | null;
+  order?: {
+    id: string;
+    ref: string;
+    status: string;
+    totalAmount: number;
+    createdAt: string;
+    client?: { id: string; name?: string; email?: string; company?: string };
+    company?: { id: string; name: string };
+  };
+  requestedBy?: { id: string; name: string; email: string };
+}
 
 // ── Reject Modal ───────────────────────────────────────────────────────────────
 
 function RejectModal({
-  orderId,
-  orderRef,
+  approval,
   onClose,
   onConfirm,
 }: {
-  orderId: string;
-  orderRef: string;
+  approval: ApprovalRecord;
   onClose: () => void;
   onConfirm: (notes: string) => void;
 }) {
@@ -38,12 +43,14 @@ function RejectModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="bg-[#0b1526] rounded-xl border border-[#1a2f48] p-6 w-full max-w-md shadow-2xl">
-        <h3 className="text-base font-bold text-white mb-1">Rejeitar encomenda</h3>
+        <h3 className="text-base font-bold text-white mb-1">Rejeitar aprovação</h3>
         <p className="text-sm text-[#4d6a87] mb-4">
-          Referência:{' '}
+          Encomenda{' '}
           <span className="font-mono text-[#f87171]">
-            {orderRef}
+            {approval.order?.ref ?? approval.id.slice(0, 8).toUpperCase()}
           </span>
+          {' · '}
+          <span className="text-[#8ba8c7] uppercase text-xs">{approval.stage}</span>
         </p>
         <textarea
           value={notes}
@@ -73,165 +80,196 @@ function RejectModal({
   );
 }
 
-// ── Approval Card ─────────────────────────────────────────────────────────────
+// ── Stage badge ────────────────────────────────────────────────────────────────
 
-function ApprovalCard({
-  order,
-  tab,
+const STAGE_COLORS: Record<string, string> = {
+  hr: 'bg-[#0d1f3a] text-[#4da3ff] border-[#1a3a5c]',
+  manager: 'bg-[#1a0f3a] text-[#a78bfa] border-[#2a1f4a]',
+  finance: 'bg-[#062515] text-[#63e6be] border-[#063e1f]',
+};
+
+function StageBadge({ stage }: { stage: string }) {
+  const color = STAGE_COLORS[stage.toLowerCase()] ?? STAGE_COLORS.manager;
+  return (
+    <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase ${color}`}>
+      {stage}
+    </span>
+  );
+}
+
+// ── Pending Table ──────────────────────────────────────────────────────────────
+
+function PendingTable({
+  items,
+  processing,
   onApprove,
   onReject,
 }: {
-  order: ApprovalOrder;
-  tab: Tab;
-  onApprove: (id: string) => void;
-  onReject: (id: string) => void;
+  items: ApprovalRecord[];
+  processing: string | null;
+  onApprove: (a: ApprovalRecord) => void;
+  onReject: (a: ApprovalRecord) => void;
 }) {
-  const waitingSince = order.paidAt ?? order.createdAt;
-  const diff = Date.now() - new Date(waitingSince).getTime();
-  const hours = Math.floor(diff / 3_600_000);
-  const mins = Math.floor((diff % 3_600_000) / 60_000);
-  const waitLabel = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
-  const isUrgent = hours >= 24;
-
-  const stageColors: Record<string, string> = {
-    HR: 'bg-[#0d1f3a] text-[#4da3ff] border-[#1a3a5c]',
-    MANAGER: 'bg-[#1a0f3a] text-[#a78bfa] border-[#2a1f4a]',
-    FINANCE: 'bg-[#062515] text-[#63e6be] border-[#063e1f]',
-  };
-  const stage = order.approvalStage ?? 'MANAGER';
+  if (items.length === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-[#1a2f48] py-16 text-center">
+        <p className="text-3xl mb-3 text-[#4d6a87]">✓</p>
+        <p className="text-sm text-[#4d6a87]">Sem aprovações pendentes</p>
+      </div>
+    );
+  }
 
   return (
-    <div
-      className={`rounded-xl border bg-[#0b1526] overflow-hidden transition-all ${
-        isUrgent && tab === 'pending'
-          ? 'border-[#f59e0b]/30'
-          : 'border-[#1a2f48]'
-      }`}
-    >
-      <div className="px-5 py-4">
-        {/* Top row */}
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-mono text-sm text-[#4da3ff] font-bold">
-                {order.ref ?? order.id.slice(0, 8).toUpperCase()}
-              </span>
-              <StatusBadge status={order.status} size="sm" />
-              <span
-                className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-                  stageColors[stage] ?? stageColors.MANAGER
-                }`}
-              >
-                {stage}
-              </span>
-            </div>
-            <p className="text-xs text-[#8ba8c7] mt-1">
-              {order.client?.name ?? order.client?.company ?? '—'}
-              {order.client?.email && (
-                <span className="text-[#4d6a87] ml-1">· {order.client.email}</span>
-              )}
-            </p>
-          </div>
-          <div className="text-right flex-shrink-0">
-            <p className="text-base font-black text-white tabular-nums">
-              {formatCurrency(order.totalAmount)}
-            </p>
-            {tab === 'pending' && (
-              <p
-                className={`text-[10px] font-semibold mt-0.5 ${
-                  isUrgent ? 'text-[#f59e0b]' : 'text-[#4d6a87]'
-                }`}
-              >
-                {isUrgent ? '⚠ ' : ''}Aguardando {waitLabel}
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Product thumbnails */}
-        {order.items && order.items.length > 0 && (
-          <div className="flex items-center gap-2 mb-3">
-            <div className="flex -space-x-2">
-              {order.items.slice(0, 4).map((item, i) => (
-                <div
-                  key={i}
-                  className="w-8 h-8 rounded-lg border-2 border-[#0b1526] bg-[#102131] overflow-hidden flex-shrink-0"
-                >
-                  {item.imageUrl ? (
-                    <img
-                      src={item.imageUrl}
-                      alt={item.productTitle ?? ''}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-[8px]">
-                      🎁
-                    </div>
-                  )}
-                </div>
+    <div className="rounded-xl border border-[#1a2f48] bg-[#0b1526] overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-[#1a2f48]">
+              {['Ref', 'Cliente', 'Empresa', 'Etapa', 'Solicitado por', 'Há quanto tempo', 'Total', ''].map((h) => (
+                <th key={h} className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-widest text-[#4d6a87] whitespace-nowrap">
+                  {h}
+                </th>
               ))}
-            </div>
-            <div className="text-xs text-[#4d6a87]">
-              {order.items.map((it) => `${it.quantity}× ${it.productTitle ?? '?'}`).join(', ')}
-            </div>
-          </div>
-        )}
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((a) => {
+              const hrs = (Date.now() - new Date(a.requestedAt).getTime()) / 3_600_000;
+              const isUrgent = hrs >= 24;
+              const isProcessing = processing === a.id;
+              return (
+                <tr
+                  key={a.id}
+                  className={`border-b border-[#0f1f35] last:border-0 transition-colors ${isUrgent ? 'bg-[#2a1f00]/10' : 'hover:bg-[#102131]/40'}`}
+                >
+                  <td className="px-4 py-3.5 whitespace-nowrap">
+                    <span className="font-mono text-xs text-[#4da3ff] font-bold">
+                      {a.order?.ref ?? a.id.slice(0, 8).toUpperCase()}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3.5">
+                    <p className="text-sm text-white font-medium truncate max-w-[140px]">
+                      {a.order?.client?.name ?? a.order?.client?.company ?? '—'}
+                    </p>
+                    {a.order?.client?.email && (
+                      <p className="text-xs text-[#4d6a87] truncate max-w-[140px]">{a.order.client.email}</p>
+                    )}
+                  </td>
+                  <td className="px-4 py-3.5 whitespace-nowrap">
+                    <span className="text-xs text-[#8ba8c7]">{a.order?.company?.name ?? '—'}</span>
+                  </td>
+                  <td className="px-4 py-3.5 whitespace-nowrap">
+                    <StageBadge stage={a.stage} />
+                  </td>
+                  <td className="px-4 py-3.5">
+                    <span className="text-xs text-[#8ba8c7] truncate max-w-[120px] block">
+                      {a.requestedBy?.name ?? a.requestedBy?.email ?? '—'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3.5 whitespace-nowrap">
+                    <span className={`text-xs font-semibold ${isUrgent ? 'text-[#f59e0b]' : 'text-[#4d6a87]'}`}>
+                      {isUrgent ? '⚠ ' : ''}{timeAgo(a.requestedAt)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3.5 whitespace-nowrap text-right">
+                    <span className="text-sm font-bold text-white tabular-nums">
+                      {a.order?.totalAmount != null ? formatCurrency(a.order.totalAmount) : '—'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3.5 whitespace-nowrap">
+                    {isProcessing ? (
+                      <span className="text-xs text-[#4da3ff] animate-pulse">A processar...</span>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => onApprove(a)}
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#063e1f] text-[#63e6be] text-xs font-semibold border border-[#63e6be]/20 hover:bg-[#0a5a2a] transition-colors whitespace-nowrap"
+                        >
+                          <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                            <path d="M1.5 5.5l2.5 2.5 5-5" />
+                          </svg>
+                          Aprovar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onReject(a)}
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#2a0a0a] text-[#f87171] text-xs font-semibold border border-[#f87171]/20 hover:bg-[#3a1010] transition-colors whitespace-nowrap"
+                        >
+                          <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                            <path d="M2.5 2.5l6 6M8.5 2.5l-6 6" />
+                          </svg>
+                          Rejeitar
+                        </button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
 
-        {/* Footer */}
-        <div className="flex items-center gap-2 text-[10px] text-[#4d6a87] mb-4">
-          <span>{formatDateTime(order.createdAt)}</span>
-        </div>
+// ── History Table ──────────────────────────────────────────────────────────────
 
-        {/* Actions */}
-        {tab === 'pending' && (
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => onApprove(order.id)}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-[#063e1f] text-[#63e6be] text-xs font-semibold border border-[#63e6be]/20 hover:bg-[#0a5a2a] transition-colors"
-            >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                <path d="M2 6l3 3 5-5" />
-              </svg>
-              Aprovar
-            </button>
-            <button
-              type="button"
-              onClick={() => onReject(order.id)}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-[#2a0a0a] text-[#f87171] text-xs font-semibold border border-[#f87171]/20 hover:bg-[#3a1010] transition-colors"
-            >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                <path d="M3 3l6 6M9 3l-6 6" />
-              </svg>
-              Rejeitar
-            </button>
-          </div>
-        )}
+function HistoryTable({ items, type }: { items: ApprovalRecord[]; type: HistoryTab }) {
+  if (items.length === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-[#1a2f48] py-12 text-center">
+        <p className="text-sm text-[#4d6a87]">
+          {type === 'approved' ? 'Sem aprovações hoje' : 'Sem rejeições hoje'}
+        </p>
+      </div>
+    );
+  }
 
-        {tab === 'approved' && (
-          <div className="flex items-center gap-2 text-xs text-[#63e6be]">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-              <path d="M2 6l3 3 5-5" />
-            </svg>
-            Aprovado
-          </div>
-        )}
-
-        {tab === 'rejected' && (
-          <div>
-            <div className="flex items-center gap-2 text-xs text-[#f87171]">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                <path d="M3 3l6 6M9 3l-6 6" />
-              </svg>
-              Rejeitado
-            </div>
-            {order.approvalNotes && (
-              <p className="text-xs text-[#4d6a87] mt-1.5 bg-[#102131] rounded px-2 py-1.5 border border-[#1a2f48]">
-                {order.approvalNotes}
-              </p>
-            )}
-          </div>
-        )}
+  return (
+    <div className="rounded-xl border border-[#1a2f48] bg-[#0b1526] overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-[#1a2f48]">
+              {['Ref', 'Etapa', 'Resolvido por', 'Quando', 'Notas'].map((h) => (
+                <th key={h} className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-widest text-[#4d6a87] whitespace-nowrap">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((a) => (
+              <tr key={a.id} className="border-b border-[#0f1f35] last:border-0 hover:bg-[#102131]/40 transition-colors">
+                <td className="px-4 py-3.5">
+                  <span className="font-mono text-xs text-[#4da3ff]">
+                    {a.order?.ref ?? a.id.slice(0, 8).toUpperCase()}
+                  </span>
+                </td>
+                <td className="px-4 py-3.5">
+                  <StageBadge stage={a.stage} />
+                </td>
+                <td className="px-4 py-3.5">
+                  <span className="text-xs text-[#8ba8c7]">{a.approvedById?.slice(0, 8) ?? '—'}</span>
+                </td>
+                <td className="px-4 py-3.5 whitespace-nowrap">
+                  <span className="text-xs text-[#4d6a87]">
+                    {a.resolvedAt ? formatDateTime(a.resolvedAt) : '—'}
+                  </span>
+                </td>
+                <td className="px-4 py-3.5 max-w-[200px]">
+                  {a.notes ? (
+                    <span className="text-xs text-[#8ba8c7] line-clamp-2">{a.notes}</span>
+                  ) : (
+                    <span className="text-xs text-[#4d6a87]">—</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -239,63 +277,91 @@ function ApprovalCard({
 
 // ── Page ───────────────────────────────────────────────────────────────────────
 
+const AUTO_REFRESH_SECS = 30;
+
 export default function ApprovalsPage() {
-  const [orders, setOrders] = useState<ApprovalOrder[]>([]);
+  const [pending, setPending] = useState<ApprovalRecord[]>([]);
+  const [approved, setApproved] = useState<ApprovalRecord[]>([]);
+  const [rejected, setRejected] = useState<ApprovalRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<Tab>('pending');
-  const [rejectModal, setRejectModal] = useState<{
-    id: string;
-    ref: string;
-  } | null>(null);
+  const [historyTab, setHistoryTab] = useState<HistoryTab>('approved');
+  const [rejectTarget, setRejectTarget] = useState<ApprovalRecord | null>(null);
   const [processing, setProcessing] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState(AUTO_REFRESH_SECS);
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setCountdown(AUTO_REFRESH_SECS);
     try {
       const token = getAdminToken();
-      const res = await fetch(`${API_BASE}/api/v1/orders?limit=200`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      const data = await res.json();
-      const all: ApprovalOrder[] = Array.isArray(data) ? data : data.data ?? [];
-      setOrders(all);
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const [pendingRes, approvedRes, rejectedRes] = await Promise.all([
+        fetch(`${API_BASE}/api/v1/approvals?status=pending`, { headers }),
+        fetch(`${API_BASE}/api/v1/approvals?status=approved`, { headers }),
+        fetch(`${API_BASE}/api/v1/approvals?status=rejected`, { headers }),
+      ]);
+
+      const [pendingData, approvedData, rejectedData] = await Promise.all([
+        pendingRes.json() as Promise<ApprovalRecord[]>,
+        approvedRes.json() as Promise<ApprovalRecord[]>,
+        rejectedRes.json() as Promise<ApprovalRecord[]>,
+      ]);
+
+      setPending(Array.isArray(pendingData) ? pendingData : []);
+      setApproved(Array.isArray(approvedData) ? approvedData : []);
+      setRejected(Array.isArray(rejectedData) ? rejectedData : []);
     } catch {
-      setOrders([]);
+      // keep stale data
     } finally {
       setLoading(false);
     }
   }, []);
 
+  // Initial load
   useEffect(() => {
     load();
   }, [load]);
 
-  const pending = useMemo(
-    () =>
-      orders.filter((o) => o.status === 'paid' || o.status === 'payment_confirmed'),
-    [orders]
-  );
-  const approved = useMemo(
-    () => orders.filter((o) => o.status === 'approved'),
-    [orders]
-  );
-  const rejected = useMemo(
-    () => orders.filter((o) => o.status === 'cancelled'),
-    [orders]
+  // Auto-refresh countdown
+  useEffect(() => {
+    countdownRef.current = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          load();
+          return AUTO_REFRESH_SECS;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => {
+      if (countdownRef.current) clearInterval(countdownRef.current);
+    };
+  }, [load]);
+
+  // KPIs
+  const approvedToday = useMemo(() => {
+    const today = new Date().toDateString();
+    return approved.filter((a) => a.resolvedAt && new Date(a.resolvedAt).toDateString() === today).length;
+  }, [approved]);
+
+  const rejectedToday = useMemo(() => {
+    const today = new Date().toDateString();
+    return rejected.filter((a) => a.resolvedAt && new Date(a.resolvedAt).toDateString() === today).length;
+  }, [rejected]);
+
+  const urgentCount = useMemo(
+    () => pending.filter((a) => (Date.now() - new Date(a.requestedAt).getTime()) / 3_600_000 >= 24).length,
+    [pending],
   );
 
-  const tabData: Record<Tab, ApprovalOrder[]> = {
-    pending,
-    approved,
-    rejected,
-  };
-
-  async function handleApprove(id: string) {
-    setProcessing(id);
+  async function handleApprove(approval: ApprovalRecord) {
+    setProcessing(approval.id);
     try {
       const token = getAdminToken();
-      await fetch(`${API_BASE}/api/v1/orders/${id}/approve`, {
-        method: 'POST',
+      await fetch(`${API_BASE}/api/v1/approvals/${approval.id}`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -311,19 +377,19 @@ export default function ApprovalsPage() {
   }
 
   async function handleRejectConfirm(notes: string) {
-    if (!rejectModal) return;
-    const { id } = rejectModal;
-    setRejectModal(null);
-    setProcessing(id);
+    if (!rejectTarget) return;
+    const target = rejectTarget;
+    setRejectTarget(null);
+    setProcessing(target.id);
     try {
       const token = getAdminToken();
-      await fetch(`${API_BASE}/api/v1/orders/${id}/reject`, {
-        method: 'POST',
+      await fetch(`${API_BASE}/api/v1/approvals/${target.id}`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ status: 'cancelled', notes }),
+        body: JSON.stringify({ status: 'rejected', notes }),
       });
       await load();
     } catch {
@@ -333,134 +399,141 @@ export default function ApprovalsPage() {
     }
   }
 
-  const TABS: { key: Tab; label: string; count: number; color: string }[] = [
-    {
-      key: 'pending',
-      label: 'Pendentes',
-      count: pending.length,
-      color: pending.length > 5 ? 'text-[#f59e0b]' : 'text-[#4da3ff]',
-    },
-    { key: 'approved', label: 'Aprovadas', count: approved.length, color: 'text-[#63e6be]' },
-    { key: 'rejected', label: 'Rejeitadas', count: rejected.length, color: 'text-[#f87171]' },
-  ];
-
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-start justify-between mb-6">
         <div>
           <h1 className="text-2xl font-black text-white tracking-tight">Aprovações</h1>
-          <p className="text-sm text-[#4d6a87] mt-1">
-            Workflow de aprovação de encomendas
-          </p>
+          <p className="text-sm text-[#4d6a87] mt-1">Workflow de aprovação de encomendas</p>
         </div>
-        <button
-          type="button"
-          onClick={load}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#1a2f48] text-[#8ba8c7] text-sm hover:bg-[#102131] hover:text-white transition-all"
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-            <path d="M12 7A5 5 0 1 1 7 2c1.5 0 2.9.6 3.9 1.6L13 1v4H9" />
-          </svg>
-          Atualizar
-        </button>
+        <div className="flex items-center gap-3">
+          {/* Countdown indicator */}
+          <div className="flex items-center gap-1.5 text-xs text-[#4d6a87]">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+              <circle cx="6" cy="6" r="5" />
+              <path d="M6 3.5V6l1.5 1.5" />
+            </svg>
+            <span className="tabular-nums">Atualiza em {countdown}s</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => { load(); }}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#1a2f48] text-[#8ba8c7] text-sm hover:bg-[#102131] hover:text-white transition-all"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+              <path d="M12 7A5 5 0 1 1 7 2c1.5 0 2.9.6 3.9 1.6L13 1v4H9" />
+            </svg>
+            Atualizar
+          </button>
+        </div>
+      </div>
+
+      {/* KPI row */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className={`rounded-xl border bg-[#0b1526] px-5 py-4 ${pending.length > 0 ? 'border-[#f87171]/30' : 'border-[#1a2f48]'}`}>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#4d6a87] mb-1">Pendentes</p>
+          <p className={`text-3xl font-black tabular-nums ${pending.length > 0 ? 'text-[#f87171]' : 'text-white'}`}>
+            {loading ? '—' : pending.length}
+          </p>
+          {urgentCount > 0 && (
+            <p className="text-xs text-[#f59e0b] mt-0.5 font-semibold">⚠ {urgentCount} com +24h</p>
+          )}
+        </div>
+        <div className="rounded-xl border border-[#1a2f48] bg-[#0b1526] px-5 py-4">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#4d6a87] mb-1">Aprovadas Hoje</p>
+          <p className="text-3xl font-black text-[#63e6be] tabular-nums">{loading ? '—' : approvedToday}</p>
+          <p className="text-xs text-[#4d6a87] mt-0.5">{approved.length} total</p>
+        </div>
+        <div className="rounded-xl border border-[#1a2f48] bg-[#0b1526] px-5 py-4">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#4d6a87] mb-1">Rejeitadas Hoje</p>
+          <p className="text-3xl font-black text-white tabular-nums">{loading ? '—' : rejectedToday}</p>
+          <p className="text-xs text-[#4d6a87] mt-0.5">{rejected.length} total</p>
+        </div>
       </div>
 
       {/* Urgent banner */}
-      {!loading && pending.filter((o) => {
-        const hrs = (Date.now() - new Date(o.paidAt ?? o.createdAt).getTime()) / 3_600_000;
-        return hrs > 24;
-      }).length > 0 && (
+      {!loading && urgentCount > 0 && (
         <div className="mb-6 rounded-xl border border-[#f59e0b]/20 bg-[#2a1f00]/50 px-5 py-4 flex items-center gap-3">
           <span className="text-[#f59e0b] text-lg">⚠</span>
           <p className="text-sm text-[#f59e0b]">
-            {pending.filter((o) => {
-              const hrs = (Date.now() - new Date(o.paidAt ?? o.createdAt).getTime()) / 3_600_000;
-              return hrs > 24;
-            }).length}{' '}
-            encomenda(s) aguardam aprovação há mais de 24h. Ação necessária.
+            {urgentCount} aprovação(ões) aguardam há mais de 24h. Ação necessária.
           </p>
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-[#0b1526] rounded-xl border border-[#1a2f48] mb-6 w-fit">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            onClick={() => setTab(t.key)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-              tab === t.key
-                ? 'bg-[#102131] text-white border border-[#1a2f48]'
-                : 'text-[#4d6a87] hover:text-[#8ba8c7]'
-            }`}
-          >
-            {t.label}
-            <span
-              className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${
-                tab === t.key ? t.color : 'text-[#4d6a87]'
-              }`}
-            >
-              {t.count}
-            </span>
-          </button>
-        ))}
+      {/* Priority queue — pending */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-bold text-white">
+            Fila de Aprovações Pendentes
+            {pending.length > 0 && (
+              <span className="ml-2 px-2 py-0.5 rounded-full text-[10px] font-black bg-[#f87171]/10 text-[#f87171] border border-[#f87171]/20">
+                {pending.length}
+              </span>
+            )}
+          </h2>
+        </div>
+
+        {loading ? (
+          <div className="space-y-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="skeleton rounded-xl h-14" />
+            ))}
+          </div>
+        ) : (
+          <PendingTable
+            items={pending}
+            processing={processing}
+            onApprove={handleApprove}
+            onReject={(a) => setRejectTarget(a)}
+          />
+        )}
       </div>
 
-      {/* Cards grid */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="skeleton rounded-xl h-48" />
+      {/* History section */}
+      <div>
+        <h2 className="text-sm font-bold text-white mb-3">Histórico</h2>
+
+        {/* History tabs */}
+        <div className="flex gap-1 p-1 bg-[#0b1526] rounded-xl border border-[#1a2f48] mb-4 w-fit">
+          {([
+            { key: 'approved' as HistoryTab, label: 'Aprovadas', count: approved.length, color: 'text-[#63e6be]' },
+            { key: 'rejected' as HistoryTab, label: 'Rejeitadas', count: rejected.length, color: 'text-[#f87171]' },
+          ] as const).map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => setHistoryTab(t.key)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                historyTab === t.key
+                  ? 'bg-[#102131] text-white border border-[#1a2f48]'
+                  : 'text-[#4d6a87] hover:text-[#8ba8c7]'
+              }`}
+            >
+              {t.label}
+              <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-black tabular-nums ${historyTab === t.key ? t.color : 'text-[#4d6a87]'}`}>
+                {t.count}
+              </span>
+            </button>
           ))}
         </div>
-      ) : tabData[tab].length === 0 ? (
-        <div className="rounded-xl border border-dashed border-[#1a2f48] py-20 text-center">
-          <p className="text-3xl mb-3 text-[#4d6a87]">
-            {tab === 'pending' ? '✓' : tab === 'approved' ? '🎉' : '—'}
-          </p>
-          <p className="text-sm text-[#4d6a87]">
-            {tab === 'pending'
-              ? 'Sem aprovações pendentes'
-              : tab === 'approved'
-              ? 'Sem encomendas aprovadas'
-              : 'Sem encomendas rejeitadas'}
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {tabData[tab].map((order) => (
-            <div key={order.id} className="relative">
-              {processing === order.id && (
-                <div className="absolute inset-0 z-10 bg-[#07111f]/60 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                  <div className="text-[#4da3ff] text-sm font-semibold animate-pulse">
-                    A processar...
-                  </div>
-                </div>
-              )}
-              <ApprovalCard
-                order={order}
-                tab={tab}
-                onApprove={handleApprove}
-                onReject={(id) =>
-                  setRejectModal({
-                    id,
-                    ref: order.ref ?? order.id.slice(0, 8).toUpperCase(),
-                  })
-                }
-              />
-            </div>
-          ))}
-        </div>
-      )}
+
+        {loading ? (
+          <div className="skeleton rounded-xl h-32" />
+        ) : (
+          <HistoryTable
+            items={historyTab === 'approved' ? approved : rejected}
+            type={historyTab}
+          />
+        )}
+      </div>
 
       {/* Reject Modal */}
-      {rejectModal && (
+      {rejectTarget && (
         <RejectModal
-          orderId={rejectModal.id}
-          orderRef={rejectModal.ref}
-          onClose={() => setRejectModal(null)}
+          approval={rejectTarget}
+          onClose={() => setRejectTarget(null)}
           onConfirm={handleRejectConfirm}
         />
       )}

@@ -23,6 +23,22 @@ export class ApprovalsService {
 
   // ── Public API ────────────────────────────────────────────────────────────
 
+  async findAll(status?: string) {
+    return this.prisma.approval.findMany({
+      where: status ? { status } : undefined,
+      include: {
+        order: {
+          include: {
+            client: { select: { id: true, name: true, email: true, company: true } },
+            company: { select: { id: true, name: true } },
+          },
+        },
+        requestedBy: { select: { id: true, name: true, email: true } },
+      },
+      orderBy: { requestedAt: 'desc' },
+    });
+  }
+
   async requestApproval(
     orderId: string,
     requestedById: string,

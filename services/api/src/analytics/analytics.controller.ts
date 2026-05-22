@@ -55,4 +55,10 @@ export class AnalyticsController {
   getClientAnalytics(@Query('companyId') companyId?: string) {
     return this.analytics.getClientAnalytics(companyId);
   }
+
+  @Get('dashboard')
+  @ApiQuery({ name: 'range', required: false, enum: ['7d', '30d', '90d', '12m'] })
+  getDashboard(@Query('range') range?: '7d' | '30d' | '90d' | '12m') {
+    return this.analytics.getDashboard(range ?? '30d');
+  }
 }
