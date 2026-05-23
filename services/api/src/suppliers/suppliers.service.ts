@@ -11,7 +11,7 @@ type SyncableProduct = ReturnType<typeof transformProduct>;
 export class SuppliersService {
   private readonly logger = new Logger(SuppliersService.name);
   private midocean: MidoceanClient;
-  private pfConcept: PFConceptClient;
+  private pfConcept?: PFConceptClient;
 
   constructor(
     private config: ConfigService,
@@ -19,10 +19,13 @@ export class SuppliersService {
     private prisma: PrismaService,
   ) {
     this.midocean = new MidoceanClient(this.config.getOrThrow('MIDOCEAN_KEY'));
-    this.pfConcept = new PFConceptClient(
-      this.config.getOrThrow('PF_CONCEPT_KEY'),
-      this.config.getOrThrow('PF_CONCEPT_USERNAME'),
-    );
+    const pfKey = this.config.get<string>('PF_CONCEPT_KEY');
+    const pfUser = this.config.get<string>('PF_CONCEPT_USER') || this.config.get<string>('PF_CONCEPT_USERNAME');
+    if (pfKey && pfUser) {
+      this.pfConcept = new PFConceptClient(pfKey, pfUser);
+    } else {
+      this.logger.warn('PF Concept: PF_CONCEPT_KEY or PF_CONCEPT_USER not set — integration disabled');
+    }
     this.events.on('payment.confirmed', this.routeToSupplier.bind(this));
   }
 
@@ -250,6 +253,10 @@ export class SuppliersService {
   }
 
   private async dispatchToPfConcept(order: any) {
+    if (!this.pfConcept) {
+      this.logger.warn(`PF Concept not configured — cannot dispatch order ${order.ref}`);
+      return;
+    }
     try {
       const response = await this.pfConcept.createOrder({
         reference: order.ref,
