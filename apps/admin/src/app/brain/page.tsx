@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ReactNode } from 'react';
+import Link from 'next/link';
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
@@ -1086,6 +1087,13 @@ function RightPanel({
           ) : null}
           {simLoading ? 'Simulating…' : 'Simulate ▶'}
         </button>
+        <Link
+          href="/simulate"
+          className="block text-center mt-2 text-[12px] hover:underline"
+          style={{ color: '#4da3ff' }}
+        >
+          Open full simulator →
+        </Link>
       </div>
 
       {/* Simulation result */}

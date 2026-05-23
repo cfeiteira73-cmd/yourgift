@@ -14,6 +14,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { DecisionEngineService, AlternativeAction } from './decision-engine.service';
 import { ProcurementSimulatorService, SimulationInput } from './procurement-simulator.service';
 import { DecisionCorrectnessService } from './decision-correctness.service';
+import { WhatIfEngineService, WhatIfInput } from './what-if-engine.service';
 
 @Controller('api/v1/decision-engine')
 @UseGuards(JwtAuthGuard)
@@ -22,6 +23,7 @@ export class DecisionEngineController {
     private readonly engine: DecisionEngineService,
     private readonly simulator: ProcurementSimulatorService,
     private readonly correctnessService: DecisionCorrectnessService,
+    private readonly whatIfService: WhatIfEngineService,
   ) {}
 
   // POST /simulate
@@ -146,5 +148,23 @@ export class DecisionEngineController {
   @Get('decisions/:id/accuracy')
   async getDecisionAccuracy(@Param('id') id: string) {
     return this.correctnessService.getDecisionAccuracy(id);
+  }
+
+  // POST /api/v1/decision-engine/what-if
+  @Post('what-if')
+  async runWhatIf(@Body() body: WhatIfInput & { tenantId?: string; decisionCardId?: string }) {
+    return this.whatIfService.generateMatrix(body);
+  }
+
+  // GET /api/v1/decision-engine/what-if/runs
+  @Get('what-if/runs')
+  async getWhatIfRuns(@Query('tenantId') tenantId?: string) {
+    return this.whatIfService.getRecentRuns(tenantId);
+  }
+
+  // GET /api/v1/decision-engine/what-if/runs/:id
+  @Get('what-if/runs/:id')
+  async getWhatIfRun(@Param('id') id: string) {
+    return this.whatIfService.getRun(id);
   }
 }

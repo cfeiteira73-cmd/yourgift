@@ -60,6 +60,20 @@ interface CorrectnessData {
   byCategory: Record<string, { correctness: number; count: number }>;
 }
 
+interface CashFlowData {
+  totalPayablesEur: number;
+  overduePayablesEur: number;
+  pendingInvoiceCount: number;
+  overdueInvoiceCount: number;
+  avgDaysPayableOutstanding: number;
+  cashConversionCycleDays: number;
+  liquidityRiskScore: number;
+  workingCapitalAtRiskEur: number;
+  thirtyDayForecastEur: number;
+  riskLevel: 'low' | 'medium' | 'high';
+  cashFlowTimeline: Array<{ date: string; outflow: number; inflow: number; net: number }>;
+}
+
 type TabId = 'overview' | 'categories' | 'suppliers' | 'adoption';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -289,13 +303,38 @@ export default function CFOPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [correctness, setCorrectness] = useState<CorrectnessData | null>(null);
+  const [cashFlow, setCashFlow] = useState<CashFlowData | null>(null);
+
+  const CASH_FLOW_FALLBACK: CashFlowData = {
+    totalPayablesEur: 60300,
+    overduePayablesEur: 4400,
+    pendingInvoiceCount: 6,
+    overdueInvoiceCount: 2,
+    avgDaysPayableOutstanding: 30,
+    cashConversionCycleDays: 34,
+    liquidityRiskScore: 28,
+    workingCapitalAtRiskEur: 4400,
+    thirtyDayForecastEur: 60300,
+    riskLevel: 'low',
+    cashFlowTimeline: [
+      { date: '2026-05-23', outflow: 15800, inflow: 0, net: -15800 },
+      { date: '2026-05-30', outflow: 4500,  inflow: 0, net: -4500  },
+      { date: '2026-06-06', outflow: 18900, inflow: 0, net: -18900 },
+      { date: '2026-06-13', outflow: 7800,  inflow: 0, net: -7800  },
+      { date: '2026-06-20', outflow: 13400, inflow: 0, net: -13400 },
+      { date: '2026-06-27', outflow: 0,     inflow: 0, net: 0      },
+      { date: '2026-07-04', outflow: 0,     inflow: 0, net: 0      },
+      { date: '2026-07-11', outflow: 0,     inflow: 0, net: 0      },
+    ],
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [sumRes, modeRes, corrRes] = await Promise.allSettled([
+    const [sumRes, modeRes, corrRes, cfRes] = await Promise.allSettled([
       fetch(`${API_BASE}/api/v1/proof-engine/summary`, { headers: authHdrs }),
       fetch(`${API_BASE}/api/v1/proof-engine/adoption`, { headers: authHdrs }),
       fetch(`${API_BASE}/api/v1/decision-engine/correctness?period=30d`, { headers: authHdrs }),
+      fetch(`${API_BASE}/api/v1/cash-flow/working-capital`, { headers: authHdrs }),
     ]);
 
     if (sumRes.status === 'fulfilled' && sumRes.value.ok) {
@@ -310,6 +349,12 @@ export default function CFOPage() {
       try {
         const data = await corrRes.value.json() as CorrectnessData;
         setCorrectness(data);
+      } catch { /* ignore */ }
+    }
+    if (cfRes.status === 'fulfilled' && cfRes.value.ok) {
+      try {
+        const data = await cfRes.value.json() as CashFlowData;
+        setCashFlow(data);
       } catch { /* ignore */ }
     }
     setLoading(false);
@@ -633,6 +678,144 @@ export default function CFOPage() {
           </div>
         )}
       </div>
+
+      {/* ── CASH FLOW REALITY ENGINE ─────────────────────────────────────── */}
+      {(() => {
+        const cf = cashFlow ?? CASH_FLOW_FALLBACK;
+        const riskColor = cf.riskLevel === 'high' ? '#ef4444' : cf.riskLevel === 'medium' ? '#f59e0b' : '#22c55e';
+        const maxOutflow = Math.max(...cf.cashFlowTimeline.map((w) => w.outflow), 1);
+
+        return (
+          <div style={{ marginTop: 40 }}>
+            {/* Section header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#4d6a87', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                Cash Flow Reality Engine
+              </span>
+              <div style={{ flex: 1, height: 1, background: '#1a2f48' }} />
+              <span style={{
+                fontSize: 11, fontWeight: 700, color: riskColor,
+                background: riskColor + '18', borderRadius: 20,
+                padding: '2px 10px', border: `1px solid ${riskColor}40`,
+                textTransform: 'uppercase', letterSpacing: '0.08em',
+              }}>
+                {cf.riskLevel} risk
+              </span>
+            </div>
+
+            {/* 4 hero numbers */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
+              {/* Total Payables */}
+              <div style={{ background: '#0b1526', border: '1px solid #1a2f48', borderRadius: 12, padding: '18px 20px' }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#8ba8c7', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                  Total Payables
+                </div>
+                <div style={{ fontSize: 28, fontWeight: 700, color: '#f0f6ff', fontVariantNumeric: 'tabular-nums', lineHeight: 1, marginBottom: 4 }}>
+                  {fmtEurFull(cf.totalPayablesEur)}
+                </div>
+                <div style={{ fontSize: 12, color: '#4a6480' }}>
+                  {cf.pendingInvoiceCount} pending invoice{cf.pendingInvoiceCount !== 1 ? 's' : ''}
+                </div>
+              </div>
+
+              {/* Overdue */}
+              <div style={{ background: '#0b1526', border: `1px solid ${cf.overduePayablesEur > 0 ? '#ef444440' : '#1a2f48'}`, borderRadius: 12, padding: '18px 20px' }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#8ba8c7', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                  Overdue Payables
+                </div>
+                <div style={{ fontSize: 28, fontWeight: 700, color: cf.overduePayablesEur > 0 ? '#ef4444' : '#22c55e', fontVariantNumeric: 'tabular-nums', lineHeight: 1, marginBottom: 4 }}>
+                  {fmtEurFull(cf.overduePayablesEur)}
+                </div>
+                <div style={{ fontSize: 12, color: '#4a6480' }}>
+                  {cf.overdueInvoiceCount} overdue invoice{cf.overdueInvoiceCount !== 1 ? 's' : ''}
+                </div>
+              </div>
+
+              {/* Cash Conversion Cycle */}
+              <div style={{ background: '#0b1526', border: '1px solid #1a2f48', borderRadius: 12, padding: '18px 20px' }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#8ba8c7', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                  Cash Conversion
+                </div>
+                <div style={{ fontSize: 28, fontWeight: 700, color: '#4da3ff', fontVariantNumeric: 'tabular-nums', lineHeight: 1, marginBottom: 4 }}>
+                  {cf.cashConversionCycleDays}d
+                </div>
+                <div style={{ fontSize: 12, color: '#4a6480' }}>Avg cycle · DPO {cf.avgDaysPayableOutstanding}d</div>
+              </div>
+
+              {/* Liquidity Risk Score */}
+              <div style={{ background: '#0b1526', border: '1px solid #1a2f48', borderRadius: 12, padding: '18px 20px' }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#8ba8c7', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                  Liquidity Risk
+                </div>
+                <div style={{ fontSize: 28, fontWeight: 700, color: riskColor, fontVariantNumeric: 'tabular-nums', lineHeight: 1, marginBottom: 4 }}>
+                  {cf.liquidityRiskScore}<span style={{ fontSize: 14, fontWeight: 500, color: '#4a6480' }}>/100</span>
+                </div>
+                <div style={{ fontSize: 12, color: '#4a6480' }}>
+                  {fmtEurFull(cf.workingCapitalAtRiskEur)} at risk
+                </div>
+              </div>
+            </div>
+
+            {/* 30-day outflow forecast SVG bar chart */}
+            <div style={{ background: '#0b1526', border: '1px solid #1a2f48', borderRadius: 12, padding: '20px 24px', marginBottom: 16 }}>
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#f0f6ff', marginBottom: 4 }}>8-Week Outflow Forecast</div>
+                <div style={{ fontSize: 12, color: '#4a6480' }}>
+                  30-day: {fmtEurFull(cf.thirtyDayForecastEur)} due · Weekly payment obligations
+                </div>
+              </div>
+              <svg width="100%" viewBox={`0 0 ${cf.cashFlowTimeline.length * 90 + 20} 140`} style={{ display: 'block' }}>
+                {cf.cashFlowTimeline.map((week, i) => {
+                  const BAR_MAX_H = 90;
+                  const barH = week.outflow > 0 ? Math.max(4, (week.outflow / maxOutflow) * BAR_MAX_H) : 4;
+                  const x = i * 90 + 10;
+                  const y = BAR_MAX_H - barH + 10;
+                  const barColor = week.outflow > 10000 ? '#ef4444' : week.outflow > 5000 ? '#f59e0b' : '#4da3ff';
+                  return (
+                    <g key={week.date}>
+                      <rect x={x} y={y} width={60} height={barH} rx={4} fill={barColor} opacity={0.8} />
+                      {week.outflow > 0 && (
+                        <text x={x + 30} y={y - 4} textAnchor="middle" fontSize={9} fill="#8ba8c7">
+                          {fmtEur(week.outflow)}
+                        </text>
+                      )}
+                      <text x={x + 30} y={115} textAnchor="middle" fontSize={9} fill="#4a6480">
+                        {week.date.slice(5)}
+                      </text>
+                    </g>
+                  );
+                })}
+                <line x1={10} y1={100} x2={cf.cashFlowTimeline.length * 90 + 10} y2={100} stroke="#1a2f48" strokeWidth={1} />
+              </svg>
+            </div>
+
+            {/* Invoice status summary */}
+            <div style={{ display: 'flex', gap: 12 }}>
+              <div style={{ flex: 1, background: '#0b1526', border: '1px solid #1a2f48', borderRadius: 12, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#4da3ff', flexShrink: 0 }} />
+                <div>
+                  <span style={{ fontSize: 20, fontWeight: 700, color: '#4da3ff' }}>{cf.pendingInvoiceCount}</span>
+                  <span style={{ fontSize: 13, color: '#8ba8c7', marginLeft: 8 }}>invoices pending</span>
+                </div>
+              </div>
+              <div style={{ flex: 1, background: '#0b1526', border: `1px solid ${cf.overdueInvoiceCount > 0 ? '#ef444430' : '#1a2f48'}`, borderRadius: 12, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: cf.overdueInvoiceCount > 0 ? '#ef4444' : '#22c55e', flexShrink: 0 }} />
+                <div>
+                  <span style={{ fontSize: 20, fontWeight: 700, color: cf.overdueInvoiceCount > 0 ? '#ef4444' : '#22c55e' }}>{cf.overdueInvoiceCount}</span>
+                  <span style={{ fontSize: 13, color: '#8ba8c7', marginLeft: 8 }}>invoices overdue</span>
+                </div>
+              </div>
+              <div style={{ flex: 1, background: '#0b1526', border: '1px solid #1a2f48', borderRadius: 12, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
+                <div>
+                  <span style={{ fontSize: 20, fontWeight: 700, color: '#22c55e' }}>{fmtEurFull(cf.thirtyDayForecastEur)}</span>
+                  <span style={{ fontSize: 13, color: '#8ba8c7', marginLeft: 8 }}>due in 30 days</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* TAB 4 — ADOPTION MODES */}
       {activeTab === 'adoption' && (

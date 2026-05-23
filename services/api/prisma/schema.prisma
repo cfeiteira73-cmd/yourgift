@@ -2383,3 +2383,107 @@ model DecisionCorrectnessAggregate {
   @@unique([tenantId, period])
   @@map("decision_correctness_aggregates")
 }
+
+// ─────────────────────────────────────────────
+// WHAT-IF SIMULATION ENGINE (Sprint 21)
+// ─────────────────────────────────────────────
+
+model WhatIfScenarioRun {
+  id                String   @id @default(cuid())
+  tenantId          String   @default("default") @map("tenant_id")
+  decisionCardId    String?  @map("decision_card_id")
+
+  // Base scenario inputs
+  baseProductCost   Decimal  @map("base_product_cost") @db.Decimal(14, 2)
+  baseSalePrice     Decimal  @map("base_sale_price") @db.Decimal(14, 2)
+  baseQuantity      Int      @map("base_quantity")
+  baseOrigin        String   @map("base_origin")
+  baseDestination   String   @map("base_destination")
+  baseWeightKg      Decimal  @map("base_weight_kg") @db.Decimal(8, 3)
+  baseSupplierName  String?  @map("base_supplier_name")
+
+  // Base results
+  baseMarginEur     Decimal? @map("base_margin_eur") @db.Decimal(14, 2)
+  baseMarginPct     Decimal? @map("base_margin_pct") @db.Decimal(5, 2)
+  baseShippingCost  Decimal? @map("base_shipping_cost") @db.Decimal(14, 2)
+  baseRiskScore     Decimal? @map("base_risk_score") @db.Decimal(5, 2)
+  baseDeliveryDays  Int?     @map("base_delivery_days")
+
+  // Scenario matrix (stored as JSON array of ScenarioResult)
+  scenarios         Json     @default("[]")
+
+  // Optimal recommendation
+  optimalScenario   String?  @map("optimal_scenario") // scenario type that wins
+  optimalReasoning  String?  @map("optimal_reasoning")
+  maxSavingsEur     Decimal? @map("max_savings_eur") @db.Decimal(14, 2)
+
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  @@index([tenantId])
+  @@index([decisionCardId])
+  @@index([createdAt])
+  @@map("what_if_scenario_runs")
+}
+
+// ─────────────────────────────────────────────
+// CASH FLOW REALITY ENGINE (Sprint 21)
+// ─────────────────────────────────────────────
+
+model CashFlowInvoice {
+  id                  String    @id @default(cuid())
+  tenantId            String    @default("default") @map("tenant_id")
+  orderId             String?   @map("order_id")
+  supplierId          String?   @map("supplier_id")
+  supplierName        String?   @map("supplier_name")
+
+  invoiceRef          String    @map("invoice_ref")
+  invoiceDate         DateTime  @map("invoice_date")
+  dueDate             DateTime  @map("due_date")
+  paidDate            DateTime? @map("paid_date")
+
+  amountEur           Decimal   @map("amount_eur") @db.Decimal(14, 2)
+  paidAmountEur       Decimal   @default(0) @map("paid_amount_eur") @db.Decimal(14, 2)
+
+  status              String    @default("pending") @map("status") // pending | overdue | paid | disputed
+
+  // Cash flow timing
+  orderDate           DateTime? @map("order_date")
+  deliveryDate        DateTime? @map("delivery_date")
+
+  // Working capital impact
+  daysPayableOutstanding Int?   @map("days_payable_outstanding")
+  cashConversionDays   Int?    @map("cash_conversion_days")
+
+  category            String?
+  notes               String?
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("cash_flow_invoices")
+}
+
+model WorkingCapitalSnapshot {
+  id                      String   @id @default(cuid())
+  tenantId                String   @default("default") @map("tenant_id")
+
+  totalPayablesEur        Decimal  @default(0) @map("total_payables_eur") @db.Decimal(14, 2)
+  overduePayablesEur      Decimal  @default(0) @map("overdue_payables_eur") @db.Decimal(14, 2)
+  avgDaysPayableOutstanding Decimal @default(30) @map("avg_days_payable_outstanding") @db.Decimal(5, 2)
+  cashConversionCycleDays Decimal  @default(45) @map("cash_conversion_cycle_days") @db.Decimal(5, 2)
+
+  liquidityRiskScore      Decimal  @default(50) @map("liquidity_risk_score") @db.Decimal(5, 2)
+  workingCapitalAtRiskEur Decimal  @default(0) @map("working_capital_at_risk_eur") @db.Decimal(14, 2)
+
+  thirtyDayForecastEur    Decimal  @default(0) @map("thirty_day_forecast_eur") @db.Decimal(14, 2)
+  sixtyDayForecastEur     Decimal  @default(0) @map("sixty_day_forecast_eur") @db.Decimal(14, 2)
+  ninetyDayForecastEur    Decimal  @default(0) @map("ninety_day_forecast_eur") @db.Decimal(14, 2)
+
+  snapshotAt              DateTime @default(now()) @map("snapshot_at")
+
+  @@index([tenantId])
+  @@index([snapshotAt])
+  @@map("working_capital_snapshots")
+}

@@ -60,6 +60,7 @@ import { NetworkIntelligenceModule } from './network-intelligence/network-intell
 import { GovernanceModule } from './governance/governance.module';
 import { ProofEngineModule } from './proof-engine/proof-engine.module';
 import { CategoryIntelligenceModule } from './category-intelligence/category-intelligence.module';
+import { CashFlowModule } from './cash-flow/cash-flow.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -137,6 +138,7 @@ import { APP_GUARD } from '@nestjs/core';
     GovernanceModule,
     ProofEngineModule,
     CategoryIntelligenceModule,
+    CashFlowModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

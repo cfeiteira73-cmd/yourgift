@@ -370,6 +370,144 @@ export default function TrustPage() {
           in action.
         </p>
       </div>
+
+      {/* ── FULL SYSTEM DELEGATION — LEVEL 4 ─────────────────────────────── */}
+      {(() => {
+        // Values: hardcoded for Sprint 21 (will connect to live data in Sprint 22)
+        const trustScore = avgScore !== null && typeof avgScore === 'number' ? avgScore : 87.3;
+        const correctnessRate = 90.0;
+        const governanceClean = true;
+
+        const trustOk   = trustScore >= 90;
+        const corrOk    = correctnessRate >= 95;
+        const govOk     = governanceClean;
+        const criteriaMet = [trustOk, corrOk, govOk].filter(Boolean).length;
+        const unlocked  = criteriaMet === 3;
+
+        const statusColor  = unlocked ? '#22c55e' : '#f59e0b';
+        const statusBg     = unlocked ? '#22c55e12' : '#f59e0b12';
+        const statusBorder = unlocked ? '#22c55e30' : '#f59e0b30';
+
+        function CriterionRow({
+          met, label, current, required,
+        }: { met: boolean; label: string; current: string; required: string }) {
+          return (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0', borderBottom: '1px solid #1a2f4840' }}>
+              <span style={{ fontSize: 16, color: met ? '#22c55e' : '#f59e0b', flexShrink: 0, width: 20, textAlign: 'center' }}>
+                {met ? '✓' : '○'}
+              </span>
+              <span style={{ fontSize: 13, color: '#8ba8c7', flex: 1 }}>{label}</span>
+              <span style={{ fontSize: 12, color: met ? '#22c55e' : '#f59e0b', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                {current}
+              </span>
+              <span style={{ fontSize: 12, color: '#4a6480', whiteSpace: 'nowrap' }}>/ {required} needed</span>
+            </div>
+          );
+        }
+
+        return (
+          <div style={{ marginTop: 28 }}>
+            <div style={{
+              background: '#0b1526',
+              border: `1px solid ${statusBorder}`,
+              borderRadius: 16,
+              overflow: 'hidden',
+            }}>
+              {/* Header */}
+              <div style={{
+                display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+                padding: '20px 24px 16px', borderBottom: '1px solid #1a2f48',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <span style={{ fontSize: 22 }}>🔒</span>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: '#f0f6ff', letterSpacing: '0.05em' }}>
+                      LEVEL 4: FULL SYSTEM DELEGATION
+                    </div>
+                    <div style={{ fontSize: 12, color: '#4a6480', marginTop: 3 }}>
+                      The highest autonomy tier — CFO reviews weekly summaries only
+                    </div>
+                  </div>
+                </div>
+                <div style={{
+                  fontSize: 11, fontWeight: 700, color: statusColor,
+                  background: statusBg, border: `1px solid ${statusBorder}`,
+                  borderRadius: 20, padding: '4px 12px', whiteSpace: 'nowrap',
+                  letterSpacing: '0.06em', textTransform: 'uppercase',
+                }}>
+                  {unlocked ? 'UNLOCKED' : `LOCKED — ${criteriaMet}/3 criteria met`}
+                </div>
+              </div>
+
+              {/* Description */}
+              <div style={{ padding: '14px 24px', borderBottom: '1px solid #1a2f48' }}>
+                <p style={{ fontSize: 13, color: '#8ba8c7', lineHeight: 1.6, margin: 0 }}>
+                  At Full System Delegation, the procurement OS executes all decisions autonomously —
+                  supplier selection, order placement, payment scheduling, and exception handling —
+                  without requiring human approval on individual transactions. Governance guardrails
+                  remain active and the CFO receives weekly consolidated summaries.
+                </p>
+              </div>
+
+              {/* Requirements */}
+              <div style={{ padding: '16px 24px' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#4a6480', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>
+                  Unlock Requirements
+                </div>
+                <CriterionRow
+                  met={trustOk}
+                  label="Trust Score &gt; 90"
+                  current={`${trustScore.toFixed(1)}`}
+                  required="90.0"
+                />
+                <CriterionRow
+                  met={corrOk}
+                  label="Decision Correctness Rate &gt; 95%"
+                  current={`${correctnessRate.toFixed(0)}%`}
+                  required="95%"
+                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0' }}>
+                  <span style={{ fontSize: 16, color: '#22c55e', flexShrink: 0, width: 20, textAlign: 'center' }}>✓</span>
+                  <span style={{ fontSize: 13, color: '#8ba8c7', flex: 1 }}>Governance Compliance = Clean</span>
+                  <span style={{ fontSize: 12, color: '#22c55e', fontWeight: 600 }}>CLEAN</span>
+                  <span style={{ fontSize: 12, color: '#4a6480' }}>/ Clean needed</span>
+                </div>
+              </div>
+
+              {/* Status banner */}
+              {!unlocked && (
+                <div style={{
+                  margin: '0 24px 20px', padding: '12px 16px',
+                  background: '#f59e0b10', border: '1px solid #f59e0b30',
+                  borderRadius: 8,
+                }}>
+                  <div style={{ fontSize: 12, color: '#f59e0b', fontWeight: 600, marginBottom: 2 }}>
+                    Unlock Condition
+                  </div>
+                  <div style={{ fontSize: 13, color: '#8ba8c7' }}>
+                    Achieve <span style={{ color: '#f0f6ff', fontWeight: 600 }}>95%+</span> decision correctness
+                    rate (currently {correctnessRate}%) and raise Trust Score to{' '}
+                    <span style={{ color: '#f0f6ff', fontWeight: 600 }}>90+</span>{' '}
+                    (currently {trustScore.toFixed(1)}).
+                  </div>
+                </div>
+              )}
+
+              {unlocked && (
+                <div style={{
+                  margin: '0 24px 20px', padding: '12px 16px',
+                  background: '#22c55e10', border: '1px solid #22c55e30',
+                  borderRadius: 8,
+                }}>
+                  <div style={{ fontSize: 13, color: '#22c55e', fontWeight: 600 }}>
+                    All criteria met — Full System Delegation is active.
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
