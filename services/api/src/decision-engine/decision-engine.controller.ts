@@ -13,6 +13,7 @@ import {
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { DecisionEngineService, AlternativeAction } from './decision-engine.service';
 import { ProcurementSimulatorService, SimulationInput } from './procurement-simulator.service';
+import { DecisionCorrectnessService } from './decision-correctness.service';
 
 @Controller('api/v1/decision-engine')
 @UseGuards(JwtAuthGuard)
@@ -20,6 +21,7 @@ export class DecisionEngineController {
   constructor(
     private readonly engine: DecisionEngineService,
     private readonly simulator: ProcurementSimulatorService,
+    private readonly correctnessService: DecisionCorrectnessService,
   ) {}
 
   // POST /simulate
@@ -110,5 +112,39 @@ export class DecisionEngineController {
   @Get('stats')
   getStats() {
     return this.engine.getDecisionStats();
+  }
+
+  // POST /api/v1/decision-engine/decisions/:id/outcome
+  @Post('decisions/:id/outcome')
+  async recordOutcome(
+    @Param('id') id: string,
+    @Body() body: {
+      actualSavingsEur?: number;
+      actualMarginPct?: number;
+      actualDeliveryDays?: number;
+      actualCostEur?: number;
+      outcomeType?: 'success' | 'partial' | 'failure';
+      notes?: string;
+      supplierCode?: string;
+      category?: string;
+      tenantId?: string;
+    },
+  ) {
+    return this.correctnessService.recordOutcome({ decisionCardId: id, ...body });
+  }
+
+  // GET /api/v1/decision-engine/correctness
+  @Get('correctness')
+  async getCorrectnessStats(
+    @Query('tenantId') tenantId?: string,
+    @Query('period') period?: string,
+  ) {
+    return this.correctnessService.getCorrectnessStats(tenantId, period ?? '30d');
+  }
+
+  // GET /api/v1/decision-engine/decisions/:id/accuracy
+  @Get('decisions/:id/accuracy')
+  async getDecisionAccuracy(@Param('id') id: string) {
+    return this.correctnessService.getDecisionAccuracy(id);
   }
 }

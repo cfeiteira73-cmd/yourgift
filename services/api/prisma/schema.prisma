@@ -2313,3 +2313,73 @@ model TenantAdoptionMode {
 
   @@map("tenant_adoption_modes")
 }
+
+// ─────────────────────────────────────────────
+// DECISION QUALITY LOOP (Sprint 20)
+// ─────────────────────────────────────────────
+
+model DecisionOutcome {
+  id                      String   @id @default(cuid())
+  decisionCardId          String   @map("decision_card_id")
+  tenantId                String   @default("default") @map("tenant_id")
+
+  // Predictions (what the AI said would happen)
+  predictedSavingsEur     Decimal? @map("predicted_savings_eur") @db.Decimal(14, 2)
+  predictedMarginPct      Decimal? @map("predicted_margin_pct") @db.Decimal(5, 2)
+  predictedDeliveryDays   Int?     @map("predicted_delivery_days")
+  predictedRiskScore      Decimal? @map("predicted_risk_score") @db.Decimal(5, 2)
+
+  // Actuals (what really happened)
+  actualSavingsEur        Decimal? @map("actual_savings_eur") @db.Decimal(14, 2)
+  actualMarginPct         Decimal? @map("actual_margin_pct") @db.Decimal(5, 2)
+  actualDeliveryDays      Int?     @map("actual_delivery_days")
+  actualCostEur           Decimal? @map("actual_cost_eur") @db.Decimal(14, 2)
+
+  // Accuracy computed fields
+  savingsAccuracyPct      Decimal? @map("savings_accuracy_pct") @db.Decimal(5, 2)
+  marginAccuracyPct       Decimal? @map("margin_accuracy_pct") @db.Decimal(5, 2)
+  deliveryAccuracyPct     Decimal? @map("delivery_accuracy_pct") @db.Decimal(5, 2)
+
+  // Verdict
+  outcomeType             String   @default("success") @map("outcome_type") // success | partial | failure
+  predictionCorrect       Boolean  @default(true) @map("prediction_correct")
+  correctnessScore        Decimal  @default(100) @map("correctness_score") @db.Decimal(5, 2) // 0-100
+  notes                   String?
+
+  // Supply chain actuals
+  supplierCode            String?  @map("supplier_code")
+  routeKey                String?  @map("route_key")
+  category                String?
+
+  recordedAt              DateTime @default(now()) @map("recorded_at")
+  createdAt               DateTime @default(now()) @map("created_at")
+
+  @@index([decisionCardId])
+  @@index([tenantId])
+  @@index([recordedAt])
+  @@index([supplierCode])
+  @@map("decision_outcomes")
+}
+
+model DecisionCorrectnessAggregate {
+  id                      String   @id @default(cuid())
+  tenantId                String?  @map("tenant_id") // null = global
+  period                  String   @default("all_time") @map("period") // all_time | 30d | 7d
+
+  totalDecisions          Int      @default(0) @map("total_decisions")
+  correctDecisions        Int      @default(0) @map("correct_decisions")
+  correctnessRatePct      Decimal  @default(0) @map("correctness_rate_pct") @db.Decimal(5, 2)
+
+  avgSavingsAccuracyPct   Decimal  @default(0) @map("avg_savings_accuracy_pct") @db.Decimal(5, 2)
+  avgMarginAccuracyPct    Decimal  @default(0) @map("avg_margin_accuracy_pct") @db.Decimal(5, 2)
+  avgDeliveryAccuracyPct  Decimal  @default(0) @map("avg_delivery_accuracy_pct") @db.Decimal(5, 2)
+
+  totalRealizedSavingsEur Decimal  @default(0) @map("total_realized_savings_eur") @db.Decimal(14, 2)
+  totalPredictedSavingsEur Decimal @default(0) @map("total_predicted_savings_eur") @db.Decimal(14, 2)
+
+  updatedAt               DateTime @default(now()) @map("updated_at")
+  createdAt               DateTime @default(now()) @map("created_at")
+
+  @@unique([tenantId, period])
+  @@map("decision_correctness_aggregates")
+}

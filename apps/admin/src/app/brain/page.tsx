@@ -535,6 +535,9 @@ function CenterPanel({
   const [actionLoading, setActionLoading] = useState<'approve' | 'reject' | null>(null);
   const [modifyMode, setModifyMode] = useState(false);
   const [modifyText, setModifyText] = useState('');
+  const [outcomeFormId, setOutcomeFormId] = useState<string | null>(null);
+  const [outcomeFormData, setOutcomeFormData] = useState({ actualSavingsEur: '', actualMarginPct: '', outcomeType: 'success' });
+  const [outcomeSavedId, setOutcomeSavedId] = useState<string | null>(null);
 
   const decision = decisions[currentIdx] ?? null;
 
@@ -744,20 +747,96 @@ function CenterPanel({
           <div className="text-[10px] text-[#4d6a87] uppercase tracking-wide mb-2">Recent Decisions</div>
           <div className="space-y-1.5">
             {resolved.slice(0, 5).map((r) => (
-              <div key={r.id} className="flex items-center gap-3 px-3 py-2 bg-[#0b1526] rounded-lg border border-[#1a2f48]">
-                <span
-                  className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                    r.status === 'approved'
-                      ? 'bg-[#22c55e]/10 text-[#22c55e]'
-                      : 'bg-[#ef4444]/10 text-[#ef4444]'
-                  }`}
-                >
-                  {r.status?.toUpperCase()}
-                </span>
-                <span className="text-[12px] text-[#8ba8c7] flex-1 truncate">
-                  {r.action.slice(0, 40)}{r.action.length > 40 ? '…' : ''}
-                </span>
-                <span className="text-[11px] text-[#4d6a87] flex-shrink-0">{timeAgo(r.updatedAt ?? r.createdAt)}</span>
+              <div key={r.id}>
+                <div className="flex items-center gap-3 px-3 py-2 bg-[#0b1526] rounded-lg border border-[#1a2f48]">
+                  <span
+                    className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                      r.status === 'approved'
+                        ? 'bg-[#22c55e]/10 text-[#22c55e]'
+                        : 'bg-[#ef4444]/10 text-[#ef4444]'
+                    }`}
+                  >
+                    {r.status?.toUpperCase()}
+                  </span>
+                  <span className="text-[12px] text-[#8ba8c7] flex-1 truncate">
+                    {r.action.slice(0, 40)}{r.action.length > 40 ? '…' : ''}
+                  </span>
+                  <span className="text-[11px] text-[#4d6a87] flex-shrink-0">{timeAgo(r.updatedAt ?? r.createdAt)}</span>
+                  {(r.status === 'approved' || r.status === 'auto_executed') && (
+                    outcomeSavedId === r.id ? (
+                      <span style={{ fontSize: 11, color: '#22c55e', flexShrink: 0 }}>✓ Saved</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOutcomeFormId(outcomeFormId === r.id ? null : r.id);
+                          setOutcomeFormData({ actualSavingsEur: '', actualMarginPct: '', outcomeType: 'success' });
+                        }}
+                        style={{ fontSize: 11, color: '#4da3ff', background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, padding: 0 }}
+                      >
+                        + Outcome
+                      </button>
+                    )
+                  )}
+                </div>
+                {/* Inline outcome form */}
+                {outcomeFormId === r.id && (
+                  <div style={{ marginTop: 4, padding: '10px 12px', background: '#102131', border: '1px solid #1a2f48', borderRadius: 8, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <input
+                      type="number"
+                      placeholder="Actual Savings (€)"
+                      value={outcomeFormData.actualSavingsEur}
+                      onChange={(e) => setOutcomeFormData((p) => ({ ...p, actualSavingsEur: e.target.value }))}
+                      style={{ width: 120, background: '#0b1526', border: '1px solid #1a2f48', borderRadius: 6, padding: '4px 8px', fontSize: 11, color: '#f0f6ff', outline: 'none' }}
+                    />
+                    <input
+                      type="number"
+                      step="0.1"
+                      placeholder="Actual Margin %"
+                      value={outcomeFormData.actualMarginPct}
+                      onChange={(e) => setOutcomeFormData((p) => ({ ...p, actualMarginPct: e.target.value }))}
+                      style={{ width: 110, background: '#0b1526', border: '1px solid #1a2f48', borderRadius: 6, padding: '4px 8px', fontSize: 11, color: '#f0f6ff', outline: 'none' }}
+                    />
+                    <select
+                      value={outcomeFormData.outcomeType}
+                      onChange={(e) => setOutcomeFormData((p) => ({ ...p, outcomeType: e.target.value }))}
+                      style={{ background: '#0b1526', border: '1px solid #1a2f48', borderRadius: 6, padding: '4px 8px', fontSize: 11, color: '#f0f6ff', outline: 'none' }}
+                    >
+                      <option value="success">success</option>
+                      <option value="partial">partial</option>
+                      <option value="failure">failure</option>
+                    </select>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          await fetch(`${API_BASE}/api/v1/decision-engine/decisions/${r.id}/outcome`, {
+                            method: 'POST',
+                            headers: { ...getHeaders(), 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              actualSavingsEur: Number(outcomeFormData.actualSavingsEur) || 0,
+                              actualMarginPct: Number(outcomeFormData.actualMarginPct) || 0,
+                              outcomeType: outcomeFormData.outcomeType,
+                            }),
+                          });
+                        } catch { /* silent */ }
+                        setOutcomeFormId(null);
+                        setOutcomeSavedId(r.id);
+                        setTimeout(() => setOutcomeSavedId((prev) => (prev === r.id ? null : prev)), 3000);
+                      }}
+                      style={{ fontSize: 11, fontWeight: 600, color: '#ffffff', background: '#22c55e', border: 'none', borderRadius: 6, padding: '4px 12px', cursor: 'pointer' }}
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setOutcomeFormId(null)}
+                      style={{ fontSize: 11, color: '#4d6a87', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                    >
+                      cancel
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>

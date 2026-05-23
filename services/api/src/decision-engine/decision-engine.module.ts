@@ -6,13 +6,14 @@ import { MarginProtectionModule } from '../margin-protection/margin-protection.m
 import { DecisionEngineController } from './decision-engine.controller';
 import { ProcurementSimulatorService } from './procurement-simulator.service';
 import { DecisionEngineService } from './decision-engine.service';
+import { DecisionCorrectnessService } from './decision-correctness.service';
 
 // EventBusModule is @Global() — EventBusService is available without explicit import
 
 @Module({
   imports: [PrismaModule, AutomationModule, LogisticsModule, MarginProtectionModule],
   controllers: [DecisionEngineController],
-  providers: [ProcurementSimulatorService, DecisionEngineService],
-  exports: [ProcurementSimulatorService, DecisionEngineService],
+  providers: [ProcurementSimulatorService, DecisionEngineService, DecisionCorrectnessService],
+  exports: [ProcurementSimulatorService, DecisionEngineService, DecisionCorrectnessService],
 })
 export class DecisionEngineModule {}

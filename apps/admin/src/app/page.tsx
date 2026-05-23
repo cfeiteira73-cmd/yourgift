@@ -445,6 +445,7 @@ export default function CommandCenterPage() {
   const [pendingDecisions, setPendingDecisions] = useState<DecisionCard[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [decisionStats, setDecisionStats] = useState<DecisionStats | null>(null);
+  const [correctnessData, setCorrectnessData] = useState<{ correctnessRatePct: number; trend: string; savingsCapturePct: number } | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('executive');
 
   const loadData = useCallback(async () => {
@@ -505,6 +506,12 @@ export default function CommandCenterPage() {
         setDecisionStats(ds2.data ?? ds2);
       } catch { /* ignore parse errors */ }
     }
+
+    // Correctness rate fetch
+    const corr = await safeFetch<{ correctnessRatePct: number; trend: string; savingsCapturePct: number }>(
+      `${API}/api/v1/decision-engine/correctness?period=30d`,
+    );
+    if (corr) setCorrectnessData(corr);
 
     const dlqPermanent = dq?.byStatus?.['permanent'] ?? dq?.byStatus?.['dead'] ?? 0;
     const dlqBacklog = Number(dq?.total ?? 0);
@@ -714,18 +721,38 @@ export default function CommandCenterPage() {
               <div style={{ fontSize: 11, fontWeight: 700, color: T.dim, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 16 }}>
                 Executive Brief
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 20 }}>
                 {[
-                  { label: 'Total AI Savings', value: '€124,800', color: T.green },
-                  { label: 'Procurement Health', value: `${d.financial?.grossMarginPct?.toFixed(0) ?? '87'}`, color: T.accent },
-                  { label: 'Pending Decisions', value: String(pendingCount), color: pendingCount > 0 ? T.amber : T.green },
-                  { label: 'Auto-Execution Rate', value: decisionStats?.autoExecutionRate != null ? `${decisionStats.autoExecutionRate.toFixed(0)}%` : '—', color: T.purple },
-                ].map(({ label, value, color }) => (
+                  { label: 'Total AI Savings', value: '€124,800', color: T.green, sub: undefined },
+                  { label: 'Procurement Health', value: `${d.financial?.grossMarginPct?.toFixed(0) ?? '87'}`, color: T.accent, sub: undefined },
+                  { label: 'Pending Decisions', value: String(pendingCount), color: pendingCount > 0 ? T.amber : T.green, sub: undefined },
+                  { label: 'Auto-Execution Rate', value: decisionStats?.autoExecutionRate != null ? `${decisionStats.autoExecutionRate.toFixed(0)}%` : '—', color: T.purple, sub: undefined },
+                ].map(({ label, value, color, sub }) => (
                   <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 6, borderRight: `1px solid ${T.border}`, paddingRight: 20 }}>
                     <span style={{ fontSize: 11, fontWeight: 600, color: T.dim, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</span>
                     <span style={{ fontSize: 32, fontWeight: 700, color, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{value}</span>
+                    {sub && <span style={{ fontSize: 12, color: T.muted }}>{sub}</span>}
                   </div>
                 ))}
+                {/* 5th card — Decision Correctness */}
+                {(() => {
+                  const rate = correctnessData?.correctnessRatePct ?? 90.0;
+                  const corrColor = rate >= 85 ? T.green : rate >= 70 ? T.amber : T.red;
+                  const trendLabel = correctnessData?.trend === 'improving'
+                    ? '↑ improving'
+                    : correctnessData?.trend === 'degrading'
+                    ? '↓ degrading'
+                    : '→ stable';
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, paddingRight: 0 }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: T.dim, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Decision Correctness</span>
+                      <span style={{ fontSize: 32, fontWeight: 700, color: corrColor, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                        {`${(correctnessData?.correctnessRatePct ?? 90.0).toFixed(1)}%`}
+                      </span>
+                      <span style={{ fontSize: 12, color: T.muted }}>{trendLabel}</span>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           )}

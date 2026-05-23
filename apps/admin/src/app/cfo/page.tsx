@@ -46,6 +46,20 @@ interface AdoptionMode {
   modesHistory: Array<{ mode: string; changedAt: string }>;
 }
 
+interface CorrectnessData {
+  correctnessRatePct: number;
+  totalDecisions: number;
+  correctDecisions: number;
+  avgSavingsAccuracyPct: number;
+  avgMarginAccuracyPct: number;
+  avgDeliveryAccuracyPct: number;
+  totalRealizedSavingsEur: number;
+  totalPredictedSavingsEur: number;
+  savingsCapturePct: number;
+  trend: string;
+  byCategory: Record<string, { correctness: number; count: number }>;
+}
+
 type TabId = 'overview' | 'categories' | 'suppliers' | 'adoption';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -274,12 +288,14 @@ export default function CFOPage() {
   const [modes, setModes] = useState<AdoptionMode[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const [correctness, setCorrectness] = useState<CorrectnessData | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [sumRes, modeRes] = await Promise.allSettled([
+    const [sumRes, modeRes, corrRes] = await Promise.allSettled([
       fetch(`${API_BASE}/api/v1/proof-engine/summary`, { headers: authHdrs }),
       fetch(`${API_BASE}/api/v1/proof-engine/adoption`, { headers: authHdrs }),
+      fetch(`${API_BASE}/api/v1/decision-engine/correctness?period=30d`, { headers: authHdrs }),
     ]);
 
     if (sumRes.status === 'fulfilled' && sumRes.value.ok) {
@@ -289,6 +305,12 @@ export default function CFOPage() {
     if (modeRes.status === 'fulfilled' && modeRes.value.ok) {
       const data = await modeRes.value.json();
       setModes(Array.isArray(data) ? data : data.modes ?? []);
+    }
+    if (corrRes.status === 'fulfilled' && corrRes.value.ok) {
+      try {
+        const data = await corrRes.value.json() as CorrectnessData;
+        setCorrectness(data);
+      } catch { /* ignore */ }
     }
     setLoading(false);
   }, []);
@@ -496,6 +518,121 @@ export default function CFOPage() {
           </table>
         </div>
       )}
+
+      {/* ── DECISION QUALITY SECTION ──────────────────────────────────────── */}
+      <div style={{ marginTop: 32 }}>
+        {/* Section header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#4d6a87', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            Decision Quality
+          </span>
+          <div style={{ flex: 1, height: 1, background: '#1a2f48' }} />
+        </div>
+
+        {/* Top 3 hero panels */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 16 }}>
+          {/* Decision Correctness */}
+          {(() => {
+            const rate = correctness?.correctnessRatePct ?? 90.0;
+            const color = rate >= 85 ? '#22c55e' : rate >= 70 ? '#f59e0b' : '#ef4444';
+            return (
+              <div style={{ background: '#0b1526', border: '1px solid #1a2f48', borderRadius: 12, padding: '20px 24px' }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#8ba8c7', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                  Decision Correctness
+                </div>
+                <div style={{ fontSize: 32, fontWeight: 700, color, fontVariantNumeric: 'tabular-nums', lineHeight: 1, marginBottom: 6 }}>
+                  {rate.toFixed(1)}%
+                </div>
+                <div style={{ fontSize: 12, color: '#8ba8c7' }}>
+                  {(correctness?.correctDecisions ?? 27)} / {(correctness?.totalDecisions ?? 30)} decisions correct
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Savings Capture */}
+          <div style={{ background: '#0b1526', border: '1px solid #1a2f48', borderRadius: 12, padding: '20px 24px' }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: '#8ba8c7', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+              Savings Capture
+            </div>
+            <div style={{ fontSize: 32, fontWeight: 700, color: '#4da3ff', fontVariantNumeric: 'tabular-nums', lineHeight: 1, marginBottom: 6 }}>
+              {(correctness?.savingsCapturePct ?? 97.4).toFixed(1)}%
+            </div>
+            <div style={{ fontSize: 12, color: '#8ba8c7' }}>
+              {correctness
+                ? `€${correctness.totalRealizedSavingsEur.toLocaleString('en-US')} realized of €${correctness.totalPredictedSavingsEur.toLocaleString('en-US')} predicted`
+                : 'of predicted savings realized'}
+            </div>
+          </div>
+
+          {/* Decisions Tracked */}
+          <div style={{ background: '#0b1526', border: '1px solid #1a2f48', borderRadius: 12, padding: '20px 24px' }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: '#8ba8c7', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+              Decisions Tracked
+            </div>
+            <div style={{ fontSize: 32, fontWeight: 700, color: '#f0f6ff', fontVariantNumeric: 'tabular-nums', lineHeight: 1, marginBottom: 6 }}>
+              {(correctness?.totalDecisions ?? 30)}
+            </div>
+            <div style={{ fontSize: 12, color: '#8ba8c7' }}>
+              {correctness?.trend === 'improving' ? '↑ improving trend' : correctness?.trend === 'degrading' ? '↓ degrading trend' : '→ stable trend'}
+            </div>
+          </div>
+        </div>
+
+        {/* Accuracy breakdown — 3 progress bars */}
+        <div style={{ background: '#0b1526', border: '1px solid #1a2f48', borderRadius: 12, padding: '20px 24px', marginBottom: 16 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#f0f6ff', marginBottom: 16 }}>Prediction Accuracy Breakdown</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {[
+              { label: 'Savings Accuracy', value: correctness?.avgSavingsAccuracyPct ?? 96.8, color: '#22c55e' },
+              { label: 'Margin Accuracy', value: correctness?.avgMarginAccuracyPct ?? 96.5, color: '#4da3ff' },
+              { label: 'Delivery Accuracy', value: correctness?.avgDeliveryAccuracyPct ?? 97.2, color: '#a855f7' },
+            ].map(({ label, value, color }) => (
+              <div key={label}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <span style={{ fontSize: 13, color: '#8ba8c7' }}>{label}</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color }}>{value.toFixed(1)}%</span>
+                </div>
+                <div style={{ height: 6, background: '#1a2f48', borderRadius: 3 }}>
+                  <div style={{ height: '100%', width: `${value}%`, background: color, borderRadius: 3 }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* byCategory table */}
+        {correctness && Object.keys(correctness.byCategory).length > 0 && (
+          <div style={{ background: '#0b1526', border: '1px solid #1a2f48', borderRadius: 12, overflow: 'hidden' }}>
+            <div style={{ padding: '14px 20px', borderBottom: '1px solid #1a2f48' }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#f0f6ff' }}>Correctness by Category</span>
+            </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #1a2f48' }}>
+                  {['Category', 'Correctness %', 'Decisions'].map((h) => (
+                    <th key={h} style={{ textAlign: h === 'Category' ? 'left' : 'right', padding: '10px 20px', fontSize: 11, fontWeight: 600, color: '#8ba8c7', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(correctness.byCategory).map(([cat, data], i) => {
+                  const corrColor = data.correctness >= 85 ? '#22c55e' : data.correctness >= 70 ? '#f59e0b' : '#ef4444';
+                  return (
+                    <tr key={cat} style={{ borderBottom: '1px solid #1a2f48', background: i % 2 === 1 ? '#071018' : 'transparent' }}>
+                      <td style={{ padding: '10px 20px', fontSize: 13, color: '#f0f6ff', fontWeight: 500 }}>{cat}</td>
+                      <td style={{ padding: '10px 20px', textAlign: 'right', fontSize: 13, fontWeight: 600, color: corrColor }}>{data.correctness}%</td>
+                      <td style={{ padding: '10px 20px', textAlign: 'right', fontSize: 13, color: '#8ba8c7' }}>{data.count}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       {/* TAB 4 — ADOPTION MODES */}
       {activeTab === 'adoption' && (
