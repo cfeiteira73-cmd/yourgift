@@ -58,6 +58,7 @@ import { ProcurementAgentModule } from './procurement-agent/procurement-agent.mo
 import { DecisionEngineModule } from './decision-engine/decision-engine.module';
 import { NetworkIntelligenceModule } from './network-intelligence/network-intelligence.module';
 import { GovernanceModule } from './governance/governance.module';
+import { ProofEngineModule } from './proof-engine/proof-engine.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -133,6 +134,7 @@ import { APP_GUARD } from '@nestjs/core';
     DecisionEngineModule,
     NetworkIntelligenceModule,
     GovernanceModule,
+    ProofEngineModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

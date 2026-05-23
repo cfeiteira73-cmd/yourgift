@@ -177,6 +177,31 @@ const SECONDARY_ITEMS: NavItem[] = [
     ),
   },
   {
+    href: '/cfo',
+    label: 'CFO Intelligence',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 12l3-4 3 2 3-5 3 2" />
+        <path d="M2 14h12" />
+        <circle cx="5" cy="8" r="1" fill="currentColor" stroke="none" />
+        <circle cx="8" cy="10" r="1" fill="currentColor" stroke="none" />
+        <circle cx="11" cy="5" r="1" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
+  {
+    href: '/onboarding-wizard',
+    label: 'Value Onboarding',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 1v6l3-3" />
+        <path d="M8 7L5 4" />
+        <rect x="2" y="9" width="12" height="6" rx="1.5" />
+        <path d="M5 12h6M7 11v2" />
+      </svg>
+    ),
+  },
+  {
     href: '/financial',
     label: 'Financial Intel',
     icon: (

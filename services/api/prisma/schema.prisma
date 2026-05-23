@@ -2258,3 +2258,58 @@ model TrustEvent {
   @@index([trustScoreId])
   @@map("trust_events")
 }
+
+// PROOF ENGINE + ONBOARDING + ADOPTION MODES (Sprint 17)
+
+model ProofRecord {
+  id                String   @id @default(cuid())
+  decisionCardId    String?
+  traceId           String?
+  tenantHash        String   @default("global")
+  savedCostEur      Decimal  @default(0) @db.Decimal(12, 2)
+  avoidedCostEur    Decimal  @default(0) @db.Decimal(12, 2)
+  marginImpactEur   Decimal  @default(0) @db.Decimal(12, 2)
+  timeSavedHours    Decimal  @default(0) @db.Decimal(8, 2)
+  timeSavedValueEur Decimal  @default(0) @db.Decimal(12, 2)
+  totalValueEur     Decimal  @default(0) @db.Decimal(12, 2)
+  category          String?
+  supplierCode      String?
+  region            String?
+  period            String
+  source            String   @default("decision_engine")
+  createdAt         DateTime @default(now())
+
+  @@index([period])
+  @@index([tenantHash])
+  @@index([supplierCode])
+  @@map("proof_records")
+}
+
+model OnboardingSession {
+  id                       String    @id @default(cuid())
+  tenantHash               String
+  status                   String    @default("pending")
+  rawDataSummary           Json      @default("{}")
+  inefficiencies           Json      @default("[]")
+  savingsOpportunities     Json      @default("[]")
+  supplierRiskReport       Json      @default("{}")
+  totalSavingsPotentialEur Decimal   @default(0) @db.Decimal(14, 2)
+  completedAt              DateTime?
+  createdAt                DateTime  @default(now())
+
+  @@index([tenantHash])
+  @@map("onboarding_sessions")
+}
+
+model TenantAdoptionMode {
+  id                         String   @id @default(cuid())
+  tenantId                   String   @unique
+  mode                       String   @default("shadow")
+  shadowSimulationsRun       Int      @default(0)
+  shadowSavingsIdentifiedEur Decimal  @default(0) @db.Decimal(14, 2)
+  modesHistory               Json     @default("[]")
+  updatedAt                  DateTime @default(now())
+  createdAt                  DateTime @default(now())
+
+  @@map("tenant_adoption_modes")
+}
