@@ -1705,3 +1705,252 @@ model RegionalRoutingRule {
 
   @@map("regional_routing_rules")
 }
+
+// ─────────────────────────────────────────────
+// LOGISTICS ENGINE (Sprint 13)
+// ─────────────────────────────────────────────
+
+model LogisticsProvider {
+  id           String   @id @default(uuid())
+  code         String   @unique
+  name         String
+  isActive     Boolean  @default(true) @map("is_active")
+  strengths    String[]
+  apiAvailable Boolean  @default(false) @map("api_available")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("logistics_providers")
+}
+
+model ShippingZone {
+  id                 String   @id @default(uuid())
+  providerCode       String   @map("provider_code")
+  originCountry      String   @map("origin_country")
+  destinationCountry String   @map("destination_country")
+  zoneLevel          Int      @map("zone_level")
+  transitDaysMin     Int      @default(1) @map("transit_days_min")
+  transitDaysMax     Int      @default(5) @map("transit_days_max")
+  requiresCustoms    Boolean  @default(false) @map("requires_customs")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@unique([providerCode, originCountry, destinationCountry])
+  @@index([originCountry, destinationCountry])
+  @@map("shipping_zones")
+}
+
+model ShippingRateCard {
+  id               String   @id @default(uuid())
+  providerCode     String   @map("provider_code")
+  zoneLevel        Int      @map("zone_level")
+  weightFromKg     Decimal  @map("weight_from_kg") @db.Decimal(6, 2)
+  weightToKg       Decimal  @map("weight_to_kg") @db.Decimal(6, 2)
+  basePrice        Decimal  @map("base_price") @db.Decimal(10, 2)
+  pricePerKg       Decimal  @map("price_per_kg") @db.Decimal(8, 4)
+  fuelSurchargePct Decimal  @default(15.0) @map("fuel_surcharge_pct") @db.Decimal(5, 2)
+  isActive         Boolean  @default(true) @map("is_active")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@unique([providerCode, zoneLevel, weightFromKg])
+  @@index([providerCode, zoneLevel])
+  @@map("shipping_rate_cards")
+}
+
+model ShippingQuote {
+  id                 String   @id @default(uuid())
+  referenceId        String?  @map("reference_id")
+  referenceType      String?  @map("reference_type")
+  originCountry      String   @map("origin_country")
+  destinationCountry String   @map("destination_country")
+  weightKg           Decimal  @map("weight_kg") @db.Decimal(8, 3)
+  lengthCm           Decimal? @map("length_cm") @db.Decimal(6, 1)
+  widthCm            Decimal? @map("width_cm") @db.Decimal(6, 1)
+  heightCm           Decimal? @map("height_cm") @db.Decimal(6, 1)
+  volumetricWeightKg Decimal? @map("volumetric_weight_kg") @db.Decimal(8, 3)
+  effectiveWeightKg  Decimal  @map("effective_weight_kg") @db.Decimal(8, 3)
+  options            Json     @default("[]")
+  selectedProvider   String?  @map("selected_provider")
+  selectedCost       Decimal? @map("selected_cost") @db.Decimal(10, 2)
+  selectionReason    String?  @map("selection_reason")
+  currency           String   @default("EUR")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@index([referenceId, referenceType])
+  @@index([createdAt(sort: Desc)])
+  @@map("shipping_quotes")
+}
+
+// ─────────────────────────────────────────────
+// MARGIN PROTECTION ENGINE (Sprint 13)
+// ─────────────────────────────────────────────
+
+model MarginRule {
+  id                   String        @id @default(uuid())
+  tenantId             String        @default("default") @map("tenant_id")
+  name                 String
+  scope                String        @default("global") // 'global' | 'supplier' | 'category' | 'tenant'
+  scopeValue           String?       @map("scope_value")
+  minMarginPct         Decimal       @default(15.00) @map("min_margin_pct") @db.Decimal(5, 2)
+  warningThresholdPct  Decimal       @default(20.00) @map("warning_threshold_pct") @db.Decimal(5, 2)
+  action               String        @default("warn") // 'warn' | 'block' | 'flag'
+  isActive             Boolean       @default(true) @map("is_active")
+  createdAt            DateTime      @default(now()) @map("created_at")
+  updatedAt            DateTime      @updatedAt @map("updated_at")
+
+  alerts MarginAlert[]
+
+  @@index([scope])
+  @@index([isActive])
+  @@map("margin_rules")
+}
+
+model MarginAlert {
+  id                String    @id @default(uuid())
+  ruleId            String?   @map("rule_id")
+  referenceId       String    @map("reference_id")
+  referenceType     String    @default("order") @map("reference_type")
+  tenantId          String    @default("default") @map("tenant_id")
+  supplierName      String?   @map("supplier_name")
+  category          String?
+  salePrice         Decimal   @map("sale_price") @db.Decimal(14, 2)
+  totalCost         Decimal   @map("total_cost") @db.Decimal(14, 2)
+  expectedMarginPct Decimal   @map("expected_margin_pct") @db.Decimal(5, 2)
+  actualMarginPct   Decimal   @map("actual_margin_pct") @db.Decimal(5, 2)
+  marginGapPct      Decimal   @map("margin_gap_pct") @db.Decimal(5, 2)
+  severity          String    @default("warning") // 'info' | 'warning' | 'critical'
+  actionTaken       String    @default("flagged") @map("action_taken")
+  isResolved        Boolean   @default(false) @map("is_resolved")
+  resolutionNote    String?   @map("resolution_note")
+  resolvedAt        DateTime? @map("resolved_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  rule MarginRule? @relation(fields: [ruleId], references: [id])
+
+  @@index([isResolved])
+  @@index([severity])
+  @@index([createdAt(sort: Desc)])
+  @@map("margin_alerts")
+}
+
+model CostSnapshot {
+  id                String   @id @default(uuid())
+  supplierName      String   @map("supplier_name")
+  category          String
+  productRef        String?  @map("product_ref")
+  unitCost          Decimal  @map("unit_cost") @db.Decimal(12, 4)
+  currency          String   @default("EUR")
+  snapshotDate      DateTime @map("snapshot_date") @db.Date
+  source            String   @default("manual") // 'sync' | 'manual' | 'order'
+  changePctVsPrior  Decimal? @map("change_pct_vs_prior") @db.Decimal(7, 2)
+  notes             String?
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  @@unique([supplierName, category, productRef, snapshotDate])
+  @@index([supplierName])
+  @@index([snapshotDate(sort: Desc)])
+  @@map("cost_snapshots")
+}
+
+model ProfitabilitySimulation {
+  id              String   @id @default(uuid())
+  tenantId        String   @default("default") @map("tenant_id")
+  name            String?
+  salePrice       Decimal  @map("sale_price") @db.Decimal(14, 2)
+  productCost     Decimal  @map("product_cost") @db.Decimal(14, 2)
+  shippingCost    Decimal  @default(0) @map("shipping_cost") @db.Decimal(14, 2)
+  printCost       Decimal  @default(0) @map("print_cost") @db.Decimal(14, 2)
+  platformFeePct  Decimal  @default(8.00) @map("platform_fee_pct") @db.Decimal(5, 2)
+  fulfillmentPct  Decimal  @default(12.00) @map("fulfillment_pct") @db.Decimal(5, 2)
+  quantity        Int      @default(1)
+  currency        String   @default("EUR")
+  grossRevenue    Decimal? @map("gross_revenue") @db.Decimal(14, 2)
+  totalCost       Decimal? @map("total_cost") @db.Decimal(14, 2)
+  grossMargin     Decimal? @map("gross_margin") @db.Decimal(14, 2)
+  grossMarginPct  Decimal? @map("gross_margin_pct") @db.Decimal(5, 2)
+  platformFee     Decimal? @map("platform_fee") @db.Decimal(14, 2)
+  fulfillmentFee  Decimal? @map("fulfillment_fee") @db.Decimal(14, 2)
+  netMargin       Decimal? @map("net_margin") @db.Decimal(14, 2)
+  netMarginPct    Decimal? @map("net_margin_pct") @db.Decimal(5, 2)
+  isViable        Boolean?  @map("is_viable")
+  riskLevel       String?  @map("risk_level") // 'safe' | 'warning' | 'critical'
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt(sort: Desc)])
+  @@map("profitability_simulations")
+}
+
+// ─────────────────────────────────────────────
+// AI PROCUREMENT AGENT (Sprint 13)
+// ─────────────────────────────────────────────
+
+model ProcurementBrief {
+  id                 String    @id @default(uuid())
+  tenantId           String    @default("default") @map("tenant_id")
+  description        String
+  parsedQuantity     Int?      @map("parsed_quantity")
+  parsedBudgetEur    Decimal?  @map("parsed_budget_eur") @db.Decimal(14, 2)
+  parsedDestination  String?   @map("parsed_destination")
+  parsedTimelineDays Int?      @map("parsed_timeline_days")
+  parsedUrgency      String    @default("normal") @map("parsed_urgency")
+  parsedCategory     String?   @map("parsed_category")
+  parsedKeywords     String[]  @default([]) @map("parsed_keywords")
+  status             String    @default("processing")
+  errorMessage       String?   @map("error_message")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  plan ProcurementPlan?
+
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("procurement_briefs")
+}
+
+model ProcurementPlan {
+  id                    String    @id @default(uuid())
+  briefId               String    @unique @map("brief_id")
+  tenantId              String    @default("default") @map("tenant_id")
+
+  recommendedSupplier   String    @map("recommended_supplier")
+  fallbackSupplier      String?   @map("fallback_supplier")
+  routingConfidence     Decimal   @default(75.00) @map("routing_confidence") @db.Decimal(5, 2)
+  routingReason         String    @map("routing_reason")
+
+  suggestedProducts     Json      @default("[]") @map("suggested_products")
+
+  unitCost              Decimal?  @map("unit_cost") @db.Decimal(12, 4)
+  quantity              Int?
+  totalProductCost      Decimal?  @map("total_product_cost") @db.Decimal(14, 2)
+  estimatedShipping     Decimal?  @map("estimated_shipping") @db.Decimal(12, 2)
+  printCost             Decimal?  @default(0) @map("print_cost") @db.Decimal(12, 2)
+  platformFee           Decimal?  @map("platform_fee") @db.Decimal(12, 2)
+  totalCost             Decimal?  @map("total_cost") @db.Decimal(14, 2)
+  salePriceRecommended  Decimal?  @map("sale_price_recommended") @db.Decimal(14, 2)
+  expectedMarginPct     Decimal?  @map("expected_margin_pct") @db.Decimal(5, 2)
+
+  productionDays        Int?      @map("production_days")
+  shippingDays          Int?      @map("shipping_days")
+  totalDays             Int?      @map("total_days")
+  deliveryDateEstimate  DateTime? @map("delivery_date_estimate") @db.Date
+  meetsDeadline         Boolean   @default(true) @map("meets_deadline")
+
+  riskLevel             String    @default("low") @map("risk_level")
+  riskFactors           Json      @default("[]") @map("risk_factors")
+  confidenceScore       Decimal   @default(75.00) @map("confidence_score") @db.Decimal(5, 2)
+
+  aiReasoning           String?   @map("ai_reasoning")
+  aiRecommendations     String[]  @default([]) @map("ai_recommendations")
+  aiWarnings            String[]  @default([]) @map("ai_warnings")
+
+  isApproved            Boolean   @default(false) @map("is_approved")
+  approvedBy            String?   @map("approved_by")
+  approvedAt            DateTime? @map("approved_at")
+  workflowInstanceId    String?   @map("workflow_instance_id")
+
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  brief ProcurementBrief @relation(fields: [briefId], references: [id], onDelete: Cascade)
+
+  @@index([briefId])
+  @@map("procurement_plans")
+}

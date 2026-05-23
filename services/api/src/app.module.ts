@@ -52,6 +52,9 @@ import { CustomerSuccessModule } from './customer-success/customer-success.modul
 import { EmployeePortalModule } from './employee-portal/employee-portal.module';
 import { ObservabilityModule } from './observability/observability.module';
 import { GlobalizationModule } from './globalization/globalization.module';
+import { LogisticsModule } from './logistics/logistics.module';
+import { MarginProtectionModule } from './margin-protection/margin-protection.module';
+import { ProcurementAgentModule } from './procurement-agent/procurement-agent.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -121,6 +124,9 @@ import { APP_GUARD } from '@nestjs/core';
     EmployeePortalModule,
     ObservabilityModule,
     GlobalizationModule,
+    LogisticsModule,
+    MarginProtectionModule,
+    ProcurementAgentModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

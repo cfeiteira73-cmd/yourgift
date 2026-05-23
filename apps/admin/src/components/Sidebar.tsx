@@ -398,6 +398,39 @@ const SECONDARY_ITEMS: NavItem[] = [
     ),
   },
   {
+    href: '/logistics',
+    label: 'Logistics',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="1" y="5" width="10" height="8" rx="1" />
+        <path d="M11 7h2.5l1.5 2v3h-4V7z" />
+        <circle cx="4" cy="13.5" r="1" fill="currentColor" stroke="none" />
+        <circle cx="12" cy="13.5" r="1" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
+  {
+    href: '/margin-protection',
+    label: 'Margin Guard',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 1L2 4v4c0 3.5 2.5 5.8 6 7 3.5-1.2 6-3.5 6-7V4L8 1z" />
+        <path d="M5 8l2 2 4-4" />
+      </svg>
+    ),
+  },
+  {
+    href: '/ai-agent',
+    label: 'AI Agent',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="8" cy="8" r="6.5" />
+        <path d="M5.5 6.5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5c0 1.5-1.5 2-2.5 2.5" />
+        <circle cx="8" cy="12" r=".75" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
+  {
     href: '/settings',
     label: 'Definições',
     icon: (

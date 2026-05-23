@@ -131,3 +131,58 @@ body {
 .scrollbar-thin::-webkit-scrollbar { width: 4px; }
 .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
 .scrollbar-thin::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ── Sprint 13: Enhanced Color System ── */
+:root {
+  /* Deeper dark mode (additive — new pages can use these) */
+  --bg-deep: #070B14;
+  --surface-elevated: #111827;
+
+  /* Semantic procurement colors */
+  --margin-safe: #10b981;    /* emerald */
+  --margin-warning: #f59e0b; /* amber */
+  --margin-critical: #ef4444;/* red */
+
+  /* SLA severity gradient */
+  --sla-ok: #22c55e;
+  --sla-warning: #f59e0b;
+  --sla-breach: #ef4444;
+  --sla-critical: #dc2626;
+
+  /* Supplier risk palette */
+  --supplier-trusted: #4da3ff;
+  --supplier-watch: #f59e0b;
+  --supplier-risk: #ef4444;
+
+  /* AI/Intelligence accent */
+  --ai-primary: #a855f7;
+  --ai-secondary: #7c3aed;
+  --ai-glow: rgba(168, 85, 247, 0.15);
+
+  /* Heatmap scale (5 steps) */
+  --heat-1: #1e3a5f;
+  --heat-2: #1d4ed8;
+  --heat-3: #f59e0b;
+  --heat-4: #dc2626;
+  --heat-5: #7f1d1d;
+}
+
+/* Margin indicator classes */
+.margin-safe { color: var(--margin-safe); }
+.margin-warning { color: var(--margin-warning); }
+.margin-critical { color: var(--margin-critical); }
+
+/* AI glow effect */
+.ai-glow {
+  box-shadow: 0 0 20px var(--ai-glow), 0 0 40px rgba(168, 85, 247, 0.05);
+}
+
+/* Risk row highlighting */
+.row-critical {
+  background: rgba(239, 68, 68, 0.04);
+  border-left: 2px solid rgba(239, 68, 68, 0.4);
+}
+.row-warning {
+  background: rgba(245, 158, 11, 0.04);
+  border-left: 2px solid rgba(245, 158, 11, 0.3);
+}
