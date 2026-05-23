@@ -23,21 +23,30 @@ export class CurrencyService implements OnModuleInit {
   }
 
   private async seedStaticRates() {
+    const today = new Date();
     for (const [pair, rate] of Object.entries(STATIC_RATES)) {
-      const [from, to] = pair.split('-');
-      await this.prisma.exchangeRate.upsert({
-        where: { fromCurrency_toCurrency: { fromCurrency: from, toCurrency: to } },
-        create: { fromCurrency: from, toCurrency: to, rate },
+      const parts = pair.split('-');
+      const from = parts[0] ?? '';
+      const to = parts[1] ?? '';
+      await this.prisma.globalExchangeRate.upsert({
+        where: { fromCurrency_toCurrency_rateDate: { fromCurrency: from, toCurrency: to, rateDate: today } },
+        create: { fromCurrency: from, toCurrency: to, rate, rateDate: today, source: 'seed' },
         update: { rate },
       });
     }
   }
 
   private async loadRates() {
-    const rates = await this.prisma.exchangeRate.findMany();
+    const rates = await this.prisma.globalExchangeRate.findMany({
+      orderBy: { rateDate: 'desc' },
+    });
     this.ratesCache.clear();
+    // Only keep latest rate per pair
     for (const r of rates) {
-      this.ratesCache.set(`${r.fromCurrency}-${r.toCurrency}`, r.rate);
+      const key = `${r.fromCurrency}-${r.toCurrency}`;
+      if (!this.ratesCache.has(key)) {
+        this.ratesCache.set(key, Number(r.rate));
+      }
     }
   }
 
@@ -72,6 +81,6 @@ export class CurrencyService implements OnModuleInit {
   }
 
   async getRates() {
-    return this.prisma.exchangeRate.findMany({ orderBy: { toCurrency: 'asc' } });
+    return this.prisma.globalExchangeRate.findMany({ orderBy: { toCurrency: 'asc' } });
   }
 }

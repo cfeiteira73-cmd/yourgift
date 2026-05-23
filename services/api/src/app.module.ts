@@ -49,6 +49,9 @@ import { EventPlatformModule } from './event-platform/event-platform.module';
 import { FinancialConsolidationModule } from './financial-consolidation/financial-consolidation.module';
 import { ProductionModule } from './production/production.module';
 import { CustomerSuccessModule } from './customer-success/customer-success.module';
+import { EmployeePortalModule } from './employee-portal/employee-portal.module';
+import { ObservabilityModule } from './observability/observability.module';
+import { GlobalizationModule } from './globalization/globalization.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -115,6 +118,9 @@ import { APP_GUARD } from '@nestjs/core';
     FinancialConsolidationModule,
     ProductionModule,
     CustomerSuccessModule,
+    EmployeePortalModule,
+    ObservabilityModule,
+    GlobalizationModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
