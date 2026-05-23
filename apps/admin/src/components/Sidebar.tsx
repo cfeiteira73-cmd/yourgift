@@ -50,6 +50,15 @@ const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
+    href: '/production',
+    label: 'Production',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="18" height="18">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12a7.5 7.5 0 0 0 15 0m-15 0a7.5 7.5 0 1 1 15 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077 1.41-.513m14.095-5.13 1.41-.513M5.106 17.785l1.15-.964m11.49-9.642 1.149-.964M7.501 19.795l.75-1.3m7.5-12.99.75-1.3m-6.063 16.658.26-1.477m2.605-14.772.26-1.477m0 17.726-.26-1.477M10.698 4.614l-.26-1.477M16.5 19.794l-.75-1.299M7.5 4.205 6.75 2.9m-.893 8.653-.587-1.428m10.05 1.014-.587-1.428M5.443 12.37l-1.41-.512m14.095 5.13-1.41-.513" />
+      </svg>
+    ),
+  },
+  {
     href: '/products',
     label: 'Produtos',
     icon: (
@@ -302,6 +311,15 @@ const SECONDARY_ITEMS: NavItem[] = [
         <path d="M8 2a6 6 0 1 1-4.243 1.757" />
         <path d="M2 2h3v3" />
         <path d="M8 5v3.5l2 1.5" />
+      </svg>
+    ),
+  },
+  {
+    href: '/customer-success',
+    label: 'Customer Success',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="18" height="18">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
       </svg>
     ),
   },

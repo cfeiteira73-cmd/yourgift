@@ -1331,3 +1331,106 @@ model BudgetAnomaly {
   @@index([severity])
   @@map("budget_anomalies")
 }
+
+// ─────────────────────────────────────────────
+// PRODUCTION CONTROL TOWER (Sprint 10)
+// ─────────────────────────────────────────────
+
+model SLADefinition {
+  id              String   @id @default(uuid())
+  stage           String   @unique
+  displayName     String   @map("display_name")
+  expectedHours   Int      @map("expected_hours")
+  warningHours    Int      @map("warning_hours")
+  criticalHours   Int      @map("critical_hours")
+  color           String   @default("#4da3ff")
+  sortOrder       Int      @default(0) @map("sort_order")
+  isActive        Boolean  @default(true) @map("is_active")
+  @@map("sla_definitions")
+}
+
+model ProductionStage {
+  id                   String    @id @default(uuid())
+  orderId              String    @map("order_id")
+  tenantId             String    @default("default") @map("tenant_id")
+  stage                String
+  status               String    @default("pending")
+  startedAt            DateTime? @map("started_at")
+  completedAt          DateTime? @map("completed_at")
+  expectedCompletionAt DateTime? @map("expected_completion_at")
+  assignedTo           String?   @map("assigned_to")
+  notes                String?
+  slaStatus            String    @default("on_track") @map("sla_status")
+  slaHoursRemaining    Decimal?  @map("sla_hours_remaining") @db.Decimal(6, 1)
+  metadata             Json      @default("{}")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+  @@unique([orderId, stage])
+  @@index([orderId])
+  @@index([status])
+  @@index([slaStatus])
+  @@map("production_stages")
+}
+
+// ─────────────────────────────────────────────
+// CUSTOMER SUCCESS (Sprint 10)
+// ─────────────────────────────────────────────
+
+model CSHealthScore {
+  id                   String   @id @default(uuid())
+  companyId            String   @map("company_id")
+  tenantId             String   @default("default") @map("tenant_id")
+  healthScore          Decimal  @default(50.0) @map("health_score") @db.Decimal(5, 1)
+  churnRisk            String   @default("low") @map("churn_risk")
+  engagementScore      Decimal  @default(50.0) @map("engagement_score") @db.Decimal(5, 1)
+  spendTrend           String   @default("stable") @map("spend_trend")
+  lastOrderDaysAgo     Int?     @map("last_order_days_ago")
+  ordersLast30d        Int      @default(0) @map("orders_last_30d")
+  ordersLast90d        Int      @default(0) @map("orders_last_90d")
+  totalLifetimeSpend   Decimal  @default(0) @map("total_lifetime_spend") @db.Decimal(14, 2)
+  avgMonthlySpend      Decimal  @default(0) @map("avg_monthly_spend") @db.Decimal(12, 2)
+  expansionProbability Decimal  @default(0) @map("expansion_probability") @db.Decimal(4, 3)
+  healthFactors        Json     @default("{}") @map("health_factors")
+  computedAt           DateTime @default(now()) @map("computed_at")
+  @@unique([companyId, tenantId])
+  @@index([churnRisk])
+  @@map("cs_health_scores")
+}
+
+model ExpansionSignal {
+  id                String    @id @default(uuid())
+  companyId         String    @map("company_id")
+  tenantId          String    @default("default") @map("tenant_id")
+  signalType        String    @map("signal_type")
+  opportunityValue  Decimal?  @map("opportunity_value") @db.Decimal(12, 2)
+  confidence        Decimal   @default(0.5) @db.Decimal(4, 3)
+  description       String
+  recommendedAction String    @map("recommended_action")
+  isActioned        Boolean   @default(false) @map("is_actioned")
+  actionedAt        DateTime? @map("actioned_at")
+  actionedBy        String?   @map("actioned_by")
+  expiresAt         DateTime? @map("expires_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  @@index([companyId])
+  @@index([isActioned])
+  @@map("expansion_signals")
+}
+
+model InventoryForecast {
+  id                   String    @id @default(uuid())
+  productId            String    @map("product_id")
+  variantId            String?   @map("variant_id")
+  currentStock         Int       @default(0) @map("current_stock")
+  avgDailyConsumption  Decimal   @default(0) @map("avg_daily_consumption") @db.Decimal(8, 2)
+  daysUntilDepletion   Int?      @map("days_until_depletion")
+  reorderPoint         Int       @default(10) @map("reorder_point")
+  reorderQuantity      Int       @default(100) @map("reorder_quantity")
+  forecastedDemand30d  Int       @default(0) @map("forecasted_demand_30d")
+  confidence           Decimal   @default(0.5) @db.Decimal(4, 3)
+  isAlertActive        Boolean   @default(false) @map("is_alert_active")
+  alertSeverity        String    @default("low") @map("alert_severity")
+  lastComputedAt       DateTime  @default(now()) @map("last_computed_at")
+  @@unique([productId, variantId])
+  @@index([isAlertActive])
+  @@map("inventory_forecasts")
+}
