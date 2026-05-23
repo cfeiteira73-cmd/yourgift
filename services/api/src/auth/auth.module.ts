@@ -6,6 +6,8 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
+import { AppleStrategy } from './strategies/apple.strategy';
 
 @Module({
   imports: [
@@ -14,12 +16,12 @@ import { LocalStrategy } from './strategies/local.strategy';
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
         secret: config.get('JWT_SECRET'),
-        signOptions: { expiresIn: config.get('JWT_EXPIRES_IN', '7d') },
+        signOptions: { expiresIn: '15m' },
       }),
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, JwtStrategy, LocalStrategy],
+  providers: [AuthService, JwtStrategy, LocalStrategy, GoogleStrategy, AppleStrategy],
   controllers: [AuthController],
   exports: [AuthService],
 })
