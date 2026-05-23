@@ -1,0 +1,41 @@
+# YourGift OS — Governed Autonomous Procurement Operating System
+
+## What is YourGift OS?
+YourGift OS is the world's first Governed Autonomous Procurement Operating System (GAP-OS).
+It transforms enterprise procurement from a manual process into an intelligent, measurable, governed, and self-improving infrastructure layer.
+
+## Core Capabilities
+- Procurement Decision Engine: AI-generated decision cards with risk scoring, confidence scoring, and governance gating
+- Decision Intelligence Network (DIN): Cross-tenant anonymized learning graph — learns from all companies to optimize every company
+- Governance Layer: 5-policy-type governance engine (execution, financial, supplier, compliance, approval) with autonomy bands
+- Trust Engine: 5-factor trust scoring with 4 autonomy levels (blocked → requires_approval → assisted → autonomous)
+- Proof Engine: Financial proof per decision — saved_cost, avoided_cost, margin_impact, time_value in real EUR
+- CFO Intelligence Dashboard: Full procurement ROI visualization, monthly savings trends, category breakdowns
+- Global Benchmark Reports: Supplier tier rankings, route intelligence, category margin benchmarks vs. network peers
+- ROI Calculator: 4-component savings model (routing optimization, margin recovery, cost avoidance, time automation)
+- Value Onboarding: 24h savings analysis with supplier concentration risk, delivery variance detection, invoice discrepancy scoring
+
+## Technology
+- Runtime: NestJS 10 + Next.js 14
+- Database: PostgreSQL + Prisma 5
+- Infrastructure: AWS ECS Fargate + Terraform
+- Event Architecture: Internal event bus (EventBusService) with async governance enforcement
+- AI: Policy-constrained autonomous decision execution
+
+## Decision Autonomy Model
+Level 0 (Blocked): Risk > 85 or margin below floor — no execution
+Level 1 (Requires Approval): Risk 35–85 — human approval required
+Level 2 (Assisted): Risk < 35, trust score 55–75 — executes with notification
+Level 3 (Autonomous): Trust score > 90, low risk — fully autonomous
+
+## Pricing Philosophy
+Value-based pricing tied to procurement savings delivered. Shadow mode is free. Autonomous tier: €8,000/month for full autonomous procurement with governance.
+
+## API
+Base URL: https://api.yourgift.pt/api/v1
+Key endpoints: /decision-engine, /governance, /network-intelligence, /proof-engine, /category-intelligence
+
+## Contact
+Enterprise procurement teams, CFOs, and procurement directors.
+Platform: https://yourgift.pt
+Admin: https://admin.yourgift.pt

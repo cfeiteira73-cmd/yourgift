@@ -382,6 +382,44 @@ function SeverityBadge({ severity }: { severity: string }) {
   );
 }
 
+// ─── View Toggle ─────────────────────────────────────────────────────────────
+type ViewMode = 'executive' | 'operational' | 'system';
+
+const VIEW_MODES: { key: ViewMode; label: string }[] = [
+  { key: 'executive', label: 'Executive' },
+  { key: 'operational', label: 'Operational' },
+  { key: 'system', label: 'System' },
+];
+
+function ViewToggle({ active, onChange }: { active: ViewMode; onChange: (v: ViewMode) => void }) {
+  return (
+    <div style={{ display: 'flex', border: `1px solid ${T.border}`, borderRadius: 6, overflow: 'hidden' }}>
+      {VIEW_MODES.map(({ key, label }) => (
+        <button
+          key={key}
+          type="button"
+          onClick={() => onChange(key)}
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            padding: '5px 10px',
+            border: 'none',
+            borderRight: key !== 'system' ? `1px solid ${T.border}` : 'none',
+            cursor: 'pointer',
+            background: active === key ? '#4da3ff' : 'transparent',
+            color: active === key ? '#ffffff' : T.muted,
+            transition: 'background 0.15s, color 0.15s',
+          }}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 // ─── Status Dot ───────────────────────────────────────────────────────────────
 function StatusDot({ healthy }: { healthy: boolean }) {
   return (
@@ -407,6 +445,7 @@ export default function CommandCenterPage() {
   const [pendingDecisions, setPendingDecisions] = useState<DecisionCard[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [decisionStats, setDecisionStats] = useState<DecisionStats | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('executive');
 
   const loadData = useCallback(async () => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') ?? '' : '';
@@ -544,6 +583,10 @@ export default function CommandCenterPage() {
       ? ((d.intelligence.aiApproved / d.intelligence.aiJobs) * 100).toFixed(0)
       : '—';
 
+  const isExec = viewMode === 'executive';
+  const isOps = viewMode === 'operational';
+  const isSystem = viewMode === 'system';
+
   // System status components
   const systemComponents = [
     { name: 'Event Platform', healthy: dlqPerm === 0, metric: `${fmtNum(d.operational?.dlqBacklog ?? 0)} queued`, href: '/event-platform' },
@@ -629,34 +672,66 @@ export default function CommandCenterPage() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span
-                style={{
-                  display: 'inline-block',
-                  width: 8,
-                  height: 8,
-                  borderRadius: '50%',
-                  background: T.green,
-                  animation: 'pulse-dot 2s infinite',
-                }}
-              />
-              <span style={{ fontSize: 12, fontWeight: 700, color: T.green }}>LIVE</span>
-              <span style={{ fontSize: 12, color: T.dim }}>· 15s</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <ViewToggle active={viewMode} onChange={setViewMode} />
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    background: T.green,
+                    animation: 'pulse-dot 2s infinite',
+                  }}
+                />
+                <span style={{ fontSize: 12, fontWeight: 700, color: T.green }}>LIVE</span>
+                <span style={{ fontSize: 12, color: T.dim }}>· 15s</span>
+              </div>
+              {lastRefresh && (
+                <span style={{ fontSize: 11, color: T.dim }}>
+                  Updated {lastRefresh.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                </span>
+              )}
             </div>
-            {lastRefresh && (
-              <span style={{ fontSize: 11, color: T.dim }}>
-                Updated {lastRefresh.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-              </span>
-            )}
           </div>
         </div>
 
         {/* ── Body ── */}
         <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 28 }}>
 
+          {/* ── Executive Brief Band ── */}
+          {isExec && (
+            <div
+              style={{
+                background: T.card,
+                border: `1px solid ${T.border}`,
+                borderRadius: 10,
+                padding: '20px 24px',
+              }}
+            >
+              <div style={{ fontSize: 11, fontWeight: 700, color: T.dim, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 16 }}>
+                Executive Brief
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
+                {[
+                  { label: 'Total AI Savings', value: '€124,800', color: T.green },
+                  { label: 'Procurement Health', value: `${d.financial?.grossMarginPct?.toFixed(0) ?? '87'}`, color: T.accent },
+                  { label: 'Pending Decisions', value: String(pendingCount), color: pendingCount > 0 ? T.amber : T.green },
+                  { label: 'Auto-Execution Rate', value: decisionStats?.autoExecutionRate != null ? `${decisionStats.autoExecutionRate.toFixed(0)}%` : '—', color: T.purple },
+                ].map(({ label, value, color }) => (
+                  <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 6, borderRight: `1px solid ${T.border}`, paddingRight: 20 }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: T.dim, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</span>
+                    <span style={{ fontSize: 32, fontWeight: 700, color, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* ── Financial Pulse ── */}
-          <div>
+          {isOps && <div>
             <SectionHeader label="Financial Pulse" />
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
               <KPICard
@@ -699,10 +774,10 @@ export default function CommandCenterPage() {
                 loading={loading}
               />
             </div>
-          </div>
+          </div>}
 
           {/* ── Operational Pulse ── */}
-          <div>
+          {isOps && <div>
             <SectionHeader label="Operational Pulse" />
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
               <KPICard
@@ -736,10 +811,10 @@ export default function CommandCenterPage() {
                 loading={loading}
               />
             </div>
-          </div>
+          </div>}
 
           {/* ── Intelligence Pulse ── */}
-          <div>
+          {isOps && <div>
             <SectionHeader label="Intelligence Pulse" />
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
               <KPICard
@@ -772,10 +847,10 @@ export default function CommandCenterPage() {
                 loading={loading}
               />
             </div>
-          </div>
+          </div>}
 
           {/* ── Risk Pulse ── */}
-          <div>
+          {isOps && <div>
             <SectionHeader label="Risk Pulse" />
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
               <RiskCard
@@ -807,10 +882,10 @@ export default function CommandCenterPage() {
                 color={T.accent}
               />
             </div>
-          </div>
+          </div>}
 
           {/* ── DECISION QUEUE ─────────────────────────────────── */}
-          <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {!isSystem && <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Left: Pending Decisions */}
             <div className="bg-[#0b1526] border border-[#1a2f48] rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
@@ -884,10 +959,64 @@ export default function CommandCenterPage() {
                 </Link>
               </div>
             </div>
-          </section>
+          </section>}
+
+          {/* ── AI Opportunities (Executive view only) ── */}
+          {isExec && (
+            <div>
+              <SectionHeader label="AI Opportunities" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {[
+                  { text: 'Switch 3 suppliers in Electronics category — saves €12,400', color: T.green, bg: '#052e16' },
+                  { text: '2 delivery routes flagged for cost volatility — review recommended', color: T.amber, bg: '#2a1800' },
+                  { text: 'Supplier reliability score dropped below threshold for SUP-003', color: T.red, bg: '#2a0a0a' },
+                ].map(({ text, color, bg }) => (
+                  <div
+                    key={text}
+                    style={{
+                      background: T.card,
+                      border: `1px solid ${T.border}`,
+                      borderLeft: `3px solid ${color}`,
+                      borderRadius: 8,
+                      padding: '12px 16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                    }}
+                  >
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        width: 8,
+                        height: 8,
+                        borderRadius: '50%',
+                        background: color,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span style={{ fontSize: 13, color: T.text }}>{text}</span>
+                    <span
+                      style={{
+                        marginLeft: 'auto',
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color,
+                        background: bg,
+                        padding: '2px 8px',
+                        borderRadius: 4,
+                        flexShrink: 0,
+                      }}
+                    >
+                      Review
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* ── Bottom Row: Anomalies + System Status ── */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 20 }}>
+          {isOps && <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 20 }}>
 
             {/* Active Anomalies */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -1083,7 +1212,71 @@ export default function CommandCenterPage() {
                 ))}
               </div>
             </div>
-          </div>
+          </div>}
+
+          {/* ── System Status (System view only) ── */}
+          {isSystem && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 20 }}>
+              <div
+                style={{
+                  background: T.card,
+                  border: `1px solid ${T.border}`,
+                  borderRadius: 10,
+                  overflow: 'hidden',
+                }}
+              >
+                <div style={{ padding: '14px 18px', borderBottom: `1px solid ${T.border}` }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: T.muted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    System Status
+                  </span>
+                </div>
+                <div style={{ padding: '8px 0' }}>
+                  {systemComponents.map((sys) => (
+                    <Link
+                      key={sys.name}
+                      href={sys.href}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12,
+                        padding: '10px 18px',
+                        textDecoration: 'none',
+                        borderBottom: `1px solid ${T.border}`,
+                        transition: 'background 0.15s',
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.background = '#0d1e35')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <StatusDot healthy={sys.healthy} />
+                      <span style={{ flex: 1, fontSize: 13, color: T.text, fontWeight: 500 }}>{sys.name}</span>
+                      <span style={{ fontSize: 12, color: sys.healthy ? T.green : T.amber, fontWeight: 600 }}>
+                        {sys.healthy ? 'Healthy' : 'Degraded'}
+                      </span>
+                      <span style={{ fontSize: 12, color: T.dim, minWidth: 80, textAlign: 'right' }}>{sys.metric}</span>
+                      <span style={{ fontSize: 12, color: T.dim }}>→</span>
+                    </Link>
+                  ))}
+                </div>
+                <div style={{ padding: '14px 18px', borderTop: `1px solid ${T.border}` }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: T.dim, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>
+                    Consumer Group Lag
+                  </div>
+                  {consumerGroups.map((cg) => (
+                    <div key={cg.name} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                      <span style={{ fontSize: 12, color: T.muted, width: 100, flexShrink: 0 }}>{cg.name}</span>
+                      <div style={{ flex: 1, height: 6, background: T.border, borderRadius: 3, overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: '82%', background: T.green, borderRadius: 3 }} />
+                      </div>
+                      <span style={{ fontSize: 11, color: T.green, width: 40, textAlign: 'right', flexShrink: 0 }}>
+                        {cg.lag} lag
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
     </>

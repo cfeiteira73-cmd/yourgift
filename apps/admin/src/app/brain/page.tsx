@@ -82,6 +82,7 @@ interface Decision {
   triggerType: string;
   triggerDescription?: string;
   action: string;
+  actionType?: string;
   riskLevel: string;
   riskScore: number;
   confidenceScore: number;
@@ -593,163 +594,146 @@ function CenterPanel({
       </div>
 
       {/* Main decision card */}
-      <div className="bg-[#0b1526] border border-[#1a2f48] rounded-2xl p-6 flex flex-col gap-5">
-        {/* Card header */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex flex-col gap-1">
-            <span className="px-2.5 py-0.5 rounded-md bg-[#102131] border border-[#1a2f48] text-[10px] text-[#4da3ff] uppercase tracking-wide font-medium w-fit">
+      <div className="bg-[#0b1526] border border-[#1a2f48] rounded-2xl overflow-hidden">
+        {/* Card top bar */}
+        <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-[#1a2f48]">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded bg-[#102131] border border-[#1a2f48] text-[10px] text-[#4da3ff] uppercase tracking-wide font-medium">
               {decision.triggerType?.replace(/_/g, ' ')}
             </span>
             {decision.triggerDescription && (
-              <span className="text-[12px] text-[#4d6a87]">{decision.triggerDescription}</span>
+              <span className="text-[11px] text-[#4d6a87]">{decision.triggerDescription}</span>
             )}
           </div>
-          <span className="text-[11px] text-[#4d6a87] flex-shrink-0">{timeAgo(decision.createdAt)}</span>
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] text-[#4d6a87]">{timeAgo(decision.createdAt)}</span>
+            {/* navigation arrows */}
+            {decisions.length > 1 && (
+              <div className="flex items-center gap-1">
+                <button type="button" onClick={() => setCurrentIdx(Math.max(0, currentIdx - 1))} disabled={currentIdx === 0}
+                  className="w-6 h-6 flex items-center justify-center rounded text-[#4da3ff] hover:bg-[#102131] disabled:opacity-30 text-[14px]">‹</button>
+                <span className="text-[10px] text-[#4d6a87]">{currentIdx + 1}/{decisions.length}</span>
+                <button type="button" onClick={() => setCurrentIdx(Math.min(decisions.length - 1, currentIdx + 1))} disabled={currentIdx === decisions.length - 1}
+                  className="w-6 h-6 flex items-center justify-center rounded text-[#4da3ff] hover:bg-[#102131] disabled:opacity-30 text-[14px]">›</button>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Action — most prominent */}
-        <div className="font-tight text-[18px] font-semibold text-[#f0f6ff] leading-snug">
+        {/* Action headline */}
+        <div className="px-5 py-4 font-tight text-[17px] font-semibold text-[#f0f6ff] leading-snug border-b border-[#1a2f48]">
           {decision.action}
         </div>
 
-        {/* Risk & Confidence row */}
-        <div className="flex items-center gap-4 flex-wrap">
-          <span className={`px-3 py-1 rounded-full text-[12px] font-semibold ${riskBg(decision.riskLevel)}`}>
-            {decision.riskLevel?.toUpperCase() ?? 'UNKNOWN'} RISK
-          </span>
-          <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
-            <div className="flex justify-between text-[11px]">
-              <span className="text-[#4d6a87]">Confidence</span>
-              <span className="text-[#4da3ff] font-medium">{Math.round((decision.confidenceScore ?? 0) * 100)}%</span>
-            </div>
-            <MiniBar value={(decision.confidenceScore ?? 0) * 100} color="#4da3ff" />
-          </div>
-          <div className="flex flex-col items-center gap-0.5">
-            <GaugeArc value={decision.riskScore ?? 0} color={riskColor(decision.riskLevel)} />
-            <span className="text-[10px] text-[#4d6a87]">Risk</span>
-          </div>
-        </div>
+        {/* 3-column triptych */}
+        <div className="grid grid-cols-3 divide-x divide-[#1a2f48]">
 
-        {/* Impact grid */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            {
-              label: 'Margin Impact',
-              value: marginImpact >= 0 ? `+€${marginImpact.toFixed(2)}` : `-€${Math.abs(marginImpact).toFixed(2)}`,
-              color: marginImpact >= 0 ? '#22c55e' : '#ef4444',
-            },
-            {
-              label: 'Delivery Impact',
-              value: deliveryImpact === 0 ? '±0 days' : deliveryImpact > 0 ? `+${deliveryImpact}d` : `${deliveryImpact}d`,
-              color: deliveryImpact <= 0 ? '#22c55e' : '#f59e0b',
-            },
-            {
-              label: 'Failure Prob.',
-              value: `${Math.round(failureProb * 100)}%`,
-              color: failureProb < 0.1 ? '#22c55e' : failureProb < 0.3 ? '#f59e0b' : '#ef4444',
-            },
-          ].map((cell) => (
-            <div key={cell.label} className="bg-[#102131] rounded-xl p-3 text-center">
-              <div className="text-[10px] text-[#4d6a87] uppercase tracking-wide mb-1">{cell.label}</div>
-              <div className="font-tight text-[16px] font-semibold" style={{ color: cell.color }}>
-                {cell.value}
+          {/* LEFT: Context */}
+          <div className="p-4 flex flex-col gap-3">
+            <div className="text-[10px] text-[#4d6a87] uppercase tracking-wide font-semibold">Context</div>
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] text-[#4d6a87]">Trigger</span>
+                <span className="text-[12px] text-[#f0f6ff] font-medium">{decision.triggerType?.replace(/_/g, ' ')}</span>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] text-[#4d6a87]">Action Type</span>
+                <span className="text-[12px] text-[#4da3ff] font-medium">{decision.actionType ?? '—'}</span>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] text-[#4d6a87]">Urgency</span>
+                <span className="text-[12px] font-semibold" style={{ color: riskColor(decision.riskLevel) }}>
+                  {decision.riskLevel === 'high' ? 'HIGH — Act now' : decision.riskLevel === 'medium' ? 'MEDIUM — Review' : 'LOW — Can wait'}
+                </span>
+              </div>
+              {benchmark && (
+                <div className="flex flex-col gap-0.5 mt-1 pt-2 border-t border-[#1a2f48]">
+                  <span className="text-[10px] text-[#4d6a87]">vs Global Network</span>
+                  <span className="text-[12px] font-semibold" style={{ color: benchmark.vsBenchmarkPct >= 0 ? '#22c55e' : '#ef4444' }}>
+                    {benchmark.vsBenchmarkPct >= 0 ? '↑' : '↓'}{Math.abs(benchmark.vsBenchmarkPct).toFixed(1)}% {benchmark.label}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* CENTER: Financial Impact (primary) */}
+          <div className="p-4 flex flex-col gap-3">
+            <div className="text-[10px] text-[#4d6a87] uppercase tracking-wide font-semibold">Financial Impact</div>
+            <div className="flex flex-col gap-3">
+              <div className="text-center">
+                <div className="font-tight text-[28px] font-bold leading-none" style={{ color: marginImpact >= 0 ? '#22c55e' : '#ef4444' }}>
+                  {marginImpact >= 0 ? '+' : ''}€{Math.abs(marginImpact).toFixed(0)}
+                </div>
+                <div className="text-[10px] text-[#4d6a87] mt-0.5">margin impact</div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="bg-[#102131] rounded-lg p-2 text-center">
+                  <div className="font-tight text-[15px] font-semibold" style={{ color: deliveryImpact <= 0 ? '#22c55e' : '#f59e0b' }}>
+                    {deliveryImpact === 0 ? '±0d' : deliveryImpact > 0 ? `+${deliveryImpact}d` : `${deliveryImpact}d`}
+                  </div>
+                  <div className="text-[9px] text-[#4d6a87]">delivery</div>
+                </div>
+                <div className="bg-[#102131] rounded-lg p-2 text-center">
+                  <div className="font-tight text-[15px] font-semibold text-[#4da3ff]">
+                    {Math.round((decision.confidenceScore ?? 0) * 100)}%
+                  </div>
+                  <div className="text-[9px] text-[#4d6a87]">confidence</div>
+                </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <div className="flex justify-between text-[10px]">
+                  <span className="text-[#4d6a87]">Risk Score</span>
+                  <span style={{ color: riskColor(decision.riskLevel) }}>{decision.riskScore ?? 0}/100</span>
+                </div>
+                <MiniBar value={decision.riskScore ?? 0} color={riskColor(decision.riskLevel)} />
               </div>
             </div>
-          ))}
+          </div>
+
+          {/* RIGHT: Actions */}
+          <div className="p-4 flex flex-col gap-2">
+            <div className="text-[10px] text-[#4d6a87] uppercase tracking-wide font-semibold">Actions</div>
+            <button type="button" onClick={() => handleAction('approve')} disabled={actionLoading !== null}
+              className="w-full flex items-center justify-center gap-2 bg-[#22c55e] hover:bg-[#16a34a] text-white py-2.5 rounded-xl font-semibold text-[13px] transition-colors disabled:opacity-50">
+              {actionLoading === 'approve' ? <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : '✓'}
+              Approve
+            </button>
+            <button type="button" onClick={() => setModifyMode((v) => !v)} disabled={actionLoading !== null}
+              className="w-full bg-[#a855f7]/20 hover:bg-[#a855f7]/30 text-[#a855f7] border border-[#a855f7]/30 py-2 rounded-xl font-medium text-[13px] transition-colors disabled:opacity-50">
+              {modifyMode ? 'Cancel' : '⌥ Modify & Approve'}
+            </button>
+            <button type="button" onClick={() => handleAction('reject')} disabled={actionLoading !== null}
+              className="w-full bg-[#ef4444]/10 hover:bg-[#ef4444]/20 text-[#ef4444] border border-[#ef4444]/30 py-2 rounded-xl font-medium text-[13px] transition-colors disabled:opacity-50">
+              {actionLoading === 'reject' ? <span className="w-3.5 h-3.5 border-2 border-[#ef4444]/30 border-t-[#ef4444] rounded-full animate-spin" /> : '✕'}
+              {actionLoading === 'reject' ? '' : ' Reject'}
+            </button>
+            <div className="mt-auto pt-1 border-t border-[#1a2f48]">
+              <div className={`px-2.5 py-1.5 rounded-lg text-center text-[11px] font-semibold ${riskBg(decision.riskLevel)}`}>
+                {decision.riskLevel?.toUpperCase() ?? 'UNKNOWN'} RISK
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Global Benchmark */}
-        {benchmark && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'rgba(77,163,255,0.08)', border: '1px solid rgba(77,163,255,0.2)', borderRadius: 8, marginTop: 8 }}>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <circle cx="7" cy="7" r="6" stroke="#4da3ff" strokeWidth="1.2" />
-              <path d="M4 7h6M7 4v6" stroke="#4da3ff" strokeWidth="1.2" strokeLinecap="round" />
-            </svg>
-            <span style={{ fontSize: 12, color: '#8ba8c7' }}>vs global avg:</span>
-            <span style={{ fontSize: 12, fontWeight: 700, color: benchmark.vsBenchmarkPct >= 0 ? '#22c55e' : '#ef4444' }}>
-              {benchmark.vsBenchmarkPct >= 0 ? '↑' : '↓'}{Math.abs(benchmark.vsBenchmarkPct).toFixed(1)}%
-            </span>
-            <span style={{ fontSize: 11, color: '#4d6a87', marginLeft: 'auto' }}>{benchmark.label}</span>
+        {/* Modify mode */}
+        {modifyMode && (
+          <div className="px-5 pb-4 animate-fade-in">
+            <textarea value={modifyText} onChange={(e) => setModifyText(e.target.value)}
+              placeholder="Enter modified reasoning or action…"
+              className="w-full bg-[#102131] border border-[#1f3855] rounded-xl p-3 text-[13px] text-[#f0f6ff] placeholder:text-[#4d6a87] resize-none h-20 focus:outline-none focus:border-[#4da3ff]"
+            />
           </div>
         )}
 
         {/* AI Reasoning */}
         {decision.reasoning && (
-          <div className="bg-[#102131] rounded-xl p-4 border border-[#a855f7]/20 ai-glow">
-            <div className="flex items-center gap-2 mb-2">
+          <div className="mx-4 mb-4 bg-[#102131] rounded-xl p-3 border border-[#a855f7]/20 ai-glow">
+            <div className="flex items-center gap-2 mb-1.5">
               <SparkleIcon className="text-[#a855f7]" />
-              <span className="text-[11px] font-semibold text-[#a855f7] uppercase tracking-wide">AI Reasoning</span>
+              <span className="text-[10px] font-semibold text-[#a855f7] uppercase tracking-wide">AI Reasoning</span>
             </div>
-            <p className="text-[13px] text-[#8ba8c7] leading-relaxed">{decision.reasoning}</p>
-          </div>
-        )}
-
-        {/* Modify mode */}
-        {modifyMode && (
-          <div className="animate-fade-in">
-            <textarea
-              value={modifyText}
-              onChange={(e) => setModifyText(e.target.value)}
-              placeholder="Enter modified reasoning or action…"
-              className="w-full bg-[#102131] border border-[#1f3855] rounded-xl p-3 text-[13px] text-[#f0f6ff] placeholder:text-[#4d6a87] resize-none h-24 focus:outline-none focus:border-[#4da3ff]"
-            />
-          </div>
-        )}
-
-        {/* Action buttons */}
-        <div className="flex gap-3 pt-1">
-          <button
-            type="button"
-            onClick={() => handleAction('approve')}
-            disabled={actionLoading !== null}
-            className="flex-1 flex items-center justify-center gap-2 bg-[#22c55e] hover:bg-[#16a34a] text-white px-6 py-2.5 rounded-xl font-medium text-[14px] transition-colors disabled:opacity-50"
-          >
-            {actionLoading === 'approve' ? (
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : '✓'}
-            Approve
-          </button>
-          <button
-            type="button"
-            onClick={() => setModifyMode((v) => !v)}
-            disabled={actionLoading !== null}
-            className="flex-1 bg-[#1a2f48] hover:bg-[#1f3855] text-[#f0f6ff] px-6 py-2.5 rounded-xl font-medium text-[14px] transition-colors disabled:opacity-50"
-          >
-            {modifyMode ? 'Cancel' : 'Modify'}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleAction('reject')}
-            disabled={actionLoading !== null}
-            className="flex-1 flex items-center justify-center gap-2 bg-[#ef4444]/20 hover:bg-[#ef4444]/30 text-[#ef4444] border border-[#ef4444]/30 px-6 py-2.5 rounded-xl font-medium text-[14px] transition-colors disabled:opacity-50"
-          >
-            {actionLoading === 'reject' ? (
-              <span className="w-4 h-4 border-2 border-[#ef4444]/30 border-t-[#ef4444] rounded-full animate-spin" />
-            ) : '✕'}
-            Reject
-          </button>
-        </div>
-
-        {/* Navigation */}
-        {decisions.length > 1 && (
-          <div className="flex items-center justify-between pt-1 border-t border-[#1a2f48]">
-            <button
-              type="button"
-              onClick={() => setCurrentIdx(Math.max(0, currentIdx - 1))}
-              disabled={currentIdx === 0}
-              className="text-[12px] text-[#4da3ff] hover:text-[#f0f6ff] disabled:opacity-30 transition-colors"
-            >
-              ← Previous
-            </button>
-            <span className="text-[11px] text-[#4d6a87]">{currentIdx + 1} / {decisions.length} pending</span>
-            <button
-              type="button"
-              onClick={() => setCurrentIdx(Math.min(decisions.length - 1, currentIdx + 1))}
-              disabled={currentIdx === decisions.length - 1}
-              className="text-[12px] text-[#4da3ff] hover:text-[#f0f6ff] disabled:opacity-30 transition-colors"
-            >
-              Next →
-            </button>
+            <p className="text-[12px] text-[#8ba8c7] leading-relaxed">{decision.reasoning}</p>
           </div>
         )}
       </div>
@@ -835,6 +819,101 @@ function RightPanel({
 
   return (
     <div className="space-y-5">
+      {/* AI Intelligence Brief */}
+      <div>
+        <SectionTitle icon={<SparkleIcon />} label="Intelligence Brief" muted="live" />
+        <div className="bg-[#0b1526] border border-[#1a2f48] rounded-xl overflow-hidden">
+          {/* Risk Signals */}
+          <div className="p-3 border-b border-[#1a2f48]">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 rounded-full bg-[#ef4444] flex-shrink-0" />
+              <span className="text-[10px] font-semibold text-[#ef4444] uppercase tracking-wide">Risk Signals</span>
+            </div>
+            <div className="space-y-1.5">
+              {activeDecision ? (
+                <>
+                  {(activeDecision.riskScore ?? 0) >= 65 && (
+                    <div className="text-[12px] text-[#8ba8c7]">
+                      · Risk score <span className="text-[#ef4444] font-semibold">{activeDecision.riskScore}</span> exceeds approval threshold
+                    </div>
+                  )}
+                  {(activeDecision.failureProbability ?? 0) > 0.3 && (
+                    <div className="text-[12px] text-[#8ba8c7]">
+                      · Failure probability <span className="text-[#ef4444] font-semibold">{((activeDecision.failureProbability ?? 0) * 100).toFixed(0)}%</span> — review before approving
+                    </div>
+                  )}
+                  {(activeDecision.deliveryImpact ?? 0) > 2 && (
+                    <div className="text-[12px] text-[#8ba8c7]">
+                      · Delivery delay of <span className="text-[#f59e0b] font-semibold">+{activeDecision.deliveryImpact}d</span> may breach SLA
+                    </div>
+                  )}
+                  {(activeDecision.riskScore ?? 0) < 35 && (activeDecision.failureProbability ?? 0) <= 0.2 && (
+                    <div className="text-[12px] text-[#22c55e]">· No significant risk signals detected</div>
+                  )}
+                </>
+              ) : (
+                <div className="text-[12px] text-[#4d6a87]">No active decision</div>
+              )}
+            </div>
+          </div>
+
+          {/* Opportunities */}
+          <div className="p-3 border-b border-[#1a2f48]">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 rounded-full bg-[#22c55e] flex-shrink-0" />
+              <span className="text-[10px] font-semibold text-[#22c55e] uppercase tracking-wide">Opportunities</span>
+            </div>
+            <div className="space-y-1.5">
+              {activeDecision?.alternatives && activeDecision.alternatives.length > 0 ? (
+                activeDecision.alternatives.slice(0, 2).map((alt, i) => (
+                  <div key={i} className="text-[12px] text-[#8ba8c7]">
+                    · {alt.action.slice(0, 55)}{alt.action.length > 55 ? '…' : ''}
+                    {(alt.marginImpact ?? 0) > 0 && (
+                      <span className="text-[#22c55e] font-semibold"> (+€{(alt.marginImpact ?? 0).toFixed(0)})</span>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="text-[12px] text-[#4d6a87]">No alternatives available</div>
+              )}
+            </div>
+          </div>
+
+          {/* Recommended Actions */}
+          <div className="p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 rounded-full bg-[#4da3ff] flex-shrink-0" />
+              <span className="text-[10px] font-semibold text-[#4da3ff] uppercase tracking-wide">Actions</span>
+            </div>
+            <div className="space-y-1.5">
+              {activeDecision ? (
+                <>
+                  <div className="text-[12px] text-[#8ba8c7]">
+                    · {(activeDecision.riskScore ?? 0) < 35
+                        ? 'Low risk — safe to auto-approve'
+                        : (activeDecision.riskScore ?? 0) < 65
+                        ? 'Review reasoning before approving'
+                        : 'Escalate to procurement manager'}
+                  </div>
+                  {stats && stats.pendingDecisions > 3 && (
+                    <div className="text-[12px] text-[#8ba8c7]">
+                      · <span className="text-[#f59e0b] font-semibold">{stats.pendingDecisions}</span> decisions in queue — prioritize high-risk first
+                    </div>
+                  )}
+                  {stats && (stats.autoExecutionRate ?? 0) < 50 && (
+                    <div className="text-[12px] text-[#8ba8c7]">
+                      · Auto-exec rate low ({stats.autoExecutionRate?.toFixed(0)}%) — consider expanding policy thresholds
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-[12px] text-[#22c55e]">· System operating autonomously — no action required</div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Simulation Engine title */}
       <SectionTitle icon={<CircuitIcon />} label="Simulation Engine" />
 
