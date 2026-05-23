@@ -2071,3 +2071,94 @@ model SimulationRun {
   @@index([createdAt(sort: Desc)])
   @@map("simulation_runs")
 }
+
+// DECISION INTELLIGENCE NETWORK (Sprint 15)
+
+model NetworkLearningEvent {
+  id                   String   @id @default(cuid())
+  tenantHash           String
+  eventType            String
+  supplierCode         String?
+  routeKey             String?
+  category             String?
+  outcome              String   @default("success")
+  marginImpactPct      Decimal? @db.Decimal(8, 4)
+  deliveryVarianceDays Int?
+  costVariancePct      Decimal? @db.Decimal(8, 4)
+  region               String?
+  createdAt            DateTime @default(now())
+
+  @@index([supplierCode])
+  @@index([routeKey])
+  @@index([category])
+  @@index([eventType])
+  @@map("network_learning_events")
+}
+
+model SupplierGlobalScore {
+  id                       String   @id @default(cuid())
+  supplierCode             String   @unique
+  supplierName             String
+  globalReliabilityScore   Decimal  @default(75) @db.Decimal(5, 2)
+  failureProbabilityPct    Decimal  @default(5) @db.Decimal(5, 2)
+  avgLeadTimeDays          Decimal  @default(14) @db.Decimal(5, 2)
+  leadTimeVarianceDays     Decimal  @default(2) @db.Decimal(5, 2)
+  avgMarginContributionPct Decimal  @default(0) @db.Decimal(8, 4)
+  totalEvents              Int      @default(0)
+  activeTenantCount        Int      @default(0)
+  lastUpdatedAt            DateTime @default(now())
+  createdAt                DateTime @default(now())
+
+  @@map("supplier_global_scores")
+}
+
+model RouteIntelligence {
+  id                         String   @id @default(cuid())
+  originCountry              String
+  destinationCountry         String
+  carrierCode                String
+  avgTransitDays             Decimal  @default(5) @db.Decimal(5, 2)
+  transitVarianceDays        Decimal  @default(1) @db.Decimal(5, 2)
+  customsDelayProbabilityPct Decimal  @default(10) @db.Decimal(5, 2)
+  costVolatilityPct          Decimal  @default(5) @db.Decimal(5, 2)
+  onTimeDeliveryRatePct      Decimal  @default(90) @db.Decimal(5, 2)
+  totalShipments             Int      @default(0)
+  lastUpdatedAt              DateTime @default(now())
+  createdAt                  DateTime @default(now())
+
+  @@unique([originCountry, destinationCountry, carrierCode])
+  @@map("route_intelligence")
+}
+
+model CategoryIntelligence {
+  id               String   @id @default(cuid())
+  category         String
+  region           String
+  avgMarginPct     Decimal  @default(25) @db.Decimal(8, 4)
+  demandTrend      String   @default("stable")
+  riskScore        Decimal  @default(30) @db.Decimal(5, 2)
+  seasonalPeaks    Json     @default("[]")
+  topSupplierCodes Json     @default("[]")
+  totalOrders      Int      @default(0)
+  lastUpdatedAt    DateTime @default(now())
+  createdAt        DateTime @default(now())
+
+  @@unique([category, region])
+  @@map("category_intelligence")
+}
+
+model NetworkBenchmark {
+  id             String   @id @default(cuid())
+  benchmarkType  String
+  category       String?
+  region         String?
+  carrierCode    String?
+  globalAvgValue Decimal  @db.Decimal(12, 4)
+  globalP25Value Decimal  @db.Decimal(12, 4)
+  globalP75Value Decimal  @db.Decimal(12, 4)
+  sampleCount    Int      @default(0)
+  computedAt     DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  @@map("network_benchmarks")
+}

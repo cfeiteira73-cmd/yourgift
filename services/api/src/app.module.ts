@@ -56,6 +56,7 @@ import { LogisticsModule } from './logistics/logistics.module';
 import { MarginProtectionModule } from './margin-protection/margin-protection.module';
 import { ProcurementAgentModule } from './procurement-agent/procurement-agent.module';
 import { DecisionEngineModule } from './decision-engine/decision-engine.module';
+import { NetworkIntelligenceModule } from './network-intelligence/network-intelligence.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -129,6 +130,7 @@ import { APP_GUARD } from '@nestjs/core';
     MarginProtectionModule,
     ProcurementAgentModule,
     DecisionEngineModule,
+    NetworkIntelligenceModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

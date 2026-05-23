@@ -509,6 +509,11 @@ function LeftPanel({
 // CENTER PANEL
 // ═══════════════════════════════════════════════════════════════════════════════
 
+interface BenchmarkData {
+  label: string;
+  vsBenchmarkPct: number;
+}
+
 function CenterPanel({
   decisions,
   resolved,
@@ -516,6 +521,7 @@ function CenterPanel({
   setCurrentIdx,
   onDecisionAction,
   stats,
+  benchmark,
 }: {
   decisions: Decision[];
   resolved: ResolvedDecision[];
@@ -523,6 +529,7 @@ function CenterPanel({
   setCurrentIdx: (i: number) => void;
   onDecisionAction: (id: string, action: 'approve' | 'reject', reasoning?: string) => Promise<void>;
   stats: DecisionStats | null;
+  benchmark: BenchmarkData | null;
 }) {
   const [actionLoading, setActionLoading] = useState<'approve' | 'reject' | null>(null);
   const [modifyMode, setModifyMode] = useState(false);
@@ -650,6 +657,21 @@ function CenterPanel({
             </div>
           ))}
         </div>
+
+        {/* Global Benchmark */}
+        {benchmark && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'rgba(77,163,255,0.08)', border: '1px solid rgba(77,163,255,0.2)', borderRadius: 8, marginTop: 8 }}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="6" stroke="#4da3ff" strokeWidth="1.2" />
+              <path d="M4 7h6M7 4v6" stroke="#4da3ff" strokeWidth="1.2" strokeLinecap="round" />
+            </svg>
+            <span style={{ fontSize: 12, color: '#8ba8c7' }}>vs global avg:</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: benchmark.vsBenchmarkPct >= 0 ? '#22c55e' : '#ef4444' }}>
+              {benchmark.vsBenchmarkPct >= 0 ? '↑' : '↓'}{Math.abs(benchmark.vsBenchmarkPct).toFixed(1)}%
+            </span>
+            <span style={{ fontSize: 11, color: '#4d6a87', marginLeft: 'auto' }}>{benchmark.label}</span>
+          </div>
+        )}
 
         {/* AI Reasoning */}
         {decision.reasoning && (
@@ -1049,6 +1071,7 @@ export default function BrainPage() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [snapshotLoading, setSnapshotLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [benchmark, setBenchmark] = useState<BenchmarkData | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function showToast(message: string, type: 'success' | 'error') {
@@ -1122,6 +1145,27 @@ export default function BrainPage() {
     const iv = setInterval(() => { void loadData(); }, 15000);
     return () => clearInterval(iv);
   }, [loadData]);
+
+  // Benchmark fetch — fires when active decision changes
+  const activeDecision = pendingDecisions[currentDecisionIdx] ?? null;
+  useEffect(() => {
+    if (!activeDecision) {
+      setBenchmark(null);
+      return;
+    }
+    const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') ?? '' : '';
+    const authHdrs: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+    const marginValue = (activeDecision as Decision & { finalMarginPct?: number }).finalMarginPct ?? 27;
+    fetch(
+      `${API_BASE}/api/v1/network-intelligence/benchmark-compare?type=decision_margin&value=${marginValue}`,
+      { headers: authHdrs },
+    )
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data) setBenchmark(data as BenchmarkData);
+      })
+      .catch(() => { /* silent */ });
+  }, [activeDecision?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleSnapshot() {
     setSnapshotLoading(true);
@@ -1197,8 +1241,6 @@ export default function BrainPage() {
     showToast('Alternative added as next decision', 'success');
   }
 
-  const activeDecision = pendingDecisions[currentDecisionIdx] ?? null;
-
   return (
     // Break out of ShellLayout's px-8 py-8 max-w container
     <div className="-mx-8 -my-8">
@@ -1239,6 +1281,7 @@ export default function BrainPage() {
               setCurrentIdx={setCurrentDecisionIdx}
               onDecisionAction={handleDecisionAction}
               stats={decisionStats}
+              benchmark={benchmark}
             />
           )}
         </main>

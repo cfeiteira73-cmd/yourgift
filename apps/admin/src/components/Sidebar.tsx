@@ -327,6 +327,23 @@ const SECONDARY_ITEMS: NavItem[] = [
     ),
   },
   {
+    href: '/network',
+    label: 'DIN Network',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="8" cy="8" r="2" />
+        <circle cx="2" cy="3" r="1.5" />
+        <circle cx="14" cy="3" r="1.5" />
+        <circle cx="2" cy="13" r="1.5" />
+        <circle cx="14" cy="13" r="1.5" />
+        <line x1="3.5" y1="3.5" x2="6.5" y2="6.5" />
+        <line x1="12.5" y1="3.5" x2="9.5" y2="6.5" />
+        <line x1="3.5" y1="12.5" x2="6.5" y2="9.5" />
+        <line x1="12.5" y1="12.5" x2="9.5" y2="9.5" />
+      </svg>
+    ),
+  },
+  {
     href: '/supplier-intelligence',
     label: 'Supplier Intel',
     icon: (
