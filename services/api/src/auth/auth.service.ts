@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { IdentityResolverService } from './identity-resolver.service';
 import { SessionAuthorityService } from './session-authority.service';
+import { EventBusService } from '../events/event-bus.service';
 import { createHash, randomBytes } from 'crypto';
 import * as bcrypt from 'bcrypt';
 
@@ -31,6 +32,7 @@ export class AuthService {
     private readonly config: ConfigService,
     private readonly identityResolver: IdentityResolverService,
     private readonly sessionAuthority: SessionAuthorityService,
+    private readonly eventBus: EventBusService,
   ) {}
 
   // ── Existing local auth ───────────────────────────────────────────────
@@ -56,6 +58,8 @@ export class AuthService {
     await this.db.refreshToken.create({ data: { tokenHash, clientId: client.id, expiresAt } });
     // Register in session authority (fire and forget)
     this.sessionAuthority.registerSession({ clientId: client.id }).catch(() => {});
+    // Emit identity event (fire and forget)
+    this.eventBus.emit('identity.session_created', { clientId: client.id, email: client.email, provider: 'auth' });
     return { accessToken, refreshToken, expiresIn: 900 };
   }
 
@@ -81,6 +85,12 @@ export class AuthService {
   // ── OAuth ─────────────────────────────────────────────────────────────
   async upsertOAuthClient(profile: OAuthProfile): Promise<{ id: string; email: string; tier: string }> {
     const resolved = await this.identityResolver.resolveOAuth(profile);
+    // Emit identity event
+    if (resolved.isNew) {
+      this.eventBus.emit('identity.created', { clientId: resolved.client.id, email: resolved.client.email });
+    } else if (resolved.mergeOccurred) {
+      this.eventBus.emit('identity.merge', { clientId: resolved.client.id, email: resolved.client.email });
+    }
     return resolved.client;
   }
 
@@ -141,6 +151,14 @@ export class AuthService {
           errorMsg: params.errorMsg ?? null,
         },
       });
+      // Emit auth events to event bus
+      if (['login', 'oauth_login', 'magic_link_login'].includes(params.action)) {
+        this.eventBus.emit('identity.login_success', { clientId: params.clientId, email: params.email, provider: params.provider });
+      } else if (params.action === 'risk_flagged') {
+        this.eventBus.emit('identity.risk_upgrade', { clientId: params.clientId, email: params.email });
+      } else if (params.action === 'revoke_all_sessions') {
+        this.eventBus.emit('identity.session_revoked', { clientId: params.clientId });
+      }
     } catch { }
   }
 
@@ -153,6 +171,7 @@ export class AuthService {
       }),
       this.sessionAuthority.revokeAllClientSessions(clientId),
     ]);
+    this.eventBus.emit('identity.session_revoked', { clientId });
   }
 
   // ── Session info ──────────────────────────────────────────────────────

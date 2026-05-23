@@ -12,6 +12,7 @@ import { IdentityResolverService } from './identity-resolver.service';
 import { AuthRiskService } from './auth-risk.service';
 import { SessionAuthorityService } from './session-authority.service';
 import { IdentityGraphService } from './identity-graph.service';
+import { IdentityGraphController } from './identity-graph.controller';
 
 @Module({
   imports: [
@@ -36,7 +37,7 @@ import { IdentityGraphService } from './identity-graph.service';
     SessionAuthorityService,
     IdentityGraphService,
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, IdentityGraphController],
   exports: [AuthService, IdentityResolverService, AuthRiskService, SessionAuthorityService, IdentityGraphService],
 })
 export class AuthModule {}
