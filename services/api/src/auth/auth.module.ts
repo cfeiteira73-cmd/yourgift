@@ -8,6 +8,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { AppleStrategy } from './strategies/apple.strategy';
+import { IdentityResolverService } from './identity-resolver.service';
 
 @Module({
   imports: [
@@ -21,8 +22,8 @@ import { AppleStrategy } from './strategies/apple.strategy';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, JwtStrategy, LocalStrategy, GoogleStrategy, AppleStrategy],
+  providers: [AuthService, JwtStrategy, LocalStrategy, GoogleStrategy, AppleStrategy, IdentityResolverService],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, IdentityResolverService],
 })
 export class AuthModule {}

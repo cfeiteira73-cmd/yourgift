@@ -2543,3 +2543,30 @@ model AuthAuditLog {
   @@index([createdAt])
   @@map("auth_audit_logs")
 }
+
+model AuthAttempt {
+  id          String    @id @default(cuid())
+  attemptId   String    @unique @map("attempt_id")
+  provider    String
+  status      String    @default("pending")
+  clientId    String?   @map("client_id")
+  completedAt DateTime? @map("completed_at")
+  expiresAt   DateTime  @map("expires_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  @@index([attemptId])
+  @@index([createdAt])
+  @@map("auth_attempts")
+}
+
+model DeviceSession {
+  id         String   @id @default(cuid())
+  clientId   String   @map("client_id")
+  deviceId   String   @map("device_id")
+  userAgent  String?  @map("user_agent")
+  ip         String?
+  lastSeenAt DateTime @default(now()) @map("last_seen_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  @@unique([clientId, deviceId])
+  @@index([clientId])
+  @@map("device_sessions")
+}

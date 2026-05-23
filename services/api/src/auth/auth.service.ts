@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
+import { IdentityResolverService } from './identity-resolver.service';
 import { createHash, randomBytes } from 'crypto';
 import * as bcrypt from 'bcrypt';
 
@@ -27,6 +28,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly identityResolver: IdentityResolverService,
   ) {}
 
   // ── Existing local auth ───────────────────────────────────────────────
@@ -74,43 +76,8 @@ export class AuthService {
 
   // ── OAuth ─────────────────────────────────────────────────────────────
   async upsertOAuthClient(profile: OAuthProfile): Promise<{ id: string; email: string; tier: string }> {
-    // Find existing OAuth account
-    const existing = await this.db.oAuthAccount.findUnique({
-      where: { provider_providerUid: { provider: profile.provider, providerUid: profile.providerUid } },
-    });
-
-    if (existing) {
-      const client = await this.db.client.findUnique({ where: { id: existing.clientId } });
-      if (!client) throw new UnauthorizedException('Account not found');
-      return client;
-    }
-
-    // Find by email or create new client
-    let client = await this.db.client.findUnique({ where: { email: profile.email } });
-    if (!client) {
-      client = await this.db.client.create({
-        data: {
-          email: profile.email,
-          name: profile.displayName ?? profile.email.split('@')[0],
-          tier: 'free',
-          passwordHash: null,
-        },
-      });
-    }
-
-    // Link OAuth account
-    await this.db.oAuthAccount.create({
-      data: {
-        clientId: client.id,
-        provider: profile.provider,
-        providerUid: profile.providerUid,
-        email: profile.email,
-        displayName: profile.displayName ?? null,
-        avatarUrl: profile.avatarUrl ?? null,
-      },
-    });
-
-    return client;
+    const resolved = await this.identityResolver.resolveOAuth(profile);
+    return resolved.client;
   }
 
   // ── Magic link ────────────────────────────────────────────────────────
@@ -200,5 +167,94 @@ export class AuthService {
       orderBy: { createdAt: 'desc' },
       take: limit,
     });
+  }
+
+  // ── Auth attempt idempotency ──────────────────────────────────────────────────
+  async createAttempt(attemptId: string, provider: string): Promise<boolean> {
+    try {
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+      await this.db.authAttempt.create({ data: { attemptId, provider, expiresAt } });
+      return true;
+    } catch {
+      return false; // duplicate — attempt already exists
+    }
+  }
+
+  async completeAttempt(attemptId: string, clientId: string): Promise<void> {
+    try {
+      await this.db.authAttempt.update({
+        where: { attemptId },
+        data: { status: 'completed', clientId, completedAt: new Date() },
+      });
+    } catch { }
+  }
+
+  async isAttemptCompleted(attemptId: string): Promise<boolean> {
+    const attempt = await this.db.authAttempt.findUnique({ where: { attemptId } });
+    return attempt?.status === 'completed';
+  }
+
+  // ── Device session fingerprint ────────────────────────────────────────────────
+  async upsertDeviceSession(clientId: string, deviceId: string, ip?: string, userAgent?: string): Promise<void> {
+    try {
+      await this.db.deviceSession.upsert({
+        where: { clientId_deviceId: { clientId, deviceId } },
+        update: { lastSeenAt: new Date(), ip: ip ?? null },
+        create: { clientId, deviceId, ip: ip ?? null, userAgent: userAgent ?? null },
+      });
+    } catch { }
+  }
+
+  // ── Auth metrics ──────────────────────────────────────────────────────────────
+  async getMetrics(): Promise<{
+    successRate7d: number;
+    successRate30d: number;
+    total7d: number;
+    total30d: number;
+    byProvider: Array<{ provider: string; total: number; failed: number }>;
+    recoveryRate7d: number;
+    recentEvents: any[];
+  }> {
+    const now = new Date();
+    const day7 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const day30 = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    const [total7d, success7d, total30d, success30d, recovery7d, recentEvents, allEvents7d] =
+      await Promise.all([
+        this.db.authAuditLog.count({ where: { createdAt: { gte: day7 } } }),
+        this.db.authAuditLog.count({ where: { createdAt: { gte: day7 }, success: true } }),
+        this.db.authAuditLog.count({ where: { createdAt: { gte: day30 } } }),
+        this.db.authAuditLog.count({ where: { createdAt: { gte: day30 }, success: true } }),
+        this.db.authAuditLog.count({ where: { createdAt: { gte: day7 }, action: 'recovery' } }),
+        this.db.authAuditLog.findMany({
+          orderBy: { createdAt: 'desc' },
+          take: 20,
+          select: { action: true, provider: true, success: true, createdAt: true, email: true, errorMsg: true },
+        }),
+        this.db.authAuditLog.findMany({
+          where: { createdAt: { gte: day7 } },
+          select: { provider: true, success: true },
+        }),
+      ]);
+
+    // Aggregate by provider
+    const providerMap: Record<string, { total: number; failed: number }> = {};
+    for (const e of allEvents7d as Array<{ provider: string | null; success: boolean }>) {
+      const p = e.provider ?? 'unknown';
+      if (!providerMap[p]) providerMap[p] = { total: 0, failed: 0 };
+      providerMap[p].total++;
+      if (!e.success) providerMap[p].failed++;
+    }
+    const byProvider = Object.entries(providerMap).map(([provider, stats]) => ({ provider, ...stats }));
+
+    return {
+      successRate7d: total7d > 0 ? Math.round((success7d / total7d) * 1000) / 10 : 100,
+      successRate30d: total30d > 0 ? Math.round((success30d / total30d) * 1000) / 10 : 100,
+      total7d,
+      total30d,
+      byProvider,
+      recoveryRate7d: total7d > 0 ? Math.round((recovery7d / total7d) * 1000) / 10 : 0,
+      recentEvents,
+    };
   }
 }

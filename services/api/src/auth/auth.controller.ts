@@ -151,4 +151,20 @@ export class AuthController {
   async auditLog() {
     return this.auth.getAuditLogs(100);
   }
+
+  // ── Auth metrics ────────────────────────────────────────────────────────────
+  @UseGuards(JwtAuthGuard)
+  @Get('metrics')
+  @ApiOperation({ summary: 'Auth observability metrics' })
+  async authMetrics() {
+    return this.auth.getMetrics();
+  }
+
+  // ── Bootstrap (session check) ────────────────────────────────────────────────
+  @UseGuards(JwtAuthGuard)
+  @Get('bootstrap')
+  @ApiOperation({ summary: 'Validate current session — returns user info' })
+  async bootstrap(@Request() req: any) {
+    return this.auth.getSession(req.user.sub);
+  }
 }

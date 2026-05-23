@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { detectBrowserEnv, BrowserEnv } from '@/lib/auth/in-app-browser';
 
 // ── Inline SVG icons ──────────────────────────────────────────────────────────
 
@@ -98,6 +99,12 @@ function LoginForm() {
   const [error, setError] = useState<string>(urlError ? 'Authentication failed. Please try again.' : '');
   const [magicSent, setMagicSent] = useState(false);
   const [loading, setLoading] = useState<LoadingProvider>(null);
+  const [browserEnv, setBrowserEnv] = useState<BrowserEnv | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  useEffect(() => {
+    setBrowserEnv(detectBrowserEnv(navigator.userAgent));
+  }, []);
 
   const isLoading = loading !== null;
   const safeNext = next.startsWith('/') ? next : '/dashboard';
@@ -225,6 +232,28 @@ function LoginForm() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-md">
+        {/* In-app browser warning */}
+        {browserEnv?.shouldForceExternal && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6 text-sm">
+            <p className="text-amber-800 font-medium mb-1">Abre no Safari ou Chrome</p>
+            <p className="text-amber-700 text-xs mb-2">
+              O browser actual pode bloquear o login. Clica em ⋯ e escolhe &ldquo;Abrir no Safari&rdquo; ou &ldquo;Abrir no Chrome&rdquo;.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                  setLinkCopied(true);
+                  setTimeout(() => setLinkCopied(false), 2000);
+                }).catch(() => {});
+              }}
+              className="text-xs text-amber-800 underline font-medium"
+            >
+              {linkCopied ? '✓ Link copiado!' : 'Copiar link'}
+            </button>
+          </div>
+        )}
+
         {/* Logo */}
         <div className="mb-8">
           <Link href="/" className="text-xl font-black text-gray-900">
