@@ -397,6 +397,27 @@ const SECONDARY_ITEMS: NavItem[] = [
     ),
   },
   {
+    href: '/governance',
+    label: 'Governance',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 1L2 4v4c0 3.5 2.5 5.8 6 7 3.5-1.2 6-3.5 6-7V4L8 1z" />
+        <path d="M5 8l2 2 4-4" />
+      </svg>
+    ),
+  },
+  {
+    href: '/trust',
+    label: 'Trust Engine',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="8" cy="8" r="6.5" />
+        <path d="M5.5 8.5l1.5 1.5 3-3.5" />
+        <path d="M8 3v1M8 12v1M3 8h1M12 8h1" />
+      </svg>
+    ),
+  },
+  {
     href: '/audit',
     label: 'Auditoria',
     icon: (

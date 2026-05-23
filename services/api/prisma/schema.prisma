@@ -2162,3 +2162,99 @@ model NetworkBenchmark {
 
   @@map("network_benchmarks")
 }
+
+// GOVERNED AUTONOMOUS PROCUREMENT OS (Sprint 16)
+
+model GovernancePolicy {
+  id          String   @id @default(cuid())
+  tenantId    String?
+  policyType  String
+  name        String
+  description String?
+  config      Json     @default("{}")
+  isActive    Boolean  @default(true)
+  priority    Int      @default(100)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+
+  @@index([policyType])
+  @@index([tenantId])
+  @@map("governance_policies")
+}
+
+model PolicyViolation {
+  id             String    @id @default(cuid())
+  policyId       String
+  decisionCardId String?
+  triggerContext Json      @default("{}")
+  violationType  String
+  blockedAction  String
+  resolvedAction String    @default("escalated")
+  resolvedBy     String?
+  resolvedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([policyId])
+  @@index([createdAt])
+  @@map("policy_violations")
+}
+
+model DecisionTrace {
+  id                String   @id @default(cuid())
+  decisionCardId    String?
+  traceType         String   @default("order_triggered")
+  inputSnapshot     Json     @default("{}")
+  simulationResults Json     @default("[]")
+  selectedAction    String?
+  governanceStatus  String   @default("pending")
+  governanceReason  String?
+  executionStatus   String   @default("pending")
+  executionResult   Json?
+  outcomeRecorded   Boolean  @default(false)
+  outcomeData       Json?
+  trustScore        Decimal? @db.Decimal(5, 2)
+  autonomyLevel     Int      @default(1)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now())
+
+  @@index([decisionCardId])
+  @@index([createdAt])
+  @@map("decision_traces")
+}
+
+model TrustScore {
+  id                        String    @id @default(cuid())
+  context                   String
+  contextValue              String
+  explainabilityScore       Decimal   @default(80) @db.Decimal(5, 2)
+  benchmarkDeviationScore   Decimal   @default(75) @db.Decimal(5, 2)
+  historicalAccuracyScore   Decimal   @default(70) @db.Decimal(5, 2)
+  governanceComplianceScore Decimal   @default(90) @db.Decimal(5, 2)
+  overrideFrequencyScore    Decimal   @default(85) @db.Decimal(5, 2)
+  compositeScore            Decimal   @default(80) @db.Decimal(5, 2)
+  autonomyLevelGranted      Int       @default(2)
+  sampleCount               Int       @default(0)
+  lastDecayAt               DateTime?
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @default(now())
+
+  trustEvents TrustEvent[]
+
+  @@unique([context, contextValue])
+  @@map("trust_scores")
+}
+
+model TrustEvent {
+  id           String   @id @default(cuid())
+  trustScoreId String
+  eventType    String
+  impact       String   @default("positive")
+  deltaScore   Decimal  @default(0) @db.Decimal(6, 3)
+  context      Json     @default("{}")
+  createdAt    DateTime @default(now())
+
+  trustScore TrustScore @relation(fields: [trustScoreId], references: [id], onDelete: Cascade)
+
+  @@index([trustScoreId])
+  @@map("trust_events")
+}
