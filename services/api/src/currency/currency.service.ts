@@ -18,8 +18,12 @@ export class CurrencyService implements OnModuleInit {
   constructor(private prisma: PrismaService) {}
 
   async onModuleInit() {
-    await this.seedStaticRates();
-    await this.loadRates();
+    try {
+      await this.seedStaticRates();
+      await this.loadRates();
+    } catch (err) {
+      this.logger.warn(`CurrencyService init failed (non-fatal): ${err}`);
+    }
   }
 
   private async seedStaticRates() {
