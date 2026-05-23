@@ -2647,6 +2647,77 @@ model RolePermission {
   @@map("role_permissions")
 }
 
+// ─────────────────────────────────────────────
+// BUDGET LEDGER + POLICY EXECUTION + PROCUREMENT WORKFLOW (Sprint 23)
+// ─────────────────────────────────────────────
+
+model BudgetAllocation {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  departmentId   String?  @map("department_id")
+  period         String
+  category       String?
+  totalEur       Decimal  @map("total_eur") @db.Decimal(14, 2)
+  reservedEur    Decimal  @default(0) @map("reserved_eur") @db.Decimal(14, 2)
+  committedEur   Decimal  @default(0) @map("committed_eur") @db.Decimal(14, 2)
+  spentEur       Decimal  @default(0) @map("spent_eur") @db.Decimal(14, 2)
+  currency       String   @default("EUR")
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @map("updated_at")
+  @@unique([organizationId, departmentId, period, category])
+  @@index([organizationId])
+  @@map("budget_allocations")
+}
+
+model BudgetTransaction {
+  id                 String   @id @default(cuid())
+  budgetAllocationId String   @map("budget_allocation_id")
+  type               String
+  amountEur          Decimal  @map("amount_eur") @db.Decimal(14, 2)
+  referenceId        String?  @map("reference_id")
+  referenceType      String?  @map("reference_type")
+  note               String?
+  createdBy          String?  @map("created_by")
+  createdAt          DateTime @default(now()) @map("created_at")
+  @@index([budgetAllocationId])
+  @@index([referenceId])
+  @@map("budget_transactions")
+}
+
+model WorkflowProcurementRequest {
+  id                 String    @id @default(cuid())
+  tenantId           String    @default("default") @map("tenant_id")
+  organizationId     String?   @map("organization_id")
+  requesterId        String    @map("requester_id")
+  status             String    @default("draft")
+  title              String
+  description        String?
+  category           String?
+  supplierCode       String?   @map("supplier_code")
+  estimatedCostEur   Decimal?  @map("estimated_cost_eur") @db.Decimal(14, 2)
+  actualCostEur      Decimal?  @map("actual_cost_eur") @db.Decimal(14, 2)
+  quantity           Int?
+  deliveryDays       Int?      @map("delivery_days")
+  riskScore          Decimal?  @map("risk_score") @db.Decimal(5, 2)
+  approvalChainId    String?   @map("approval_chain_id")
+  currentStep        Int       @default(0) @map("current_step")
+  budgetAllocationId String?   @map("budget_allocation_id")
+  policyDecision     String?   @map("policy_decision")
+  policyReason       String?   @map("policy_reason")
+  approvedBy         String?   @map("approved_by")
+  rejectedBy         String?   @map("rejected_by")
+  rejectionReason    String?   @map("rejection_reason")
+  fulfilledAt        DateTime? @map("fulfilled_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @map("updated_at")
+  @@index([tenantId])
+  @@index([requesterId])
+  @@index([status])
+  @@index([organizationId])
+  @@map("workflow_procurement_requests")
+}
+
 model OrgDepartment {
   id             String   @id @default(cuid())
   organizationId String   @map("organization_id")

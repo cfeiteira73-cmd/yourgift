@@ -61,6 +61,9 @@ import { GovernanceModule } from './governance/governance.module';
 import { ProofEngineModule } from './proof-engine/proof-engine.module';
 import { CategoryIntelligenceModule } from './category-intelligence/category-intelligence.module';
 import { CashFlowModule } from './cash-flow/cash-flow.module';
+import { BudgetLedgerModule } from './budget-ledger/budget-ledger.module';
+import { PolicyExecutionModule } from './policy-execution/policy-execution.module';
+import { ProcurementWorkflowModule } from './procurement-workflow/procurement-workflow.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -139,6 +142,9 @@ import { APP_GUARD } from '@nestjs/core';
     ProofEngineModule,
     CategoryIntelligenceModule,
     CashFlowModule,
+    BudgetLedgerModule,
+    PolicyExecutionModule,
+    ProcurementWorkflowModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
