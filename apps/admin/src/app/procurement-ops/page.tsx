@@ -549,6 +549,50 @@ export default function ProcurementOpsPage() {
         />
       </div>
 
+      {/* Simulation Access Strip */}
+      <div className="grid grid-cols-4 gap-3">
+        {[
+          {
+            title: 'Run Simulation',
+            desc: 'Pre-compute cost, margin & risk',
+            href: '/brain',
+            icon: '◎',
+            color: '#a855f7',
+          },
+          {
+            title: 'Margin Check',
+            desc: 'Validate margin before approval',
+            href: '/margin-protection',
+            icon: '◈',
+            color: '#22c55e',
+          },
+          {
+            title: 'Shipping Quote',
+            desc: 'Compare carrier costs live',
+            href: '/logistics',
+            icon: '◷',
+            color: '#4da3ff',
+          },
+          {
+            title: 'AI Agent',
+            desc: 'Generate procurement plan',
+            href: '/ai-agent',
+            icon: '✦',
+            color: '#f59e0b',
+          },
+        ].map(card => (
+          <Link
+            key={card.href}
+            href={card.href}
+            className="bg-[#0b1526] border border-[#1a2f48] rounded-xl p-4 hover:border-[#1f3855] transition-colors card-hover"
+          >
+            <div className="text-[20px] mb-2" style={{ color: card.color }}>{card.icon}</div>
+            <div className="text-[13px] font-semibold text-[#f0f6ff]">{card.title}</div>
+            <div className="text-[11px] text-[#4d6a87] mt-0.5">{card.desc}</div>
+          </Link>
+        ))}
+      </div>
+
       {/* Middle: 3-column grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 

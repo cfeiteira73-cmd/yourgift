@@ -1954,3 +1954,120 @@ model ProcurementPlan {
   @@index([briefId])
   @@map("procurement_plans")
 }
+
+// ─────────────────────────────────────────────
+// PROCUREMENT DECISION ENGINE (Sprint 14)
+// ─────────────────────────────────────────────
+
+model DecisionCard {
+  id                  String    @id @default(uuid())
+  tenantId            String    @default("default") @map("tenant_id")
+  triggerType         String    @map("trigger_type")
+  triggerId           String?   @map("trigger_id")
+  triggerDescription  String?   @map("trigger_description")
+
+  action              String
+  actionType          String    @map("action_type")
+
+  marginImpactEur     Decimal?  @map("margin_impact_eur") @db.Decimal(12, 2)
+  deliveryImpactDays  Int?      @map("delivery_impact_days")
+  riskChangePct       Decimal?  @map("risk_change_pct") @db.Decimal(5, 2)
+  finalCost           Decimal?  @map("final_cost") @db.Decimal(14, 2)
+  finalMarginEur      Decimal?  @map("final_margin_eur") @db.Decimal(14, 2)
+  finalMarginPct      Decimal?  @map("final_margin_pct") @db.Decimal(5, 2)
+
+  riskScore           Decimal   @default(50) @map("risk_score") @db.Decimal(5, 2)
+  confidenceScore     Decimal   @default(75) @map("confidence_score") @db.Decimal(5, 2)
+  failureProbability  Decimal   @default(10) @map("failure_probability") @db.Decimal(5, 2)
+  riskLevel           String    @default("medium") @map("risk_level")
+
+  reasoning           String
+  alternatives        Json      @default("[]")
+
+  autoExecuted        Boolean   @default(false) @map("auto_executed")
+  status              String    @default("pending")
+  decidedBy           String?   @map("decided_by")
+  decidedAt           DateTime? @map("decided_at")
+  executionResult     Json?     @map("execution_result")
+  expiresAt           DateTime? @default(dbgenerated("(NOW() + INTERVAL '24 hours')")) @map("expires_at")
+
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([riskLevel, status])
+  @@index([triggerType, triggerId])
+  @@index([createdAt(sort: Desc)])
+  @@map("decision_cards")
+}
+
+model ProcurementStateSnapshot {
+  id                    String    @id @default(uuid())
+  snapshotAt            DateTime  @default(now()) @map("snapshot_at")
+
+  totalOpenOrders       Int       @default(0) @map("total_open_orders")
+  totalPendingValue     Decimal   @default(0) @map("total_pending_value") @db.Decimal(14, 2)
+  avgMarginPct          Decimal?  @map("avg_margin_pct") @db.Decimal(5, 2)
+  totalAtRiskValue      Decimal   @default(0) @map("total_at_risk_value") @db.Decimal(14, 2)
+
+  ordersInProduction    Int       @default(0) @map("orders_in_production")
+  slaBreaches           Int       @default(0) @map("sla_breaches")
+  bottleneckStage       String?   @map("bottleneck_stage")
+
+  supplierHealthScore   Decimal?  @map("supplier_health_score") @db.Decimal(5, 1)
+  degradedSuppliers     Int       @default(0) @map("degraded_suppliers")
+
+  pendingDecisions      Int       @default(0) @map("pending_decisions")
+  autoExecutedToday     Int       @default(0) @map("auto_executed_today")
+  blockedDecisions      Int       @default(0) @map("blocked_decisions")
+
+  activeAlerts          Int       @default(0) @map("active_alerts")
+  expansionOpportunities Int      @default(0) @map("expansion_opportunities")
+  overallSystemScore    Decimal?  @map("overall_system_score") @db.Decimal(5, 1)
+
+  createdAt             DateTime  @default(now()) @map("created_at")
+
+  @@index([snapshotAt(sort: Desc)])
+  @@map("procurement_state_snapshots")
+}
+
+model SimulationRun {
+  id                   String    @id @default(uuid())
+  contextType          String    @default("manual") @map("context_type")
+  contextId            String?   @map("context_id")
+
+  productCost          Decimal?  @map("product_cost") @db.Decimal(14, 4)
+  quantity             Int?
+  originCountry        String?   @map("origin_country")
+  destinationCountry   String?   @map("destination_country")
+  weightKg             Decimal?  @map("weight_kg") @db.Decimal(8, 3)
+  targetPrice          Decimal?  @map("target_price") @db.Decimal(14, 2)
+  supplierName         String?   @map("supplier_name")
+  category             String?
+
+  shippingCost         Decimal?  @map("shipping_cost") @db.Decimal(12, 2)
+  shippingProvider     String?   @map("shipping_provider")
+  shippingDays         Int?      @map("shipping_days")
+
+  printCost            Decimal?  @default(0) @map("print_cost") @db.Decimal(12, 2)
+  platformFee          Decimal?  @map("platform_fee") @db.Decimal(12, 2)
+  finalTotalCost       Decimal?  @map("final_total_cost") @db.Decimal(14, 2)
+  finalMarginEur       Decimal?  @map("final_margin_eur") @db.Decimal(14, 2)
+  finalMarginPct       Decimal?  @map("final_margin_pct") @db.Decimal(5, 2)
+
+  deliveryRiskScore    Decimal?  @map("delivery_risk_score") @db.Decimal(5, 2)
+  supplierRiskScore    Decimal?  @map("supplier_risk_score") @db.Decimal(5, 2)
+  financialRiskScore   Decimal?  @map("financial_risk_score") @db.Decimal(5, 2)
+  compositeRiskScore   Decimal?  @map("composite_risk_score") @db.Decimal(5, 2)
+  failureProbability   Decimal?  @map("failure_probability") @db.Decimal(5, 2)
+
+  recommendedAction    String?   @map("recommended_action")
+  confidenceScore      Decimal?  @map("confidence_score") @db.Decimal(5, 2)
+  simulationNotes      String[]  @default([]) @map("simulation_notes")
+
+  createdAt            DateTime  @default(now()) @map("created_at")
+
+  @@index([contextType, contextId])
+  @@index([createdAt(sort: Desc)])
+  @@map("simulation_runs")
+}

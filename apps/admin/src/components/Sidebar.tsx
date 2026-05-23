@@ -61,6 +61,18 @@ const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
+    href: '/brain',
+    label: 'Command Brain',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 2a4 4 0 0 0-4 4c0 1.1.45 2.1 1.17 2.83L4 11h8l-1.17-2.17A4 4 0 0 0 12 6a4 4 0 0 0-4-4z" />
+        <path d="M6 11v1a2 2 0 0 0 4 0v-1" />
+        <path d="M5.5 6.5h5" />
+        <path d="M6.5 8.5h3" />
+      </svg>
+    ),
+  },
+  {
     href: '/production',
     label: 'Production',
     icon: (

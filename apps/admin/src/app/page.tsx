@@ -103,6 +103,27 @@ interface TrialBalance {
   balance: number;
 }
 
+interface DecisionCard {
+  id: string;
+  action: string;
+  actionType: string;
+  riskLevel: string;
+  riskScore: number;
+  confidenceScore: number;
+  triggerType: string;
+  status: string;
+}
+
+interface DecisionStats {
+  total: number;
+  pending: number;
+  approved: number;
+  rejected: number;
+  autoExecuted: number;
+  autoExecutionRate: number;
+  avgRiskScore: number;
+}
+
 // ─── Dashboard Data Shape ─────────────────────────────────────────────────────
 interface DashboardData {
   financial: {
@@ -383,8 +404,14 @@ export default function CommandCenterPage() {
   const [data, setData] = useState<DashboardData>({ financial: null, operational: null, intelligence: null, risk: null });
   const [loading, setLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+  const [pendingDecisions, setPendingDecisions] = useState<DecisionCard[]>([]);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [decisionStats, setDecisionStats] = useState<DecisionStats | null>(null);
 
   const loadData = useCallback(async () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') ?? '' : '';
+    const authHdrs = token ? { Authorization: `Bearer ${token}` } : {};
+
     const [
       projections,
       pnl,
@@ -396,6 +423,8 @@ export default function CommandCenterPage() {
       dlq,
       tenants,
       design,
+      decisionsPending,
+      decisionStatsRes,
     ] = await Promise.allSettled([
       safeFetch<ProjectionsHealth>(`${API}/api/v1/projections/health`),
       safeFetch<PnLResponse>(`${API}/api/v1/ledger/pnl`),
@@ -407,6 +436,8 @@ export default function CommandCenterPage() {
       safeFetch<DLQStats>(`${API}/api/v1/event-platform/dlq/stats`),
       safeFetch<PlatformStats>(`${API}/api/v1/tenants/platform-stats`),
       safeFetch<DesignStats>(`${API}/api/v1/design/stats`),
+      fetch(`${API}/api/v1/decision-engine/decisions/pending`, { headers: authHdrs }),
+      fetch(`${API}/api/v1/decision-engine/stats`, { headers: authHdrs }),
     ]);
 
     const p = projections.status === 'fulfilled' ? projections.value : null;
@@ -419,6 +450,22 @@ export default function CommandCenterPage() {
     const dq = dlq.status === 'fulfilled' ? dlq.value : null;
     const tn = tenants.status === 'fulfilled' ? tenants.value : null;
     const ds = design.status === 'fulfilled' ? design.value : null;
+
+    // Decision engine data
+    if (decisionsPending.status === 'fulfilled' && decisionsPending.value.ok) {
+      try {
+        const dp = await decisionsPending.value.json() as { data?: DecisionCard[] } | DecisionCard[];
+        const list: DecisionCard[] = Array.isArray(dp) ? dp : ((dp as { data?: DecisionCard[] }).data ?? []);
+        setPendingDecisions(list);
+        setPendingCount(list.length);
+      } catch { /* ignore parse errors */ }
+    }
+    if (decisionStatsRes.status === 'fulfilled' && decisionStatsRes.value.ok) {
+      try {
+        const ds2 = await decisionStatsRes.value.json() as { data?: DecisionStats } & DecisionStats;
+        setDecisionStats(ds2.data ?? ds2);
+      } catch { /* ignore parse errors */ }
+    }
 
     const dlqPermanent = dq?.byStatus?.['permanent'] ?? dq?.byStatus?.['dead'] ?? 0;
     const dlqBacklog = Number(dq?.total ?? 0);
@@ -514,6 +561,28 @@ export default function CommandCenterPage() {
     { name: 'automation', lag: 0 },
     { name: 'workflows', lag: 0 },
   ];
+
+  async function handleApproveDecision(id: string) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') ?? '' : '';
+    const hdrs = token ? { Authorization: `Bearer ${token}` } : {};
+    await fetch(`${API}/api/v1/decision-engine/decisions/${id}/approve`, {
+      method: 'PATCH',
+      headers: { ...hdrs, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ approvedBy: 'dashboard' }),
+    });
+    void loadData();
+  }
+
+  async function handleRejectDecision(id: string) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') ?? '' : '';
+    const hdrs = token ? { Authorization: `Bearer ${token}` } : {};
+    await fetch(`${API}/api/v1/decision-engine/decisions/${id}/reject`, {
+      method: 'PATCH',
+      headers: { ...hdrs, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rejectedBy: 'dashboard' }),
+    });
+    void loadData();
+  }
 
   return (
     <>
@@ -739,6 +808,83 @@ export default function CommandCenterPage() {
               />
             </div>
           </div>
+
+          {/* ── DECISION QUEUE ─────────────────────────────────── */}
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Left: Pending Decisions */}
+            <div className="bg-[#0b1526] border border-[#1a2f48] rounded-xl p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-[13px] font-semibold text-[#f0f6ff] font-tight">Decision Queue</h2>
+                {pendingCount > 0 && (
+                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#ef4444]/20 text-[#ef4444] border border-[#ef4444]/30">
+                    {pendingCount} pending
+                  </span>
+                )}
+                <Link href="/brain" className="text-[11px] text-[#4da3ff] hover:text-[#74e7ff]">
+                  Open Brain →
+                </Link>
+              </div>
+              {/* Decision cards list — top 4 */}
+              {pendingDecisions.length === 0 ? (
+                <div className="text-center py-6 text-[#4d6a87] text-[13px]">
+                  <div className="text-green-400 text-lg mb-1">✦</div>
+                  All decisions processed — system operating autonomously
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {pendingDecisions.slice(0, 4).map((dec) => (
+                    <div key={dec.id} className={`p-3 rounded-xl border ${dec.riskLevel === 'high' ? 'border-[#ef4444]/30 bg-red-500/5' : dec.riskLevel === 'medium' ? 'border-[#f59e0b]/30 bg-amber-500/5' : 'border-[#1a2f48] bg-[#102131]'}`}>
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-[12px] text-[#f0f6ff] leading-snug flex-1">{dec.action}</p>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${dec.riskLevel === 'high' ? 'bg-[#ef4444]/20 text-[#ef4444]' : dec.riskLevel === 'medium' ? 'bg-[#f59e0b]/20 text-[#f59e0b]' : 'bg-[#22c55e]/20 text-[#22c55e]'}`}>
+                          {dec.riskLevel}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 mt-2">
+                        <span className="text-[10px] text-[#4d6a87]">{dec.triggerType}</span>
+                        <span className="text-[10px] text-[#4d6a87]">Confidence: {Number(dec.confidenceScore).toFixed(0)}%</span>
+                        <div className="ml-auto flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => void handleApproveDecision(dec.id)}
+                            className="text-[10px] px-2 py-0.5 rounded bg-[#22c55e]/20 text-[#22c55e] hover:bg-[#22c55e]/30"
+                          >Approve</button>
+                          <button
+                            type="button"
+                            onClick={() => void handleRejectDecision(dec.id)}
+                            className="text-[10px] px-2 py-0.5 rounded bg-[#ef4444]/20 text-[#ef4444] hover:bg-[#ef4444]/30"
+                          >Reject</button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Right: Decision Stats */}
+            <div className="bg-[#0b1526] border border-[#1a2f48] rounded-xl p-5">
+              <h2 className="text-[13px] font-semibold text-[#f0f6ff] mb-4 font-tight">Automation Intelligence</h2>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: 'Auto-Execution Rate', value: `${(decisionStats?.autoExecutionRate ?? 0).toFixed(1)}%`, color: '#22c55e' },
+                  { label: 'Total Decisions', value: String(decisionStats?.total ?? 0), color: '#4da3ff' },
+                  { label: 'Avg Risk Score', value: `${(decisionStats?.avgRiskScore ?? 0).toFixed(0)}/100`, color: '#f59e0b' },
+                  { label: 'Human Overrides', value: String((decisionStats?.rejected ?? 0) + (decisionStats?.approved ?? 0)), color: '#a855f7' },
+                ].map(stat => (
+                  <div key={stat.label} className="bg-[#102131] rounded-xl p-3">
+                    <div className="text-[10px] text-[#4d6a87] uppercase tracking-wide mb-1">{stat.label}</div>
+                    <div className="text-[20px] font-semibold font-tight" style={{ color: stat.color }}>{stat.value}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 pt-3 border-t border-[#1a2f48]">
+                <Link href="/brain" className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-[#a855f7]/10 border border-[#a855f7]/20 text-[#a855f7] hover:bg-[#a855f7]/20 text-[12px] font-medium transition-colors">
+                  <span>✦</span> Open Procurement Command Brain
+                </Link>
+              </div>
+            </div>
+          </section>
 
           {/* ── Bottom Row: Anomalies + System Status ── */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 20 }}>
