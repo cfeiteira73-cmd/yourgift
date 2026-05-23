@@ -352,6 +352,37 @@ const SECONDARY_ITEMS: NavItem[] = [
     ),
   },
   {
+    href: '/benchmark-report',
+    label: 'Intel Report',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="2" width="12" height="12" rx="1.5" />
+        <path d="M5 5h6M5 7.5h6M5 10h4" />
+        <path d="M9 10.5l2 2" strokeWidth="1.2" />
+      </svg>
+    ),
+  },
+  {
+    href: '/roi-calculator',
+    label: 'ROI Calculator',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="2" width="12" height="12" rx="1.5" />
+        <path d="M5 8h6M8 5v6" />
+      </svg>
+    ),
+  },
+  {
+    href: '/pricing',
+    label: 'Pricing Model',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="8" cy="8" r="6.5" />
+        <path d="M8 4.5v7M6 6h3a1 1 0 0 1 0 2H7a1 1 0 0 0 0 2h3" />
+      </svg>
+    ),
+  },
+  {
     href: '/network',
     label: 'DIN Network',
     icon: (
