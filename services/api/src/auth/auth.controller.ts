@@ -9,6 +9,9 @@ import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
+import { AuthRiskService } from './auth-risk.service';
+import { SessionAuthorityService } from './session-authority.service';
+import { IdentityGraphService } from './identity-graph.service';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -16,6 +19,9 @@ export class AuthController {
   constructor(
     private readonly auth: AuthService,
     private readonly prisma: PrismaService,
+    private readonly authRisk: AuthRiskService,
+    private readonly sessionAuthority: SessionAuthorityService,
+    private readonly identityGraph: IdentityGraphService,
   ) {}
 
   // ── Local login ──────────────────────────────────────────────────────
@@ -25,6 +31,20 @@ export class AuthController {
   @HttpCode(200)
   @ApiOperation({ summary: 'Email + password login' })
   async login(@Request() req: any) {
+    // Risk assessment (fire-and-forget — don't block login for assessment errors)
+    const ip = req.ip ?? req.headers?.['x-forwarded-for']?.split(',')[0]?.trim();
+    this.authRisk.assess({
+      clientId: req.user.id,
+      email: req.user.email,
+      ip,
+      provider: 'password',
+    }).then((risk) => {
+      if (risk.blocked) {
+        // Log but don't hard-block for now (MVP) — block in future when step-up UI exists
+        this.auth.audit({ clientId: req.user.id, action: 'risk_flagged', errorMsg: `risk_score:${risk.riskScore}` });
+      }
+    }).catch(() => {});
+
     const tokens = await this.auth.login(req.user);
     await this.auth.audit({ clientId: req.user.id, email: req.user.email, action: 'login', provider: 'local' });
     return tokens;
@@ -166,5 +186,46 @@ export class AuthController {
   @ApiOperation({ summary: 'Validate current session — returns user info' })
   async bootstrap(@Request() req: any) {
     return this.auth.getSession(req.user.sub);
+  }
+
+  // ── Risk events (recent high-risk) ──────────────────────────────────────
+  @UseGuards(JwtAuthGuard)
+  @Get('risk/events')
+  @ApiOperation({ summary: 'Recent high-risk auth events' })
+  async riskEvents() {
+    return this.authRisk.getRecentHighRisk(50);
+  }
+
+  // ── Active sessions ──────────────────────────────────────────────────────
+  @UseGuards(JwtAuthGuard)
+  @Get('sessions')
+  @ApiOperation({ summary: 'Active sessions for current user' })
+  async activeSessions(@Request() req: any) {
+    return this.sessionAuthority.getActiveSessions(req.user.sub);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('sessions/revoke-all')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Revoke all sessions (global logout)' })
+  async revokeAllSessions(@Request() req: any) {
+    await this.auth.revokeAllTokens(req.user.sub);
+    await this.auth.audit({ clientId: req.user.sub, action: 'revoke_all_sessions' });
+    return { ok: true };
+  }
+
+  // ── Identity graph ────────────────────────────────────────────────────────
+  @UseGuards(JwtAuthGuard)
+  @Get('permissions')
+  @ApiOperation({ summary: 'Get current user permissions' })
+  async permissions(@Request() req: any) {
+    return this.identityGraph.resolvePermissions(req.user.sub);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('organizations')
+  @ApiOperation({ summary: 'Get organizations for current user' })
+  async organizations(@Request() req: any) {
+    return this.identityGraph.getUserOrgs(req.user.sub);
   }
 }

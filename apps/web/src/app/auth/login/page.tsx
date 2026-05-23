@@ -84,6 +84,7 @@ function Spinner() {
 
 type LoadingProvider = 'google' | 'apple' | 'magic' | 'password' | null;
 type AuthView = 'oauth' | 'password' | 'magic';
+type FailedProvider = 'google' | 'apple' | null;
 
 // ── Main form ─────────────────────────────────────────────────────────────────
 
@@ -99,6 +100,7 @@ function LoginForm() {
   const [error, setError] = useState<string>(urlError ? 'Authentication failed. Please try again.' : '');
   const [magicSent, setMagicSent] = useState(false);
   const [loading, setLoading] = useState<LoadingProvider>(null);
+  const [failedProvider, setFailedProvider] = useState<FailedProvider>(null);
   const [browserEnv, setBrowserEnv] = useState<BrowserEnv | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
 
@@ -123,7 +125,8 @@ function LoginForm() {
       },
     });
     if (oauthError) {
-      setError('Erro ao iniciar sessão com Google. Tenta novamente.');
+      setError('Google não está disponível. Tenta outro método abaixo.');
+      setFailedProvider('google');
       setLoading(null);
     }
     // On success the browser navigates away; no need to reset loading
@@ -140,7 +143,8 @@ function LoginForm() {
       },
     });
     if (oauthError) {
-      setError('Erro ao iniciar sessão com Apple. Tenta novamente.');
+      setError('Apple não está disponível. Usa o link por email para entrar.');
+      setFailedProvider('apple');
       setLoading(null);
     }
   }
@@ -263,10 +267,41 @@ function LoginForm() {
           <p className="text-sm text-gray-500">Acede à tua conta B2B</p>
         </div>
 
-        {/* Error banner */}
+        {/* Error banner + failsafe chain */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
-            {error}
+            <p className="font-medium mb-1">{error}</p>
+            {/* Failsafe chain — show alternative providers after failure */}
+            {failedProvider === 'google' && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setError(''); setFailedProvider(null); handleApple(); }}
+                  className="text-xs text-red-700 underline font-medium"
+                >
+                  Tentar com Apple →
+                </button>
+                <span className="text-red-400">·</span>
+                <button
+                  type="button"
+                  onClick={() => { setError(''); setFailedProvider(null); setView('magic'); }}
+                  className="text-xs text-red-700 underline font-medium"
+                >
+                  Entrar por email →
+                </button>
+              </div>
+            )}
+            {failedProvider === 'apple' && (
+              <div className="mt-2">
+                <button
+                  type="button"
+                  onClick={() => { setError(''); setFailedProvider(null); setView('magic'); }}
+                  className="text-xs text-red-700 underline font-medium"
+                >
+                  Entrar por link de email →
+                </button>
+              </div>
+            )}
           </div>
         )}
 

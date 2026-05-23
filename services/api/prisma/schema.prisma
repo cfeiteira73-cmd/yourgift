@@ -2570,3 +2570,79 @@ model DeviceSession {
   @@index([clientId])
   @@map("device_sessions")
 }
+
+model ActiveSession {
+  id             String    @id @default(cuid())
+  clientId       String    @map("client_id")
+  deviceId       String?   @map("device_id")
+  ip             String?
+  userAgent      String?   @map("user_agent")
+  provider       String?
+  isActive       Boolean   @default(true) @map("is_active")
+  revokedAt      DateTime? @map("revoked_at")
+  lastActivityAt DateTime  @default(now()) @map("last_activity_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  @@index([clientId])
+  @@index([isActive])
+  @@map("active_sessions")
+}
+
+model AuthRiskEvent {
+  id        String   @id @default(cuid())
+  clientId  String?  @map("client_id")
+  email     String?
+  ip        String?
+  deviceId  String?  @map("device_id")
+  riskScore Int      @map("risk_score")
+  riskLevel String   @map("risk_level")
+  factors   Json     @default("{}")
+  action    String
+  provider  String?
+  createdAt DateTime @default(now()) @map("created_at")
+  @@index([clientId])
+  @@index([ip])
+  @@index([createdAt])
+  @@map("auth_risk_events")
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  domain    String?  @unique
+  plan      String   @default("free")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  @@map("organizations")
+}
+
+model UserOrganization {
+  id             String    @id @default(cuid())
+  clientId       String    @map("client_id")
+  organizationId String    @map("organization_id")
+  role           String    @default("member")
+  joinedAt       DateTime? @map("joined_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  @@unique([clientId, organizationId])
+  @@index([clientId])
+  @@index([organizationId])
+  @@map("user_organizations")
+}
+
+model AppPermission {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  description String?
+  resource    String
+  action      String
+  createdAt   DateTime @default(now()) @map("created_at")
+  @@map("app_permissions")
+}
+
+model RolePermission {
+  id           String @id @default(cuid())
+  role         String
+  permissionId String @map("permission_id")
+  @@unique([role, permissionId])
+  @@index([role])
+  @@map("role_permissions")
+}

@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { IdentityResolverService } from './identity-resolver.service';
+import { SessionAuthorityService } from './session-authority.service';
 import { createHash, randomBytes } from 'crypto';
 import * as bcrypt from 'bcrypt';
 
@@ -29,6 +30,7 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly identityResolver: IdentityResolverService,
+    private readonly sessionAuthority: SessionAuthorityService,
   ) {}
 
   // ── Existing local auth ───────────────────────────────────────────────
@@ -52,6 +54,8 @@ export class AuthService {
     const tokenHash = createHash('sha256').update(refreshToken).digest('hex');
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
     await this.db.refreshToken.create({ data: { tokenHash, clientId: client.id, expiresAt } });
+    // Register in session authority (fire and forget)
+    this.sessionAuthority.registerSession({ clientId: client.id }).catch(() => {});
     return { accessToken, refreshToken, expiresIn: 900 };
   }
 
@@ -142,10 +146,13 @@ export class AuthService {
 
   // ── Revoke all sessions ───────────────────────────────────────────────
   async revokeAllTokens(clientId: string): Promise<void> {
-    await this.db.refreshToken.updateMany({
-      where: { clientId, revokedAt: null },
-      data: { revokedAt: new Date() },
-    });
+    await Promise.all([
+      this.db.refreshToken.updateMany({
+        where: { clientId, revokedAt: null },
+        data: { revokedAt: new Date() },
+      }),
+      this.sessionAuthority.revokeAllClientSessions(clientId),
+    ]);
   }
 
   // ── Session info ──────────────────────────────────────────────────────
@@ -214,6 +221,7 @@ export class AuthService {
     byProvider: Array<{ provider: string; total: number; failed: number }>;
     recoveryRate7d: number;
     recentEvents: any[];
+    authReliabilityScore: number;
   }> {
     const now = new Date();
     const day7 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -247,14 +255,21 @@ export class AuthService {
     }
     const byProvider = Object.entries(providerMap).map(([provider, stats]) => ({ provider, ...stats }));
 
+    const successRate7d = total7d > 0 ? Math.round((success7d / total7d) * 1000) / 10 : 100;
+    const recoveryRate7d = total7d > 0 ? Math.round((recovery7d / total7d) * 1000) / 10 : 0;
+
     return {
-      successRate7d: total7d > 0 ? Math.round((success7d / total7d) * 1000) / 10 : 100,
+      successRate7d,
       successRate30d: total30d > 0 ? Math.round((success30d / total30d) * 1000) / 10 : 100,
       total7d,
       total30d,
       byProvider,
-      recoveryRate7d: total7d > 0 ? Math.round((recovery7d / total7d) * 1000) / 10 : 0,
+      recoveryRate7d,
       recentEvents,
+      authReliabilityScore: Math.round(
+        (successRate7d * 0.6) +
+        (Math.max(0, 100 - recoveryRate7d * 3) * 0.4)
+      ),
     };
   }
 }
