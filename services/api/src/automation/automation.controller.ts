@@ -57,4 +57,40 @@ export class AutomationController {
   getMatrix() {
     return this.routing.getMatrix();
   }
+
+  @Get('supplier-intelligence')
+  async getSupplierIntelligence() {
+    const matrix = await this.routing.getRoutingMatrix();
+
+    // Access prisma through the routing service for learning outcomes
+    const routingAsAny = this.routing as unknown as { prisma: { learningOutcome: { findMany: (q: Record<string, unknown>) => Promise<unknown[]> } } };
+    const rawOutcomes = await routingAsAny.prisma.learningOutcome.findMany({
+      where: { createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const outcomes = rawOutcomes as Array<{ supplierId: string | null; delta: string | null; [key: string]: unknown }>;
+
+    const outcomeMap: Record<string, typeof outcomes> = {};
+    for (const o of outcomes) {
+      const key = o.supplierId ?? '__unknown__';
+      if (!outcomeMap[key]) outcomeMap[key] = [];
+      outcomeMap[key].push(o);
+    }
+
+    return matrix.map((supplier) => {
+      const supplierOutcomes = outcomeMap[supplier.supplierId] ?? [];
+      const total = supplierOutcomes.length;
+      const avgScoreDelta =
+        total > 0
+          ? supplierOutcomes.reduce((s, o) => s + Number(o.delta ?? 0), 0) / total
+          : 0;
+      return {
+        ...supplier,
+        recentOutcomes: supplierOutcomes,
+        totalLearnings: total,
+        avgScoreDelta: Math.round(avgScoreDelta * 100) / 100,
+      };
+    });
+  }
 }

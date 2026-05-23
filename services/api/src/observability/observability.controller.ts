@@ -12,11 +12,15 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { MetricsService } from './metrics.service';
+import { AIInsightsService } from './ai-insights.service';
 
 @Controller('api/v1/observability')
 @UseGuards(JwtAuthGuard)
 export class ObservabilityController {
-  constructor(private readonly metrics: MetricsService) {}
+  constructor(
+    private readonly metrics: MetricsService,
+    private readonly aiInsights: AIInsightsService,
+  ) {}
 
   @Get('snapshots')
   async getSnapshots(
@@ -62,5 +66,10 @@ export class ObservabilityController {
   async resolveAlert(@Param('id') id: string) {
     await this.metrics.resolveAlert(id);
     return { ok: true };
+  }
+
+  @Get('ai-insights')
+  getAIInsights() {
+    return this.aiInsights.generateInsights();
   }
 }

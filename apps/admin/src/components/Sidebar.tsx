@@ -50,6 +50,17 @@ const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
+    href: '/procurement-ops',
+    label: 'Procurement Ops',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+        <path d="M2 10h3l1.5 2h3L11 10h3" />
+        <rect x="2" y="3" width="12" height="10" rx="1.5" />
+        <path d="M5 6.5h6M5 8.5h4" />
+      </svg>
+    ),
+  },
+  {
     href: '/production',
     label: 'Production',
     icon: (
@@ -300,6 +311,19 @@ const SECONDARY_ITEMS: NavItem[] = [
         <circle cx="4" cy="14" r="1.25" fill="currentColor" stroke="none" />
         <circle cx="12" cy="14" r="1.25" fill="currentColor" stroke="none" />
         <path d="M1 9h10" />
+      </svg>
+    ),
+  },
+  {
+    href: '/supplier-intelligence',
+    label: 'Supplier Intel',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="8" cy="4" r="2" />
+        <circle cx="4" cy="12" r="2" />
+        <circle cx="12" cy="12" r="2" />
+        <line x1="8" y1="6" x2="4" y2="10" />
+        <line x1="8" y1="6" x2="12" y2="10" />
       </svg>
     ),
   },

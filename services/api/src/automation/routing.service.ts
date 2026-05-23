@@ -112,4 +112,11 @@ export class RoutingService {
       orderBy: { category: 'asc' },
     });
   }
+
+  async getRoutingMatrix() {
+    return this.prisma.supplierRoutingMatrix.findMany({
+      where: { isActive: true },
+      orderBy: { reliabilityScore: 'desc' },
+    });
+  }
 }
