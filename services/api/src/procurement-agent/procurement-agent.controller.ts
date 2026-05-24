@@ -10,7 +10,7 @@ import {
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ProcurementAgentService } from './procurement-agent.service';
 
-@Controller('api/v1/procurement-agent')
+@Controller('procurement-agent')
 @UseGuards(JwtAuthGuard)
 export class ProcurementAgentController {
   constructor(private readonly service: ProcurementAgentService) {}

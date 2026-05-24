@@ -2,7 +2,7 @@ import { Controller, Get, Post, Patch, Param, Body, UseGuards } from '@nestjs/co
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ProductionService } from './production.service';
 
-@Controller('api/v1/production')
+@Controller('production')
 @UseGuards(JwtAuthGuard)
 export class ProductionController {
   constructor(private readonly production: ProductionService) {}

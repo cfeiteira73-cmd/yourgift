@@ -15,7 +15,7 @@ import { OnboardingKitService } from './onboarding-kit.service';
 import { DepartmentBudgetService } from './department-budget.service';
 
 @UseGuards(JwtAuthGuard)
-@Controller('api/v1/employee-portal')
+@Controller('employee-portal')
 export class EmployeePortalController {
   constructor(
     private readonly wallets: EmployeeWalletService,

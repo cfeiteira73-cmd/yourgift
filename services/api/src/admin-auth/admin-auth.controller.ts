@@ -21,7 +21,7 @@ interface AuthenticatedRequest {
   };
 }
 
-@Controller('api/v1/admin-auth')
+@Controller('admin-auth')
 export class AdminAuthController {
   constructor(private readonly adminAuthService: AdminAuthService) {}
 

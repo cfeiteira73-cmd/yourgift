@@ -22,7 +22,7 @@ interface BambooWebhookBody {
 }
 
 @ApiTags('bamboohr')
-@Controller('api/v1/bamboohr')
+@Controller('bamboohr')
 export class BambooHRController {
   constructor(
     private readonly bamboohrService: BambooHRService,

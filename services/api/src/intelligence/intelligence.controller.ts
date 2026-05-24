@@ -2,7 +2,7 @@ import { Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { IntelligenceService } from './intelligence.service';
 
-@Controller('api/v1/intelligence')
+@Controller('intelligence')
 @UseGuards(JwtAuthGuard)
 export class IntelligenceController {
   constructor(private readonly intelligence: IntelligenceService) {}

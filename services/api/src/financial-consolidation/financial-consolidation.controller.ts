@@ -3,7 +3,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { FinancialConsolidationService } from './financial-consolidation.service';
 import { BudgetAnomalyService } from './budget-anomaly.service';
 
-@Controller('api/v1/consolidation')
+@Controller('consolidation')
 @UseGuards(JwtAuthGuard)
 export class FinancialConsolidationController {
   constructor(

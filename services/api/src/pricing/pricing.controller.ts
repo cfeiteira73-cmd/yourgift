@@ -18,7 +18,7 @@ import { CalculatePriceDto } from './dto/calculate-price.dto';
 @ApiTags('pricing')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-@Controller('api/v1/pricing')
+@Controller('pricing')
 export class PricingController {
   constructor(private readonly pricing: PricingService) {}
 

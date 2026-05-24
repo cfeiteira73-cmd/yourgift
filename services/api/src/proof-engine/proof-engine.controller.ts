@@ -4,7 +4,7 @@ import { ProofEngineService, ProofRecordParams } from './proof-engine.service';
 import { OnboardingService, OnboardingDataInput } from './onboarding.service';
 import { AdoptionModeService, AdoptionMode } from './adoption-mode.service';
 
-@Controller('api/v1/proof-engine')
+@Controller('proof-engine')
 @UseGuards(JwtAuthGuard)
 export class ProofEngineController {
   constructor(

@@ -16,7 +16,7 @@ import { ProcurementSimulatorService, SimulationInput } from './procurement-simu
 import { DecisionCorrectnessService } from './decision-correctness.service';
 import { WhatIfEngineService, WhatIfInput } from './what-if-engine.service';
 
-@Controller('api/v1/decision-engine')
+@Controller('decision-engine')
 @UseGuards(JwtAuthGuard)
 export class DecisionEngineController {
   constructor(

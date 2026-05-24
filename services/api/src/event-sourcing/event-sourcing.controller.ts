@@ -4,7 +4,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { EventSourcingService, type StreamType } from './event-sourcing.service';
 
 @ApiTags('event-sourcing')
-@Controller('api/v1/event-sourcing')
+@Controller('event-sourcing')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class EventSourcingController {

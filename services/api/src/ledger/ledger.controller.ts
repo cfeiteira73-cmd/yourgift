@@ -2,7 +2,7 @@ import { Controller, Get, Query, Param, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { LedgerService } from './ledger.service';
 
-@Controller('api/v1/ledger')
+@Controller('ledger')
 @UseGuards(JwtAuthGuard)
 export class LedgerController {
   constructor(private readonly ledger: LedgerService) {}

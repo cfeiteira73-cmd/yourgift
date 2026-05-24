@@ -4,7 +4,7 @@ import { AccrualService } from './accrual.service';
 import { CostAllocationService } from './cost-allocation.service';
 import { FinancialIntelligenceService } from './financial-intelligence.service';
 
-@Controller('api/v1/financial-intelligence')
+@Controller('financial-intelligence')
 @UseGuards(JwtAuthGuard)
 export class FinancialIntelligenceController {
   constructor(

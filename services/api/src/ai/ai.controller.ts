@@ -10,7 +10,7 @@ import {
 import { AiService, CampaignInput } from './ai.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-@Controller('api/v1/ai')
+@Controller('ai')
 @UseGuards(JwtAuthGuard)
 export class AiController {
   constructor(private readonly aiService: AiService) {}

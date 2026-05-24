@@ -2,7 +2,7 @@ import { Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RetentionService } from './retention.service';
 
-@Controller('api/v1/retention')
+@Controller('retention')
 @UseGuards(JwtAuthGuard)
 export class RetentionController {
   constructor(private readonly retention: RetentionService) {}

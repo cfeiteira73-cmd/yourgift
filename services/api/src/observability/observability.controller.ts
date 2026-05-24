@@ -14,7 +14,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { MetricsService } from './metrics.service';
 import { AIInsightsService } from './ai-insights.service';
 
-@Controller('api/v1/observability')
+@Controller('observability')
 @UseGuards(JwtAuthGuard)
 export class ObservabilityController {
   constructor(

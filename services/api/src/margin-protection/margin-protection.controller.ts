@@ -16,7 +16,7 @@ import {
   PLSimulation,
 } from './margin-protection.service';
 
-@Controller('api/v1/margin-protection')
+@Controller('margin-protection')
 @UseGuards(JwtAuthGuard)
 export class MarginProtectionController {
   constructor(private readonly marginService: MarginProtectionService) {}

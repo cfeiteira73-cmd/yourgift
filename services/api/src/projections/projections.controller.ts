@@ -2,7 +2,7 @@ import { Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ProjectionsService } from './projections.service';
 
-@Controller('api/v1/projections')
+@Controller('projections')
 @UseGuards(JwtAuthGuard)
 export class ProjectionsController {
   constructor(private readonly projections: ProjectionsService) {}

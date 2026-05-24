@@ -17,7 +17,7 @@ interface MarkPaidBody {
   paidAmountEur?: number;
 }
 
-@Controller('api/v1/cash-flow')
+@Controller('cash-flow')
 export class CashFlowController {
   constructor(private readonly cashFlowService: CashFlowService) {}
 

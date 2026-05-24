@@ -14,7 +14,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { WebhooksService, CreateEndpointDto } from './webhooks.service';
 
 @UseGuards(JwtAuthGuard)
-@Controller('api/v1/webhooks')
+@Controller('webhooks')
 export class WebhooksController {
   constructor(private readonly webhooks: WebhooksService) {}
 

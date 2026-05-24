@@ -3,7 +3,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { BenchmarkReportService } from './benchmark-report.service';
 import { ROICalculatorService, ROIInput } from './roi-calculator.service';
 
-@Controller('api/v1/category-intelligence')
+@Controller('category-intelligence')
 @UseGuards(JwtAuthGuard)
 export class CategoryIntelligenceController {
   constructor(

@@ -3,7 +3,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { WorkflowEngineService } from './workflow-engine.service';
 import { LearningLoopService } from './learning-loop.service';
 
-@Controller('api/v1/workflows')
+@Controller('workflows')
 @UseGuards(JwtAuthGuard)
 export class WorkflowsController {
   constructor(

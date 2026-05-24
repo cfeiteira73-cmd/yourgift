@@ -52,7 +52,7 @@ class UpdateRoutingDto {
 @ApiTags('globalization')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-@Controller('api/v1/globalization')
+@Controller('globalization')
 export class GlobalizationController {
   constructor(
     private readonly currencyService: CurrencyService,

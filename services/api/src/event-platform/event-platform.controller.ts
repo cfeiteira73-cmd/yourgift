@@ -13,7 +13,7 @@ import { DLQService, FailureCategory } from './dlq.service';
 import { EventReplayService } from './event-replay.service';
 import { EventConsumerService } from './event-consumer.service';
 
-@Controller('api/v1/event-platform')
+@Controller('event-platform')
 @UseGuards(JwtAuthGuard)
 export class EventPlatformController {
   constructor(

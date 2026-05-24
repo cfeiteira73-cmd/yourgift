@@ -12,7 +12,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AutomationService } from './automation.service';
 import { RoutingService, RoutingCriteria } from './routing.service';
 
-@Controller('api/v1/automation')
+@Controller('automation')
 @UseGuards(JwtAuthGuard)
 export class AutomationController {
   constructor(

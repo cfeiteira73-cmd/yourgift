@@ -2,7 +2,7 @@ import { Controller, Post, Get, Body, Headers, Logger, UseGuards } from '@nestjs
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { HiBobService } from './hibob.service';
 
-@Controller('api/v1/hibob')
+@Controller('hibob')
 export class HiBobController {
   private readonly logger = new Logger(HiBobController.name);
 

@@ -4,7 +4,7 @@ import { AIDesignService } from './ai-design.service';
 import { BrandTemplateService } from './brand-template.service';
 import { ZeroFrictionService } from './zero-friction.service';
 
-@Controller('api/v1/design')
+@Controller('design')
 @UseGuards(JwtAuthGuard)
 export class AIDesignController {
   constructor(

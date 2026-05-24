@@ -4,7 +4,7 @@ import { CustomerSuccessService } from './customer-success.service';
 import { ExpansionService } from './expansion.service';
 import { InventoryForecastService } from './inventory-forecast.service';
 
-@Controller('api/v1/customer-success')
+@Controller('customer-success')
 @UseGuards(JwtAuthGuard)
 export class CustomerSuccessController {
   constructor(

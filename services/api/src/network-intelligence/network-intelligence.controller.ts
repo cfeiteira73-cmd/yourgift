@@ -3,7 +3,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { NetworkLearningService, LearningEventParams } from './network-learning.service';
 import { GlobalIntelligenceService } from './global-intelligence.service';
 
-@Controller('api/v1/network-intelligence')
+@Controller('network-intelligence')
 @UseGuards(JwtAuthGuard)
 export class NetworkIntelligenceController {
   constructor(

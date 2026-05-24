@@ -4,7 +4,7 @@ import { GovernanceService, DecisionContext } from './governance.service';
 import { TrustEngineService } from './trust-engine.service';
 import { DecisionTraceService } from './decision-trace.service';
 
-@Controller('api/v1/governance')
+@Controller('governance')
 @UseGuards(JwtAuthGuard)
 export class GovernanceController {
   constructor(

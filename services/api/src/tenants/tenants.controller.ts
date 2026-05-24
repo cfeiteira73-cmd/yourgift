@@ -2,7 +2,7 @@ import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards } f
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { TenantsService, TenantPlan, TenantRole } from './tenants.service';
 
-@Controller('api/v1/tenants')
+@Controller('tenants')
 @UseGuards(JwtAuthGuard)
 export class TenantsController {
   constructor(private readonly tenants: TenantsService) {}
