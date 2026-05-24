@@ -42,6 +42,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.7,
     },
+    // Enterprise features (public landing)
+    {
+      url: `${BASE_URL}/enterprise`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.85,
+    },
     {
       url: `${BASE_URL}/auth/login`,
       lastModified: now,

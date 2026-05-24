@@ -1,5 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
+import Redis from 'ioredis';
 
 /**
  * ROIReportService — Enterprise Commercial Engine
@@ -74,8 +76,25 @@ export interface ROIReportData {
 @Injectable()
 export class ROIReportService {
   private readonly logger = new Logger(ROIReportService.name);
+  private readonly redis: Redis | null;
+  private readonly REPORT_TTL_SECONDS = 60 * 60 * 24 * 30; // 30 days
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService,
+  ) {
+    const redisUrl = this.config.get<string>('UPSTASH_REDIS_URL') ?? this.config.get<string>('REDIS_URL');
+    if (redisUrl) {
+      try {
+        this.redis = new Redis(redisUrl, { maxRetriesPerRequest: 2, lazyConnect: true, tls: redisUrl.startsWith('rediss://') ? {} : undefined });
+        this.redis.on('error', (err: Error) => this.logger.warn(`ROI Redis: ${err.message}`));
+      } catch {
+        this.redis = null;
+      }
+    } else {
+      this.redis = null;
+    }
+  }
 
   /**
    * Generate a full ROI report for a tenant and period.
@@ -147,6 +166,14 @@ export class ROIReportService {
       `ROI report: spend=€${report.totalSpendEur} savings=€${totalSavingsEur} ` +
       `ROI=${roiPct.toFixed(0)}% orders=${orders.count}`,
     );
+
+    // Persist to Redis for share-token retrieval (30-day TTL)
+    if (this.redis && shareToken) {
+      const key = `{yourgift}:roi:report:${shareToken}`;
+      this.redis.set(key, JSON.stringify(report), 'EX', this.REPORT_TTL_SECONDS).catch((err: Error) => {
+        this.logger.warn(`Failed to cache ROI report: ${err.message}`);
+      });
+    }
 
     return report;
   }
@@ -240,17 +267,27 @@ export class ROIReportService {
 
   /**
    * Retrieve a previously generated report by share token.
-   * In production, tokens should be stored in DB with expiry.
-   * For now, returns a descriptive response (token is embedded in the report URL).
+   * Reports are stored in Redis for 30 days after generation.
    */
-  async getByShareToken(shareToken: string): Promise<{ shareToken: string; message: string }> {
-    // TODO: Store generated reports in cache/DB indexed by shareToken
-    // and retrieve them here. For now return a structured response.
+  async getByShareToken(shareToken: string): Promise<ROIReportData | { shareToken: string; message: string }> {
     this.logger.log(`Share token lookup: ${shareToken}`);
-    return {
-      shareToken,
-      message: 'Report retrieval requires DB persistence — integrate with report cache store',
-    };
+
+    if (!this.redis) {
+      return { shareToken, message: 'Report cache unavailable — configure UPSTASH_REDIS_URL' };
+    }
+
+    try {
+      const key = `{yourgift}:roi:report:${shareToken}`;
+      const cached = await this.redis.get(key);
+      if (!cached) {
+        return { shareToken, message: 'Report not found or expired (30-day retention)' };
+      }
+      return JSON.parse(cached) as ROIReportData;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Cache error';
+      this.logger.error(`Share token retrieval failed: ${msg}`);
+      return { shareToken, message: 'Report temporarily unavailable' };
+    }
   }
 }
 

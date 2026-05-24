@@ -26,8 +26,20 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const betterStackKey = process.env.NEXT_PUBLIC_BETTERSTACK_KEY;
+
   return (
     <html lang="pt">
+      <head>
+        {/* BetterStack Uptime — real user monitoring */}
+        {betterStackKey && (
+          <script
+            src="https://cdn.betterstack.com/rum/v1/index.js"
+            data-key={betterStackKey}
+            async
+          />
+        )}
+      </head>
       <body className={inter.className}>
         <Header />
         <main>{children}</main>
