@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaModule } from '../prisma/prisma.module';
+import { AuthModule } from '../auth/auth.module';
 import { SSOConfigService } from './sso-config.service';
 import { OIDCService } from './oidc.service';
 import { SCIMService } from './scim.service';
@@ -37,6 +38,7 @@ import { EnterpriseIdentityController } from './enterprise-identity.controller';
   imports: [
     ConfigModule,
     PrismaModule,
+    AuthModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({

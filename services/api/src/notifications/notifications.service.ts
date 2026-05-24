@@ -351,6 +351,74 @@ export class NotificationsService implements OnModuleInit {
     }
   }
 
+  // ── Public: direct send (for queue workers + SSO) ────────────────────────
+
+  /**
+   * Send an arbitrary HTML email directly.
+   * Used by EmailWorker and any code that builds its own HTML.
+   */
+  async sendDirect(to: string | string[], subject: string, html: string): Promise<void> {
+    const recipient = Array.isArray(to) ? to[0] : to;
+    if (!recipient) return;
+    try {
+      await this.send(recipient, subject, html);
+    } catch (err) {
+      this.logger.error('sendDirect failed', err);
+    }
+  }
+
+  /**
+   * Send an email from a named template + variables map.
+   * Generates branded HTML using the existing emailWrapper helper.
+   * Called by EmailWorker when processing queued email jobs.
+   */
+  async sendFromTemplate(
+    to: string | string[],
+    subject: string,
+    template: string,
+    variables: Record<string, unknown>,
+    from?: string,
+  ): Promise<void> {
+    const recipient = Array.isArray(to) ? to[0] : to;
+    if (!recipient) return;
+
+    // Build branded body from template + variables
+    const rows = Object.entries(variables)
+      .map(([k, v]) => `<tr><td style="padding:4px 0;color:#64748b;font-size:13px;">${k}</td><td style="padding:4px 0;font-size:13px;font-weight:500;">${String(v)}</td></tr>`)
+      .join('');
+
+    const body =
+      h1(subject) +
+      p(`Olá, este é um email automático do tipo <strong>${template}</strong>.`) +
+      (rows
+        ? `<table width="100%" cellpadding="6" style="border-collapse:collapse;margin:16px 0;">${rows}</table>`
+        : '') +
+      p('Para questões contacte <a href="mailto:ops@yourgift.pt" style="color:' + this.accent + ';">ops@yourgift.pt</a>.');
+
+    const html = emailWrapper(this.accent, body);
+
+    try {
+      if (from) {
+        // Custom from: call Resend directly rather than mutating the readonly field
+        const apiKey = this.config.get<string>('RESEND_API_KEY');
+        if (!apiKey) { this.logger.warn('RESEND_API_KEY not set — email skipped'); return; }
+        const res = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ from, to: recipient, subject, html }),
+        });
+        if (!res.ok) {
+          const text = await res.text().catch(() => '');
+          this.logger.error(`Resend error ${res.status}: ${text}`);
+        }
+      } else {
+        await this.send(recipient, subject, html);
+      }
+    } catch (err) {
+      this.logger.error('sendFromTemplate failed', err);
+    }
+  }
+
   // ── Legacy generic method (kept for backward-compat) ──────────────────────
 
   async sendNotification(dto: SendNotificationDto): Promise<{ queued: boolean }> {

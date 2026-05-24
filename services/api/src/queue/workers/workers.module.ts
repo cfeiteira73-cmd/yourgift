@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { EmailWorker } from './email.worker';
 import { PdfWorker } from './pdf.worker';
 import { SupplierSyncWorker } from './supplier-sync.worker';
 import { FinancialWorker } from './financial.worker';
+import { NotificationsModule } from '../../notifications/notifications.module';
 
 /**
  * WorkersModule
@@ -16,6 +18,7 @@ import { FinancialWorker } from './financial.worker';
  *  - Uses prefix '{yourgift}' to stay isolated on shared Redis
  */
 @Module({
+  imports: [ConfigModule, NotificationsModule],
   providers: [
     EmailWorker,
     PdfWorker,

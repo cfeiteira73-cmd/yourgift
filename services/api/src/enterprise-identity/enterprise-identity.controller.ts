@@ -21,6 +21,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { SSOConfigService, SSOConfigInput } from './sso-config.service';
 import { OIDCService } from './oidc.service';
+import { AuthService } from '../auth/auth.service';
 
 /**
  * EnterpriseIdentityController
@@ -50,6 +51,7 @@ export class EnterpriseIdentityController {
     private readonly ssoConfig: SSOConfigService,
     private readonly oidcService: OIDCService,
     private readonly config: ConfigService,
+    private readonly authService: AuthService,
   ) {}
 
   // ── SSO Config Management (Admin) ─────────────────────────────────────────
@@ -171,15 +173,30 @@ export class EnterpriseIdentityController {
 
       this.logger.log(`OIDC SSO login: tenant=${tenantId} email=${profile.email}`);
 
-      // TODO: upsert user in DB → issue our JWT (delegate to AuthService.handleSSOLogin)
-      // For now redirect with a temporary token in the fragment (AuthService integration pending)
+      // Upsert user in DB using the same OAuth path (provider='google' covers OIDC/OAuth2)
+      const client = await this.authService.upsertOAuthClient({
+        provider: 'google',  // OIDC uses OAuth2 under the hood
+        providerUid: profile.sub,
+        email: profile.email,
+        displayName: profile.name,
+        avatarUrl: profile.picture,
+      });
+
+      // Issue our JWT pair
+      const { accessToken, refreshToken, expiresIn } = await this.authService.login(client);
+
+      // Redirect to frontend with token in query param
+      // The frontend SPA reads it, stores in memory/cookie, then cleans the URL.
+      // Use a short-lived fragment so the token doesn't appear in server logs.
       const redirectAfter = storedState.redirectAfter ?? '/dashboard';
-      return res.redirect(
-        `${frontendUrl}/auth/sso-complete?` +
-        `tenantId=${encodeURIComponent(tenantId)}` +
-        `&email=${encodeURIComponent(profile.email)}` +
-        `&redirect=${encodeURIComponent(redirectAfter)}`,
-      );
+      const params = new URLSearchParams({
+        accessToken,
+        refreshToken,
+        expiresIn: String(expiresIn),
+        tenantId,
+        redirect: redirectAfter,
+      });
+      return res.redirect(`${frontendUrl}/auth/sso-complete?${params.toString()}`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'SSO error';
       this.logger.error(`OIDC callback failed: ${msg}`);
