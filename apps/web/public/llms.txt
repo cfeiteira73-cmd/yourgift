@@ -1,0 +1,104 @@
+# YourGift OS — B2B Procurement Infrastructure
+
+> YourGift OS is enterprise procurement infrastructure for B2B companies in Portugal and Spain.
+> It handles the full procurement lifecycle: quote → approval → order → production → delivery → invoice.
+
+## What YourGift OS does
+
+YourGift OS replaces manual B2B procurement with a structured platform that:
+
+- Accepts RFQs (Request for Quotation) from corporate buyers
+- Generates AI-assisted supplier quotes with pricing, lead times and landed cost
+- Routes approvals through configurable budget hierarchies
+- Manages branded merchandise orders with artwork proofing
+- Tracks production stages and shipping in real time
+- Issues invoices, tracks payments and generates ROI reports for CFOs
+
+## Who uses it
+
+- **Corporate Procurement Teams** — HR, Marketing, Operations buyers at mid-to-large companies
+- **Procurement Managers** — who need budget visibility, supplier performance and compliance reporting
+- **CFOs / Finance** — who need spend consolidation, savings tracking and audit trails
+- **Employees** — who access curated company stores to order branded merchandise within policy
+
+## Core capabilities
+
+### Procurement
+- Multi-supplier RFQ with automated comparison tables
+- AI-powered quote analysis and recommendation engine
+- Budget hierarchy: individual → team → department → company limits
+- Approval workflows with escalation and delegation
+- PO generation, order confirmation, supplier communication
+
+### Suppliers
+- Midocean and PF Concept catalog integration (50,000+ products)
+- Real-time stock sync and availability checking
+- Carrier integrations: DHL, DPD, GLS, UPS, FedEx
+- Landed cost calculation (product + shipping + customs + duties)
+- Supplier performance scoring and reliability metrics
+
+### Finance
+- Double-entry ledger for all procurement transactions
+- Stripe payment processing with fraud detection (Radar)
+- Invoice lifecycle management (draft → sent → paid → reconciled)
+- Multi-currency support with live FX rates
+- Period-based financial aggregation with CFO-ready PDF reports
+
+### AI & Intelligence
+- Procurement decision engine with predicted vs actual tracking
+- AI brief parsing to extract product specs from natural language
+- Benchmark reports: compare your pricing vs market rates
+- Spend pattern analysis and savings opportunity identification
+
+### Enterprise Identity
+- JWT-based authentication with refresh token rotation
+- Google OAuth for SSO
+- Role-based access: admin, manager, buyer, viewer
+- Multi-tenant isolation (each company is a separate tenant)
+- SAML / Okta / Azure AD integration (in progress)
+
+### Operations
+- 16-queue BullMQ job system backed by Redis (Upstash)
+- Dead Letter Queue with manual replay for failed jobs
+- Sentry error tracking with distributed tracing
+- Structured JSON logging with correlation IDs
+- Health checks at /api/v1/health
+
+## API
+
+Base URL: https://yourgift-api.onrender.com/api/v1
+Docs (non-production): /docs (Swagger UI)
+
+Authentication: Bearer JWT token in Authorization header
+All responses: { success: boolean, data: T, meta: { requestId, ts } }
+
+Key endpoints:
+- POST /auth/login — authenticate with email/password
+- POST /auth/google — Google OAuth
+- GET  /products — browse catalog
+- POST /quotes — create RFQ
+- GET  /quotes/:id — get quote with pricing breakdown
+- POST /orders — place order
+- GET  /orders/:id — track order status
+- GET  /analytics/spend — spend dashboard data
+- GET  /admin/queues — queue health (admin only)
+
+## Technology stack
+
+- **API**: NestJS 10, TypeScript, Prisma ORM, PostgreSQL (Supabase)
+- **Web**: Next.js 14 App Router, TypeScript, Tailwind CSS
+- **Admin**: Next.js 14, enterprise dashboard
+- **Queue**: BullMQ + Redis (Upstash), 16 named queues
+- **Payments**: Stripe (checkout, webhooks, Radar fraud)
+- **Email**: Resend
+- **Storage**: AWS S3 + CloudFront
+- **Observability**: Sentry, structured JSON logs
+- **Hosting**: Render (API), Vercel (web + admin)
+- **CI/CD**: GitHub Actions, pnpm workspaces, Turborepo
+
+## Contact & Links
+
+- Website: https://www.yourgift.pt
+- API: https://yourgift-api.onrender.com
+- Admin: https://admin.yourgift.pt
+- GitHub: https://github.com/cfeiteira73-cmd/yourgift
