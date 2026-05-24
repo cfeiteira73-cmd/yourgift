@@ -68,6 +68,7 @@ import { FailsafeModule } from './failsafe/failsafe.module';
 import { QueueModule } from './queue/queue.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { TenantGuard } from './common/guards/tenant.guard';
 
 @Module({
   imports: [
@@ -152,6 +153,7 @@ import { APP_GUARD } from '@nestjs/core';
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: TenantGuard },
   ],
 })
 export class AppModule {}
