@@ -15,6 +15,7 @@ import { DecisionEngineService, AlternativeAction } from './decision-engine.serv
 import { ProcurementSimulatorService, SimulationInput } from './procurement-simulator.service';
 import { DecisionCorrectnessService } from './decision-correctness.service';
 import { WhatIfEngineService, WhatIfInput } from './what-if-engine.service';
+import { ProcurementDecisionCardService, DecisionCardInput } from './procurement-decision-card.service';
 
 @Controller('decision-engine')
 @UseGuards(JwtAuthGuard)
@@ -24,7 +25,27 @@ export class DecisionEngineController {
     private readonly simulator: ProcurementSimulatorService,
     private readonly correctnessService: DecisionCorrectnessService,
     private readonly whatIfService: WhatIfEngineService,
+    private readonly decisionCard: ProcurementDecisionCardService,
   ) {}
+
+  // ── Procurement Decision Card ─────────────────────────────────────────────
+
+  /**
+   * POST /decision-engine/card
+   *
+   * One-screen, full-context procurement decision card.
+   * Aggregates landed cost + supplier trust + budget + delivery + risk
+   * into a single card with APPROVE / APPROVE_WITH_CONDITIONS / REJECT action.
+   *
+   * Frontend makes a single call to this endpoint to render the decision UI.
+   * Target: decision in <30 seconds.
+   */
+  @Post('card')
+  generateCard(@Body() body: DecisionCardInput) {
+    return this.decisionCard.generate(body);
+  }
+
+  // ── Simulation ────────────────────────────────────────────────────────────
 
   // POST /simulate
   @Post('simulate')
