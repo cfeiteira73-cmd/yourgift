@@ -64,6 +64,7 @@ import { CashFlowModule } from './cash-flow/cash-flow.module';
 import { BudgetLedgerModule } from './budget-ledger/budget-ledger.module';
 import { PolicyExecutionModule } from './policy-execution/policy-execution.module';
 import { ProcurementWorkflowModule } from './procurement-workflow/procurement-workflow.module';
+import { FailsafeModule } from './failsafe/failsafe.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -145,6 +146,7 @@ import { APP_GUARD } from '@nestjs/core';
     BudgetLedgerModule,
     PolicyExecutionModule,
     ProcurementWorkflowModule,
+    FailsafeModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

@@ -13,6 +13,7 @@ import { AuthRiskService } from './auth-risk.service';
 import { SessionAuthorityService } from './session-authority.service';
 import { IdentityGraphService } from './identity-graph.service';
 import { IdentityGraphController } from './identity-graph.controller';
+import { DelegationValidatorService } from './delegation/delegation-validator.service';
 
 @Module({
   imports: [
@@ -36,8 +37,9 @@ import { IdentityGraphController } from './identity-graph.controller';
     AuthRiskService,
     SessionAuthorityService,
     IdentityGraphService,
+    DelegationValidatorService,
   ],
   controllers: [AuthController, IdentityGraphController],
-  exports: [AuthService, IdentityResolverService, AuthRiskService, SessionAuthorityService, IdentityGraphService],
+  exports: [AuthService, IdentityResolverService, AuthRiskService, SessionAuthorityService, IdentityGraphService, DelegationValidatorService],
 })
 export class AuthModule {}
