@@ -362,6 +362,38 @@ const SECONDARY_ITEMS: NavItem[] = [
     ),
   },
   {
+    href: '/payments',
+    label: 'Payments',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="1" y="3" width="14" height="10" rx="2" />
+        <path d="M1 6h14" />
+        <path d="M4 10h3M11 10h1" />
+      </svg>
+    ),
+  },
+  {
+    href: '/notifications',
+    label: 'Notifications',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 2a5 5 0 0 1 5 5v2.5l1 2H2l1-2V7a5 5 0 0 1 5-5z" />
+        <path d="M6.5 12.5a1.5 1.5 0 0 0 3 0" />
+      </svg>
+    ),
+  },
+  {
+    href: '/identity',
+    label: 'SSO / SCIM',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="8" cy="5" r="3" />
+        <path d="M2 14a6 6 0 0 1 12 0" />
+        <path d="M11 8l2 2-2 2" />
+      </svg>
+    ),
+  },
+  {
     href: '/suppliers',
     label: 'Fornecedores',
     icon: (
