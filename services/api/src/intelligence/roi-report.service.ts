@@ -237,6 +237,21 @@ export class ROIReportService {
     const payload = Buffer.from(`${reportId}:${tenantId}:${Date.now()}`).toString('base64url');
     return payload.substring(0, 32);
   }
+
+  /**
+   * Retrieve a previously generated report by share token.
+   * In production, tokens should be stored in DB with expiry.
+   * For now, returns a descriptive response (token is embedded in the report URL).
+   */
+  async getByShareToken(shareToken: string): Promise<{ shareToken: string; message: string }> {
+    // TODO: Store generated reports in cache/DB indexed by shareToken
+    // and retrieve them here. For now return a structured response.
+    this.logger.log(`Share token lookup: ${shareToken}`);
+    return {
+      shareToken,
+      message: 'Report retrieval requires DB persistence — integrate with report cache store',
+    };
+  }
 }
 
 // ── Defaults for when DB tables don't yet exist ────────────────────────────
