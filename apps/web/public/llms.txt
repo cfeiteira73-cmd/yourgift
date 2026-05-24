@@ -52,10 +52,12 @@ YourGift OS replaces manual B2B procurement with a structured platform that:
 
 ### Enterprise Identity
 - JWT-based authentication with refresh token rotation
-- Google OAuth for SSO
+- Google OAuth + OIDC SSO (Okta, Azure AD, Google Workspace, Auth0)
+- SCIM 2.0 automated provisioning (RFC 7643/7644) — Okta + Azure AD compatible
+- SAML 2.0 scaffold (passport-saml integration pending)
 - Role-based access: admin, manager, buyer, viewer
-- Multi-tenant isolation (each company is a separate tenant)
-- SAML / Okta / Azure AD integration (in progress)
+- Multi-tenant isolation with per-tenant rate limiting
+- Per-tenant SSO configuration with email domain routing
 
 ### Operations
 - 16-queue BullMQ job system backed by Redis (Upstash)
@@ -73,15 +75,21 @@ Authentication: Bearer JWT token in Authorization header
 All responses: { success: boolean, data: T, meta: { requestId, ts } }
 
 Key endpoints:
-- POST /auth/login — authenticate with email/password
-- POST /auth/google — Google OAuth
-- GET  /products — browse catalog
-- POST /quotes — create RFQ
-- GET  /quotes/:id — get quote with pricing breakdown
-- POST /orders — place order
-- GET  /orders/:id — track order status
-- GET  /analytics/spend — spend dashboard data
-- GET  /admin/queues — queue health (admin only)
+- POST /auth/login                                    — email/password auth
+- POST /auth/google                                   — Google OAuth
+- GET  /enterprise-identity/oidc/:tenantId/login      — initiate OIDC SSO
+- GET  /scim/v2/tenants/:tenantId/Users               — SCIM user provisioning
+- GET  /products                                      — browse catalog
+- POST /quotes                                        — create RFQ
+- GET  /quotes/:id                                    — quote with pricing breakdown
+- POST /logistics/landed-cost                         — calculate landed cost
+- POST /decision-engine/card                          — procurement decision card
+- POST /orders                                        — place order
+- GET  /orders/:id                                    — track order status
+- GET  /analytics/spend                               — spend dashboard data
+- GET  /intelligence/suppliers/:id/trust              — supplier trust score
+- POST /intelligence/roi                              — generate CFO ROI report
+- GET  /admin/queues                                  — queue health (admin only)
 
 ## Technology stack
 
