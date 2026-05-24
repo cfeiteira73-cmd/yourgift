@@ -66,6 +66,7 @@ import { PolicyExecutionModule } from './policy-execution/policy-execution.modul
 import { ProcurementWorkflowModule } from './procurement-workflow/procurement-workflow.module';
 import { FailsafeModule } from './failsafe/failsafe.module';
 import { QueueModule } from './queue/queue.module';
+import { EnterpriseIdentityModule } from './enterprise-identity/enterprise-identity.module';
 import { APP_GUARD } from '@nestjs/core';
 import { TenantGuard } from './common/guards/tenant.guard';
 import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard';
@@ -150,6 +151,7 @@ import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard'
     ProcurementWorkflowModule,
     FailsafeModule,
     QueueModule,
+    EnterpriseIdentityModule,
   ],
   providers: [
     // Rate limiting — per tenant (not per IP) for authenticated requests
