@@ -2112,6 +2112,33 @@ model SupplierGlobalScore {
   @@map("supplier_global_scores")
 }
 
+// ─────────────────────────────────────────────
+// NOTIFICATION LOGS (email audit trail)
+// ─────────────────────────────────────────────
+
+model NotificationLog {
+  id           String    @id @default(uuid())
+  to           String                         // recipient email
+  subject      String
+  template     String?                        // template name (welcome, order_confirmed, etc.)
+  status       String    @default("sent")     // sent | failed | skipped
+  provider     String    @default("resend")   // resend | smtp | mock
+  messageId    String?   @map("message_id")   // Resend message ID for tracking
+  errorMessage String?   @map("error_message")
+  tenantId     String?   @map("tenant_id")
+  referenceId  String?   @map("reference_id") // orderId, quoteId, etc.
+  referenceType String?  @map("reference_type")
+  sentAt       DateTime  @default(now()) @map("sent_at")
+  // APPEND-ONLY: no updatedAt, no soft delete — audit trail
+
+  @@index([to])
+  @@index([status])
+  @@index([template])
+  @@index([tenantId])
+  @@index([sentAt(sort: Desc)])
+  @@map("notification_logs")
+}
+
 model RouteIntelligence {
   id                         String   @id @default(cuid())
   originCountry              String

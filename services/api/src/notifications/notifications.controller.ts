@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Query,
   UseGuards,
   Request,
   ForbiddenException,
@@ -11,6 +12,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IsString, IsOptional, IsObject } from 'class-validator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { NotificationsService } from './notifications.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 // ─── DTO ──────────────────────────────────────────────────────────────────────
 
@@ -44,7 +46,10 @@ interface AuthRequest extends Request {
 @UseGuards(JwtAuthGuard)
 @Controller('notifications')
 export class NotificationsController {
-  constructor(private readonly notifications: NotificationsService) {}
+  constructor(
+    private readonly notifications: NotificationsService,
+    private readonly prisma: PrismaService,
+  ) {}
 
   // ── POST /notifications/send ──────────────────────────────────────────────
 
@@ -61,35 +66,77 @@ export class NotificationsController {
 
   @Get('stats')
   @ApiOperation({ summary: 'Admin: notification delivery statistics' })
-  getStats(@Request() req: AuthRequest) {
+  async getStats(@Request() req: AuthRequest) {
     if (req.user.role !== 'admin') {
       throw new ForbiddenException('Admin role required');
     }
-    // Stats are maintained in-memory in the service
-    // In production these would come from a notification_logs table
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    const [sentToday, sentThisMonth, failedToday, byTemplate] = await Promise.all([
+      this.prisma.notificationLog.count({ where: { status: 'sent', sentAt: { gte: today } } }),
+      this.prisma.notificationLog.count({ where: { status: 'sent', sentAt: { gte: monthStart } } }),
+      this.prisma.notificationLog.count({ where: { status: 'failed', sentAt: { gte: today } } }),
+      this.prisma.notificationLog.groupBy({
+        by: ['template'],
+        where: { template: { not: null } },
+        _count: { template: true },
+        orderBy: { _count: { template: 'desc' } },
+        take: 10,
+      }),
+    ]);
+
     return {
-      sentToday: 0,
-      sentThisMonth: 0,
-      failedToday: 0,
-      templates: [
-        { name: 'order_created', count: 0 },
-        { name: 'order_paid', count: 0 },
-        { name: 'order_shipped', count: 0 },
-        { name: 'order_delivered', count: 0 },
-      ],
+      sentToday,
+      sentThisMonth,
+      failedToday,
+      templates: byTemplate.map((r) => ({ name: r.template, count: r._count.template })),
     };
   }
 
   // ── GET /notifications/logs ────────────────────────────────────────────────
 
   @Get('logs')
-  @ApiOperation({ summary: 'Admin: notification audit logs' })
-  getLogs(@Request() req: AuthRequest) {
+  @ApiOperation({ summary: 'Admin: notification audit logs (paginated)' })
+  async getLogs(
+    @Request() req: AuthRequest,
+    @Query('status') status?: string,
+    @Query('page') page?: string,
+  ) {
     if (req.user.role !== 'admin') {
       throw new ForbiddenException('Admin role required');
     }
-    // Returns empty array until notification_logs table is added to schema
-    // Logs are currently emitted to BetterStack via structured logging
-    return [];
+
+    const take = 50;
+    const skip = Math.max(0, (parseInt(page ?? '1', 10) - 1)) * take;
+
+    const where = status && status !== 'all' ? { status } : {};
+
+    const [logs, total] = await Promise.all([
+      this.prisma.notificationLog.findMany({
+        where,
+        orderBy: { sentAt: 'desc' },
+        take,
+        skip,
+        select: {
+          id: true,
+          to: true,
+          subject: true,
+          template: true,
+          status: true,
+          messageId: true,
+          errorMessage: true,
+          tenantId: true,
+          referenceId: true,
+          referenceType: true,
+          sentAt: true,
+        },
+      }),
+      this.prisma.notificationLog.count({ where }),
+    ]);
+
+    return { logs, total, page: parseInt(page ?? '1', 10), pageSize: take };
   }
 }

@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EventBusService } from '../events/event-bus.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 // ── Order shape expected from event bus ───────────────────────────────────────
 
@@ -154,6 +155,7 @@ export class NotificationsService implements OnModuleInit {
   constructor(
     private readonly config: ConfigService,
     private readonly events: EventBusService,
+    private readonly prisma: PrismaService,
   ) {}
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
@@ -184,13 +186,21 @@ export class NotificationsService implements OnModuleInit {
 
   // ── Core send via Resend REST API ──────────────────────────────────────────
 
-  private async send(to: string, subject: string, html: string): Promise<void> {
+  private async send(
+    to: string,
+    subject: string,
+    html: string,
+    opts?: { template?: string; from?: string; tenantId?: string; referenceId?: string; referenceType?: string },
+  ): Promise<void> {
     const apiKey = this.config.get<string>('RESEND_API_KEY');
 
     if (!apiKey) {
       this.logger.warn('RESEND_API_KEY not set — email skipped');
+      await this.logNotification({ to, subject, template: opts?.template, status: 'skipped', tenantId: opts?.tenantId, referenceId: opts?.referenceId, referenceType: opts?.referenceType });
       return;
     }
+
+    const fromAddr = opts?.from ?? this.from;
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -198,15 +208,50 @@ export class NotificationsService implements OnModuleInit {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ from: this.from, to, subject, html }),
+      body: JSON.stringify({ from: fromAddr, to, subject, html }),
     });
 
     if (!res.ok) {
       const text = await res.text().catch(() => '');
       this.logger.error(`Resend error ${res.status}: ${text}`);
+      await this.logNotification({ to, subject, template: opts?.template, status: 'failed', errorMessage: `${res.status}: ${text}`, tenantId: opts?.tenantId, referenceId: opts?.referenceId, referenceType: opts?.referenceType });
     } else {
       const data = (await res.json()) as { id?: string };
       this.logger.log(`Email sent → ${to} | id=${data.id ?? 'unknown'}`);
+      await this.logNotification({ to, subject, template: opts?.template, status: 'sent', messageId: data.id, tenantId: opts?.tenantId, referenceId: opts?.referenceId, referenceType: opts?.referenceType });
+    }
+  }
+
+  // ── Audit log ──────────────────────────────────────────────────────────────
+
+  private async logNotification(entry: {
+    to: string;
+    subject: string;
+    template?: string;
+    status: string;
+    messageId?: string;
+    errorMessage?: string;
+    tenantId?: string;
+    referenceId?: string;
+    referenceType?: string;
+  }): Promise<void> {
+    try {
+      await this.prisma.notificationLog.create({
+        data: {
+          to: entry.to,
+          subject: entry.subject,
+          template: entry.template ?? null,
+          status: entry.status,
+          messageId: entry.messageId ?? null,
+          errorMessage: entry.errorMessage ?? null,
+          tenantId: entry.tenantId ?? null,
+          referenceId: entry.referenceId ?? null,
+          referenceType: entry.referenceType ?? null,
+        },
+      });
+    } catch (err) {
+      // Non-critical — never block email delivery due to log write failure
+      this.logger.warn('Failed to write notification log', err);
     }
   }
 
@@ -398,22 +443,7 @@ export class NotificationsService implements OnModuleInit {
     const html = emailWrapper(this.accent, body);
 
     try {
-      if (from) {
-        // Custom from: call Resend directly rather than mutating the readonly field
-        const apiKey = this.config.get<string>('RESEND_API_KEY');
-        if (!apiKey) { this.logger.warn('RESEND_API_KEY not set — email skipped'); return; }
-        const res = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ from, to: recipient, subject, html }),
-        });
-        if (!res.ok) {
-          const text = await res.text().catch(() => '');
-          this.logger.error(`Resend error ${res.status}: ${text}`);
-        }
-      } else {
-        await this.send(recipient, subject, html);
-      }
+      await this.send(recipient, subject, html, { template, from });
     } catch (err) {
       this.logger.error('sendFromTemplate failed', err);
     }

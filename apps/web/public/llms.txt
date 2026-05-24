@@ -77,32 +77,58 @@ All responses: { success: boolean, data: T, meta: { requestId, ts } }
 Key endpoints:
 - POST /auth/login                                    — email/password auth
 - POST /auth/google                                   — Google OAuth
-- GET  /enterprise-identity/oidc/:tenantId/login      — initiate OIDC SSO
-- GET  /scim/v2/tenants/:tenantId/Users               — SCIM user provisioning
-- GET  /products                                      — browse catalog
+- GET  /enterprise-identity/oidc/:tenantId/login      — initiate OIDC SSO (Okta, Azure AD, Google)
+- GET  /enterprise-identity/oidc/:tenantId/callback   — OIDC callback → issues JWT pair
+- POST /enterprise-identity/sso/:tenantId/config      — configure IdP per tenant (admin)
+- GET  /scim/v2/ServiceProviderConfig                 — SCIM discovery (Okta/Azure AD compatible)
+- GET  /scim/v2/tenants/:tenantId/Users               — SCIM user provisioning (RFC 7643)
+- GET  /scim/v2/tenants/:tenantId/Groups              — SCIM group provisioning
+- GET  /products                                      — browse catalog (20,000+ products)
+- GET  /products/:id                                  — product detail with variants and images
 - POST /quotes                                        — create RFQ
-- GET  /quotes/:id                                    — quote with pricing breakdown
-- POST /logistics/landed-cost                         — calculate landed cost
-- POST /decision-engine/card                          — procurement decision card
+- GET  /quotes/:id                                    — quote with pricing breakdown and landed cost
+- POST /logistics/landed-cost                         — calculate landed cost (product + freight + duties + VAT)
+- POST /decision-engine/card                          — procurement decision card (APPROVE/REJECT/CONDITIONS)
 - POST /orders                                        — place order
-- GET  /orders/:id                                    — track order status
+- GET  /orders/:id                                    — track order status and production stage
+- GET  /orders/:id/invoice                            — download order invoice (HTML → print to PDF)
 - GET  /analytics/spend                               — spend dashboard data
-- GET  /intelligence/suppliers/:id/trust              — supplier trust score
-- POST /intelligence/roi                              — generate CFO ROI report
-- GET  /admin/queues                                  — queue health (admin only)
+- GET  /intelligence/suppliers/:id/trust              — supplier trust score (GOLD/SILVER/BRONZE/PROBATION)
+- POST /intelligence/suppliers/:id/actuals            — record actual vs predicted cost (accuracy tracking)
+- POST /intelligence/roi                              — generate CFO ROI report (shareable link)
+- GET  /intelligence/roi/:shareToken                  — retrieve ROI report by share token (public)
+- GET  /admin/queues                                  — BullMQ queue health — 16 queues (admin only)
+- GET  /admin/queues/dlq                              — dead letter queue items (admin only)
+- POST /admin/queues/dlq/:id/replay                   — replay failed job (admin only)
+- GET  /notifications/stats                           — email delivery statistics (admin only)
+- POST /payments/webhook                              — Stripe webhook endpoint (signature verified)
+- GET  /api/v1/health                                 — API health check (used by Render + BetterStack)
+
+## Enterprise features
+
+- **SSO**: OIDC (Okta, Azure AD, Google Workspace, Auth0) → issues JWT pair on callback
+- **SCIM 2.0**: Automated user/group provisioning, RFC 7643/7644, async DB write for speed
+- **SAML 2.0**: Scaffolded — requires `passport-saml` installation to activate
+- **Multi-tenant**: Complete data isolation per tenant, per-tenant rate limits at edge
+- **Budget hierarchy**: individual → team → department → company limits with escalation
+- **Audit trail**: every procurement event sourced, immutable log
+- **PDF generation**: self-contained print-ready HTML uploaded to S3 / CloudFront
+- **Email delivery**: Resend with branded templates, queued via BullMQ, DLQ on failure
 
 ## Technology stack
 
 - **API**: NestJS 10, TypeScript, Prisma ORM, PostgreSQL (Supabase)
 - **Web**: Next.js 14 App Router, TypeScript, Tailwind CSS
-- **Admin**: Next.js 14, enterprise dashboard
-- **Queue**: BullMQ + Redis (Upstash), 16 named queues
+- **Admin**: Next.js 14, enterprise dashboard (57 pages)
+- **Queue**: BullMQ + Redis (Upstash), 16 named queues, DLQ + replay
 - **Payments**: Stripe (checkout, webhooks, Radar fraud)
-- **Email**: Resend
-- **Storage**: AWS S3 + CloudFront
-- **Observability**: Sentry, structured JSON logs
-- **Hosting**: Render (API), Vercel (web + admin)
-- **CI/CD**: GitHub Actions, pnpm workspaces, Turborepo
+- **Email**: Resend, 6 branded transactional templates
+- **Storage**: AWS S3 + CloudFront CDN (eu-west-1, DR to eu-west-2)
+- **Observability**: Sentry, BetterStack (uptime + RUM), structured JSON logs
+- **Edge security**: Cloudflare Worker (SQLi blocking, rate limiting, security headers)
+- **Hosting**: Render (API + web, Frankfurt), Blueprint IaC in render.yaml
+- **CI/CD**: GitHub Actions (TypeScript check → Render deploy hooks)
+- **Monorepo**: pnpm workspaces, Turborepo, shared packages (@yourgift/shared, @yourgift/midocean)
 
 ## Contact & Links
 
