@@ -4,8 +4,13 @@ on:
   push:
     branches: [main, master]
 
+# Cancel in-flight runs for the same branch
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  # ── Type Check & Build ──────────────────────────────────────────────────────
+  # ── Type Check & Build verification ──────────────────────────────────────────
   ci:
     name: CI — Type Check & Build
     runs-on: ubuntu-latest
@@ -22,95 +27,103 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Build shared package
         run: pnpm --filter @yourgift/shared run build
+
+      - name: Build Midocean integration
+        run: pnpm --filter @yourgift/midocean run build
 
       - name: Generate Prisma client
         working-directory: services/api
         run: pnpm exec prisma generate
 
       - name: Type check API
-        working-directory: services/api
-        run: pnpm exec tsc --noEmit
+        run: pnpm --filter api exec tsc --noEmit
 
-      - name: Build API
-        working-directory: services/api
-        run: pnpm run build
+      - name: Type check Web
+        run: pnpm --filter web exec tsc --noEmit
 
-  # ── Deploy API → Railway ─────────────────────────────────────────────────────
+      - name: Type check Admin
+        run: pnpm --filter admin exec tsc --noEmit
+
+      - name: Build API (smoke test)
+        run: pnpm --filter api run build
+
+  # ── Deploy API → Render ──────────────────────────────────────────────────────
   deploy-api:
-    name: Deploy API → Railway
+    name: Deploy API → Render
     needs: ci
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Trigger Render deploy — yourgift-api
+        run: |
+          curl -s --fail \
+            -X POST \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            "https://api.render.com/v1/services/${{ secrets.RENDER_API_SERVICE_ID }}/deploys" \
+            -H "Content-Type: application/json" \
+            -d '{"clearCache": false}'
+        # To get these values:
+        #   RENDER_API_KEY       → Render Dashboard → Account → API Keys → New
+        #   RENDER_API_SERVICE_ID → Render Dashboard → yourgift-api → Settings → copy Service ID (srv-...)
 
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
-      - name: Deploy API to Railway
-        working-directory: services/api
-        run: railway up --service yourgift-api --detach
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
-  # ── Deploy Web → Vercel ──────────────────────────────────────────────────────
+  # ── Deploy Web → Render ──────────────────────────────────────────────────────
   deploy-web:
-    name: Deploy Web → Vercel
+    name: Deploy Web → Render
     needs: ci
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Trigger Render deploy — yourgift-web
+        run: |
+          curl -s --fail \
+            -X POST \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            "https://api.render.com/v1/services/${{ secrets.RENDER_WEB_SERVICE_ID }}/deploys" \
+            -H "Content-Type: application/json" \
+            -d '{"clearCache": false}'
+        # RENDER_WEB_SERVICE_ID → Render Dashboard → yourgift-web → Settings → copy Service ID (srv-...)
 
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 9
+  # ── Deploy Worker → Cloudflare ───────────────────────────────────────────────
+  deploy-worker:
+    name: Deploy Edge Worker → Cloudflare
+    needs: ci
+    runs-on: ubuntu-latest
+    if: ${{ vars.CLOUDFLARE_WORKER_ENABLED == 'true' }}
+    defaults:
+      run:
+        working-directory: infra/cloudflare
+    steps:
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
 
-      - name: Install Vercel CLI
-        run: npm install -g vercel
+      - name: Install Wrangler
+        run: npm install -g wrangler
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-
-      - name: Deploy Web to Vercel
-        run: vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy worker
+        run: wrangler deploy --env production
         env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_PROJECT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-  # ── Deploy Admin → Vercel ────────────────────────────────────────────────────
-  deploy-admin:
-    name: Deploy Admin → Vercel
-    needs: ci
+  # ── Notify on success ────────────────────────────────────────────────────────
+  notify:
+    name: Notify
+    needs: [deploy-api, deploy-web]
     runs-on: ubuntu-latest
+    if: always()
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 9
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Install Vercel CLI
-        run: npm install -g vercel
-
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-
-      - name: Deploy Admin to Vercel
-        working-directory: apps/admin
-        run: vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_ADMIN_PROJECT_ID }}
+      - name: Summary
+        run: |
+          echo "## Deploy Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| yourgift-api | ${{ needs.deploy-api.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| yourgift-web | ${{ needs.deploy-web.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Commit: \`${{ github.sha }}\` by @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,30 @@
+name = "yourgift-edge"
+main = "worker.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# ── Environments ──────────────────────────────────────────────────────────────
+
+[env.production]
+name = "yourgift-edge"
+routes = [
+  { pattern = "yourgift-api.onrender.com/*", zone_name = "yourgift.pt" },
+  { pattern = "www.yourgift.pt/*",           zone_name = "yourgift.pt" },
+]
+
+[env.staging]
+name = "yourgift-edge-staging"
+routes = [
+  { pattern = "staging.yourgift.pt/*", zone_name = "yourgift.pt" },
+]
+
+# ── Rate limiting via Workers KV ──────────────────────────────────────────────
+# Create the KV namespace: wrangler kv:namespace create RATE_LIMITS
+# Then paste the id below.
+# [[kv_namespaces]]
+# binding = "RATE_LIMITS"
+# id = "PASTE_KV_NAMESPACE_ID_HERE"
+
+# ── Limits ────────────────────────────────────────────────────────────────────
+[limits]
+cpu_ms = 10

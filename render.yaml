@@ -1,0 +1,191 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# YourGift OS — Render Blueprint
+# https://render.com/docs/infrastructure-as-code
+#
+# Usage:
+#   1. Connect this repo to Render (Dashboard → New → Blueprint)
+#   2. Render reads this file and creates/updates all services
+#   3. Fill in the sync:false env vars (marked with ← SET THIS) in the dashboard
+#
+# Services:
+#   yourgift-api   — NestJS 10 API (Node 20, port 3001)
+#   yourgift-web   — Next.js 14 web app (Node 20, port 3000)
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── API ────────────────────────────────────────────────────────────────────
+  - type: web
+    name: yourgift-api
+    runtime: node
+    region: frankfurt
+    plan: starter
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter api build
+    startCommand: node services/api/dist/main.js
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    scaling:
+      minInstances: 1
+      maxInstances: 3
+      targetMemoryPercent: 80
+      targetCPUPercent: 70
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      - key: PORT
+        value: 3001
+
+      - key: API_URL
+        value: https://yourgift-api.onrender.com
+
+      - key: FRONTEND_URL
+        value: https://www.yourgift.pt
+
+      # ── Database (Supabase) ──────────────────────────────────────────────
+      - key: DATABASE_URL
+        sync: false    # ← SET THIS: postgresql://yourgift_app.PROJECT_REF:PASSWORD@aws-0-eu-west-1.pooler.supabase.com:5432/postgres
+
+      - key: DIRECT_URL
+        sync: false    # ← SET THIS: postgresql://yourgift_app:PASSWORD@db.PROJECT_REF.supabase.co:5432/postgres
+
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false    # ← SET THIS: https://PROJECT_REF.supabase.co
+
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false    # ← SET THIS: eyJ...
+
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false    # ← SET THIS: sb_secret_...
+
+      # ── Auth ────────────────────────────────────────────────────────────
+      - key: JWT_SECRET
+        generateValue: true   # Render auto-generates a secure random value
+        # Rotate every 90 days — forces all sessions to expire
+
+      - key: JWT_EXPIRES_IN
+        value: 7d
+
+      - key: GOOGLE_CLIENT_ID
+        sync: false    # ← SET THIS: from Google Cloud Console
+
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false    # ← SET THIS: from Google Cloud Console
+
+      - key: GOOGLE_CALLBACK_URL
+        value: https://yourgift-api.onrender.com/auth/callback/google
+
+      # ── Redis / BullMQ ──────────────────────────────────────────────────
+      - key: UPSTASH_REDIS_URL
+        sync: false    # ← SET THIS: rediss://default:TOKEN@true-sole-99661.upstash.io:6379
+
+      # ── Stripe ──────────────────────────────────────────────────────────
+      - key: STRIPE_KEY
+        sync: false    # ← SET THIS: sk_live_... (production) or sk_test_... (staging)
+
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false    # ← SET THIS: whsec_... from Stripe Dashboard → Webhooks
+
+      - key: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+        sync: false    # ← SET THIS: pk_live_... or pk_test_...
+
+      - key: PAYMENT_ALERTS_EMAIL
+        value: ops@yourgift.pt
+
+      # ── Suppliers ───────────────────────────────────────────────────────
+      - key: MIDOCEAN_KEY
+        sync: false    # ← SET THIS: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+      - key: PF_CONCEPT_KEY
+        sync: false    # ← SET THIS (optional)
+
+      - key: PF_CONCEPT_USER
+        sync: false    # ← SET THIS (optional)
+
+      # ── Email (Resend) ──────────────────────────────────────────────────
+      - key: RESEND_API_KEY
+        sync: false    # ← SET THIS: re_... from resend.com/api-keys
+
+      - key: EMAIL_FROM
+        value: noreply@yourgift.pt
+
+      # ── AWS S3 ──────────────────────────────────────────────────────────
+      - key: AWS_REGION
+        value: eu-west-1
+
+      - key: AWS_ACCESS_KEY_ID
+        sync: false    # ← SET THIS: AKIA...
+
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false    # ← SET THIS
+
+      - key: S3_BUCKET
+        value: yourgift-assets
+
+      - key: CLOUDFRONT_URL
+        value: https://cdn.yourgift.pt
+
+      # ── Observability ───────────────────────────────────────────────────
+      - key: SENTRY_DSN
+        sync: false    # ← SET THIS: https://xxxxx@o.ingest.sentry.io/NNNNN
+                       #   Steps: sentry.io → New Project → Node.js → copy DSN
+
+      - key: SENTRY_ENVIRONMENT
+        value: production
+
+      - key: SENTRY_TRACES_SAMPLE_RATE
+        value: "0.1"
+
+      - key: SENTRY_PROFILES_SAMPLE_RATE
+        value: "0.1"
+
+      - key: BETTERSTACK_HEARTBEAT_URL
+        sync: false    # ← SET THIS: https://uptime.betterstack.com/api/v1/heartbeat/TOKEN
+                       #   Steps: betterstack.com → Monitors → New Heartbeat → copy URL
+
+      - key: BETTERSTACK_SOURCE_TOKEN
+        sync: false    # ← SET THIS (optional): from betterstack.com → Logs → Sources
+
+      - key: APP_VERSION
+        value: "1.0.0"
+
+  # ── Web App ────────────────────────────────────────────────────────────────
+  - type: web
+    name: yourgift-web
+    runtime: node
+    region: frankfurt
+    plan: starter
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter web build
+    startCommand: pnpm --filter web start
+    healthCheckPath: /
+    autoDeploy: true
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      - key: NEXT_PUBLIC_API_URL
+        value: https://yourgift-api.onrender.com
+
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://www.yourgift.pt
+
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false    # ← Same as API
+
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false    # ← Same as API
+
+      - key: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+        sync: false    # ← Same as API
+
+      - key: NEXT_PUBLIC_BETTERSTACK_KEY
+        sync: false    # ← SET THIS: RUM key from betterstack.com → Real User Monitoring
+
+      - key: SENTRY_DSN
+        sync: false    # ← Same as API
+
+      # SCIM tokens — add one per enterprise tenant
+      # Format: SCIM_TOKEN_TENANT_ID_UPPERCASE=<bearer_token>
+      # Example: SCIM_TOKEN_ACME_CORP=scim_token_abc123
