@@ -39,6 +39,7 @@ const queueProviders = (Object.values(QUEUE_NAMES) as QueueName[]).map((name) =>
     const retry = QUEUE_RETRY_CONFIG[retryKey];
     return new Queue(name, {
       connection,
+      prefix: '{yourgift}', // Namespace isolation — shared Redis with agency-group
       defaultJobOptions: {
         attempts: retry.attempts,
         backoff: retry.backoff,
