@@ -4,6 +4,7 @@ import { Queue, Worker, QueueEvents, ConnectionOptions } from 'bullmq';
 import { QUEUE_NAMES, QUEUE_RETRY_CONFIG, QueueName } from './queue.constants';
 import { QueueService } from './queue.service';
 import { DlqService } from './dlq.service';
+import { QueueAdminController } from './queue-admin.controller';
 
 /**
  * Factory token for the Redis connection shared across all queues.
@@ -63,6 +64,7 @@ function getRetryKey(name: string): keyof typeof QUEUE_RETRY_CONFIG {
 @Global()
 @Module({
   imports: [ConfigModule],
+  controllers: [QueueAdminController],
   providers: [
     {
       provide: REDIS_CONNECTION,

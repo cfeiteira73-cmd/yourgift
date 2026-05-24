@@ -1,4 +1,8 @@
 import 'reflect-metadata';
+import { initSentry } from './observability/sentry.config';
+// Sentry MUST be initialised before any other import that touches instrumentation
+initSentry();
+
 import { NestFactory, Reflector } from '@nestjs/core';
 import { ValidationPipe, Logger, ClassSerializerInterceptor } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
