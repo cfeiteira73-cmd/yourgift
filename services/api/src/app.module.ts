@@ -82,6 +82,10 @@ import { TenantEconomicsModule } from './tenant-economics/tenant-economics.modul
 import { DataPlatformModule } from './data-platform/data-platform.module';
 import { RefundsModule } from './refunds/refunds.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { RfqModule } from './rfq/rfq.module';
+import { FulfillmentModule } from './fulfillment/fulfillment.module';
+import { CartModule } from './cart/cart.module';
+import { InvoicesModule } from './invoices/invoices.module';
 import { APP_GUARD } from '@nestjs/core';
 import { TenantGuard } from './common/guards/tenant.guard';
 import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard';
@@ -182,6 +186,10 @@ import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard'
     DataPlatformModule,
     RefundsModule,
     SubscriptionsModule,
+    RfqModule,
+    FulfillmentModule,
+    CartModule,
+    InvoicesModule,
   ],
   providers: [
     // Rate limiting — per tenant (not per IP) for authenticated requests
