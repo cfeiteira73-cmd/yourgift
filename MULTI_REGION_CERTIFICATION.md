@@ -1,6 +1,10 @@
-# MULTI_REGION_CERTIFICATION.md
-## YourGift OS — Multi-Region Active-Active Certification
-### Status: IaC Ready · Activation Pending · 2026-05-25
+# Multi-Region Certification Report
+## YourGift OS — Active-Active Infrastructure
+
+**Version:** 2.0 (Phase 8)  
+**Date:** 2026-05-25  
+**Terraform Module:** `terraform/multi-region/` (7 files)  
+**Status:** IaC Complete · Activation Pending (target: 10,000 MAU)
 
 ---
 
@@ -14,8 +18,19 @@ YourGift OS multi-region infrastructure is fully specified in Terraform at `terr
 **DB**: Aurora PostgreSQL 15.4 Global Cluster  
 **Cache**: ElastiCache Redis 7, Multi-AZ, automatic failover  
 **Traffic**: AWS Global Accelerator + Route53 latency-based routing  
-**Terraform**: `terraform/multi-region/` (7 files, valid HCL)  
-**Activation Status**: ⚠️ Pending — activate when MAU > 10,000
+**Terraform**: `terraform/multi-region/` — 7 files: `main.tf`, `variables.tf`, `vpc.tf`, `ecs.tf`, `routing.tf`, `database.tf`, `redis.tf`, `outputs.tf`  
+**Activation Status**: Pending — activate when MAU > 10,000
+
+### Phase 8 Terraform Additions
+
+The Phase 8 implementation adds the following to `terraform/multi-region/`:
+
+- **`vpc.tf`**: Full VPC setup for both regions (CIDR 10.1.0.0/16 primary, 10.2.0.0/16 secondary), 3 public + 3 private subnets per region, NAT Gateways, all security groups for ALB/ECS/RDS/Redis
+- **`ecs.tf`**: ALBs in both regions, ECS clusters with Container Insights, task definitions (API port 3001, dual REGION_ROLE env var), services with `desired_count=2` (primary) + `desired_count=1` (secondary hot standby), autoscaling CPU 70% + Memory 80%
+- **`routing.tf`**: Route53 latency-based records (A + AAAA), health checks at 10s intervals with 3×threshold (30s detection), Global Accelerator with DUAL_STACK + flow logs, CloudWatch alarms + SNS topic for failover alerts
+- **`database.tf`**: Aurora Global Cluster + primary writer (2 instances) + secondary reader (1 instance), enhanced monitoring, CloudWatch alarm on `AuroraGlobalDBReplicationLag > 1000ms`
+- **`redis.tf`**: Primary 3-node cluster + secondary 2-node cluster, both with TLS-required, keyspace notifications, slowlog, failover SNS topics, CloudWatch alarms for replication lag + CPU + memory + connections
+- **`outputs.tf`**: All DNS names, ARNs, endpoints, IP sets, deployment summary object
 
 ---
 

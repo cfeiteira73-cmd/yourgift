@@ -69,7 +69,7 @@ Queue concurrency settings:
 - learning-loop: 1
 - chaos-drill: 1
 - cost-attribution: 5
-- evidence-export: 1
+- evidence-export: 1   # Phase 8: SOC2/ISO27001 evidence package generation
 
 Total concurrency: 87 parallel workers
 At avg 1 job/5s per worker: 87 × 720 = 62,640 jobs/hour = 1.5M jobs/day

@@ -1,6 +1,11 @@
-# SECURITY_AUDIT_EXPORT.md
-## YourGift OS — Security Audit Evidence Export
-### SOC2 Type II + ISO27001 Readiness · 2026-05-25
+# Security Audit Export Report
+## YourGift OS — SOC2 Type II + ISO27001 Evidence Package
+
+**Version:** 2.0 (Phase 8 — EvidenceExportService)  
+**Date:** 2026-05-25  
+**Evidence Export Service:** `services/api/src/security-certification/evidence-export.service.ts`  
+**API Endpoints:** `GET /admin/security-certification/evidence/soc2` · `GET /admin/security-certification/evidence/iso27001`  
+**Status:** Production-Ready
 
 ---
 
@@ -13,6 +18,74 @@ YourGift OS generates security audit evidence from **real database queries** —
 **Evidence Source**: Live PostgreSQL queries against production tables  
 **Export API**: `GET /admin/security-certification/evidence/soc2?from=&to=`  
 **Format**: JSON (machine-readable) + this report (human-readable)
+
+**Phase 8 Addition**: `EvidenceExportService` now generates time-bounded, query-verified evidence packages for CC6.1, CC6.2, CC7.1, CC7.4, CC8.1, CC9.1 (SOC2) and A.9.1, A.12.4, A.16.1, A.14.2 (ISO27001). Each control evaluates real records from the database and assigns `satisfied | partial | gap` status with raw evidence count and 5-record sample.
+
+---
+
+## EvidenceExportService — Phase 8 Implementation
+
+### Service Location
+
+`services/api/src/security-certification/evidence-export.service.ts`
+
+Registered in `SecurityCertificationModule` as a provider and export. Injected with `PrismaService` for direct DB access.
+
+### Control Implementations
+
+| Method | Control | DB Table | Key Query |
+|--------|---------|----------|-----------|
+| `cc61AccessControl()` | CC6.1 | `auth_audit_logs` | Count login + MFA + provisioning events in period |
+| `cc62Authentication()` | CC6.2 | `auth_audit_logs` | Count failed attempts, detect anomalous hours (>10 failures/hr) |
+| `cc71IncidentResponse()` | CC7.1 | `event_logs` | Count incident.* events, measure avg resolution time |
+| `cc74Monitoring()` | CC7.4 | `event_logs` + `system_alerts` | Count sre.* events, auto-remediation actions |
+| `cc81ChangeManagement()` | CC8.1 | `event_logs` | Count deployment.* events, compute gate compliance rate |
+| `cc91RiskAssessment()` | CC9.1 | `chaos_drills` | Count completed drills, RTO met rate, MTTR aggregate |
+| `a91AccessPolicy()` | A.9.1 | `auth_audit_logs` | Access events by type, unique users, success rate |
+| `a124AuditLogging()` | A.12.4 | `event_logs` | Daily coverage check (daysWithLogs / periodDays × 100%) |
+| `a161IncidentManagement()` | A.16.1 | `event_logs` | Incident resolution rate, avg response time |
+| `a142ChangeControl()` | A.14.2 | `event_logs` | Gate compliance rate, emergency changes, rollback count |
+
+### Anomaly Detection (CC6.2)
+
+The `cc62Authentication()` method executes a raw SQL query to detect hours with > 10 failed auth attempts:
+
+```sql
+SELECT date_trunc('hour', created_at) AS hour, COUNT(*) AS failures
+FROM auth_audit_logs
+WHERE created_at BETWEEN :from AND :to AND success = false
+GROUP BY hour
+HAVING COUNT(*) > 10
+ORDER BY failures DESC LIMIT 5;
+```
+
+This provides real anomaly evidence, not just aggregate counts.
+
+### Logging Continuity (A.12.4)
+
+The logging continuity check computes a `loggingCoveragePct`:
+- ≥ 95%: `satisfied`
+- 80–94%: `partial`
+- < 80%: `gap`
+
+```sql
+SELECT date_trunc('day', created_at) AS day, COUNT(*) AS count
+FROM event_logs
+WHERE created_at BETWEEN :from AND :to
+GROUP BY day ORDER BY day;
+```
+
+`loggingCoveragePct = daysWithLogs / periodDays × 100`
+
+### New API Endpoints (Phase 8)
+
+```
+GET /admin/security-certification/evidence/soc2?from=&to=
+GET /admin/security-certification/evidence/iso27001?from=&to=
+GET /admin/security-certification/evidence/metrics?from=&to=
+```
+
+All three accept optional `from` and `to` ISO8601 parameters. Defaults to a rolling 90-day window.
 
 ---
 

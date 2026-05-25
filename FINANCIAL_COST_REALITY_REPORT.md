@@ -225,4 +225,22 @@ This SQL runs against the real production PostgreSQL database and returns real c
 
 ---
 
+---
+
+## 8. Phase 8 — EvidenceExportService Cost Profile
+
+Evidence export operations are periodic (not in the hot path) but can be intensive:
+
+| Operation | Estimated Compute (ms) | Estimated DB Queries | Estimated Cost (€) |
+|-----------|----------------------|---------------------|-------------------|
+| `generateSoc2Evidence(90d)` | 3,000–8,000ms | 30–60 queries | 0.001–0.004 |
+| `generateIso27001Evidence(90d)` | 2,000–5,000ms | 20–40 queries | 0.0008–0.003 |
+| `getSupportingMetrics(90d)` | 1,000–3,000ms | 11 queries | 0.0003–0.0007 |
+
+These operations include raw SQL via `prisma.$queryRaw` against time-range filtered tables. For periods > 1 year, ensure `event_logs.created_at` and `auth_audit_logs.created_at` indexes are present (they are, per the Prisma schema `@@index([createdAt])` declarations).
+
+Evidence export is called at most quarterly by auditors, so compute cost is negligible. However, for DB cost attribution, evidence export operations are tagged with `actorType = 'system'` in EventLog for easy filtering.
+
+---
+
 *All cost rates are configurable via environment variables. Real costs flow from the first production request through `CostPerRequestInterceptor`. This report's per-workflow averages are populated from `EventLog` after sustained production traffic.*
