@@ -99,6 +99,9 @@ jobs:
       - name: Build midocean integration
         run: pnpm --filter @yourgift/midocean run build
 
+      - name: Build pf-concept integration
+        run: pnpm --filter @yourgift/pf-concept run build
+
       - name: Generate Prisma client
         working-directory: services/api
         run: pnpm exec prisma generate
