@@ -88,6 +88,9 @@ import { CartModule } from './cart/cart.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { FinancialReplayModule } from './financial-replay/financial-replay.module';
 import { SreModule } from './sre/sre.module';
+import { CostIntelligenceModule } from './cost-intelligence/cost-intelligence.module';
+import { LearningLoopModule } from './learning-loop/learning-loop.module';
+import { ControlPlaneModule } from './control-plane/control-plane.module';
 import { APP_GUARD } from '@nestjs/core';
 import { TenantGuard } from './common/guards/tenant.guard';
 import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard';
@@ -194,6 +197,9 @@ import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard'
     InvoicesModule,
     FinancialReplayModule,
     SreModule,
+    CostIntelligenceModule,
+    LearningLoopModule,
+    ControlPlaneModule,
   ],
   providers: [
     // Rate limiting — per tenant (not per IP) for authenticated requests

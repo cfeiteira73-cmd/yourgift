@@ -105,7 +105,7 @@ jobs:
         continue-on-error: false
 
       # ── 7. Coverage threshold ─────────────────────────────────────────────
-      - name: Enforce coverage thresholds (lines≥70%, branches≥60%, functions≥70%)
+      - name: Enforce coverage thresholds (lines≥80%, branches≥70%, functions≥80%)
         working-directory: services/api
         env:
           DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
@@ -116,7 +116,7 @@ jobs:
         run: |
           pnpm test \
             --coverage \
-            --coverageThreshold='{"global":{"lines":70,"branches":60,"functions":70}}' \
+            --coverageThreshold='{"global":{"lines":80,"branches":70,"functions":80}}' \
             --passWithNoTests
         continue-on-error: false
 
@@ -209,7 +209,7 @@ jobs:
           echo "| TypeScript (API + Admin + Web) | ✅ |" >> $GITHUB_STEP_SUMMARY
           echo "| TODO/FIXME/HACK/XXX scan | ✅ |" >> $GITHUB_STEP_SUMMARY
           echo "| Unit tests | ✅ |" >> $GITHUB_STEP_SUMMARY
-          echo "| Coverage thresholds (70/60/70) | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Coverage thresholds (80/70/80) | ✅ |" >> $GITHUB_STEP_SUMMARY
           echo "| Prisma migration drift | ✅ |" >> $GITHUB_STEP_SUMMARY
           echo "| Integration test count (≥5) | ✅ |" >> $GITHUB_STEP_SUMMARY
           echo "| SYSTEM_READINESS_REPORT.md | ✅ |" >> $GITHUB_STEP_SUMMARY

@@ -279,3 +279,41 @@ jobs:
             echo "✅ No high-severity vulnerabilities found." >> $GITHUB_STEP_SUMMARY
           fi
         continue-on-error: false
+
+  # ── Zod/OpenAPI Schema Parity ──────────────────────────────────────────────
+  zod-schema-parity:
+    name: Zod Schema Parity Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+      - name: Build shared package (includes Zod schemas)
+        run: pnpm --filter @yourgift/shared run build
+      - name: Verify Zod schemas compile and export correctly
+        run: |
+          node -e "
+            const schemas = require('./packages/shared/dist/index.js');
+            const required = ['CreateOrderSchema','CreateQuoteSchema','CreateRefundSchema','CreateSubscriptionSchema','CreateRfqSchema'];
+            const missing = required.filter(s => !schemas[s]);
+            if (missing.length > 0) {
+              console.error('Missing Zod schemas:', missing.join(', '));
+              process.exit(1);
+            }
+            console.log('All required Zod schemas present:', required.join(', '));
+          "
+      - name: Check schema count is growing (minimum 5 schemas exported)
+        run: |
+          COUNT=$(node -e "const s = require('./packages/shared/dist/index.js'); console.log(Object.keys(s).filter(k => k.endsWith('Schema')).length)")
+          echo "Schema count: $COUNT"
+          if [ "$COUNT" -lt 5 ]; then
+            echo "::error::Fewer than 5 Zod schemas exported from @yourgift/shared. Add missing schemas."
+            exit 1
+          fi

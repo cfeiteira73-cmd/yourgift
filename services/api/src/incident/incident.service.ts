@@ -2,7 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventBusService } from '../events/event-bus.service';
 
-export type IncidentSeverity = 'SEV1' | 'SEV2' | 'SEV3' | 'SEV4';
+export type IncidentSeverity = 'SEV0' | 'SEV1' | 'SEV2' | 'SEV3' | 'SEV4';
 export type IncidentStatus = 'open' | 'investigating' | 'mitigating' | 'resolved' | 'closed';
 
 export interface CreateIncidentInput {
@@ -93,6 +93,36 @@ export class IncidentService implements OnModuleInit {
         this.logger.error('supplier.degraded handler error', err.stack),
       );
     });
+
+    this.eventBus.on('reconciliation.critical_drift', (payload: Record<string, unknown>) => {
+      this.autoCreateSev0Incident('Critical reconciliation drift detected', [
+        'reconciliation',
+        'ledger',
+      ]).catch((err: Error) =>
+        this.logger.error('reconciliation.critical_drift handler error', err.stack),
+      );
+      void payload;
+    });
+
+    this.eventBus.on('sre.critical_system_alert', (payload: Record<string, unknown>) => {
+      this.autoCreateSev0Incident('SRE critical system alert', [
+        'api-gateway',
+        'queue',
+      ]).catch((err: Error) =>
+        this.logger.error('sre.critical_system_alert handler error', err.stack),
+      );
+      void payload;
+    });
+
+    this.eventBus.on('financial-replay.anomaly', (payload: Record<string, unknown>) => {
+      this.autoCreateSev0Incident('Financial replay anomaly', [
+        'ledger',
+        'reconciliation',
+      ]).catch((err: Error) =>
+        this.logger.error('financial-replay.anomaly handler error', err.stack),
+      );
+      void payload;
+    });
   }
 
   private async handleQueueFailure(queue: string): Promise<void> {
@@ -173,6 +203,42 @@ export class IncidentService implements OnModuleInit {
   }
 
   // ── Public API ───────────────────────────────────────────────────────────
+
+  /**
+   * Auto-create a SEV0 incident (complete system outage or financial data corruption).
+   * Logs a CRITICAL-prefixed error, then delegates to autoCreateIncident for
+   * deduplication before persisting. Emits 'incident.sev0_created' after creation.
+   * Errors are never propagated — callers must not crash on SEV0 creation failure.
+   */
+  async autoCreateSev0Incident(
+    title: string,
+    affectedServices: string[],
+  ): Promise<void> {
+    this.logger.error(
+      `CRITICAL [SEV0] ${title} — affected: ${affectedServices.join(', ')}`,
+    );
+
+    try {
+      await this.autoCreateIncident({
+        title,
+        severity: 'SEV0',
+        affectedServices,
+        source: 'event-bus',
+        description: `SEV0 auto-created: ${title}`,
+      });
+
+      this.eventBus.emit('incident.sev0_created', {
+        title,
+        affectedServices,
+        createdAt: new Date().toISOString(),
+      });
+    } catch (err) {
+      this.logger.error(
+        `Failed to persist SEV0 incident "${title}"`,
+        (err as Error).stack,
+      );
+    }
+  }
 
   async createIncident(input: CreateIncidentInput): Promise<unknown> {
     const incident = await this.prisma.incident.create({
@@ -283,7 +349,7 @@ export class IncidentService implements OnModuleInit {
   }
 
   async getStats(): Promise<Record<string, number>> {
-    const severities: IncidentSeverity[] = ['SEV1', 'SEV2', 'SEV3', 'SEV4'];
+    const severities: IncidentSeverity[] = ['SEV0', 'SEV1', 'SEV2', 'SEV3', 'SEV4'];
     const results = await Promise.all(
       severities.map((sev) =>
         this.prisma.incident.count({
