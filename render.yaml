@@ -109,6 +109,10 @@ services:
       - key: PF_CONCEPT_USER
         sync: false    # ← SET THIS (optional)
 
+      # ── Frontend URL (for Stripe redirects, CORS) ───────────────────────
+      - key: FRONTEND_URL
+        value: https://www.yourgift.pt
+
       # ── Email (Resend) ──────────────────────────────────────────────────
       - key: RESEND_API_KEY
         sync: false    # ← SET THIS: re_... from resend.com/api-keys
