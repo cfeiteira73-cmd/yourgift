@@ -6,18 +6,22 @@ export const ORDER_STATUSES = [
   'shipped',
   'delivered',
   'cancelled',
+  'payment_expired',  // Stripe checkout session expired before payment
+  'payment_failed',   // Payment intent failed (card declined etc.)
 ] as const;
 
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
 
 export const VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  created: ['paid', 'cancelled'],
+  created: ['paid', 'cancelled', 'payment_expired', 'payment_failed'],
   paid: ['approved', 'cancelled'],
   approved: ['producing', 'cancelled'],
   producing: ['shipped', 'cancelled'],
   shipped: ['delivered', 'cancelled'],
   delivered: [],
   cancelled: [],
+  payment_expired: ['created'],   // Allow re-creating checkout after expiry
+  payment_failed: ['created'],    // Allow retry after failure
 };
 
 /**

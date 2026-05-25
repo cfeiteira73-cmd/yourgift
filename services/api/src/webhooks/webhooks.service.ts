@@ -64,6 +64,11 @@ export class WebhooksService implements OnModuleInit {
     );
   }
 
+  /**
+   * Sends a webhook to a single endpoint with exponential-backoff retry.
+   * Attempts: 1 immediate + up to 2 retries (delays: 2s, 6s).
+   * Records a WebhookDelivery row after all attempts, with final status.
+   */
   private async sendToEndpoint(
     endpoint: { id: string; url: string; secret: string },
     event: string,
@@ -76,28 +81,47 @@ export class WebhooksService implements OnModuleInit {
     });
     const signature = this.sign(endpoint.secret, body);
 
+    const MAX_ATTEMPTS = 3;
+    const RETRY_DELAYS_MS = [2_000, 6_000]; // waits between attempt 1→2 and 2→3
+
     let statusCode: number | undefined;
     let responseBody: string | undefined;
     let success = false;
+    let attempts = 0;
 
-    try {
-      const res = await fetch(endpoint.url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-YourGift-Signature': signature,
-          'X-YourGift-Event': event,
-          'User-Agent': 'YourGift-Webhooks/1.0',
-        },
-        body,
-        signal: AbortSignal.timeout(10_000),
-      });
-      statusCode = res.status;
-      responseBody = (await res.text()).slice(0, 500);
-      success = res.ok;
-    } catch (err) {
-      responseBody =
-        err instanceof Error ? err.message : String(err);
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      attempts = attempt;
+      try {
+        const res = await fetch(endpoint.url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-YourGift-Signature': signature,
+            'X-YourGift-Event': event,
+            'X-YourGift-Attempt': String(attempt),
+            'User-Agent': 'YourGift-Webhooks/1.0',
+          },
+          body,
+          signal: AbortSignal.timeout(10_000),
+        });
+        statusCode = res.status;
+        responseBody = (await res.text()).slice(0, 500);
+        success = res.ok;
+      } catch (err) {
+        responseBody = err instanceof Error ? err.message : String(err);
+        success = false;
+      }
+
+      if (success) break;
+
+      if (attempt < MAX_ATTEMPTS) {
+        const delay = RETRY_DELAYS_MS[attempt - 1] ?? 6_000;
+        this.logger.warn(
+          `Webhook attempt ${attempt}/${MAX_ATTEMPTS} failed: ${event} → ${endpoint.url} ` +
+          `(${statusCode ?? 'network error'}) — retrying in ${delay}ms`,
+        );
+        await new Promise<void>((resolve) => setTimeout(resolve, delay));
+      }
     }
 
     await this.prisma.webhookDelivery.create({
@@ -111,16 +135,18 @@ export class WebhooksService implements OnModuleInit {
         statusCode,
         responseBody,
         success,
-        attempts: 1,
+        attempts,
         deliveredAt: success ? new Date() : undefined,
       },
     });
 
     if (success) {
-      this.logger.log(`Webhook delivered: ${event} → ${endpoint.url}`);
+      this.logger.log(
+        `Webhook delivered: ${event} → ${endpoint.url} (attempt ${attempts}/${MAX_ATTEMPTS})`,
+      );
     } else {
-      this.logger.warn(
-        `Webhook failed: ${event} → ${endpoint.url} (${statusCode ?? 'network error'})`,
+      this.logger.error(
+        `Webhook FAILED after ${attempts} attempts: ${event} → ${endpoint.url} (${statusCode ?? 'network error'})`,
       );
     }
   }

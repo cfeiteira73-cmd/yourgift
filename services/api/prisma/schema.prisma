@@ -3400,3 +3400,18 @@ model Subscription {
   @@index([status])
   @@map("subscriptions")
 }
+
+// ─────────────────────────────────────────────
+// STRIPE EVENT IDEMPOTENCY
+// Prevents duplicate processing of Stripe webhooks.
+// Records every event ID we have successfully processed.
+// ─────────────────────────────────────────────
+
+model StripeEvent {
+  id          String   @id                    // Stripe event ID (evt_...)
+  type        String                           // e.g. "checkout.session.completed"
+  processedAt DateTime @default(now()) @map("processed_at")
+
+  @@index([processedAt])
+  @@map("stripe_events")
+}

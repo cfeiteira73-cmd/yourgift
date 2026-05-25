@@ -70,26 +70,31 @@ export class PaymentsService {
       quantity: item.quantity,
     }));
 
-    const session = await this.stripe.checkout.sessions.create({
-      mode: 'payment',
-      line_items: lineItems,
-      currency: 'eur',
-      success_url: `${this.config.get('FRONTEND_URL') ?? this.config.get('NEXT_PUBLIC_API_URL')}/orders/${order.id}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${this.config.get('FRONTEND_URL') ?? this.config.get('NEXT_PUBLIC_API_URL')}/orders/${order.id}/cancel`,
-      metadata: {
-        orderId: order.id,
-        tenantId: order.tenantId ?? '',
-        environment: this.config.get('NODE_ENV') ?? 'development',
+    const session = await this.stripe.checkout.sessions.create(
+      {
+        mode: 'payment',
+        line_items: lineItems,
+        currency: 'eur',
+        success_url: `${this.config.get('FRONTEND_URL') ?? this.config.get('NEXT_PUBLIC_API_URL')}/orders/${order.id}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${this.config.get('FRONTEND_URL') ?? this.config.get('NEXT_PUBLIC_API_URL')}/orders/${order.id}/cancel`,
+        metadata: {
+          orderId: order.id,
+          tenantId: order.tenantId ?? '',
+          environment: this.config.get('NODE_ENV') ?? 'development',
+        },
+        // Stripe Radar — collect billing address for fraud signals
+        billing_address_collection: 'required',
+        // Payment method types — cards + SEPA for EU B2B
+        payment_method_types: ['card'],
+        // Collect tax — pass-through if you handle tax separately
+        automatic_tax: { enabled: false },
+        // Idempotency: use orderId so duplicate calls don't double-charge
+        client_reference_id: order.id,
       },
-      // Stripe Radar — collect billing address for fraud signals
-      billing_address_collection: 'required',
-      // Payment method types — cards + SEPA for EU B2B
-      payment_method_types: ['card'],
-      // Collect tax — pass-through if you handle tax separately
-      automatic_tax: { enabled: false },
-      // Idempotency: use orderId so duplicate calls don't double-charge
-      client_reference_id: order.id,
-    });
+      // Stripe idempotency key: guarantees same session returned on retries,
+      // preventing duplicate checkout sessions for the same order.
+      { idempotencyKey: `checkout-${order.id}` },
+    );
 
     await this.prisma.order.update({
       where: { id: order.id },
@@ -187,32 +192,48 @@ export class PaymentsService {
     }
 
     const amountEur = (session.amount_total ?? 0) / 100;
+    const tenantId = session.metadata?.tenantId ?? '';
 
-    await this.prisma.order.update({
-      where: { id: orderId },
-      data: {
-        status: 'paid',
-        stripePaymentId: session.payment_intent as string,
-      },
+    // ── Atomic: order status + invoice job enqueue in one DB transaction ─────
+    // If any step fails, the entire block rolls back — order never ends up "paid"
+    // without the invoice job queued. We use the `jobs` table (model: Job).
+    await this.prisma.$transaction(async (tx) => {
+      // 1. Mark order as paid
+      await tx.order.update({
+        where: { id: orderId },
+        data: {
+          status: 'paid',
+          stripePaymentId: session.payment_intent as string,
+        },
+      });
+
+      // 2. Enqueue invoice PDF generation inside the same transaction so the
+      //    job row is only committed if the order update succeeds.
+      //    Use upsert on a deterministic ID to prevent duplicate invoice jobs.
+      const invoiceJobId = `invoice-${orderId}`;
+      await tx.job.upsert({
+        where: { id: invoiceJobId },
+        create: {
+          id: invoiceJobId,
+          type: 'invoice.generate',
+          payload: { type: 'invoice', tenantId, entityId: orderId },
+          status: 'pending',
+        },
+        update: {}, // no-op if job already exists (idempotent)
+      });
     });
 
-    // Emit payment.confirmed for downstream: invoice generation, ledger entry, notifications
+    // ── Post-commit: emit event for ledger + notifications ────────────────────
+    // Runs outside the transaction — these are fire-and-forget side effects.
     this.events.emit('payment.confirmed', {
       orderId,
       sessionId: session.id,
       paymentIntentId: session.payment_intent,
       amountEur,
-      tenantId: session.metadata?.tenantId,
+      tenantId,
     });
 
-    // Enqueue invoice PDF generation
-    await this.queueService.enqueuePdfGeneration({
-      type: 'invoice',
-      tenantId: session.metadata?.tenantId ?? '',
-      entityId: orderId,
-    });
-
-    this.logger.log(`Payment confirmed: order=${orderId} amount=€${amountEur}`);
+    this.logger.log(`Payment confirmed (atomic): order=${orderId} amount=€${amountEur}`);
   }
 
   private async onCheckoutExpired(session: Stripe.Checkout.Session): Promise<void> {
@@ -319,27 +340,25 @@ export class PaymentsService {
 
   private async isEventProcessed(eventId: string): Promise<boolean> {
     try {
-      // Use a simple DB check — store in a stripe_events table or use Redis SETNX
-      // For now: check if we have a record in the event_log table
-      const exists = await (this.prisma as unknown as { stripeEvent?: { findUnique: (args: unknown) => Promise<unknown> } })
-        .stripeEvent?.findUnique?.({ where: { id: eventId } });
+      const exists = await this.prisma.stripeEvent.findUnique({ where: { id: eventId } });
       return !!exists;
-    } catch {
-      return false; // If table doesn't exist yet, process anyway
+    } catch (err) {
+      // Defensive fallback: if DB is unreachable log and process anyway
+      this.logger.warn(`isEventProcessed check failed for ${eventId}: ${(err as Error).message}`);
+      return false;
     }
   }
 
   private async markEventProcessed(eventId: string, eventType: string): Promise<void> {
     try {
-      await (this.prisma as unknown as { stripeEvent?: { upsert: (args: unknown) => Promise<unknown> } })
-        .stripeEvent?.upsert?.({
-          where: { id: eventId },
-          create: { id: eventId, type: eventType, processedAt: new Date() },
-          update: {},
-        });
-    } catch {
-      // Table may not exist — log but don't fail
-      this.logger.debug(`Could not persist stripe event ${eventId} — StripeEvent table missing from schema`);
+      await this.prisma.stripeEvent.upsert({
+        where: { id: eventId },
+        create: { id: eventId, type: eventType },
+        update: {}, // no-op if already exists
+      });
+    } catch (err) {
+      // Non-fatal — idempotency degrades gracefully, handler already ran
+      this.logger.warn(`markEventProcessed failed for ${eventId}: ${(err as Error).message}`);
     }
   }
 }

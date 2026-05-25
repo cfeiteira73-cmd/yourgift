@@ -1,6 +1,10 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { EventBusService } from '../events/event-bus.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { ReconciliationService } from './reconciliation.service';
+
+// How long a lock is considered valid before it can be stolen by another replica.
+const LOCK_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 @Injectable()
 export class ReconciliationScheduler implements OnModuleInit, OnModuleDestroy {
@@ -12,6 +16,7 @@ export class ReconciliationScheduler implements OnModuleInit, OnModuleDestroy {
   constructor(
     private readonly reconciliationService: ReconciliationService,
     private readonly eventBus: EventBusService,
+    private readonly prisma: PrismaService,
   ) {}
 
   onModuleInit(): void {
@@ -34,7 +39,7 @@ export class ReconciliationScheduler implements OnModuleInit, OnModuleDestroy {
     );
 
     this.logger.log(
-      'ReconciliationScheduler initialised — hourly every 60 min, nightly every 24 h',
+      'ReconciliationScheduler initialised — hourly every 60 min, nightly every 24 h (with distributed lock)',
     );
   }
 
@@ -50,11 +55,59 @@ export class ReconciliationScheduler implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
+   * Acquires a DB-level distributed lock for the given lockKey.
+   * Returns true if this replica won the lock (should proceed).
+   * Returns false if another replica already holds it.
+   *
+   * Uses the EventLog table (always present) to store lock state.
+   * Lock TTL prevents permanent hold if a replica crashes mid-run.
+   */
+  private async acquireLock(lockKey: string): Promise<boolean> {
+    const now = new Date();
+    const ttlThreshold = new Date(now.getTime() - LOCK_TTL_MS);
+
+    try {
+      // Check if a live (non-expired) lock already exists
+      const existing = await this.prisma.eventLog.findFirst({
+        where: {
+          event: `scheduler.lock.${lockKey}`,
+          createdAt: { gt: ttlThreshold },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      if (existing) {
+        this.logger.debug(`Lock held by another replica: ${lockKey}`);
+        return false;
+      }
+
+      // Create new lock
+      await this.prisma.eventLog.create({
+        data: {
+          event: `scheduler.lock.${lockKey}`,
+          entity: 'scheduler',
+          entityId: lockKey,
+          actorType: 'system',
+          payload: { acquiredAt: now.toISOString(), pid: process.pid },
+        },
+      });
+
+      return true;
+    } catch (err) {
+      // If lock acquisition fails, default to running (single-replica safety)
+      this.logger.warn(`Lock acquisition error for ${lockKey}, proceeding anyway: ${(err as Error).message}`);
+      return true;
+    }
+  }
+
+  /**
    * Runs every hour.
-   * Calls getDriftStatus() and emits 'reconciliation.hourly_complete'.
-   * Errors are caught and logged — never crash the process.
+   * Uses distributed lock so only one replica runs per interval.
    */
   async runHourlyReconciliation(): Promise<void> {
+    const locked = await this.acquireLock('reconciliation.hourly');
+    if (!locked) return;
+
     this.logger.log('Starting hourly reconciliation drift check');
     try {
       const results = await this.reconciliationService.getDriftStatus();
@@ -82,12 +135,13 @@ export class ReconciliationScheduler implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
-   * Runs nightly at approximately 02:00 (offset from startup; for exact 02:00
-   * scheduling upgrade to @nestjs/schedule with @Cron('0 2 * * *')).
-   * Calls getDriftStatus() for all tenants and emits 'reconciliation.nightly_complete'.
-   * Errors are caught and logged — never crash the process.
+   * Runs nightly.
+   * Uses distributed lock so only one replica runs per interval.
    */
   async runNightlyReconciliation(): Promise<void> {
+    const locked = await this.acquireLock('reconciliation.nightly');
+    if (!locked) return;
+
     this.logger.log('Starting nightly full reconciliation drift check');
     try {
       const results = await this.reconciliationService.getDriftStatus();

@@ -272,12 +272,20 @@ export class CampaignsService implements OnModuleInit {
       };
     });
 
+    // Deduct Stripe processing fees from margin so reported margin reflects
+    // actual net revenue. EU card rate: 1.5% + €0.25 per transaction.
+    // (Non-EU / corporate cards can be higher, but 1.5% is the standard EU Stripe rate.)
+    const stripeFeeEur = parseFloat((totalAmount * 0.015 + 0.25).toFixed(2));
+    const netMarginAmount = parseFloat(Math.max(0, marginAmount - stripeFeeEur).toFixed(2));
+
     const pricingSnapshot = {
       source: 'campaign',
       campaignId,
       calculatedAt: new Date().toISOString(),
       totalAmount: parseFloat(totalAmount.toFixed(2)),
-      marginAmount: parseFloat(marginAmount.toFixed(2)),
+      grossMarginAmount: parseFloat(marginAmount.toFixed(2)),
+      stripeFeeEur,
+      marginAmount: netMarginAmount, // net of Stripe fees
     };
 
     const order = await this.prisma.order.create({
@@ -289,7 +297,7 @@ export class CampaignsService implements OnModuleInit {
         status: 'created',
         shippingAddress: JSON.parse(JSON.stringify(shippingAddress)) as Prisma.InputJsonValue,
         totalAmount: parseFloat(totalAmount.toFixed(2)),
-        marginAmount: parseFloat(marginAmount.toFixed(2)),
+        marginAmount: netMarginAmount, // net of Stripe fees
         pricingSnapshot: JSON.parse(JSON.stringify(pricingSnapshot)) as Prisma.InputJsonValue,
         items: { create: orderItemsData },
       },
