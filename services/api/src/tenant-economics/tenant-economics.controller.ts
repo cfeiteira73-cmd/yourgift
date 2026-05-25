@@ -16,7 +16,7 @@ import { AdminAuthGuard } from '../admin-auth/admin-auth.guard';
 import { UsageMeteringService } from './usage-metering.service';
 import { TenantQuotaService } from './tenant-quota.service';
 
-@Controller('api/v1/tenant-economics')
+@Controller('tenant-economics')
 @UseGuards(AdminAuthGuard)
 export class TenantEconomicsController {
   constructor(

@@ -56,7 +56,7 @@ interface CompleteFailoverDto {
 @ApiTags('chaos')
 @ApiBearerAuth()
 @UseGuards(AdminAuthGuard)
-@Controller('api/v1/chaos')
+@Controller('chaos')
 export class ChaosController {
   constructor(
     private readonly chaosEngine: ChaosEngineService,

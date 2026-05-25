@@ -28,7 +28,7 @@ class RunOlapQueryDto implements OlapQuery {
 @ApiTags('data-platform')
 @ApiBearerAuth()
 @UseGuards(AdminAuthGuard)
-@Controller('api/v1/data-platform')
+@Controller('data-platform')
 export class DataPlatformController {
   constructor(
     private readonly dataLake: DataLakeService,
