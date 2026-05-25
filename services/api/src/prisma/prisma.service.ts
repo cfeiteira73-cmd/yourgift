@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { RequestCostContext } from '../cost-intelligence/cost-per-request.interceptor';
+import { RequestCostContext } from '../cost-intelligence/request-cost-context';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {

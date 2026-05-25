@@ -1,33 +1,10 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable, tap } from 'rxjs';
-import { AsyncLocalStorage } from 'async_hooks';
 import { PrismaService } from '../prisma/prisma.service';
+import { RequestCostContext } from './request-cost-context';
 
-const queryCountStorage = new AsyncLocalStorage<{ count: number }>();
-
-export class RequestCostContext {
-  static setQueryCount(n: number): void {
-    const store = queryCountStorage.getStore();
-    if (store) {
-      store.count = n;
-    }
-  }
-
-  static getQueryCount(): number {
-    return queryCountStorage.getStore()?.count ?? 0;
-  }
-
-  static increment(): void {
-    const store = queryCountStorage.getStore();
-    if (store) {
-      store.count += 1;
-    }
-  }
-
-  static run<T>(fn: () => T): T {
-    return queryCountStorage.run({ count: 0 }, fn);
-  }
-}
+// Re-export so existing imports from this file continue to work
+export { RequestCostContext } from './request-cost-context';
 
 @Injectable()
 export class CostPerRequestInterceptor implements NestInterceptor {
@@ -55,15 +32,14 @@ export class CostPerRequestInterceptor implements NestInterceptor {
     const method: string = req.method;
 
     return new Observable((subscriber) => {
-      const store = { count: 0 };
-      queryCountStorage.run(store, () => {
+      RequestCostContext.run(() => {
         next.handle().pipe(
           tap({
             next: () => {
-              this.attributeCost(start, tenantId, endpoint, method, store.count);
+              this.attributeCost(start, tenantId, endpoint, method, RequestCostContext.getQueryCount());
             },
             error: () => {
-              this.attributeCost(start, tenantId, endpoint, method, store.count);
+              this.attributeCost(start, tenantId, endpoint, method, RequestCostContext.getQueryCount());
             },
           }),
         ).subscribe(subscriber);
