@@ -95,6 +95,7 @@ import { CommerceIntelligenceModule } from './commerce-intelligence/commerce-int
 import { SecurityCertificationModule } from './security-certification/security-certification.module';
 import { FinancialTraceModule } from './financial-trace/financial-trace.module';
 import { LifecycleModule } from './lifecycle/lifecycle.module';
+import { MaturityModule } from './maturity/maturity.module';
 import { APP_GUARD } from '@nestjs/core';
 import { TenantGuard } from './common/guards/tenant.guard';
 import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard';
@@ -208,6 +209,7 @@ import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard'
     SecurityCertificationModule,
     FinancialTraceModule,
     LifecycleModule,
+    MaturityModule,
   ],
   providers: [
     // Rate limiting — per tenant (not per IP) for authenticated requests
