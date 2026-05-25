@@ -27,7 +27,7 @@ services:
       pnpm --filter @yourgift/pf-concept run build &&
       cd services/api && pnpm exec prisma generate && cd ../.. &&
       pnpm --filter api run build
-    startCommand: node services/api/dist/main.js
+    startCommand: sh start-render.sh
     healthCheckPath: /api/v1/health
     autoDeploy: true
     scaling:
@@ -198,3 +198,30 @@ services:
       # SCIM tokens — add one per enterprise tenant
       # Format: SCIM_TOKEN_TENANT_ID_UPPERCASE=<bearer_token>
       # Example: SCIM_TOKEN_ACME_CORP=scim_token_abc123
+
+  # ── Admin Dashboard ────────────────────────────────────────────────────────
+  - type: web
+    name: yourgift-admin
+    runtime: node
+    region: frankfurt
+    plan: starter
+    buildCommand: >-
+      pnpm install --frozen-lockfile &&
+      pnpm --filter @yourgift/shared run build &&
+      pnpm --filter admin run build
+    startCommand: pnpm --filter admin start
+    healthCheckPath: /
+    autoDeploy: true
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      - key: NEXT_PUBLIC_API_URL
+        value: https://yourgift-api.onrender.com
+
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://admin.yourgift.pt
+
+      - key: SENTRY_DSN
+        sync: false    # <- Same as API
