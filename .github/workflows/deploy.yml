@@ -35,6 +35,9 @@ jobs:
       - name: Build Midocean integration
         run: pnpm --filter @yourgift/midocean run build
 
+      - name: Build pf-concept integration
+        run: pnpm --filter @yourgift/pf-concept run build
+
       - name: Generate Prisma client
         working-directory: services/api
         run: pnpm exec prisma generate
@@ -76,6 +79,9 @@ jobs:
 
       - name: Build Midocean integration (required for tsc)
         run: pnpm --filter @yourgift/midocean run build
+
+      - name: Build pf-concept integration (required for tsc)
+        run: pnpm --filter @yourgift/pf-concept run build
 
       - name: Generate Prisma client (required for tsc)
         working-directory: services/api
@@ -138,16 +144,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Render deploy — yourgift-api
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_API_SERVICE_ID: ${{ secrets.RENDER_API_SERVICE_ID }}
         run: |
+          if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_API_SERVICE_ID" ]; then
+            echo "⚠ RENDER_API_KEY or RENDER_API_SERVICE_ID not set — skipping Render deploy trigger"
+            echo "  Set secrets in: GitHub → repo Settings → Secrets → Actions"
+            exit 0
+          fi
           curl -s --fail \
             -X POST \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-            "https://api.render.com/v1/services/${{ secrets.RENDER_API_SERVICE_ID }}/deploys" \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            "https://api.render.com/v1/services/$RENDER_API_SERVICE_ID/deploys" \
             -H "Content-Type: application/json" \
             -d '{"clearCache": false}'
         # To get these values:
         #   RENDER_API_KEY       → Render Dashboard → Account → API Keys → New
-        #   RENDER_API_SERVICE_ID → Render Dashboard → yourgift-api → Settings → copy Service ID (srv-...)
+        #   RENDER_API_SERVICE_ID → srv-d87o4q0jo6nc73cpdue0
 
   # ── Deploy Web → Render ──────────────────────────────────────────────────────
   deploy-web:
@@ -156,11 +170,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Render deploy — yourgift-web
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_WEB_SERVICE_ID: ${{ secrets.RENDER_WEB_SERVICE_ID }}
         run: |
+          if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_WEB_SERVICE_ID" ]; then
+            echo "⚠ RENDER_API_KEY or RENDER_WEB_SERVICE_ID not set — skipping Render deploy trigger"
+            exit 0
+          fi
           curl -s --fail \
             -X POST \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-            "https://api.render.com/v1/services/${{ secrets.RENDER_WEB_SERVICE_ID }}/deploys" \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            "https://api.render.com/v1/services/$RENDER_WEB_SERVICE_ID/deploys" \
             -H "Content-Type: application/json" \
             -d '{"clearCache": false}'
         # RENDER_WEB_SERVICE_ID → Render Dashboard → yourgift-web → Settings → copy Service ID (srv-...)
