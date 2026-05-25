@@ -25,8 +25,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Build shared package
-        run: pnpm --filter @yourgift/shared run build
+      - name: Build shared packages (required before tsc)
+        run: |
+          pnpm --filter @yourgift/shared run build
+          pnpm --filter @yourgift/midocean run build
+          pnpm --filter @yourgift/pf-concept run build
 
       - name: Generate Prisma client
         working-directory: services/api
