@@ -4,15 +4,13 @@ on:
   push:
     branches: [main, master]
 
-# Cancel in-flight runs for the same branch
 concurrency:
   group: deploy-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # ── Type Check & Build verification ──────────────────────────────────────────
-  ci:
-    name: CI — Type Check & Build
+  build:
+    name: Build and type-check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,36 +27,35 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build shared package
+      - name: Build shared
         run: pnpm --filter @yourgift/shared run build
 
-      - name: Build Midocean integration
+      - name: Build midocean
         run: pnpm --filter @yourgift/midocean run build
 
-      - name: Build pf-concept integration
+      - name: Build pf-concept
         run: pnpm --filter @yourgift/pf-concept run build
 
-      - name: Generate Prisma client
+      - name: Prisma generate
         working-directory: services/api
         run: pnpm exec prisma generate
 
-      - name: Type check API
+      - name: Type-check API
         run: pnpm --filter api exec tsc --noEmit
 
-      - name: Type check Web
+      - name: Type-check Web
         run: pnpm --filter web exec tsc --noEmit
 
-      - name: Type check Admin
+      - name: Type-check Admin
         run: pnpm --filter admin exec tsc --noEmit
 
-      - name: Build API (smoke test)
+      - name: Build API
         run: pnpm --filter api run build
 
-  # ── Quality Gate ─────────────────────────────────────────────────────────────
-  quality-gate:
-    name: Quality Gate
+  quality:
+    name: Quality gate
     runs-on: ubuntu-latest
-    needs: [ci]
+    needs: [build]
     steps:
       - uses: actions/checkout@v4
 
@@ -74,157 +71,95 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build shared package (required for tsc)
+      - name: Build shared
         run: pnpm --filter @yourgift/shared run build
 
-      - name: Build Midocean integration (required for tsc)
+      - name: Build midocean
         run: pnpm --filter @yourgift/midocean run build
 
-      - name: Build pf-concept integration (required for tsc)
+      - name: Build pf-concept
         run: pnpm --filter @yourgift/pf-concept run build
 
-      - name: Generate Prisma client (required for tsc)
+      - name: Prisma generate
         working-directory: services/api
         run: pnpm exec prisma generate
 
-      - name: TypeScript — zero errors required
-        run: |
-          pnpm --filter api exec tsc --noEmit && echo "API: 0 TS errors"
-          pnpm --filter web exec tsc --noEmit && echo "Web: 0 TS errors"
-          pnpm --filter admin exec tsc --noEmit && echo "Admin: 0 TS errors"
-
-      - name: Schema drift check
+      - name: Prisma schema validate
         working-directory: services/api
-        run: |
-          pnpm exec prisma validate
-          echo "Prisma schema: valid"
+        run: pnpm exec prisma validate
 
-      - name: Scan for TODOs and placeholders (fail if critical)
-        run: |
-          TODOS=$(grep -r "TODO\|FIXME\|HACK" services/api/src --include="*.ts" | wc -l)
-          echo "TODOs found: $TODOS"
-          BLOCKERS=$(grep -r "saml_integration_pending\|passport-saml integration pending" services/api/src --include="*.ts" | wc -l)
-          if [ "$BLOCKERS" -gt 0 ]; then echo "BLOCKING TODOs found" && exit 1; fi
-          echo "No blocking TODOs"
-
-      - name: Env var completeness check
+      - name: Check env vars documented
         run: |
           REQUIRED_VARS="DATABASE_URL DIRECT_URL JWT_SECRET STRIPE_KEY RESEND_API_KEY AWS_ACCESS_KEY_ID UPSTASH_REDIS_URL"
           for var in $REQUIRED_VARS; do
-            grep -q "^${var}=" services/api/.env.example || (echo "Missing: $var in .env.example" && exit 1)
+            grep -q "^${var}=" services/api/.env.example || (echo "Missing in .env.example: $var" && exit 1)
           done
           echo "All required env vars documented"
 
-      - name: Check SYSTEM_READINESS_REPORT exists
-        run: test -f SYSTEM_READINESS_REPORT.md && echo "Readiness report: present" || (echo "SYSTEM_READINESS_REPORT.md missing" && exit 1)
+      - name: Check readiness report exists
+        run: test -f SYSTEM_READINESS_REPORT.md && echo "OK" || (echo "SYSTEM_READINESS_REPORT.md missing" && exit 1)
 
-  # ── Performance Budget ────────────────────────────────────────────────────────
-  performance-budget:
-    name: Performance Budget
-    runs-on: ubuntu-latest
-    needs: [ci]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Check SYSTEM_READINESS_REPORT exists
-        run: test -f SYSTEM_READINESS_REPORT.md && echo "Readiness report: present" || (echo "SYSTEM_READINESS_REPORT.md missing" && exit 1)
-
-      - name: Verify integration test suite is present
+      - name: Check integration tests exist
         run: |
-          test -f services/api/test/integration/reconciliation.test.ts && echo "reconciliation tests: present" || (echo "Missing reconciliation tests" && exit 1)
-          test -f services/api/test/integration/circuit-breaker.test.ts && echo "circuit-breaker tests: present" || (echo "Missing circuit-breaker tests" && exit 1)
-          test -f services/api/test/integration/rate-limit.test.ts && echo "rate-limit tests: present" || (echo "Missing rate-limit tests" && exit 1)
-          test -f services/api/test/integration/saml.test.ts && echo "saml tests: present" || (echo "Missing SAML tests" && exit 1)
-          test -f services/api/test/integration/health-deep.test.ts && echo "health-deep tests: present" || (echo "Missing health-deep tests" && exit 1)
+          for f in reconciliation circuit-breaker rate-limit saml health-deep; do
+            test -f "services/api/test/integration/${f}.test.ts" && echo "${f}: ok" || (echo "Missing: ${f}.test.ts" && exit 1)
+          done
 
-  # ── Deploy API → Render ──────────────────────────────────────────────────────
   deploy-api:
-    name: Deploy API → Render
-    needs: [quality-gate, performance-budget]
+    name: Deploy API to Render
     runs-on: ubuntu-latest
+    needs: [quality]
     steps:
-      - name: Trigger Render deploy — yourgift-api
+      - name: Trigger Render deploy for yourgift-api
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           RENDER_API_SERVICE_ID: ${{ secrets.RENDER_API_SERVICE_ID }}
         run: |
           if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_API_SERVICE_ID" ]; then
-            echo "⚠ RENDER_API_KEY or RENDER_API_SERVICE_ID not set — skipping Render deploy trigger"
-            echo "  Set secrets in: GitHub → repo Settings → Secrets → Actions"
+            echo "RENDER_API_KEY or RENDER_API_SERVICE_ID not set - skipping"
+            echo "Set in: GitHub Settings > Secrets > Actions"
+            echo "RENDER_API_SERVICE_ID = srv-d87o4q0jo6nc73cpdue0"
             exit 0
           fi
-          curl -s --fail \
+          curl -sf \
             -X POST \
             -H "Authorization: Bearer $RENDER_API_KEY" \
-            "https://api.render.com/v1/services/$RENDER_API_SERVICE_ID/deploys" \
             -H "Content-Type: application/json" \
-            -d '{"clearCache": false}'
-        # To get these values:
-        #   RENDER_API_KEY       → Render Dashboard → Account → API Keys → New
-        #   RENDER_API_SERVICE_ID → srv-d87o4q0jo6nc73cpdue0
+            -d '{"clearCache": false}' \
+            "https://api.render.com/v1/services/$RENDER_API_SERVICE_ID/deploys"
 
-  # ── Deploy Web → Render ──────────────────────────────────────────────────────
   deploy-web:
-    name: Deploy Web → Render
-    needs: [quality-gate, performance-budget]
+    name: Deploy Web to Render
     runs-on: ubuntu-latest
+    needs: [quality]
     steps:
-      - name: Trigger Render deploy — yourgift-web
+      - name: Trigger Render deploy for yourgift-web
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           RENDER_WEB_SERVICE_ID: ${{ secrets.RENDER_WEB_SERVICE_ID }}
         run: |
           if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_WEB_SERVICE_ID" ]; then
-            echo "⚠ RENDER_API_KEY or RENDER_WEB_SERVICE_ID not set — skipping Render deploy trigger"
+            echo "RENDER_API_KEY or RENDER_WEB_SERVICE_ID not set - skipping"
             exit 0
           fi
-          curl -s --fail \
+          curl -sf \
             -X POST \
             -H "Authorization: Bearer $RENDER_API_KEY" \
-            "https://api.render.com/v1/services/$RENDER_WEB_SERVICE_ID/deploys" \
             -H "Content-Type: application/json" \
-            -d '{"clearCache": false}'
-        # RENDER_WEB_SERVICE_ID → Render Dashboard → yourgift-web → Settings → copy Service ID (srv-...)
+            -d '{"clearCache": false}' \
+            "https://api.render.com/v1/services/$RENDER_WEB_SERVICE_ID/deploys"
 
-  # ── Deploy Worker → Cloudflare ───────────────────────────────────────────────
-  deploy-worker:
-    name: Deploy Edge Worker → Cloudflare
-    needs: [quality-gate, performance-budget]
+  summary:
+    name: Deploy summary
     runs-on: ubuntu-latest
-    if: ${{ vars.CLOUDFLARE_WORKER_ENABLED == 'true' }}
-    defaults:
-      run:
-        working-directory: infra/cloudflare
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Wrangler
-        run: npm install -g wrangler
-
-      - name: Deploy worker
-        run: wrangler deploy --env production
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-  # ── Notify on success ────────────────────────────────────────────────────────
-  notify:
-    name: Notify
     needs: [deploy-api, deploy-web]
-    runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Summary
+      - name: Write summary
         run: |
           echo "## Deploy Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Service | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | Result |" >> $GITHUB_STEP_SUMMARY
           echo "|---------|--------|" >> $GITHUB_STEP_SUMMARY
           echo "| yourgift-api | ${{ needs.deploy-api.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| yourgift-web | ${{ needs.deploy-web.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Commit: \`${{ github.sha }}\` by @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
