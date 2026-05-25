@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { EmailWorker } from './email.worker';
 import { PdfWorker } from './pdf.worker';
 import { SupplierSyncWorker } from './supplier-sync.worker';
 import { FinancialWorker } from './financial.worker';
 import { NotificationsModule } from '../../notifications/notifications.module';
+import { QueueModule } from '../queue.module';
 
 /**
  * WorkersModule
@@ -16,9 +17,12 @@ import { NotificationsModule } from '../../notifications/notifications.module';
  *  - Starts on module init, shuts down gracefully on module destroy
  *  - Sends exhausted jobs to DLQ via DlqService
  *  - Uses prefix '{yourgift}' to stay isolated on shared Redis
+ *
+ * forwardRef breaks circular: QueueModule↔WorkersModule
+ * (QueueModule provides REDIS_CONNECTION + DlqService which workers need)
  */
 @Module({
-  imports: [ConfigModule, NotificationsModule],
+  imports: [ConfigModule, NotificationsModule, forwardRef(() => QueueModule)],
   providers: [
     EmailWorker,
     PdfWorker,

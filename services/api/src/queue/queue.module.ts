@@ -1,4 +1,4 @@
-import { Module, Global } from '@nestjs/common';
+import { Module, Global, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Queue, Worker, QueueEvents, ConnectionOptions } from 'bullmq';
 import { QUEUE_NAMES, QUEUE_RETRY_CONFIG, QueueName } from './queue.constants';
@@ -64,7 +64,7 @@ function getRetryKey(name: string): keyof typeof QUEUE_RETRY_CONFIG {
 
 @Global()
 @Module({
-  imports: [ConfigModule, WorkersModule],
+  imports: [ConfigModule, forwardRef(() => WorkersModule)],
   controllers: [QueueAdminController],
   providers: [
     {
