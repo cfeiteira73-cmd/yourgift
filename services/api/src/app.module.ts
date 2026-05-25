@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { TelemetryModule } from './common/telemetry/telemetry.module';
+import { PiiModule } from './common/pii/pii.module';
 import { OrdersModule } from './orders/orders.module';
 import { ProductsModule } from './products/products.module';
 import { AuthModule } from './auth/auth.module';
@@ -78,12 +80,16 @@ import { ModelOpsModule } from './model-ops/model-ops.module';
 import { ChaosModule } from './chaos/chaos.module';
 import { TenantEconomicsModule } from './tenant-economics/tenant-economics.module';
 import { DataPlatformModule } from './data-platform/data-platform.module';
+import { RefundsModule } from './refunds/refunds.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { APP_GUARD } from '@nestjs/core';
 import { TenantGuard } from './common/guards/tenant.guard';
 import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard';
 
 @Module({
   imports: [
+    TelemetryModule,
+    PiiModule,
     ConfigModule.forRoot({ isGlobal: true }),
     ThrottlerModule.forRoot([
       {
@@ -174,6 +180,8 @@ import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard'
     ChaosModule,
     TenantEconomicsModule,
     DataPlatformModule,
+    RefundsModule,
+    SubscriptionsModule,
   ],
   providers: [
     // Rate limiting — per tenant (not per IP) for authenticated requests

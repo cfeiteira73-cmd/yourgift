@@ -31,10 +31,10 @@ const config: Config = {
   globals: {
     'ts-jest': {
       tsconfig: {
-        // Allow js files in tests
         allowJs: true,
-        // Relax some checks for test files
         strict: false,
+        types: ['jest', 'node'],
+        esModuleInterop: true,
       },
     },
   },

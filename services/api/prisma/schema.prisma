@@ -222,6 +222,7 @@ model Order {
   approvals   Approval[]
   eventLogs   EventLog[]
   quote       Quote?
+  refunds     Refund[]
 
   @@index([clientId])
   @@index([companyId])
@@ -1008,7 +1009,9 @@ model Tenant {
   settings            Json     @default("{}")
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
-  memberships         TenantMembership[]
+  memberships   TenantMembership[]
+  subscriptions Subscription[]
+
   @@map("tenants")
 }
 
@@ -3339,4 +3342,57 @@ model TenantResourceAllocation {
   @@unique([tenantId, resourceType])
   @@index([resourceType, weight])
   @@map("tenant_resource_allocations")
+}
+
+// ─────────────────────────────────────────────
+// REFUNDS
+// ─────────────────────────────────────────────
+
+model Refund {
+  id             String   @id @default(cuid())
+  orderId        String   @map("order_id")
+  order          Order    @relation(fields: [orderId], references: [id])
+  stripeRefundId String   @unique @map("stripe_refund_id")
+  amount         Decimal  @db.Decimal(12, 2)
+  currency       String   @default("EUR")
+  reason         String?
+  status         String   @default("succeeded")
+  refundedBy     String?  @map("refunded_by")
+  ledgerTxId     String?  @map("ledger_tx_id")
+  metadata       Json?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([orderId])
+  @@map("refunds")
+}
+
+// ─────────────────────────────────────────────
+// SUBSCRIPTIONS
+// ─────────────────────────────────────────────
+
+model Subscription {
+  id                   String    @id @default(cuid())
+  tenantId             String    @map("tenant_id")
+  tenant               Tenant    @relation(fields: [tenantId], references: [id])
+  stripeSubscriptionId String    @unique @map("stripe_subscription_id")
+  stripeCustomerId     String    @map("stripe_customer_id")
+  stripePriceId        String    @map("stripe_price_id")
+  planId               String    @map("plan_id")
+  // active | trialing | past_due | canceling | canceled
+  status               String    @default("active")
+  currentPeriodStart   DateTime  @map("current_period_start")
+  currentPeriodEnd     DateTime  @map("current_period_end")
+  cancelAtPeriodEnd    Boolean   @default(false) @map("cancel_at_period_end")
+  trialEnd             DateTime? @map("trial_end")
+  metadata             Json?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([tenantId])
+  @@index([stripeSubscriptionId])
+  @@index([status])
+  @@map("subscriptions")
 }

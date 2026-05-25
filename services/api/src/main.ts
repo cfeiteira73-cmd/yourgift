@@ -3,6 +3,10 @@ import { initSentry } from './observability/sentry.config';
 // Sentry MUST be initialised before any other import that touches instrumentation
 initSentry();
 
+import { initTelemetry } from './common/telemetry/otel';
+// OpenTelemetry MUST be initialised before NestJS boots so auto-instrumentations can patch modules
+initTelemetry();
+
 import { NestFactory, Reflector } from '@nestjs/core';
 import { ValidationPipe, Logger, ClassSerializerInterceptor } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
