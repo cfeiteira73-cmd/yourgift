@@ -66,6 +66,7 @@ import { PolicyExecutionModule } from './policy-execution/policy-execution.modul
 import { ProcurementWorkflowModule } from './procurement-workflow/procurement-workflow.module';
 import { FailsafeModule } from './failsafe/failsafe.module';
 import { QueueModule } from './queue/queue.module';
+import { WorkersModule } from './queue/workers/workers.module';
 import { EnterpriseIdentityModule } from './enterprise-identity/enterprise-identity.module';
 import { TracingModule } from './tracing/tracing.module';
 import { IncidentModule } from './incident/incident.module';
@@ -161,6 +162,7 @@ import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard'
     ProcurementWorkflowModule,
     FailsafeModule,
     QueueModule,
+    WorkersModule,
     EnterpriseIdentityModule,
     TracingModule,
     IncidentModule,

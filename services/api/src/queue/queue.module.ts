@@ -1,11 +1,10 @@
-import { Module, Global, forwardRef } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Queue, Worker, QueueEvents, ConnectionOptions } from 'bullmq';
 import { QUEUE_NAMES, QUEUE_RETRY_CONFIG, QueueName } from './queue.constants';
 import { QueueService } from './queue.service';
 import { DlqService } from './dlq.service';
 import { QueueAdminController } from './queue-admin.controller';
-import { WorkersModule } from './workers/workers.module';
 
 /**
  * Factory token for the Redis connection shared across all queues.
@@ -64,7 +63,7 @@ function getRetryKey(name: string): keyof typeof QUEUE_RETRY_CONFIG {
 
 @Global()
 @Module({
-  imports: [ConfigModule, forwardRef(() => WorkersModule)],
+  imports: [ConfigModule],
   controllers: [QueueAdminController],
   providers: [
     {
