@@ -201,7 +201,7 @@ export class SamlService {
     const parser = new XMLParser({
       ignoreAttributes: false,
       attributeNamePrefix: '@_',
-      isArray: (name) =>
+      isArray: (name: string) =>
         ['Attribute', 'AttributeValue', 'AudienceRestriction'].includes(name),
       processEntities: true,
       allowBooleanAttributes: true,
