@@ -12,6 +12,8 @@ const config: Config = {
     '**/*.spec.ts',
     // Integration tests
     'test/integration/**/*.test.ts',
+    // Security / penetration simulation tests
+    'test/security/**/*.test.ts',
   ],
   moduleNameMapper: {
     // Map workspace packages to their dist or src equivalents during testing

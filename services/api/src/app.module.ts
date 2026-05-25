@@ -91,6 +91,8 @@ import { SreModule } from './sre/sre.module';
 import { CostIntelligenceModule } from './cost-intelligence/cost-intelligence.module';
 import { LearningLoopModule } from './learning-loop/learning-loop.module';
 import { ControlPlaneModule } from './control-plane/control-plane.module';
+import { CommerceIntelligenceModule } from './commerce-intelligence/commerce-intelligence.module';
+import { SecurityCertificationModule } from './security-certification/security-certification.module';
 import { APP_GUARD } from '@nestjs/core';
 import { TenantGuard } from './common/guards/tenant.guard';
 import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard';
@@ -200,6 +202,8 @@ import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard'
     CostIntelligenceModule,
     LearningLoopModule,
     ControlPlaneModule,
+    CommerceIntelligenceModule,
+    SecurityCertificationModule,
   ],
   providers: [
     // Rate limiting — per tenant (not per IP) for authenticated requests
