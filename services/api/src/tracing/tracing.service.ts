@@ -14,7 +14,7 @@ import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { ExportResultCode } from '@opentelemetry/core';
 import type { ExportResult } from '@opentelemetry/core';
-import { resourceFromAttributes } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 
 export interface SpanFilters {
   service?: string;
@@ -60,7 +60,7 @@ class PrismaSpanExporter implements SpanExporter {
       return {
         traceId: sc.traceId,
         spanId: sc.spanId,
-        parentSpanId: span.parentSpanContext?.spanId ?? null,
+        parentSpanId: span.parentSpanId ?? null,
         name: span.name,
         service: (span.resource.attributes['service.name'] as string) ?? 'unknown',
         kind: span.kind,
@@ -112,7 +112,7 @@ export class TracingService implements OnModuleInit {
     const processor = new SimpleSpanProcessor(exporter);
 
     this.provider = new BasicTracerProvider({
-      resource: resourceFromAttributes({
+      resource: new Resource({
         'service.name': this.serviceName,
         'service.version': this.serviceVersion,
         'deployment.environment':
