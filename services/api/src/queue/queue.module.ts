@@ -1,5 +1,6 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AdminGuard } from '../auth/guards/admin.guard';
 import { Queue, Worker, QueueEvents, ConnectionOptions } from 'bullmq';
 import { QUEUE_NAMES, QUEUE_RETRY_CONFIG, QueueName } from './queue.constants';
 import { QueueService } from './queue.service';
@@ -75,6 +76,7 @@ function getRetryKey(name: string): keyof typeof QUEUE_RETRY_CONFIG {
     ...queueProviders,
     QueueService,
     DlqService,
+    AdminGuard,
   ],
   exports: [
     REDIS_CONNECTION,

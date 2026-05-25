@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AdminGuard } from '../auth/guards/admin.guard';
 import { GovernanceService } from './governance.service';
 import { TrustEngineService } from './trust-engine.service';
 import { DecisionTraceService } from './decision-trace.service';
@@ -10,7 +11,7 @@ import { GdprController } from './gdpr/gdpr.controller';
 
 @Module({
   controllers: [GovernanceController, RiskController, GdprController],
-  providers: [GovernanceService, TrustEngineService, DecisionTraceService, UnifiedRiskService, GdprService],
+  providers: [GovernanceService, TrustEngineService, DecisionTraceService, UnifiedRiskService, GdprService, AdminGuard],
   exports: [GovernanceService, TrustEngineService, DecisionTraceService, UnifiedRiskService, GdprService],
 })
 export class GovernanceModule {}

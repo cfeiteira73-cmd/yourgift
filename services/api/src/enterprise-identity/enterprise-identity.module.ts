@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuthModule } from '../auth/auth.module';
+import { AdminGuard } from '../auth/guards/admin.guard';
 import { SSOConfigService } from './sso-config.service';
 import { OIDCService } from './oidc.service';
 import { SamlService } from './saml.service';
@@ -48,7 +49,7 @@ import { EnterpriseIdentityController } from './enterprise-identity.controller';
     }),
   ],
   controllers: [EnterpriseIdentityController, SCIMController],
-  providers: [SSOConfigService, OIDCService, SamlService, SCIMService],
+  providers: [SSOConfigService, OIDCService, SamlService, SCIMService, AdminGuard],
   exports: [SSOConfigService, SamlService, SCIMService],
 })
 export class EnterpriseIdentityModule {}
