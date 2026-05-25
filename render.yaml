@@ -20,7 +20,13 @@ services:
     runtime: node
     region: frankfurt
     plan: starter
-    buildCommand: pnpm install --frozen-lockfile && pnpm --filter api build
+    buildCommand: >-
+      pnpm install --frozen-lockfile &&
+      pnpm --filter @yourgift/shared run build &&
+      pnpm --filter @yourgift/midocean run build &&
+      pnpm --filter @yourgift/pf-concept run build &&
+      cd services/api && pnpm exec prisma generate && cd ../.. &&
+      pnpm --filter api run build
     startCommand: node services/api/dist/main.js
     healthCheckPath: /api/v1/health
     autoDeploy: true
@@ -156,7 +162,10 @@ services:
     runtime: node
     region: frankfurt
     plan: starter
-    buildCommand: pnpm install --frozen-lockfile && pnpm --filter web build
+    buildCommand: >-
+      pnpm install --frozen-lockfile &&
+      pnpm --filter @yourgift/shared run build &&
+      pnpm --filter web run build
     startCommand: pnpm --filter web start
     healthCheckPath: /
     autoDeploy: true
