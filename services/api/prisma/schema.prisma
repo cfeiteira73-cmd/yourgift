@@ -3101,3 +3101,242 @@ model HealthCheckResult {
   @@index([checkedAt(sort: Desc)])
   @@map("health_check_results")
 }
+
+// ─────────────────────────────────────────────
+// MODEL OPS / AI GOVERNANCE
+// ─────────────────────────────────────────────
+
+model ModelVersion {
+  id             String    @id @default(uuid())
+  modelId        String    @map("model_id")
+  name           String
+  provider       String
+  modelRef       String    @map("model_ref")
+  purpose        String
+  status         String    @default("candidate")
+  config         Json      @default("{}")
+  promotedAt     DateTime? @map("promoted_at")
+  retiredAt      DateTime? @map("retired_at")
+  rolledBackAt   DateTime? @map("rolled_back_at")
+  rollbackReason String?   @map("rollback_reason")
+  createdBy      String?   @map("created_by")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  driftRecords    ModelDriftRecord[]
+  overrideRecords ModelOverrideRecord[]
+
+  @@index([modelId])
+  @@index([status])
+  @@index([purpose])
+  @@map("model_versions")
+}
+
+model ModelDriftRecord {
+  id             String   @id @default(uuid())
+  modelVersionId String   @map("model_version_id")
+  metric         String
+  expectedValue  Float    @map("expected_value")
+  observedValue  Float    @map("observed_value")
+  driftPct       Float    @map("drift_pct")
+  severity       String   @default("low")
+  windowStart    DateTime @map("window_start")
+  windowEnd      DateTime @map("window_end")
+  sampleCount    Int      @map("sample_count")
+  tenantId       String?  @map("tenant_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  modelVersion ModelVersion @relation(fields: [modelVersionId], references: [id], onDelete: Cascade)
+
+  @@index([modelVersionId])
+  @@index([metric])
+  @@index([severity])
+  @@index([createdAt(sort: Desc)])
+  @@map("model_drift_records")
+}
+
+model ModelOverrideRecord {
+  id                   String    @id @default(uuid())
+  modelVersionId       String    @map("model_version_id")
+  decisionId           String?   @map("decision_id")
+  procurementRequestId String?   @map("procurement_request_id")
+  tenantId             String?   @map("tenant_id")
+  overriddenBy         String    @map("overridden_by")
+  aiRecommendation     String    @map("ai_recommendation")
+  humanDecision        String    @map("human_decision")
+  overrideReason       String?   @map("override_reason")
+  outcome              String?
+  outcomeNotes         String?   @map("outcome_notes")
+  financialImpact      Float?    @map("financial_impact")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  resolvedAt           DateTime? @map("resolved_at")
+
+  modelVersion ModelVersion @relation(fields: [modelVersionId], references: [id], onDelete: Cascade)
+
+  @@index([modelVersionId])
+  @@index([tenantId])
+  @@index([createdAt(sort: Desc)])
+  @@map("model_override_records")
+}
+
+model ShadowDeployment {
+  id               String    @id @default(uuid())
+  activeVersionId  String    @map("active_version_id")
+  shadowVersionId  String    @map("shadow_version_id")
+  purpose          String
+  status           String    @default("running")
+  totalRequests    Int       @default(0) @map("total_requests")
+  agreementRate    Float?    @map("agreement_rate")
+  avgLatencyDelta  Float?    @map("avg_latency_delta")
+  startedAt        DateTime  @default(now()) @map("started_at")
+  endedAt          DateTime? @map("ended_at")
+  promotionNotes   String?   @map("promotion_notes")
+  tenantId         String?   @map("tenant_id")
+
+  @@index([status])
+  @@index([purpose])
+  @@map("shadow_deployments")
+}
+
+// ─────────────────────────────────────────────
+// CHAOS ENGINEERING + MULTI-REGION RESILIENCE
+// ─────────────────────────────────────────────
+
+model ChaosDrill {
+  id            String    @id @default(uuid())
+  drillType     String    @map("drill_type")
+  targetService String    @map("target_service")
+  status        String    @default("scheduled")
+  config        Json      @default("{}")
+  scheduledAt   DateTime  @map("scheduled_at")
+  startedAt     DateTime? @map("started_at")
+  completedAt   DateTime? @map("completed_at")
+  triggeredBy   String    @map("triggered_by")
+  observations  Json      @default("[]")
+  mttrMinutes   Float?    @map("mttr_minutes")
+  rtoMet        Boolean?  @map("rto_met")
+  rpoMet        Boolean?  @map("rpo_met")
+  findings      String?
+  tenantId      String?   @map("tenant_id")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  @@index([status])
+  @@index([drillType])
+  @@index([scheduledAt(sort: Desc)])
+  @@map("chaos_drills")
+}
+
+model RegionHealth {
+  id               String    @id @default(uuid())
+  region           String
+  role             String    @default("primary")
+  status           String    @default("healthy")
+  dbLatencyMs      Int?      @map("db_latency_ms")
+  redisLatencyMs   Int?      @map("redis_latency_ms")
+  apiLatencyP95Ms  Int?      @map("api_latency_p95_ms")
+  lastSyncAt       DateTime? @map("last_sync_at")
+  lagSeconds       Int?      @map("lag_seconds")
+  checkedAt        DateTime  @default(now()) @map("checked_at")
+
+  @@index([region, checkedAt(sort: Desc)])
+  @@index([status])
+  @@map("region_health")
+}
+
+model FailoverEvent {
+  id            String    @id @default(uuid())
+  fromRegion    String    @map("from_region")
+  toRegion      String    @map("to_region")
+  trigger       String
+  status        String    @default("initiated")
+  rtoMinutes    Float?    @map("rto_minutes")
+  rpoMinutes    Float?    @map("rpo_minutes")
+  rtoTargetMet  Boolean?  @map("rto_target_met")
+  rpoTargetMet  Boolean?  @map("rpo_target_met")
+  initiatedBy   String    @map("initiated_by")
+  notes         String?
+  startedAt     DateTime  @default(now()) @map("started_at")
+  completedAt   DateTime? @map("completed_at")
+
+  @@index([status])
+  @@index([startedAt(sort: Desc)])
+  @@map("failover_events")
+}
+
+// ─────────────────────────────────────────────
+// TENANT ECONOMICS & USAGE METERING
+// ─────────────────────────────────────────────
+
+model UsageMeteringEvent {
+  id          String   @id @default(uuid())
+  tenantId    String   @map("tenant_id")
+  eventType   String   @map("event_type")
+  resourceId  String?  @map("resource_id")
+  units       Float    @default(1)
+  unitType    String   @map("unit_type")
+  costEur     Float    @default(0) @map("cost_eur")
+  provider    String?
+  modelRef    String?  @map("model_ref")
+  durationMs  Int?     @map("duration_ms")
+  tenantPlan  String   @map("tenant_plan")
+  occurredAt  DateTime @default(now()) @map("occurred_at")
+
+  @@index([tenantId, occurredAt(sort: Desc)])
+  @@index([eventType])
+  @@index([occurredAt(sort: Desc)])
+  @@map("usage_metering_events")
+}
+
+model TenantUsageSummary {
+  id               String   @id @default(uuid())
+  tenantId         String   @map("tenant_id")
+  periodStart      DateTime @map("period_start")
+  periodEnd        DateTime @map("period_end")
+  periodType       String   @map("period_type")
+  aiCallCount      Int      @default(0) @map("ai_call_count")
+  aiTokensUsed     BigInt   @default(0) @map("ai_tokens_used")
+  aiCostEur        Float    @default(0) @map("ai_cost_eur")
+  apiCallCount     Int      @default(0) @map("api_call_count")
+  procurementCount Int      @default(0) @map("procurement_count")
+  simulationCount  Int      @default(0) @map("simulation_count")
+  queueJobCount    Int      @default(0) @map("queue_job_count")
+  storageBytes     BigInt   @default(0) @map("storage_bytes")
+  totalCostEur     Float    @default(0) @map("total_cost_eur")
+  computedAt       DateTime @default(now()) @map("computed_at")
+
+  @@unique([tenantId, periodStart, periodType])
+  @@index([tenantId, periodType])
+  @@index([periodStart(sort: Desc)])
+  @@map("tenant_usage_summaries")
+}
+
+model TenantQuota {
+  id                      String   @id @default(uuid())
+  tenantId                String   @unique @map("tenant_id")
+  maxAiCallsPerDay        Int      @default(1000) @map("max_ai_calls_per_day")
+  maxAiTokensPerDay       BigInt   @default(1000000) @map("max_ai_tokens_per_day")
+  maxProcurementsPerMonth Int      @default(500) @map("max_procurements_per_month")
+  maxSimulationsPerDay    Int      @default(200) @map("max_simulations_per_day")
+  maxApiCallsPerMinute    Int      @default(200) @map("max_api_calls_per_minute")
+  maxStorageGb            Float    @default(10) @map("max_storage_gb")
+  maxQueueJobsPerHour     Int      @default(1000) @map("max_queue_jobs_per_hour")
+  aiCostBudgetEurMonth    Float?   @map("ai_cost_budget_eur_month")
+  alertThresholdPct       Int      @default(80) @map("alert_threshold_pct")
+  softEnforcement         Boolean  @default(true) @map("soft_enforcement")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  @@map("tenant_quotas")
+}
+
+model TenantResourceAllocation {
+  id           String   @id @default(uuid())
+  tenantId     String   @map("tenant_id")
+  resourceType String   @map("resource_type")
+  weight       Float    @default(1.0)
+  priority     Int      @default(5)
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@unique([tenantId, resourceType])
+  @@index([resourceType, weight])
+  @@map("tenant_resource_allocations")
+}

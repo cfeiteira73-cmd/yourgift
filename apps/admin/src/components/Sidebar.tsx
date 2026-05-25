@@ -624,6 +624,30 @@ const SECONDARY_ITEMS: NavItem[] = [
   },
 ];
 
+const MODEL_OPS_ITEMS: NavItem[] = [
+  {
+    href: '/ai-governance',
+    label: 'AI Governance',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 1l1.5 3.5H13l-2.5 2 1 3.5L8 8l-3.5 2 1-3.5L3 4.5h3.5L8 1z" />
+        <circle cx="3" cy="13" r="1.5" />
+        <circle cx="8" cy="13" r="1.5" />
+        <circle cx="13" cy="13" r="1.5" />
+        <path d="M3 11.5v-2M8 11.5v-3M13 11.5v-2" />
+      </svg>
+    ),
+  },
+];
+
+const ECONOMICS_ITEMS: NavItem[] = [
+  {
+    href: '/tenant-economics',
+    label: 'Tenant Economics',
+    icon: <span style={{ fontSize: 14 }}>💰</span>,
+  },
+];
+
 const RELIABILITY_ITEMS: NavItem[] = [
   {
     href: '/traces',
@@ -702,6 +726,16 @@ const RELIABILITY_ITEMS: NavItem[] = [
         <line x1="12.5" y1="3.5" x2="9.5" y2="6.5" />
         <line x1="3.5" y1="12.5" x2="6.5" y2="9.5" />
         <line x1="12.5" y1="12.5" x2="9.5" y2="9.5" />
+      </svg>
+    ),
+  },
+  {
+    href: '/chaos',
+    label: 'Chaos Engineering',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 1L14.5 4.5V8.5c0 3.5-2.8 5.8-6.5 6.5C1.3 14.3 1.5 12 1.5 8.5V4.5L8 1z" />
+        <path d="M5.5 7.5l1.5 2.5 3.5-4" />
       </svg>
     ),
   },
@@ -797,10 +831,50 @@ export default function Sidebar() {
         <div className="my-4 border-t border-[#1a2f48]" />
 
         <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest text-[#4d6a87]">
+          Analytics
+        </p>
+
+        <NavLink
+          item={{
+            href: '/data-platform',
+            label: 'Data Platform',
+            icon: (
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <ellipse cx="8" cy="4" rx="6" ry="2" />
+                <path d="M2 4v4c0 1.1 2.686 2 6 2s6-.9 6-2V4" />
+                <path d="M2 8v4c0 1.1 2.686 2 6 2s6-.9 6-2V8" />
+              </svg>
+            ),
+          }}
+        />
+
+        <div className="my-4 border-t border-[#1a2f48]" />
+
+        <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest text-[#4d6a87]">
+          Model Ops ⚡
+        </p>
+
+        {MODEL_OPS_ITEMS.map((item) => (
+          <NavLink key={item.href} item={item} />
+        ))}
+
+        <div className="my-4 border-t border-[#1a2f48]" />
+
+        <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest text-[#4d6a87]">
           Reliability
         </p>
 
         {RELIABILITY_ITEMS.map((item) => (
+          <NavLink key={item.href} item={item} />
+        ))}
+
+        <div className="my-4 border-t border-[#1a2f48]" />
+
+        <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest text-[#4d6a87]">
+          Economics
+        </p>
+
+        {ECONOMICS_ITEMS.map((item) => (
           <NavLink key={item.href} item={item} />
         ))}
       </nav>

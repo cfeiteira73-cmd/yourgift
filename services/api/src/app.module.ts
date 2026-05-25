@@ -73,6 +73,10 @@ import { ReconciliationModule } from './reconciliation/reconciliation.module';
 import { RecoveryModule } from './recovery/recovery.module';
 import { RateLimitModule } from './rate-limit/rate-limit.module';
 import { ReliabilityModule } from './reliability/reliability.module';
+import { ModelOpsModule } from './model-ops/model-ops.module';
+import { ChaosModule } from './chaos/chaos.module';
+import { TenantEconomicsModule } from './tenant-economics/tenant-economics.module';
+import { DataPlatformModule } from './data-platform/data-platform.module';
 import { APP_GUARD } from '@nestjs/core';
 import { TenantGuard } from './common/guards/tenant.guard';
 import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard';
@@ -164,6 +168,10 @@ import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard'
     RecoveryModule,
     RateLimitModule,
     ReliabilityModule,
+    ModelOpsModule,
+    ChaosModule,
+    TenantEconomicsModule,
+    DataPlatformModule,
   ],
   providers: [
     // Rate limiting — per tenant (not per IP) for authenticated requests

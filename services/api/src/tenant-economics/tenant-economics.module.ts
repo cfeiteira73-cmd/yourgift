@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { AdminAuthService } from './admin-auth.service';
-import { AdminAuthController } from './admin-auth.controller';
-import { AdminAuthGuard } from './admin-auth.guard';
 import { PrismaModule } from '../prisma/prisma.module';
+import { UsageMeteringService } from './usage-metering.service';
+import { TenantQuotaService } from './tenant-quota.service';
+import { TenantEconomicsController } from './tenant-economics.controller';
 
 @Module({
   imports: [
@@ -17,8 +17,8 @@ import { PrismaModule } from '../prisma/prisma.module';
       }),
     }),
   ],
-  controllers: [AdminAuthController],
-  providers: [AdminAuthService, AdminAuthGuard],
-  exports: [AdminAuthService, AdminAuthGuard, JwtModule],
+  controllers: [TenantEconomicsController],
+  providers: [UsageMeteringService, TenantQuotaService],
+  exports: [UsageMeteringService, TenantQuotaService],
 })
-export class AdminAuthModule {}
+export class TenantEconomicsModule {}
