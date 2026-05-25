@@ -77,6 +77,9 @@ async function bootstrap() {
       'https://admin.yourgift.pt',
       'https://www.yourgift.pt',
       'https://yourgift.pt',
+      // Render default service URLs (active until custom domains are pointed)
+      'https://yourgift-web.onrender.com',
+      'https://yourgift-admin.onrender.com',
       /\.vercel\.app$/,
       ...(process.env.NODE_ENV !== 'production'
         ? ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002']

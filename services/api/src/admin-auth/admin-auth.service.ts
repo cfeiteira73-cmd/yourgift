@@ -1,9 +1,11 @@
 import {
   Injectable,
+  Logger,
   UnauthorizedException,
   NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
@@ -18,9 +20,12 @@ interface AdminTokenPayload {
 
 @Injectable()
 export class AdminAuthService implements OnModuleInit {
+  private readonly logger = new Logger(AdminAuthService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
+    private readonly config: ConfigService,
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -153,15 +158,18 @@ export class AdminAuthService implements OnModuleInit {
         where: { email: 'admin@yourgift.pt' },
       });
       if (existing) return;
-      await this.createAdmin(
-        'admin@yourgift.pt',
-        'Super Admin',
-        'YourGift2026!',
-        'admin',
-      );
-      console.log(
-        '✓ Default admin created: admin@yourgift.pt / YourGift2026!',
-      );
+
+      // Use ADMIN_DEFAULT_PASSWORD env var; fall back to a random value
+      // so we never ship a known password to production.
+      const password =
+        this.config.get<string>('ADMIN_DEFAULT_PASSWORD') ??
+        Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+
+      await this.createAdmin('admin@yourgift.pt', 'Super Admin', password, 'admin');
+      this.logger.log('Default admin created: admin@yourgift.pt');
+      if (this.config.get('NODE_ENV') !== 'production') {
+        this.logger.debug(`Default admin password: ${password}`);
+      }
     } catch {
       // DB may not be ready yet during initial boot — suppress gracefully
     }
