@@ -4,11 +4,13 @@ import {
   ExecutionContext,
   CallHandler,
   Logger,
+  Optional,
 } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { Request, Response } from 'express';
 import { getRequestContext } from '../middleware/correlation-id.middleware';
+import { MetricsService } from '../../observability/metrics.service';
 
 export interface StructuredLog {
   level: 'info' | 'warn' | 'error';
@@ -32,6 +34,8 @@ export interface StructuredLog {
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
   private readonly logger = new Logger('HTTP');
+
+  constructor(@Optional() private readonly metricsService?: MetricsService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     if (context.getType() !== 'http') return next.handle();
@@ -63,6 +67,9 @@ export class LoggingInterceptor implements NestInterceptor {
           ...baseLog,
         };
 
+        // Record latency for p95/p99 SLO tracking
+        this.metricsService?.recordLatency(req.path, req.method, res.statusCode, durationMs);
+
         if (durationMs > 3000) {
           this.logger.warn(JSON.stringify({ ...log, level: 'warn', slowRequest: true }));
         } else {
@@ -84,6 +91,9 @@ export class LoggingInterceptor implements NestInterceptor {
           },
           ...baseLog,
         };
+
+        // Record latency for error responses too
+        this.metricsService?.recordLatency(req.path, req.method, statusCode, durationMs);
 
         if (statusCode >= 500) {
           this.logger.error(JSON.stringify(log));

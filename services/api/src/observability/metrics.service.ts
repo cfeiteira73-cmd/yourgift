@@ -2,6 +2,22 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import type { SystemHealthSnapshot, SystemAlert } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
+export interface LatencyPercentiles {
+  p50: number;
+  p95: number;
+  p99: number;
+  count: number;
+  avg: number;
+}
+
+export interface SloBreachReport {
+  endpoint: string;
+  p95: number;
+  p99: number;
+  sampleCount: number;
+  severity: 'warning' | 'critical';
+}
+
 @Injectable()
 export class MetricsService implements OnModuleInit {
   private readonly logger = new Logger(MetricsService.name);
@@ -293,6 +309,82 @@ export class MetricsService implements OnModuleInit {
       where: { isResolved: false },
       orderBy: { createdAt: 'desc' },
     });
+  }
+
+  // ── In-memory p95/p99 latency buckets ────────────────────────────────────────
+
+  private readonly latencyBuckets = new Map<string, number[]>(); // key → [latencies]
+  private readonly MAX_SAMPLES = 10_000; // rolling window per endpoint key
+
+  /**
+   * Record a request latency sample for an endpoint.
+   * Called by the LoggingInterceptor on each request completion.
+   */
+  recordLatency(endpoint: string, method: string, statusCode: number, durationMs: number): void {
+    const key = `${method}:${endpoint}:${statusCode}`;
+    if (!this.latencyBuckets.has(key)) {
+      this.latencyBuckets.set(key, []);
+    }
+    const bucket = this.latencyBuckets.get(key)!;
+    bucket.push(durationMs);
+    // Rolling window — drop oldest when over cap
+    if (bucket.length > this.MAX_SAMPLES) {
+      bucket.shift();
+    }
+  }
+
+  /**
+   * Get p50/p95/p99 for a specific endpoint key.
+   * Returns null if fewer than 10 samples have been recorded.
+   */
+  getLatencyPercentiles(
+    endpoint: string,
+    method: string,
+    statusCode = 200,
+  ): LatencyPercentiles | null {
+    const key = `${method}:${endpoint}:${statusCode}`;
+    const samples = this.latencyBuckets.get(key);
+    if (!samples || samples.length < 10) return null;
+    const sorted = [...samples].sort((a, b) => a - b);
+    const avg = sorted.reduce((a, b) => a + b, 0) / sorted.length;
+    return {
+      p50: sorted[Math.floor(sorted.length * 0.5)] ?? 0,
+      p95: sorted[Math.floor(sorted.length * 0.95)] ?? 0,
+      p99: sorted[Math.floor(sorted.length * 0.99)] ?? 0,
+      count: sorted.length,
+      avg: Math.round(avg * 100) / 100,
+    };
+  }
+
+  /**
+   * Get all endpoint keys currently tracked in-memory.
+   */
+  getAllTrackedEndpoints(): string[] {
+    return Array.from(this.latencyBuckets.keys());
+  }
+
+  /**
+   * Get all endpoints breaching SLO thresholds.
+   * p95 > 300ms = warning, p99 > 800ms = critical.
+   */
+  getSloBreaches(): SloBreachReport[] {
+    const breaches: SloBreachReport[] = [];
+    for (const [key, samples] of this.latencyBuckets) {
+      if (samples.length < 10) continue;
+      const sorted = [...samples].sort((a, b) => a - b);
+      const p95 = sorted[Math.floor(sorted.length * 0.95)] ?? 0;
+      const p99 = sorted[Math.floor(sorted.length * 0.99)] ?? 0;
+      if (p95 > 300 || p99 > 800) {
+        breaches.push({
+          endpoint: key,
+          p95,
+          p99,
+          sampleCount: samples.length,
+          severity: p99 > 800 ? 'critical' : 'warning',
+        });
+      }
+    }
+    return breaches.sort((a, b) => b.p99 - a.p99);
   }
 
   async getEventProcessingStats(hours = 1): Promise<

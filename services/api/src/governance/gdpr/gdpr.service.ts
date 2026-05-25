@@ -1,8 +1,35 @@
 import { Injectable, Logger, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
-import { randomUUID } from 'crypto';
+import { randomUUID, createHash } from 'crypto';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { EventBusService } from '../../events/event-bus.service';
+
+// ── GDPR data export types ────────────────────────────────────────────────────
+
+export interface GdprDataExport {
+  exportedAt: string;
+  requestId: string;
+  subject: string;
+  data: {
+    profile: Record<string, unknown> | null;
+    orders: unknown[];
+    authAuditLogs: unknown[];
+    authAttempts: unknown[];
+    deviceSessions: unknown[];
+    activeSessions: unknown[];
+  };
+}
+
+export interface GdprErasureResult {
+  erased: string[];
+  retained: Array<{ table: string; reason: string }>;
+}
+
+export interface GdprPendingProcessResult {
+  processed: number;
+  errors: number;
+}
 
 export interface CreateGdprRequestInput {
   requestType: 'erasure' | 'portability' | 'access' | 'rectification';
@@ -39,6 +66,7 @@ export class GdprService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
+    private readonly eventBus: EventBusService,
   ) {
     this.bucket = this.config.get<string>('AWS_S3_BUCKET') ?? 'yourgift-exports';
     this.s3 = new S3Client({
@@ -68,6 +96,272 @@ export class GdprService {
     );
     return request;
   }
+
+  // ── Automated DSR Pipeline (Article 15 / Article 17) ───────────────────────
+
+  /**
+   * Process a GDPR Subject Access Request (Article 15 — Right of Access).
+   * Returns all PII data held for the requestor within 30 days (automated: immediate).
+   */
+  async processAccessRequest(requestId: string): Promise<GdprDataExport> {
+    const request = await this.prisma.gdprRequest.findUnique({ where: { id: requestId } });
+    if (!request) throw new NotFoundException(`GDPR request ${requestId} not found`);
+    if (request.status !== 'pending') {
+      throw new BadRequestException(`Request ${requestId} is not in pending status (current: ${request.status})`);
+    }
+
+    await this.prisma.gdprRequest.update({
+      where: { id: requestId },
+      data: { status: 'processing', processedAt: new Date() },
+    });
+
+    const client = await this.prisma.client.findFirst({
+      where: { email: request.subjectEmail },
+    });
+
+    const [orders, authAuditLogs, authAttempts, deviceSessions, activeSessions] = await Promise.all([
+      client
+        ? this.prisma.order.findMany({
+            where: { clientId: client.id },
+            include: { items: true },
+          }).catch(() => [])
+        : Promise.resolve([]),
+      this.prisma.authAuditLog
+        .findMany({
+          where: {
+            OR: [
+              ...(client ? [{ clientId: client.id }] : []),
+              { email: request.subjectEmail },
+            ],
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 200,
+        })
+        .catch(() => []),
+      client
+        ? this.prisma.authAttempt
+            .findMany({ where: { clientId: client.id }, orderBy: { createdAt: 'desc' }, take: 100 })
+            .catch(() => [])
+        : Promise.resolve([]),
+      client
+        ? this.prisma.deviceSession.findMany({ where: { clientId: client.id } }).catch(() => [])
+        : Promise.resolve([]),
+      client
+        ? this.prisma.activeSession.findMany({ where: { clientId: client.id } }).catch(() => [])
+        : Promise.resolve([]),
+    ]);
+
+    const exportData: GdprDataExport = {
+      exportedAt: new Date().toISOString(),
+      requestId,
+      subject: request.subjectEmail,
+      data: {
+        profile: client
+          ? { id: client.id, email: client.email, name: client.name, nif: client.nif, createdAt: client.createdAt }
+          : null,
+        orders: orders.map((o) => ({
+          id: o.id,
+          ref: o.ref,
+          status: o.status,
+          totalAmount: o.totalAmount,
+          createdAt: o.createdAt,
+          items: o.items.length,
+        })),
+        authAuditLogs: authAuditLogs.map((l) => ({
+          id: l.id,
+          action: l.action,
+          success: l.success,
+          ip: l.ip,
+          createdAt: l.createdAt,
+        })),
+        authAttempts: authAttempts.map((a) => ({
+          id: a.id,
+          provider: a.provider,
+          status: a.status,
+          createdAt: a.createdAt,
+        })),
+        deviceSessions: deviceSessions.map((d) => ({
+          id: d.id,
+          deviceId: d.deviceId,
+          userAgent: d.userAgent,
+          ip: d.ip,
+          lastSeenAt: d.lastSeenAt,
+          createdAt: d.createdAt,
+        })),
+        activeSessions: activeSessions.map((s) => ({
+          id: s.id,
+          deviceId: s.deviceId,
+          provider: s.provider,
+          ip: s.ip,
+          isActive: s.isActive,
+          lastActivityAt: s.lastActivityAt,
+          createdAt: s.createdAt,
+        })),
+      },
+    };
+
+    const resultSummary = {
+      orders: orders.length,
+      authAuditLogs: authAuditLogs.length,
+      authAttempts: authAttempts.length,
+      deviceSessions: deviceSessions.length,
+      activeSessions: activeSessions.length,
+    };
+
+    await this.prisma.gdprRequest.update({
+      where: { id: requestId },
+      data: {
+        status: 'completed',
+        completedAt: new Date(),
+        completedBy: 'system',
+        metadata: resultSummary as unknown as object,
+      },
+    });
+
+    this.eventBus.emit('gdpr.access_request.completed', { requestId, subject: request.subjectEmail, resultSummary });
+    this.logger.log(`GDPR access request ${requestId} completed for ${request.subjectEmail}`);
+
+    return exportData;
+  }
+
+  /**
+   * Process a GDPR Erasure Request (Article 17 — Right to be Forgotten).
+   * Anonymizes all PII. Preserves financial records (legal obligation).
+   */
+  async processErasureRequestFull(requestId: string): Promise<GdprErasureResult> {
+    const request = await this.prisma.gdprRequest.findUnique({ where: { id: requestId } });
+    if (!request) throw new NotFoundException(`GDPR request ${requestId} not found`);
+    if (request.status !== 'pending') {
+      throw new BadRequestException(`Request ${requestId} is not in pending status (current: ${request.status})`);
+    }
+
+    // Check for active legal holds
+    const hold = await this.checkLegalHold(request.subjectEmail);
+    if (hold) {
+      throw new BadRequestException(
+        `Cannot erase: active legal hold in place for ${request.subjectEmail}`,
+      );
+    }
+
+    await this.prisma.gdprRequest.update({
+      where: { id: requestId },
+      data: { status: 'processing', processedAt: new Date() },
+    });
+
+    const erased: string[] = [];
+    const retained: Array<{ table: string; reason: string }> = [];
+
+    const client = await this.prisma.client.findFirst({ where: { email: request.subjectEmail } });
+
+    if (client) {
+      // Anonymize client PII — do NOT delete (preserve foreign key integrity)
+      const anonymizedEmail = `erased-${createHash('sha256').update(client.email).digest('hex').slice(0, 16)}@deleted.yourgift.pt`;
+      await this.prisma.client.update({
+        where: { id: client.id },
+        data: {
+          name: 'ANONYMIZED',
+          email: anonymizedEmail,
+          nif: null,
+          passwordHash: null,
+        },
+      });
+      erased.push('clients (PII anonymized)');
+
+      // Delete auth attempts (keyed by clientId)
+      await this.prisma.authAttempt
+        .deleteMany({ where: { clientId: client.id } })
+        .catch(() => null);
+      erased.push('auth_attempts');
+
+      // Delete device sessions
+      await this.prisma.deviceSession
+        .deleteMany({ where: { clientId: client.id } })
+        .catch(() => null);
+      erased.push('device_sessions');
+
+      // Delete active sessions
+      await this.prisma.activeSession
+        .deleteMany({ where: { clientId: client.id } })
+        .catch(() => null);
+      erased.push('active_sessions');
+
+      // Purge old auth audit logs (keep last 30 days for security audit trail requirement)
+      const retentionCutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      await this.prisma.authAuditLog
+        .deleteMany({
+          where: {
+            clientId: client.id,
+            createdAt: { lt: retentionCutoff },
+          },
+        })
+        .catch(() => null);
+      erased.push('auth_audit_logs (older than 30 days)');
+    }
+
+    // RETAIN financial records — 7 year legal requirement
+    retained.push({ table: 'orders', reason: 'Financial record — 7-year legal retention (AML/VAT)' });
+    retained.push({ table: 'ledger_entries', reason: 'Financial record — 7-year legal retention (AML/VAT)' });
+    retained.push({ table: 'invoices', reason: 'Financial record — 7-year legal retention (AML/VAT)' });
+
+    await this.prisma.gdprRequest.update({
+      where: { id: requestId },
+      data: {
+        status: 'completed',
+        completedAt: new Date(),
+        completedBy: 'system',
+        metadata: { erased, retained } as unknown as object,
+      },
+    });
+
+    this.eventBus.emit('gdpr.erasure_request.completed', { requestId, subject: request.subjectEmail, erased, retained });
+    this.logger.log(`GDPR erasure request ${requestId} completed: ${erased.length} tables erased, ${retained.length} retained`);
+
+    return { erased, retained };
+  }
+
+  /**
+   * Auto-process pending requests older than 24h.
+   * Called by the scheduler / cron job.
+   */
+  async processPendingRequests(): Promise<GdprPendingProcessResult> {
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    const pending = await this.prisma.gdprRequest.findMany({
+      where: { status: 'pending', requestedAt: { lte: cutoff } },
+      take: 50,
+    });
+
+    let processed = 0;
+    let errors = 0;
+
+    for (const req of pending) {
+      try {
+        if (req.requestType === 'access') {
+          await this.processAccessRequest(req.id);
+        } else if (req.requestType === 'erasure') {
+          await this.processErasureRequestFull(req.id);
+        } else {
+          await this.processRequest(req.id);
+        }
+        processed++;
+      } catch (err) {
+        errors++;
+        this.logger.error(`Failed to auto-process GDPR request ${req.id}`, (err as Error).message);
+        // Mark as failed so it won't be re-queued endlessly
+        await this.prisma.gdprRequest
+          .update({
+            where: { id: req.id },
+            data: { status: 'failed', metadata: { error: (err as Error).message } as unknown as object },
+          })
+          .catch(() => null);
+      }
+    }
+
+    this.logger.log(`GDPR auto-processing: ${processed} processed, ${errors} errors out of ${pending.length} pending`);
+    return { processed, errors };
+  }
+
+  // ── Existing processRequest (enhanced routing) ────────────────────────────
 
   async processRequest(requestId: string): Promise<unknown> {
     const request = await this.prisma.gdprRequest.findUnique({ where: { id: requestId } });

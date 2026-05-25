@@ -1,5 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { EventBusService } from '../events/event-bus.service';
+
+export interface DriftReport {
+  tenantId: string | null;
+  ledgerRevenue: number;
+  totalOrderPayments: number;
+  drift: number;
+  status: 'clean' | 'warning' | 'critical';
+  issueCreated: boolean;
+}
+
+export interface DriftStatusEntry {
+  tenantId: string;
+  drift: number;
+  status: 'clean' | 'warning' | 'critical';
+}
 
 export type ReconciliationType = 'full' | 'delta';
 export type IssueSeverity = 'critical' | 'high' | 'medium' | 'low';
@@ -27,7 +43,10 @@ interface ReconciliationCheckResult {
 export class ReconciliationService {
   private readonly logger = new Logger(ReconciliationService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventBus: EventBusService,
+  ) {}
 
   async runReconciliation(
     type: ReconciliationType,
@@ -319,6 +338,132 @@ export class ReconciliationService {
       }
     }
     return issues;
+  }
+
+  // ── Drift Detection & Alerting ───────────────────────────────────────────
+
+  /**
+   * Detect and alert on reconciliation drift for a tenant.
+   * Drift = difference between ledger revenue balance and total paid order amounts.
+   * Called hourly by the job scheduler.
+   */
+  async detectDrift(tenantId: string): Promise<DriftReport> {
+    const tenantFilter = tenantId !== 'default' ? { tenantId } : {};
+
+    // Sum ledger revenue entries for this tenant
+    const ledgerResult = await this.prisma.ledgerEntry.aggregate({
+      _sum: { amount: true },
+      where: {
+        accountCode: { startsWith: 'revenue' },
+        ...tenantFilter,
+      },
+    });
+    const ledgerRevenue = (ledgerResult._sum.amount ?? 0) as number;
+
+    // Sum total amount of paid orders for this tenant
+    const orderResult = await this.prisma.order.aggregate({
+      _sum: { totalAmount: true },
+      where: {
+        status: 'paid',
+        ...tenantFilter,
+      },
+    });
+    const totalOrderPayments = (orderResult._sum.totalAmount ?? 0) as number;
+
+    const drift = Math.abs(ledgerRevenue - totalOrderPayments);
+
+    let status: 'clean' | 'warning' | 'critical';
+    if (drift <= 0.01) {
+      status = 'clean';
+    } else if (drift <= 100) {
+      status = 'warning';
+    } else {
+      status = 'critical';
+    }
+
+    let issueCreated = false;
+
+    if (drift > 0.01) {
+      // Create a lightweight reconciliation run record to satisfy the FK constraint
+      const now = new Date();
+      const driftRun = await this.prisma.reconciliationRun.create({
+        data: {
+          runType: 'delta',
+          periodStart: new Date(now.getTime() - 60 * 60 * 1000), // last hour
+          periodEnd: now,
+          status: 'completed',
+          triggeredBy: 'drift_detector',
+          tenantId: tenantId ?? null,
+          integrityScore: drift > 100 ? 50 : drift > 10 ? 80 : 95,
+          totalChecked: 1,
+          issuesFound: 1,
+          durationMs: 0,
+          completedAt: now,
+        },
+      }).catch(() => null);
+
+      if (driftRun) {
+        await this.prisma.reconciliationIssue.create({
+          data: {
+            runId: driftRun.id,
+            issueType: 'ledger_drift',
+            severity: drift > 100 ? 'critical' : drift > 10 ? 'high' : 'medium',
+            description: `Hourly drift check: ledger revenue ${ledgerRevenue.toFixed(2)} EUR vs paid orders ${totalOrderPayments.toFixed(2)} EUR — drift=${drift.toFixed(2)} EUR`,
+            expectedAmount: totalOrderPayments,
+            actualAmount: ledgerRevenue,
+            discrepancy: drift,
+            tenantId: tenantId ?? null,
+            metadata: { detectedAt: now.toISOString(), source: 'drift_detector' } as object,
+          },
+        }).catch((err: Error) => {
+          this.logger.error(`Failed to persist drift issue for tenant ${tenantId}`, err.message);
+        });
+        issueCreated = true;
+      }
+    }
+
+    if (drift > 100) {
+      this.eventBus.emit('reconciliation.critical_drift', {
+        tenantId,
+        drift,
+        ledgerRevenue,
+        totalOrderPayments,
+        detectedAt: new Date().toISOString(),
+      });
+      this.logger.warn(`Critical drift detected for tenant ${tenantId}: ${drift.toFixed(2)} EUR`);
+    } else if (drift > 0.01) {
+      this.logger.warn(`Drift detected for tenant ${tenantId}: ${drift.toFixed(2)} EUR`);
+    } else {
+      this.logger.log(`No drift for tenant ${tenantId}`);
+    }
+
+    return { tenantId, ledgerRevenue, totalOrderPayments, drift, status, issueCreated };
+  }
+
+  /**
+   * Get current drift status across all distinct tenants in the orders table.
+   */
+  async getDriftStatus(): Promise<DriftStatusEntry[]> {
+    // Discover distinct tenantIds from orders
+    const tenantRows = await this.prisma.order.groupBy({
+      by: ['tenantId'],
+      _count: { id: true },
+    }).catch(() => []);
+
+    const results: DriftStatusEntry[] = [];
+
+    for (const row of tenantRows) {
+      const tid = row.tenantId ?? 'default';
+      try {
+        const report = await this.detectDrift(tid);
+        results.push({ tenantId: tid, drift: report.drift, status: report.status });
+      } catch (err) {
+        this.logger.error(`getDriftStatus failed for tenant ${tid}`, (err as Error).message);
+        results.push({ tenantId: tid, drift: -1, status: 'critical' });
+      }
+    }
+
+    return results;
   }
 
   // ── Public API ───────────────────────────────────────────────────────────

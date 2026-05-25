@@ -10,6 +10,8 @@ import {
   UseGuards,
   ParseIntPipe,
   DefaultValuePipe,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AdminGuard } from '../../auth/guards/admin.guard';
@@ -45,6 +47,26 @@ export class GdprController {
   @Post('requests/:id/process')
   async processRequest(@Param('id') id: string): Promise<unknown> {
     return this.gdprService.processRequest(id);
+  }
+
+  @Patch('requests/:id/process')
+  async processRequestPatch(@Param('id') id: string): Promise<unknown> {
+    return this.gdprService.processRequest(id);
+  }
+
+  @Post('requests/:id/access')
+  async processAccessRequest(@Param('id') id: string): Promise<unknown> {
+    return this.gdprService.processAccessRequest(id);
+  }
+
+  @Post('requests/:id/erasure')
+  async processErasureRequestFull(@Param('id') id: string): Promise<unknown> {
+    return this.gdprService.processErasureRequestFull(id);
+  }
+
+  @Post('requests/process-pending')
+  async processPendingRequests(): Promise<unknown> {
+    return this.gdprService.processPendingRequests();
   }
 
   @Get('holds')

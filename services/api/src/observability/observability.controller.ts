@@ -72,4 +72,26 @@ export class ObservabilityController {
   getAIInsights() {
     return this.aiInsights.generateInsights();
   }
+
+  @Get('slo/breaches')
+  getSloBreaches() {
+    return this.metrics.getSloBreaches();
+  }
+
+  @Get('slo/percentiles')
+  getLatencyPercentiles(
+    @Query('endpoint') endpoint: string,
+    @Query('method') method = 'GET',
+    @Query('statusCode', new DefaultValuePipe(200), ParseIntPipe) statusCode: number,
+  ) {
+    if (!endpoint) {
+      return { error: 'endpoint query parameter is required' };
+    }
+    return this.metrics.getLatencyPercentiles(endpoint, method, statusCode) ?? { message: 'Not enough samples (< 10)' };
+  }
+
+  @Get('slo/endpoints')
+  getTrackedEndpoints() {
+    return { endpoints: this.metrics.getAllTrackedEndpoints() };
+  }
 }

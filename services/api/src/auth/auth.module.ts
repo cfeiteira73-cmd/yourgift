@@ -14,6 +14,7 @@ import { SessionAuthorityService } from './session-authority.service';
 import { IdentityGraphService } from './identity-graph.service';
 import { IdentityGraphController } from './identity-graph.controller';
 import { DelegationValidatorService } from './delegation/delegation-validator.service';
+import { DeviceFingerprintService } from './device-fingerprint.service';
 
 @Module({
   imports: [
@@ -38,8 +39,9 @@ import { DelegationValidatorService } from './delegation/delegation-validator.se
     SessionAuthorityService,
     IdentityGraphService,
     DelegationValidatorService,
+    DeviceFingerprintService,
   ],
   controllers: [AuthController, IdentityGraphController],
-  exports: [AuthService, IdentityResolverService, AuthRiskService, SessionAuthorityService, IdentityGraphService, DelegationValidatorService],
+  exports: [AuthService, IdentityResolverService, AuthRiskService, SessionAuthorityService, IdentityGraphService, DelegationValidatorService, DeviceFingerprintService],
 })
 export class AuthModule {}
