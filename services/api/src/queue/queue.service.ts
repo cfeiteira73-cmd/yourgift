@@ -157,6 +157,76 @@ export class QueueService {
 
     return Promise.all(names.map((n) => this.getQueueStats(n)));
   }
+
+  /**
+   * Get lag metrics for all queues.
+   *
+   * "lag" = jobs waiting to be processed.
+   * lagSeconds = estimated time until the queue drains at current throughput.
+   * Estimated as: waiting / max(active, 1) * AVG_JOB_DURATION_SECONDS
+   *
+   * Status thresholds:
+   *   healthy  — waiting < 10
+   *   degraded — waiting < 100
+   *   critical — waiting >= 100
+   */
+  async getQueueMetrics(): Promise<QueueMetrics[]> {
+    // Average job duration assumption per queue (seconds).
+    // These are conservative estimates; actual durations depend on workload.
+    const AVG_DURATION_S: Record<string, number> = {
+      [QUEUE_NAMES.EMAIL]: 2,
+      [QUEUE_NAMES.AI_GENERATION]: 15,
+      [QUEUE_NAMES.PROCUREMENT_WORKFLOW]: 5,
+      [QUEUE_NAMES.SUPPLIER_SYNC]: 10,
+      [QUEUE_NAMES.SHIPPING_SYNC]: 8,
+      [QUEUE_NAMES.PDF_GENERATION]: 6,
+      [QUEUE_NAMES.FINANCIAL_AGGREGATION]: 12,
+      [QUEUE_NAMES.DLQ]: 1,
+    };
+
+    const queueMap: Record<string, Queue> = {
+      [QUEUE_NAMES.EMAIL]: this.emailQueue,
+      [QUEUE_NAMES.AI_GENERATION]: this.aiGenerationQueue,
+      [QUEUE_NAMES.PROCUREMENT_WORKFLOW]: this.procurementWorkflowQueue,
+      [QUEUE_NAMES.SUPPLIER_SYNC]: this.supplierSyncQueue,
+      [QUEUE_NAMES.SHIPPING_SYNC]: this.shippingSyncQueue,
+      [QUEUE_NAMES.PDF_GENERATION]: this.pdfGenerationQueue,
+      [QUEUE_NAMES.FINANCIAL_AGGREGATION]: this.financialAggregationQueue,
+      [QUEUE_NAMES.DLQ]: this.dlqQueue,
+    };
+
+    const results: QueueMetrics[] = await Promise.all(
+      Object.entries(queueMap).map(async ([name, queue]) => {
+        const counts = await queue.getJobCounts(
+          'waiting',
+          'active',
+          'failed',
+          'completed',
+        );
+
+        const waiting = counts['waiting'] ?? 0;
+        const active = counts['active'] ?? 0;
+        const failed = counts['failed'] ?? 0;
+        const completed = counts['completed'] ?? 0;
+
+        const avgDurationS = AVG_DURATION_S[name] ?? 5;
+        const lagSeconds = Math.round((waiting / Math.max(active, 1)) * avgDurationS);
+
+        let status: QueueMetrics['status'];
+        if (waiting < 10) {
+          status = 'healthy';
+        } else if (waiting < 100) {
+          status = 'degraded';
+        } else {
+          status = 'critical';
+        }
+
+        return { name, waiting, active, failed, completed, lagSeconds, status };
+      }),
+    );
+
+    return results;
+  }
 }
 
 // ── Job Data Types ──────────────────────────────────────────────────────────
@@ -192,4 +262,14 @@ export interface QueueStats {
   completed: number;
   failed: number;
   delayed: number;
+}
+
+export interface QueueMetrics {
+  name: string;
+  waiting: number;      // jobs waiting = LAG
+  active: number;       // jobs being processed
+  failed: number;       // total failed
+  completed: number;    // completed in window
+  lagSeconds: number;   // estimated lag: waiting / max(active, 1) * avgJobDurationS
+  status: 'healthy' | 'degraded' | 'critical'; // healthy: waiting<10, degraded: <100, critical: >=100
 }

@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
-import { QueueService, QueueStats } from './queue.service';
+import { QueueService, QueueStats, QueueMetrics } from './queue.service';
 import { DlqService, DlqItem } from './dlq.service';
 import { QUEUE_NAMES } from './queue.constants';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -68,6 +68,17 @@ export class QueueAdminController {
   async replayAllForQueue(@Param('queue') queue: string): Promise<{ queue: string; replayed: number }> {
     const count = await this.dlqService.replayQueue_byOriginal(queue);
     return { queue, replayed: count };
+  }
+
+  @Get('metrics')
+  @ApiOperation({
+    summary: 'Get lag metrics for all queues',
+    description:
+      'Returns waiting/active/failed/completed counts plus estimated lag in seconds and health status (healthy/degraded/critical) for each queue.',
+  })
+  async getMetrics(): Promise<{ metrics: QueueMetrics[]; capturedAt: string }> {
+    const metrics = await this.queueService.getQueueMetrics();
+    return { metrics, capturedAt: new Date().toISOString() };
   }
 
   @Get(':name')
