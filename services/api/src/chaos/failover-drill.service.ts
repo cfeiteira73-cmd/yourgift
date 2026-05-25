@@ -664,6 +664,42 @@ export class FailoverDrillService {
 
   // ── Query last drill results ───────────────────────────────────────────────
 
+  async getDrillStatus(drillId: string): Promise<FailoverDrillResult | null> {
+    const record = await this.prisma.chaosDrill.findUnique({ where: { id: drillId } });
+    if (!record) return null;
+
+    const obs = Array.isArray(record.observations)
+      ? (record.observations as unknown as DrillStep[])
+      : [];
+    const rtoActualSeconds = record.mttrMinutes != null ? record.mttrMinutes * 60 : 0;
+    const rtoMet = record.rtoMet ?? false;
+    const rpoMet = record.rpoMet ?? false;
+    const failedSteps = obs.filter((s) => s.status === 'failed').length;
+    const overallStatus: 'passed' | 'failed' | 'partial' =
+      record.status === 'aborted'
+        ? 'failed'
+        : failedSteps === 0 && rtoMet && rpoMet
+          ? 'passed'
+          : 'partial';
+
+    return {
+      drillId: record.id,
+      drillType: record.drillType as FailoverDrillType,
+      startedAt: record.startedAt ?? record.scheduledAt,
+      completedAt: record.completedAt ?? new Date(),
+      rtoActualSeconds,
+      rtoTargetSeconds: RTO_TARGET_SECONDS,
+      rtoMet,
+      rpoActualSeconds: 0,
+      rpoTargetSeconds: RPO_TARGET_SECONDS,
+      rpoMet,
+      stepsExecuted: obs,
+      overallStatus,
+      findings: record.findings ? record.findings.split(' | ') : [],
+      recommendations: [],
+    };
+  }
+
   async getLastDrillResults(limit = 10): Promise<FailoverDrillResult[]> {
     const drillTypes: FailoverDrillType[] = [
       'db_primary_failover',

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { PrismaModule } from '../prisma/prisma.module';
 import { EventBusModule } from '../events/event-bus.module';
 import { AdminAuthModule } from '../admin-auth/admin-auth.module';
@@ -15,6 +16,11 @@ import { InfraCostOptimizerService } from './infra-cost-optimizer.service';
     CostPerRequestInterceptor,
     AiEconomicsService,
     InfraCostOptimizerService,
+    // Register as global interceptor — runs on EVERY HTTP request
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CostPerRequestInterceptor,
+    },
   ],
   controllers: [CostIntelligenceController],
   exports: [

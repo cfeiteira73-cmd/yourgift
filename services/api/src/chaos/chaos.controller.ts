@@ -13,6 +13,7 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AdminAuthGuard } from '../admin-auth/admin-auth.guard';
 import { ChaosEngineService } from './chaos-engine.service';
 import { MultiRegionService } from './multi-region.service';
+import { FailoverDrillService } from './failover-drill.service';
 
 interface ScheduleDrillDto {
   drillType: string;
@@ -60,6 +61,7 @@ export class ChaosController {
   constructor(
     private readonly chaosEngine: ChaosEngineService,
     private readonly multiRegion: MultiRegionService,
+    private readonly failoverDrill: FailoverDrillService,
   ) {}
 
   // ── Chaos Drills ──────────────────────────────────────────────────────────
@@ -156,5 +158,39 @@ export class ChaosController {
   @Get('resilience')
   async getResilientStatus(): Promise<unknown> {
     return this.multiRegion.getResilientStatus();
+  }
+
+  // ── Failover Drills (RTO/RPO measurement) ────────────────────────────────
+  // Called by scripts/failover-drill.ts and chaos-drill.yml CI workflow
+
+  @Post('failover-drill/:type')
+  @HttpCode(HttpStatus.CREATED)
+  async startFailoverDrill(@Param('type') drillType: string) {
+    const validTypes = ['db_primary_failover', 'redis_primary_failover', 'full_region_isolation'];
+    if (!validTypes.includes(drillType)) {
+      const { BadRequestException } = await import('@nestjs/common');
+      throw new BadRequestException(
+        `Invalid drill type. Must be one of: ${validTypes.join(', ')}`,
+      );
+    }
+    switch (drillType) {
+      case 'db_primary_failover':
+        return this.failoverDrill.runDbFailoverDrill();
+      case 'redis_primary_failover':
+        return this.failoverDrill.runRedisFailoverDrill();
+      case 'full_region_isolation':
+        return this.failoverDrill.runRegionIsolationDrill();
+    }
+  }
+
+  @Get('failover-drill/:id/status')
+  async getFailoverDrillStatus(@Param('id') id: string) {
+    return this.failoverDrill.getDrillStatus(id);
+  }
+
+  @Get('failover-drill/history')
+  async getFailoverDrillHistory(@Query('limit') limitStr?: string) {
+    const limit = limitStr ? parseInt(limitStr, 10) : 20;
+    return this.failoverDrill.getLastDrillResults(isNaN(limit) ? 20 : limit);
   }
 }

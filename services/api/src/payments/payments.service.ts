@@ -35,9 +35,26 @@ export class PaymentsService {
     this.events.on('order.created', (order: unknown) => this.createCheckoutSession(order as Order));
   }
 
+  // ── Chaos engineering flag helpers ───────────────────────────────────────
+
+  /** Called before any outbound Stripe API call. Throws if chaos drills are active. */
+  private assertChaosFlags(): void {
+    if (process.env.CHAOS_REGION_ISOLATED === '1') {
+      throw new BadRequestException(
+        '[CHAOS] Region isolation active — outbound Stripe calls are blocked during failover drill',
+      );
+    }
+    if (process.env.CHAOS_STRIPE_TIMEOUT === '1') {
+      throw new BadRequestException(
+        '[CHAOS] Stripe timeout chaos active — simulating payment provider timeout',
+      );
+    }
+  }
+
   // ── Checkout Session ─────────────────────────────────────────────────────
 
   async createCheckoutSession(order: Order): Promise<{ url: string }> {
+    this.assertChaosFlags();
     const items = order.items ?? [];
 
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = items.map((item) => ({
