@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { QueueService } from '../queue/queue.service';
 import { REDIS_CONNECTION } from '../queue/queue.module';
 import type { ConnectionOptions } from 'bullmq';
+import { S3Client, HeadBucketCommand } from '@aws-sdk/client-s3';
 
 type ServiceStatus = 'ok' | 'degraded' | 'down';
 
@@ -21,6 +22,13 @@ interface HealthResponse {
   environment: string;
   services: Record<string, ServiceHealth>;
   latencyMs: number;
+}
+
+export interface DeepHealthResponse {
+  overall: 'healthy' | 'degraded' | 'unhealthy';
+  services: Record<string, ServiceHealth>;
+  durationMs: number;
+  checkedAt: string;
 }
 
 /**
@@ -155,6 +163,107 @@ export class HealthService {
       };
     } catch (err) {
       return { status: 'degraded', detail: (err as Error).message };
+    }
+  }
+
+  async deepCheck(): Promise<DeepHealthResponse> {
+    const start = Date.now();
+
+    const [db, redis, stripe, s3, queues] = await Promise.allSettled([
+      this.checkDatabase(),
+      this.checkRedis(),
+      this.checkStripe(),
+      this.checkS3(),
+      this.checkQueues(),
+    ]);
+
+    const services: Record<string, ServiceHealth> = {
+      database: db.status === 'fulfilled' ? db.value : { status: 'down', detail: (db as PromiseRejectedResult).reason?.message },
+      redis:    redis.status === 'fulfilled' ? redis.value : { status: 'down', detail: (redis as PromiseRejectedResult).reason?.message },
+      stripe:   stripe.status === 'fulfilled' ? stripe.value : { status: 'degraded', detail: (stripe as PromiseRejectedResult).reason?.message },
+      s3:       s3.status === 'fulfilled' ? s3.value : { status: 'degraded', detail: (s3 as PromiseRejectedResult).reason?.message },
+      queues:   queues.status === 'fulfilled' ? queues.value : { status: 'degraded', detail: 'Queue stats unavailable' },
+    };
+
+    const hasDown = Object.values(services).some((s) => s.status === 'down');
+    const hasDegraded = Object.values(services).some((s) => s.status !== 'ok');
+
+    const overall: DeepHealthResponse['overall'] =
+      hasDown ? 'unhealthy' :
+      hasDegraded ? 'degraded' :
+      'healthy';
+
+    const durationMs = Date.now() - start;
+
+    // Persist to DB (best-effort)
+    this.prisma.healthCheckResult.create({
+      data: {
+        overall,
+        results: services as object,
+        durationMs,
+      },
+    }).catch((err: Error) => this.logger.warn('Failed to persist deep health check', err.message));
+
+    return { overall, services, durationMs, checkedAt: new Date().toISOString() };
+  }
+
+  private async checkStripe(): Promise<ServiceHealth> {
+    const t = Date.now();
+    try {
+      const stripeKey = this.config.get<string>('STRIPE_SECRET_KEY');
+      if (!stripeKey) return { status: 'degraded', detail: 'STRIPE_SECRET_KEY not configured' };
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+
+      const res = await fetch('https://api.stripe.com/v1/charges?limit=1', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${stripeKey}`,
+          'Stripe-Version': '2023-10-16',
+        },
+        signal: controller.signal,
+      }).finally(() => clearTimeout(timeout));
+
+      return {
+        status: res.ok ? 'ok' : 'degraded',
+        latencyMs: Date.now() - t,
+        detail: `HTTP ${res.status}`,
+      };
+    } catch (err) {
+      return {
+        status: 'degraded',
+        latencyMs: Date.now() - t,
+        detail: (err as Error).name === 'AbortError' ? 'timeout (5s)' : (err as Error).message,
+      };
+    }
+  }
+
+  private async checkS3(): Promise<ServiceHealth> {
+    const t = Date.now();
+    try {
+      const bucket = this.config.get<string>('AWS_S3_BUCKET');
+      const region = this.config.get<string>('AWS_REGION') ?? 'eu-west-1';
+      if (!bucket) return { status: 'degraded', detail: 'AWS_S3_BUCKET not configured' };
+
+      const s3 = new S3Client({
+        region,
+        credentials: {
+          accessKeyId: this.config.get<string>('AWS_ACCESS_KEY_ID') ?? '',
+          secretAccessKey: this.config.get<string>('AWS_SECRET_ACCESS_KEY') ?? '',
+        },
+      });
+
+      await s3.send(new HeadBucketCommand({ Bucket: bucket }));
+      return { status: 'ok', latencyMs: Date.now() - t, detail: `Bucket: ${bucket}` };
+    } catch (err) {
+      const error = err as Error & { name?: string };
+      const isNotFound = error.name === 'NotFound' || error.name === 'NoSuchBucket';
+      return {
+        status: isNotFound ? 'down' : 'degraded',
+        latencyMs: Date.now() - t,
+        detail: error.message,
+      };
     }
   }
 

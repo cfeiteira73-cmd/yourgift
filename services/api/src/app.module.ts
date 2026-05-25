@@ -67,6 +67,12 @@ import { ProcurementWorkflowModule } from './procurement-workflow/procurement-wo
 import { FailsafeModule } from './failsafe/failsafe.module';
 import { QueueModule } from './queue/queue.module';
 import { EnterpriseIdentityModule } from './enterprise-identity/enterprise-identity.module';
+import { TracingModule } from './tracing/tracing.module';
+import { IncidentModule } from './incident/incident.module';
+import { ReconciliationModule } from './reconciliation/reconciliation.module';
+import { RecoveryModule } from './recovery/recovery.module';
+import { RateLimitModule } from './rate-limit/rate-limit.module';
+import { ReliabilityModule } from './reliability/reliability.module';
 import { APP_GUARD } from '@nestjs/core';
 import { TenantGuard } from './common/guards/tenant.guard';
 import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard';
@@ -152,6 +158,12 @@ import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard'
     FailsafeModule,
     QueueModule,
     EnterpriseIdentityModule,
+    TracingModule,
+    IncidentModule,
+    ReconciliationModule,
+    RecoveryModule,
+    RateLimitModule,
+    ReliabilityModule,
   ],
   providers: [
     // Rate limiting — per tenant (not per IP) for authenticated requests

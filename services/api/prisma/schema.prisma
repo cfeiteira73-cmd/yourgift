@@ -2812,3 +2812,292 @@ model ApprovalChainStep {
   @@index([approvalChainId])
   @@map("approval_chain_steps")
 }
+
+// ─────────────────────────────────────────────
+// DISTRIBUTED TRACING (OpenTelemetry export)
+// ─────────────────────────────────────────────
+
+model TraceSpan {
+  id            String   @id @default(uuid())
+  traceId       String   @map("trace_id")
+  spanId        String   @map("span_id")
+  parentSpanId  String?  @map("parent_span_id")
+  name          String
+  service       String
+  kind          Int      @default(0)
+  statusCode    Int      @default(0) @map("status_code")
+  statusMessage String?  @map("status_message")
+  startTimeNs   BigInt   @map("start_time_ns")
+  durationNs    BigInt   @map("duration_ns")
+  attributes    Json     @default("{}")
+  events        Json     @default("[]")
+  links         Json     @default("[]")
+  resource      Json     @default("{}")
+  tenantId      String?  @map("tenant_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([traceId])
+  @@index([spanId])
+  @@index([service])
+  @@index([tenantId])
+  @@index([createdAt(sort: Desc)])
+  @@map("trace_spans")
+}
+
+// ─────────────────────────────────────────────
+// INCIDENT ENGINE
+// ─────────────────────────────────────────────
+
+model Incident {
+  id                 String    @id @default(uuid())
+  title              String
+  severity           String    @default("SEV3")
+  status             String    @default("open")
+  blastRadius        String    @default("unknown")
+  affectedServices   String[]  @map("affected_services")
+  rootCauseCandidate String?   @map("root_cause_candidate")
+  description        String?
+  startedAt          DateTime  @default(now()) @map("started_at")
+  detectedAt         DateTime  @default(now()) @map("detected_at")
+  mitigatedAt        DateTime? @map("mitigated_at")
+  resolvedAt         DateTime? @map("resolved_at")
+  resolvedBy         String?   @map("resolved_by")
+  mttrMinutes        Int?      @map("mttr_minutes")
+  tenantId           String?   @map("tenant_id")
+  source             String    @default("system")
+  externalRef        String?   @map("external_ref")
+  metadata           Json      @default("{}")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  timeline IncidentEvent[]
+
+  @@index([severity, status])
+  @@index([status])
+  @@index([startedAt(sort: Desc)])
+  @@map("incidents")
+}
+
+model IncidentEvent {
+  id         String   @id @default(uuid())
+  incidentId String   @map("incident_id")
+  eventType  String   @map("event_type")
+  actor      String?
+  message    String
+  metadata   Json     @default("{}")
+  occurredAt DateTime @default(now()) @map("occurred_at")
+
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
+  @@index([incidentId, occurredAt])
+  @@map("incident_events")
+}
+
+// ─────────────────────────────────────────────
+// FINANCIAL RECONCILIATION
+// ─────────────────────────────────────────────
+
+model ReconciliationRun {
+  id             String    @id @default(uuid())
+  runType        String    @map("run_type")
+  periodStart    DateTime  @map("period_start")
+  periodEnd      DateTime  @map("period_end")
+  status         String    @default("running")
+  integrityScore Decimal   @default(100) @map("integrity_score") @db.Decimal(5, 2)
+  totalChecked   Int       @default(0) @map("total_checked")
+  issuesFound    Int       @default(0) @map("issues_found")
+  issuesResolved Int       @default(0) @map("issues_resolved")
+  durationMs     Int?      @map("duration_ms")
+  errorMessage   String?   @map("error_message")
+  triggeredBy    String    @default("scheduler") @map("triggered_by")
+  startedAt      DateTime  @default(now()) @map("started_at")
+  completedAt    DateTime? @map("completed_at")
+  tenantId       String?   @map("tenant_id")
+
+  issues ReconciliationIssue[]
+
+  @@index([status])
+  @@index([startedAt(sort: Desc)])
+  @@map("reconciliation_runs")
+}
+
+model ReconciliationIssue {
+  id             String    @id @default(uuid())
+  runId          String    @map("run_id")
+  issueType      String    @map("issue_type")
+  severity       String    @default("medium")
+  status         String    @default("open")
+  description    String
+  referenceType  String?   @map("reference_type")
+  referenceId    String?   @map("reference_id")
+  expectedAmount Decimal?  @map("expected_amount") @db.Decimal(14, 2)
+  actualAmount   Decimal?  @map("actual_amount") @db.Decimal(14, 2)
+  discrepancy    Decimal?  @db.Decimal(14, 2)
+  currency       String    @default("EUR")
+  repairAction   String?   @map("repair_action")
+  repairedAt     DateTime? @map("repaired_at")
+  repairedBy     String?   @map("repaired_by")
+  tenantId       String?   @map("tenant_id")
+  metadata       Json      @default("{}")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  run ReconciliationRun @relation(fields: [runId], references: [id])
+
+  @@index([runId])
+  @@index([issueType])
+  @@index([status])
+  @@index([severity])
+  @@map("reconciliation_issues")
+}
+
+// ─────────────────────────────────────────────
+// CIRCUIT BREAKERS (self-healing)
+// ─────────────────────────────────────────────
+
+model CircuitBreakerState {
+  id              String    @id @default(uuid())
+  service         String    @unique
+  state           String    @default("closed")
+  failureCount    Int       @default(0) @map("failure_count")
+  successCount    Int       @default(0) @map("success_count")
+  lastFailureAt   DateTime? @map("last_failure_at")
+  lastSuccessAt   DateTime? @map("last_success_at")
+  openedAt        DateTime? @map("opened_at")
+  halfOpenAt      DateTime? @map("half_open_at")
+  nextRetryAt     DateTime? @map("next_retry_at")
+  threshold       Int       @default(5)
+  cooldownSeconds Int       @default(60) @map("cooldown_seconds")
+  metadata        Json      @default("{}")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@index([state])
+  @@map("circuit_breaker_states")
+}
+
+model RetryAudit {
+  id             String   @id @default(uuid())
+  service        String
+  operation      String
+  attempt        Int      @default(1)
+  success        Boolean  @default(false)
+  errorMessage   String?  @map("error_message")
+  durationMs     Int?     @map("duration_ms")
+  backoffMs      Int?     @map("backoff_ms")
+  idempotencyKey String?  @map("idempotency_key")
+  tenantId       String?  @map("tenant_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([service, operation])
+  @@index([createdAt(sort: Desc)])
+  @@map("retry_audits")
+}
+
+// ─────────────────────────────────────────────
+// DATA GOVERNANCE / GDPR
+// ─────────────────────────────────────────────
+
+model GdprRequest {
+  id             String    @id @default(uuid())
+  requestType    String    @map("request_type")
+  subjectEmail   String    @map("subject_email")
+  subjectId      String?   @map("subject_id")
+  tenantId       String?   @map("tenant_id")
+  status         String    @default("pending")
+  legalBasis     String?   @map("legal_basis")
+  notes          String?
+  requestedAt    DateTime  @default(now()) @map("requested_at")
+  acknowledgedAt DateTime? @map("acknowledged_at")
+  processedAt    DateTime? @map("processed_at")
+  completedAt    DateTime? @map("completed_at")
+  completedBy    String?   @map("completed_by")
+  exportUrl      String?   @map("export_url")
+  metadata       Json      @default("{}")
+
+  legalHolds LegalHold[]
+
+  @@index([status])
+  @@index([requestType])
+  @@index([subjectEmail])
+  @@map("gdpr_requests")
+}
+
+model LegalHold {
+  id           String    @id @default(uuid())
+  requestId    String?   @map("request_id")
+  tenantId     String?   @map("tenant_id")
+  subjectEmail String?   @map("subject_email")
+  scope        String
+  reason       String
+  placedBy     String    @map("placed_by")
+  placedAt     DateTime  @default(now()) @map("placed_at")
+  releasedAt   DateTime? @map("released_at")
+  releasedBy   String?   @map("released_by")
+  expiresAt    DateTime? @map("expires_at")
+  isActive     Boolean   @default(true) @map("is_active")
+
+  request GdprRequest? @relation(fields: [requestId], references: [id])
+
+  @@index([isActive])
+  @@index([tenantId])
+  @@map("legal_holds")
+}
+
+model RetentionPolicy {
+  id                 String   @id @default(uuid())
+  entityType         String   @unique @map("entity_type")
+  retentionDays      Int      @map("retention_days")
+  anonymizeAfterDays Int?     @map("anonymize_after_days")
+  deleteAfterDays    Int?     @map("delete_after_days")
+  legalBasis         String   @map("legal_basis")
+  isActive           Boolean  @default(true) @map("is_active")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@map("retention_policies")
+}
+
+// ─────────────────────────────────────────────
+// RELIABILITY SCORING
+// ─────────────────────────────────────────────
+
+model ReliabilitySnapshot {
+  id                       String   @id @default(uuid())
+  snapshotAt               DateTime @default(now()) @map("snapshot_at")
+  overallScore             Decimal  @default(100) @map("overall_score") @db.Decimal(5, 2)
+  apiReliability           Decimal  @default(100) @map("api_reliability") @db.Decimal(5, 2)
+  queueReliability         Decimal  @default(100) @map("queue_reliability") @db.Decimal(5, 2)
+  procurementCorrectness   Decimal  @default(100) @map("procurement_correctness") @db.Decimal(5, 2)
+  supplierStability        Decimal  @default(100) @map("supplier_stability") @db.Decimal(5, 2)
+  workflowHealth           Decimal  @default(100) @map("workflow_health") @db.Decimal(5, 2)
+  financialIntegrity       Decimal  @default(100) @map("financial_integrity") @db.Decimal(5, 2)
+  authReliability          Decimal  @default(100) @map("auth_reliability") @db.Decimal(5, 2)
+  uptimePct                Decimal  @default(100) @map("uptime_pct") @db.Decimal(6, 3)
+  p50Ms                    Int      @default(0) @map("p50_ms")
+  p95Ms                    Int      @default(0) @map("p95_ms")
+  p99Ms                    Int      @default(0) @map("p99_ms")
+  errorRatePct             Decimal  @default(0) @map("error_rate_pct") @db.Decimal(5, 2)
+  queueLagSeconds          Int      @default(0) @map("queue_lag_seconds")
+  openIncidents            Int      @default(0) @map("open_incidents")
+  openReconciliationIssues Int      @default(0) @map("open_reconciliation_issues")
+  circuitBreakersOpen      Int      @default(0) @map("circuit_breakers_open")
+  metadata                 Json     @default("{}")
+
+  @@index([snapshotAt(sort: Desc)])
+  @@map("reliability_snapshots")
+}
+
+// ─────────────────────────────────────────────
+// DEEP HEALTH CHECK RESULTS
+// ─────────────────────────────────────────────
+
+model HealthCheckResult {
+  id         String   @id @default(uuid())
+  checkedAt  DateTime @default(now()) @map("checked_at")
+  overall    String   @default("healthy")
+  results    Json     @default("{}")
+  durationMs Int      @default(0) @map("duration_ms")
+
+  @@index([checkedAt(sort: Desc)])
+  @@map("health_check_results")
+}

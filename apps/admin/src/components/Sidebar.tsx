@@ -624,6 +624,89 @@ const SECONDARY_ITEMS: NavItem[] = [
   },
 ];
 
+const RELIABILITY_ITEMS: NavItem[] = [
+  {
+    href: '/traces',
+    label: 'Traces',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+        <path d="M2 9h4M10 9h4M8 2v4M8 10v4" />
+        <circle cx="8" cy="8" r="2.5" />
+      </svg>
+    ),
+  },
+  {
+    href: '/incidents',
+    label: 'Incidents',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 1L1 14h14L8 1z" />
+        <path d="M8 6v3M8 11h.01" />
+      </svg>
+    ),
+  },
+  {
+    href: '/reconciliation',
+    label: 'Reconciliation',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 4h5M2 8h8M2 12h5" />
+        <path d="M12 6l2 2-2 2" />
+        <path d="M10 8h4" />
+      </svg>
+    ),
+  },
+  {
+    href: '/recovery',
+    label: 'Recovery',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 1L1.5 4v4c0 4 3 6.5 6.5 7.5 3.5-1 6.5-3.5 6.5-7.5V4L8 1z" />
+        <path d="M5.5 8.5l1.5 1.5 3-3.5" />
+      </svg>
+    ),
+  },
+  {
+    href: '/governance-data',
+    label: 'Governance',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 1L1.5 4v4c0 4 3 6.5 6.5 7.5 3.5-1 6.5-3.5 6.5-7.5V4L8 1z" />
+        <path d="M5 8l2 2 4-4" />
+        <circle cx="11.5" cy="4.5" r="1.5" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
+  {
+    href: '/reliability',
+    label: 'Reliability',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+        <circle cx="8" cy="8" r="6.5" />
+        <circle cx="8" cy="8" r="3.5" />
+        <circle cx="8" cy="8" r="1" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
+  {
+    href: '/topology',
+    label: 'Topology',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="8" cy="8" r="2" />
+        <circle cx="2" cy="3" r="1.5" />
+        <circle cx="14" cy="3" r="1.5" />
+        <circle cx="2" cy="13" r="1.5" />
+        <circle cx="14" cy="13" r="1.5" />
+        <line x1="3.5" y1="3.5" x2="6.5" y2="6.5" />
+        <line x1="12.5" y1="3.5" x2="9.5" y2="6.5" />
+        <line x1="3.5" y1="12.5" x2="6.5" y2="9.5" />
+        <line x1="12.5" y1="12.5" x2="9.5" y2="9.5" />
+      </svg>
+    ),
+  },
+];
+
 function NavLink({ item }: { item: NavItem }) {
   const pathname = usePathname();
   const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
@@ -708,6 +791,16 @@ export default function Sidebar() {
         </p>
 
         {SECONDARY_ITEMS.map((item) => (
+          <NavLink key={item.href} item={item} />
+        ))}
+
+        <div className="my-4 border-t border-[#1a2f48]" />
+
+        <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest text-[#4d6a87]">
+          Reliability
+        </p>
+
+        {RELIABILITY_ITEMS.map((item) => (
           <NavLink key={item.href} item={item} />
         ))}
       </nav>

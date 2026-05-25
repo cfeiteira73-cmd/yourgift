@@ -54,7 +54,7 @@ YourGift OS replaces manual B2B procurement with a structured platform that:
 - JWT-based authentication with refresh token rotation
 - Google OAuth + OIDC SSO (Okta, Azure AD, Google Workspace, Auth0)
 - SCIM 2.0 automated provisioning (RFC 7643/7644) — Okta + Azure AD compatible
-- SAML 2.0 scaffold (passport-saml integration pending)
+- SAML 2.0: Native implementation — RSA-SHA256, Exclusive C14N, HTTP-Redirect + HTTP-POST bindings. No passport-saml required. Compatible with Okta, Azure AD, ADFS, PingFederate, OneLogin
 - Role-based access: admin, manager, buyer, viewer
 - Multi-tenant isolation with per-tenant rate limiting
 - Per-tenant SSO configuration with email domain routing
@@ -103,6 +103,24 @@ Key endpoints:
 - GET  /notifications/stats                           — email delivery statistics (admin only)
 - POST /payments/webhook                              — Stripe webhook endpoint (signature verified)
 - GET  /api/v1/health                                 — API health check (used by Render + BetterStack)
+- GET  /health/deep                                   — deep dependency health check (DB + Redis + queues + Midocean)
+- GET  /failsafe/status                               — circuit breaker state + failsafe mode (admin only)
+- POST /failsafe/recover                              — reset circuit breaker + restore normal mode (admin only)
+- GET  /governance/policies                           — list governance policies (admin only)
+- POST /governance/check                              — evaluate a decision against active policies
+- GET  /governance/violations                         — recent policy violations
+- GET  /governance/stats                              — governance statistics
+- GET  /governance/trust                              — all trust scores
+- GET  /governance/traces                             — decision trace list
+- POST /governance/traces                             — create decision trace
+- GET  /tracing/spans                                 — distributed trace explorer
+- GET  /tracing/stats                                 — latency percentiles
+- GET  /incidents                                     — incident list
+- POST /incidents                                     — create incident
+- GET  /reconciliation/runs                           — reconciliation history
+- POST /reconciliation/run                            — trigger reconciliation (delta or full)
+- GET  /recovery/circuit-breakers                     — circuit breaker states
+- GET  /reliability/latest                            — system trust score
 
 ## Enterprise features
 
@@ -114,6 +132,13 @@ Key endpoints:
 - **Audit trail**: every procurement event sourced, immutable log
 - **PDF generation**: self-contained print-ready HTML uploaded to S3 / CloudFront
 - **Email delivery**: Resend with branded templates, queued via BullMQ, DLQ on failure
+- **Distributed tracing**: OpenTelemetry SDK via Sentry — trace spans across all modules with correlation IDs
+- **Incident engine**: Failsafe mode engine with auto-detection (normal / degraded / emergency) and circuit breaker
+- **Financial reconciliation**: 4 check types (orphan payments, amount mismatch, duplicate Stripe IDs, ghost orders) with integrity scoring
+- **Circuit breakers**: State machine (CLOSED → OPEN → HALF_OPEN) with 5-failure threshold and 30s reset timeout
+- **Redis rate limiting**: Per-tenant sliding-window rate limiting via TenantThrottlerGuard (20 req/s + 200 req/min)
+- **GDPR / Data governance**: Governance policies with violation tracking, decision traces, trust engine, and retention module
+- **Reliability scoring**: Composite trust scoring via TrustEngineService — tracks outcome accuracy, override rates, violation rates
 
 ## Technology stack
 

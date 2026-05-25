@@ -5,10 +5,12 @@ import { DecisionTraceService } from './decision-trace.service';
 import { GovernanceController } from './governance.controller';
 import { UnifiedRiskService } from './risk/unified-risk.service';
 import { RiskController } from './risk/risk.controller';
+import { GdprService } from './gdpr/gdpr.service';
+import { GdprController } from './gdpr/gdpr.controller';
 
 @Module({
-  controllers: [GovernanceController, RiskController],
-  providers: [GovernanceService, TrustEngineService, DecisionTraceService, UnifiedRiskService],
-  exports: [GovernanceService, TrustEngineService, DecisionTraceService, UnifiedRiskService],
+  controllers: [GovernanceController, RiskController, GdprController],
+  providers: [GovernanceService, TrustEngineService, DecisionTraceService, UnifiedRiskService, GdprService],
+  exports: [GovernanceService, TrustEngineService, DecisionTraceService, UnifiedRiskService, GdprService],
 })
 export class GovernanceModule {}
