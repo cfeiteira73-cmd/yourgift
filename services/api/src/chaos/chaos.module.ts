@@ -6,11 +6,12 @@ import { ChaosEngineService } from './chaos-engine.service';
 import { MultiRegionService } from './multi-region.service';
 import { FailoverDrillService } from './failover-drill.service';
 import { ChaosController } from './chaos.controller';
+import { FinancialChaosService } from './financial-chaos.service';
 
 @Module({
   imports: [PrismaModule, AdminAuthModule, EventBusModule],
   controllers: [ChaosController],
-  providers: [ChaosEngineService, MultiRegionService, FailoverDrillService],
-  exports: [ChaosEngineService, MultiRegionService, FailoverDrillService],
+  providers: [ChaosEngineService, MultiRegionService, FailoverDrillService, FinancialChaosService],
+  exports: [ChaosEngineService, MultiRegionService, FailoverDrillService, FinancialChaosService],
 })
 export class ChaosModule {}
