@@ -96,6 +96,11 @@ resource "aws_cloudwatch_log_group" "api" {
   retention_in_days = 30
 }
 
+resource "aws_cloudwatch_log_group" "pgbouncer" {
+  name              = "/ecs/${var.project_name}/pgbouncer"
+  retention_in_days = 30
+}
+
 resource "aws_ecs_task_definition" "api" {
   family                   = "${var.project_name}-api"
   network_mode             = "awsvpc"
@@ -105,43 +110,92 @@ resource "aws_ecs_task_definition" "api" {
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
   task_role_arn            = aws_iam_role.ecs_task.arn
 
-  container_definitions = jsonencode([{
-    name  = "api"
-    image = var.api_image
-    portMappings = [{
-      containerPort = 3001
-      protocol      = "tcp"
-    }]
-    environment = [
-      { name = "NODE_ENV", value = "production" },
-      { name = "PORT", value = "3001" },
-      { name = "AWS_REGION", value = var.aws_region },
-      { name = "S3_BUCKET", value = aws_s3_bucket.assets.bucket },
-      { name = "CLOUDFRONT_DOMAIN", value = aws_cloudfront_distribution.assets.domain_name }
-    ]
-    secrets = [
-      { name = "DATABASE_URL", valueFrom = aws_secretsmanager_secret.db_url.arn },
-      { name = "DIRECT_URL", valueFrom = aws_secretsmanager_secret.direct_url.arn },
-      { name = "JWT_SECRET", valueFrom = aws_secretsmanager_secret.jwt_secret.arn },
-      { name = "REDIS_URL", valueFrom = aws_secretsmanager_secret.redis_url.arn },
-      { name = "STRIPE_SECRET_KEY", valueFrom = aws_secretsmanager_secret.stripe_key.arn }
-    ]
-    logConfiguration = {
-      logDriver = "awslogs"
-      options = {
-        "awslogs-group"         = aws_cloudwatch_log_group.api.name
-        "awslogs-region"        = var.aws_region
-        "awslogs-stream-prefix" = "api"
+  container_definitions = jsonencode([
+    {
+      name  = "api"
+      image = var.api_image
+      portMappings = [{
+        containerPort = 3001
+        protocol      = "tcp"
+      }]
+      environment = [
+        { name = "NODE_ENV", value = "production" },
+        { name = "PORT", value = "3001" },
+        { name = "AWS_REGION", value = var.aws_region },
+        { name = "S3_BUCKET", value = aws_s3_bucket.assets.bucket },
+        { name = "CLOUDFRONT_DOMAIN", value = aws_cloudfront_distribution.assets.domain_name }
+      ]
+      secrets = [
+        { name = "DATABASE_URL", valueFrom = aws_secretsmanager_secret.db_url.arn },
+        { name = "DIRECT_URL", valueFrom = aws_secretsmanager_secret.direct_url.arn },
+        { name = "JWT_SECRET", valueFrom = aws_secretsmanager_secret.jwt_secret.arn },
+        { name = "REDIS_URL", valueFrom = aws_secretsmanager_secret.redis_url.arn },
+        { name = "STRIPE_SECRET_KEY", valueFrom = aws_secretsmanager_secret.stripe_key.arn }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.api.name
+          "awslogs-region"        = var.aws_region
+          "awslogs-stream-prefix" = "api"
+        }
       }
+      healthCheck = {
+        command     = ["CMD-SHELL", "wget -qO- http://localhost:3001/api/v1/health || exit 1"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 60
+      }
+    },
+
+    # pgBouncer sidecar — connection pooler for Postgres
+    {
+      name      = "pgbouncer"
+      image     = "edoburu/pgbouncer:1.21.0"
+      essential = false
+      portMappings = [{ containerPort = 5432, hostPort = 0 }]
+
+      environment = [
+        { name = "DB_USER",             value = var.db_username },
+        { name = "DB_HOST",             value = var.db_host },
+        { name = "DB_PORT",             value = "5432" },
+        { name = "DB_NAME",             value = var.db_name },
+        { name = "POOL_MODE",           value = "transaction" },
+        { name = "MAX_CLIENT_CONN",     value = "1000" },
+        { name = "DEFAULT_POOL_SIZE",   value = "25" },
+        { name = "MIN_POOL_SIZE",       value = "5" },
+        { name = "RESERVE_POOL_SIZE",   value = "5" },
+        { name = "SERVER_IDLE_TIMEOUT", value = "600" },
+        { name = "LOG_CONNECTIONS",     value = "0" },
+        { name = "LOG_DISCONNECTIONS",  value = "0" },
+        { name = "ADMIN_USERS",         value = "postgres" },
+      ]
+
+      secrets = [
+        { name = "DB_PASSWORD", valueFrom = "${var.db_secret_arn}:password::" }
+      ]
+
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.pgbouncer.name
+          "awslogs-region"        = var.aws_region
+          "awslogs-stream-prefix" = "pgbouncer"
+        }
+      }
+
+      healthCheck = {
+        command     = ["CMD-SHELL", "pg_isready -h localhost -p 5432 -U $DB_USER || exit 1"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 10
+      }
+
+      dependsOn = []
     }
-    healthCheck = {
-      command     = ["CMD-SHELL", "wget -qO- http://localhost:3001/api/v1/health || exit 1"]
-      interval    = 30
-      timeout     = 5
-      retries     = 3
-      startPeriod = 60
-    }
-  }])
+  ])
 }
 
 resource "aws_ecs_service" "api" {

@@ -56,3 +56,25 @@ variable "api_desired_count" {
   type        = number
   default     = 2
 }
+
+# ── pgBouncer / DB connection pool variables ───────────────────────────────────
+
+variable "db_host" {
+  description = "Postgres host (RDS endpoint) that pgBouncer connects to"
+  type        = string
+}
+
+variable "db_name" {
+  description = "Postgres database name that pgBouncer targets"
+  type        = string
+}
+
+variable "db_username" {
+  description = "Postgres superuser / application username for pgBouncer"
+  type        = string
+}
+
+variable "db_secret_arn" {
+  description = "ARN of the AWS Secrets Manager secret that contains the 'password' key for the DB user"
+  type        = string
+}

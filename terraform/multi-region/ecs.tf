@@ -128,6 +128,18 @@ resource "aws_cloudwatch_log_group" "api_secondary" {
   retention_in_days = 30
 }
 
+resource "aws_cloudwatch_log_group" "pgbouncer_primary" {
+  provider          = aws.primary
+  name              = "/ecs/${local.project}/primary/pgbouncer"
+  retention_in_days = 30
+}
+
+resource "aws_cloudwatch_log_group" "pgbouncer_secondary" {
+  provider          = aws.secondary
+  name              = "/ecs/${local.project}/secondary/pgbouncer"
+  retention_in_days = 30
+}
+
 # ── Task Definitions ──────────────────────────────────────────────────────────
 
 resource "aws_ecs_task_definition" "api_primary" {
@@ -140,56 +152,105 @@ resource "aws_ecs_task_definition" "api_primary" {
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
   task_role_arn            = aws_iam_role.ecs_task.arn
 
-  container_definitions = jsonencode([{
-    name  = "api"
-    image = var.api_image
+  container_definitions = jsonencode([
+    {
+      name  = "api"
+      image = var.api_image
 
-    portMappings = [{
-      containerPort = 3001
-      protocol      = "tcp"
-    }]
+      portMappings = [{
+        containerPort = 3001
+        protocol      = "tcp"
+      }]
 
-    environment = [
-      { name = "NODE_ENV", value = "production" },
-      { name = "PORT", value = "3001" },
-      { name = "AWS_REGION", value = var.primary_region },
-      { name = "REGION_ROLE", value = "primary" },
-      { name = "S3_BUCKET", value = var.s3_assets_bucket_primary },
-      { name = "CLOUDFRONT_DOMAIN", value = var.cloudfront_domain },
-    ]
+      environment = [
+        { name = "NODE_ENV", value = "production" },
+        { name = "PORT", value = "3001" },
+        { name = "AWS_REGION", value = var.primary_region },
+        { name = "REGION_ROLE", value = "primary" },
+        { name = "S3_BUCKET", value = var.s3_assets_bucket_primary },
+        { name = "CLOUDFRONT_DOMAIN", value = var.cloudfront_domain },
+      ]
 
-    secrets = [
-      {
-        name      = "DATABASE_URL"
-        valueFrom = var.secrets_manager_db_url_arn_primary
-      },
-      {
-        name      = "JWT_SECRET"
-        valueFrom = var.secrets_manager_jwt_arn_primary
-      },
-      {
-        name      = "STRIPE_SECRET_KEY"
-        valueFrom = var.secrets_manager_stripe_arn_primary
-      },
-    ]
+      secrets = [
+        {
+          name      = "DATABASE_URL"
+          valueFrom = var.secrets_manager_db_url_arn_primary
+        },
+        {
+          name      = "JWT_SECRET"
+          valueFrom = var.secrets_manager_jwt_arn_primary
+        },
+        {
+          name      = "STRIPE_SECRET_KEY"
+          valueFrom = var.secrets_manager_stripe_arn_primary
+        },
+      ]
 
-    logConfiguration = {
-      logDriver = "awslogs"
-      options = {
-        "awslogs-group"         = aws_cloudwatch_log_group.api_primary.name
-        "awslogs-region"        = var.primary_region
-        "awslogs-stream-prefix" = "api"
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.api_primary.name
+          "awslogs-region"        = var.primary_region
+          "awslogs-stream-prefix" = "api"
+        }
       }
-    }
 
-    healthCheck = {
-      command     = ["CMD-SHELL", "wget -qO- http://localhost:3001/api/v1/health || exit 1"]
-      interval    = 30
-      timeout     = 5
-      retries     = 3
-      startPeriod = 60
+      healthCheck = {
+        command     = ["CMD-SHELL", "wget -qO- http://localhost:3001/api/v1/health || exit 1"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 60
+      }
+    },
+
+    # pgBouncer sidecar — connection pooler for Postgres (primary region)
+    {
+      name      = "pgbouncer"
+      image     = "edoburu/pgbouncer:1.21.0"
+      essential = false
+      portMappings = [{ containerPort = 5432, hostPort = 0 }]
+
+      environment = [
+        { name = "DB_USER",             value = var.db_username },
+        { name = "DB_HOST",             value = var.db_host_primary },
+        { name = "DB_PORT",             value = "5432" },
+        { name = "DB_NAME",             value = var.db_name },
+        { name = "POOL_MODE",           value = "transaction" },
+        { name = "MAX_CLIENT_CONN",     value = "1000" },
+        { name = "DEFAULT_POOL_SIZE",   value = "25" },
+        { name = "MIN_POOL_SIZE",       value = "5" },
+        { name = "RESERVE_POOL_SIZE",   value = "5" },
+        { name = "SERVER_IDLE_TIMEOUT", value = "600" },
+        { name = "LOG_CONNECTIONS",     value = "0" },
+        { name = "LOG_DISCONNECTIONS",  value = "0" },
+        { name = "ADMIN_USERS",         value = "postgres" },
+      ]
+
+      secrets = [
+        { name = "DB_PASSWORD", valueFrom = "${var.db_secret_arn_primary}:password::" }
+      ]
+
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.pgbouncer_primary.name
+          "awslogs-region"        = var.primary_region
+          "awslogs-stream-prefix" = "pgbouncer"
+        }
+      }
+
+      healthCheck = {
+        command     = ["CMD-SHELL", "pg_isready -h localhost -p 5432 -U $DB_USER || exit 1"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 10
+      }
+
+      dependsOn = []
     }
-  }])
+  ])
 
   tags = { Region = "primary" }
 }
@@ -204,56 +265,105 @@ resource "aws_ecs_task_definition" "api_secondary" {
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
   task_role_arn            = aws_iam_role.ecs_task.arn
 
-  container_definitions = jsonencode([{
-    name  = "api"
-    image = var.api_image
+  container_definitions = jsonencode([
+    {
+      name  = "api"
+      image = var.api_image
 
-    portMappings = [{
-      containerPort = 3001
-      protocol      = "tcp"
-    }]
+      portMappings = [{
+        containerPort = 3001
+        protocol      = "tcp"
+      }]
 
-    environment = [
-      { name = "NODE_ENV", value = "production" },
-      { name = "PORT", value = "3001" },
-      { name = "AWS_REGION", value = var.secondary_region },
-      { name = "REGION_ROLE", value = "secondary" },
-      { name = "S3_BUCKET", value = var.s3_assets_bucket_primary },
-      { name = "CLOUDFRONT_DOMAIN", value = var.cloudfront_domain },
-    ]
+      environment = [
+        { name = "NODE_ENV", value = "production" },
+        { name = "PORT", value = "3001" },
+        { name = "AWS_REGION", value = var.secondary_region },
+        { name = "REGION_ROLE", value = "secondary" },
+        { name = "S3_BUCKET", value = var.s3_assets_bucket_primary },
+        { name = "CLOUDFRONT_DOMAIN", value = var.cloudfront_domain },
+      ]
 
-    secrets = [
-      {
-        name      = "DATABASE_URL"
-        valueFrom = var.secrets_manager_db_url_arn_secondary
-      },
-      {
-        name      = "JWT_SECRET"
-        valueFrom = var.secrets_manager_jwt_arn_secondary
-      },
-      {
-        name      = "STRIPE_SECRET_KEY"
-        valueFrom = var.secrets_manager_stripe_arn_secondary
-      },
-    ]
+      secrets = [
+        {
+          name      = "DATABASE_URL"
+          valueFrom = var.secrets_manager_db_url_arn_secondary
+        },
+        {
+          name      = "JWT_SECRET"
+          valueFrom = var.secrets_manager_jwt_arn_secondary
+        },
+        {
+          name      = "STRIPE_SECRET_KEY"
+          valueFrom = var.secrets_manager_stripe_arn_secondary
+        },
+      ]
 
-    logConfiguration = {
-      logDriver = "awslogs"
-      options = {
-        "awslogs-group"         = aws_cloudwatch_log_group.api_secondary.name
-        "awslogs-region"        = var.secondary_region
-        "awslogs-stream-prefix" = "api"
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.api_secondary.name
+          "awslogs-region"        = var.secondary_region
+          "awslogs-stream-prefix" = "api"
+        }
       }
-    }
 
-    healthCheck = {
-      command     = ["CMD-SHELL", "wget -qO- http://localhost:3001/api/v1/health || exit 1"]
-      interval    = 30
-      timeout     = 5
-      retries     = 3
-      startPeriod = 60
+      healthCheck = {
+        command     = ["CMD-SHELL", "wget -qO- http://localhost:3001/api/v1/health || exit 1"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 60
+      }
+    },
+
+    # pgBouncer sidecar — connection pooler for Postgres (secondary region)
+    {
+      name      = "pgbouncer"
+      image     = "edoburu/pgbouncer:1.21.0"
+      essential = false
+      portMappings = [{ containerPort = 5432, hostPort = 0 }]
+
+      environment = [
+        { name = "DB_USER",             value = var.db_username },
+        { name = "DB_HOST",             value = var.db_host_secondary },
+        { name = "DB_PORT",             value = "5432" },
+        { name = "DB_NAME",             value = var.db_name },
+        { name = "POOL_MODE",           value = "transaction" },
+        { name = "MAX_CLIENT_CONN",     value = "1000" },
+        { name = "DEFAULT_POOL_SIZE",   value = "25" },
+        { name = "MIN_POOL_SIZE",       value = "5" },
+        { name = "RESERVE_POOL_SIZE",   value = "5" },
+        { name = "SERVER_IDLE_TIMEOUT", value = "600" },
+        { name = "LOG_CONNECTIONS",     value = "0" },
+        { name = "LOG_DISCONNECTIONS",  value = "0" },
+        { name = "ADMIN_USERS",         value = "postgres" },
+      ]
+
+      secrets = [
+        { name = "DB_PASSWORD", valueFrom = "${var.db_secret_arn_secondary}:password::" }
+      ]
+
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.pgbouncer_secondary.name
+          "awslogs-region"        = var.secondary_region
+          "awslogs-stream-prefix" = "pgbouncer"
+        }
+      }
+
+      healthCheck = {
+        command     = ["CMD-SHELL", "pg_isready -h localhost -p 5432 -U $DB_USER || exit 1"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 10
+      }
+
+      dependsOn = []
     }
-  }])
+  ])
 
   tags = { Region = "secondary" }
 }

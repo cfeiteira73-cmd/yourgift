@@ -6,7 +6,14 @@
     "dev": "nest start --watch",
     "start": "node dist/main.js",
     "test": "jest",
-    "export:openapi": "ts-node --project scripts/tsconfig.scripts.json -r tsconfig-paths/register scripts/export-openapi.ts"
+    "export:openapi": "ts-node --project scripts/tsconfig.scripts.json -r tsconfig-paths/register scripts/export-openapi.ts",
+    "drill:latency": "tsx ../../scripts/chaos-drill.ts latency_injection 30",
+    "drill:redis": "tsx ../../scripts/chaos-drill.ts redis_outage 30",
+    "drill:db": "tsx ../../scripts/chaos-drill.ts db_failover 60",
+    "drill:queue": "tsx ../../scripts/chaos-drill.ts queue_corruption 30",
+    "drill:failover:db": "tsx ../../scripts/failover-drill.ts db_primary_failover",
+    "drill:failover:redis": "tsx ../../scripts/failover-drill.ts redis_primary_failover",
+    "mfa:enroll": "tsx ../../scripts/mfa-enroll.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.0.0",

@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { AdminAuthService } from './admin-auth.service';
 import { AdminAuthController } from './admin-auth.controller';
 import { AdminAuthGuard } from './admin-auth.guard';
+import { TotpService } from './totp.service';
 import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
@@ -18,7 +19,7 @@ import { PrismaModule } from '../prisma/prisma.module';
     }),
   ],
   controllers: [AdminAuthController],
-  providers: [AdminAuthService, AdminAuthGuard],
-  exports: [AdminAuthService, AdminAuthGuard, JwtModule],
+  providers: [AdminAuthService, AdminAuthGuard, TotpService],
+  exports: [AdminAuthService, AdminAuthGuard, TotpService, JwtModule],
 })
 export class AdminAuthModule {}

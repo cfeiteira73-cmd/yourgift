@@ -174,3 +174,30 @@ variable "global_accelerator_flow_logs_bucket" {
   type        = string
   default     = "yourgift-ga-flow-logs"
 }
+
+# ── pgBouncer / DB connection pool variables ───────────────────────────────────
+
+variable "db_host_primary" {
+  description = "Postgres host (Aurora primary writer endpoint) that pgBouncer connects to in the primary region"
+  type        = string
+}
+
+variable "db_host_secondary" {
+  description = "Postgres host (Aurora secondary reader/writer endpoint) that pgBouncer connects to in the secondary region"
+  type        = string
+}
+
+variable "db_name" {
+  description = "Postgres database name that pgBouncer targets in both regions"
+  type        = string
+}
+
+variable "db_secret_arn_primary" {
+  description = "ARN of the Secrets Manager secret containing the 'password' key for the DB user in the primary region"
+  type        = string
+}
+
+variable "db_secret_arn_secondary" {
+  description = "ARN of the Secrets Manager secret containing the 'password' key for the DB user in the secondary region"
+  type        = string
+}
