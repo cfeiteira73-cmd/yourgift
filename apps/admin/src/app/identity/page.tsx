@@ -74,7 +74,9 @@ function SSOConfigForm({ tenantId, existing, onSave, onCancel }: SSOFormProps) {
     oidcClientSecret: '',
     oidcCallbackUrl: existing?.oidcCallbackUrl ?? `${API_BASE}/enterprise-identity/oidc/${tenantId}/callback`,
     samlEntryPoint: existing?.samlEntryPoint ?? '',
-    samlIssuer: existing?.samlIssuer ?? '',
+    samlIssuer: existing?.samlIssuer ?? `${API_BASE}/enterprise-identity/saml/${tenantId}`,
+    samlCert: '',
+    samlIdpIssuer: '',
     emailDomains: (existing?.emailDomains ?? []).join(', '),
   });
 
@@ -160,9 +162,11 @@ function SSOConfigForm({ tenantId, existing, onSave, onCancel }: SSOFormProps) {
       ) : (
         <>
           {field('IdP Entry Point URL', 'samlEntryPoint', 'https://idp.example.com/sso/saml')}
-          {field('SP Issuer (Entity ID)', 'samlIssuer', 'https://yourgift.pt/sp')}
-          <p className="text-[11px] text-[#fbbf24]">
-            ⚠️ SAML requires <code className="bg-[#07111f] px-1 rounded">passport-saml</code> — install with: <code className="bg-[#07111f] px-1 rounded">pnpm add passport-saml --filter api</code>
+          {field('SP Issuer (Entity ID)', 'samlIssuer', `${process.env.NEXT_PUBLIC_API_URL ?? 'https://api.yourgift.pt'}/enterprise-identity/saml/{tenantId}`)}
+          {field('IdP Signing Certificate (PEM or base64)', 'samlCert', '-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----')}
+          {field('IdP Issuer / Entity ID (optional)', 'samlIdpIssuer', 'http://www.okta.com/exk...')}
+          <p className="text-[11px] text-[#4ade80] bg-[#4ade8011] border border-[#4ade8033] rounded px-2 py-1">
+            ✓ SAML 2.0 active — native implementation (RSA-SHA256, Exclusive C14N). Compatible with Okta, Azure AD, ADFS, PingFederate, OneLogin.
           </p>
         </>
       )}

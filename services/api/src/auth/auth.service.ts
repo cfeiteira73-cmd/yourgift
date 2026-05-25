@@ -9,7 +9,7 @@ import { createHash, randomBytes } from 'crypto';
 import * as bcrypt from 'bcrypt';
 
 export interface OAuthProfile {
-  provider: 'google' | 'apple';
+  provider: 'google' | 'apple' | 'saml' | 'oidc';
   providerUid: string;
   email: string;
   displayName?: string;

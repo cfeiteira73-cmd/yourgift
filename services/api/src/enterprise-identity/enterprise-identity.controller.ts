@@ -21,6 +21,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { SSOConfigService, SSOConfigInput } from './sso-config.service';
 import { OIDCService } from './oidc.service';
+import { SamlService } from './saml.service';
 import { AuthService } from '../auth/auth.service';
 
 /**
@@ -50,6 +51,7 @@ export class EnterpriseIdentityController {
   constructor(
     private readonly ssoConfig: SSOConfigService,
     private readonly oidcService: OIDCService,
+    private readonly samlService: SamlService,
     private readonly config: ConfigService,
     private readonly authService: AuthService,
   ) {}
@@ -204,18 +206,23 @@ export class EnterpriseIdentityController {
     }
   }
 
-  // ── SAML Flow (Stubbed — requires passport-saml) ──────────────────────────
+  // ── SAML 2.0 Flow (native — no passport-saml) ────────────────────────────
 
   /**
    * GET /enterprise-identity/saml/:tenantId/login
    *
-   * Redirects to IdP SAML SSO URL.
-   * TODO: Integrate passport-saml once package is available.
-   * Install: pnpm add passport-saml @types/passport-saml --filter api
+   * Initiates SAML SP-initiated SSO flow.
+   *
+   * Builds a signed SAML AuthnRequest (HTTP-Redirect Binding):
+   *   XML → deflateRaw → base64 → SAMLRequest query param
+   *
+   * Redirects to the IdP Single Sign-On URL.
+   * Compatible with Okta, Azure AD / Entra ID, ADFS, PingFederate, OneLogin.
    */
   @Get('saml/:tenantId/login')
   async samlLogin(
     @Param('tenantId') tenantId: string,
+    @Query('redirectAfter') redirectAfter: string | undefined,
     @Res() res: Response,
   ) {
     const ssoConf = await this.ssoConfig.findFull(tenantId);
@@ -223,22 +230,40 @@ export class EnterpriseIdentityController {
       throw new UnauthorizedException(`SAML SSO not configured for tenant ${tenantId}`);
     }
 
-    // Redirect directly to IdP entry point (basic redirect without AuthnRequest signature)
-    // For signed requests, integrate passport-saml here
-    const spIssuer = ssoConf.samlIssuer ?? `${this.config.get('API_URL')}/enterprise-identity/saml/${tenantId}`;
-    const acsUrl = encodeURIComponent(this.defaultCallbackUrl(tenantId, 'saml'));
-    const issuer = encodeURIComponent(spIssuer);
+    if (!ssoConf.samlCert) {
+      throw new UnauthorizedException(`SAML: IdP signing certificate not configured for tenant ${tenantId}`);
+    }
 
-    this.logger.log(`SAML login initiated: tenant=${tenantId} entryPoint=${ssoConf.samlEntryPoint}`);
-    res.redirect(`${ssoConf.samlEntryPoint}?SAMLRequest=&RelayState=${acsUrl}&Issuer=${issuer}`);
+    const apiUrl = this.config.get<string>('API_URL') ?? 'https://api.yourgift.pt';
+    const issuer = ssoConf.samlIssuer ?? `${apiUrl}/enterprise-identity/saml/${tenantId}`;
+    const callbackUrl = ssoConf.samlCallbackUrl ?? this.defaultCallbackUrl(tenantId, 'saml');
+
+    const redirectUrl = await this.samlService.buildAuthRequestUrl({
+      entryPoint: ssoConf.samlEntryPoint,
+      issuer,
+      callbackUrl,
+      tenantId,
+      redirectAfter,
+    });
+
+    this.logger.log(`SAML login initiated: tenant=${tenantId} idp=${ssoConf.samlEntryPoint}`);
+    res.redirect(redirectUrl);
   }
 
   /**
    * POST /enterprise-identity/saml/:tenantId/callback
    *
    * SAML ACS (Assertion Consumer Service) endpoint.
-   * IdP POSTs the SAML Response here.
-   * TODO: Parse and verify with passport-saml.
+   * IdP POSTs the SAMLResponse here after authentication.
+   *
+   * Validates:
+   *  - Response Status (must be Success)
+   *  - Conditions (NotBefore / NotOnOrAfter / clock skew ±5min)
+   *  - AudienceRestriction (SP entityId)
+   *  - XML Signature (RSA-SHA256 or RSA-SHA1 fallback) using IdP certificate
+   *  - InResponseTo (anti-replay, matched against outstanding request IDs)
+   *
+   * On success: upserts user record → issues JWT pair → redirects to frontend.
    */
   @Post('saml/:tenantId/callback')
   @HttpCode(HttpStatus.OK)
@@ -250,20 +275,70 @@ export class EnterpriseIdentityController {
     const frontendUrl = this.config.get<string>('FRONTEND_URL') ?? 'https://app.yourgift.pt';
 
     if (!body.SAMLResponse) {
-      this.logger.error(`SAML callback: missing SAMLResponse for tenant ${tenantId}`);
+      this.logger.error(`SAML ACS: missing SAMLResponse for tenant ${tenantId}`);
       return res.redirect(`${frontendUrl}/auth/error?error=missing_saml_response`);
     }
 
-    this.logger.log(`SAML ACS received: tenant=${tenantId} — passport-saml integration pending`);
+    try {
+      const ssoConf = await this.ssoConfig.findFull(tenantId);
+      if (!ssoConf || ssoConf.protocol !== 'SAML') {
+        throw new UnauthorizedException('SAML not configured for this tenant');
+      }
+      if (!ssoConf.samlCert) {
+        throw new UnauthorizedException('SAML: IdP signing certificate not configured');
+      }
 
-    // When passport-saml is installed:
-    // const passport = require('passport');
-    // const { Strategy: SamlStrategy } = require('passport-saml');
-    // const ssoConf = await this.ssoConfig.findFull(tenantId);
-    // const strategy = new SamlStrategy({ entryPoint: ssoConf.samlEntryPoint, cert: ssoConf.samlCert, ... }, cb);
-    // strategy.authenticate(req, {}, callback);
+      const apiUrl = this.config.get<string>('API_URL') ?? 'https://api.yourgift.pt';
+      const issuer = ssoConf.samlIssuer ?? `${apiUrl}/enterprise-identity/saml/${tenantId}`;
+      const callbackUrl = ssoConf.samlCallbackUrl ?? this.defaultCallbackUrl(tenantId, 'saml');
 
-    return res.redirect(`${frontendUrl}/auth/error?error=saml_integration_pending`);
+      // Parse RelayState to recover context from the original request
+      const relayState = this.samlService.parseRelayState(body.RelayState);
+
+      // Validate the SAML Response (signature, conditions, status)
+      const profile = await this.samlService.validateResponse(
+        body.SAMLResponse,
+        {
+          idpCert: ssoConf.samlCert,
+          issuer,
+          idpIssuer: ssoConf.samlIdpIssuer,
+          callbackUrl,
+        },
+        relayState,
+      );
+
+      this.logger.log(`SAML SSO login: tenant=${tenantId} email=${profile.email}`);
+
+      // Upsert user record in our DB
+      const client = await this.authService.upsertOAuthClient({
+        provider: 'saml',
+        providerUid: profile.nameId,
+        email: profile.email,
+        displayName: profile.displayName,
+        avatarUrl: undefined,
+      });
+
+      // Issue our JWT pair
+      const { accessToken, refreshToken, expiresIn } = await this.authService.login(client);
+
+      // Redirect to frontend SSO completion page with tokens
+      const redirectAfter = relayState?.redirectAfter ?? '/dashboard';
+      const params = new URLSearchParams({
+        accessToken,
+        refreshToken,
+        expiresIn: String(expiresIn),
+        tenantId,
+        redirect: redirectAfter,
+      });
+
+      return res.redirect(`${frontendUrl}/auth/sso-complete?${params.toString()}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'SAML error';
+      this.logger.error(`SAML ACS failed: tenant=${tenantId} — ${msg}`);
+      return res.redirect(
+        `${frontendUrl}/auth/error?error=${encodeURIComponent(msg)}`,
+      );
+    }
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────

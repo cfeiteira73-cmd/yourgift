@@ -108,7 +108,7 @@ Key endpoints:
 
 - **SSO**: OIDC (Okta, Azure AD, Google Workspace, Auth0) → issues JWT pair on callback
 - **SCIM 2.0**: Automated user/group provisioning, RFC 7643/7644, async DB write for speed
-- **SAML 2.0**: Scaffolded — requires `passport-saml` installation to activate
+- **SAML 2.0**: Native implementation — RSA-SHA256, Exclusive C14N, HTTP-Redirect + HTTP-POST bindings. No passport-saml required. Compatible with Okta, Azure AD, ADFS, PingFederate, OneLogin
 - **Multi-tenant**: Complete data isolation per tenant, per-tenant rate limits at edge
 - **Budget hierarchy**: individual → team → department → company limits with escalation
 - **Audit trail**: every procurement event sourced, immutable log

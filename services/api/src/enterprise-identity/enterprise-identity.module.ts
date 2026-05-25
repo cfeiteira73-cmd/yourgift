@@ -6,6 +6,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { AuthModule } from '../auth/auth.module';
 import { SSOConfigService } from './sso-config.service';
 import { OIDCService } from './oidc.service';
+import { SamlService } from './saml.service';
 import { SCIMService } from './scim.service';
 import { SCIMController } from './scim.controller';
 import { EnterpriseIdentityController } from './enterprise-identity.controller';
@@ -18,9 +19,7 @@ import { EnterpriseIdentityController } from './enterprise-identity.controller';
  * Capabilities:
  *  - OIDC SSO: Okta, Azure AD, Google Workspace, Auth0 (✅ live)
  *  - SCIM 2.0: Automated user provisioning from any IdP (✅ live)
- *  - SAML 2.0: Okta, Azure AD, ADFS (📋 requires passport-saml install)
- *
- * To complete SAML: pnpm add passport-saml @types/passport-saml --filter api
+ *  - SAML 2.0: Okta, Azure AD, ADFS, PingFederate, OneLogin (✅ live — native, no passport-saml)
  *
  * Env vars needed per tenant:
  *  - SCIM_TOKEN_{TENANT_ID}: bearer token for SCIM provisioning endpoint
@@ -49,7 +48,7 @@ import { EnterpriseIdentityController } from './enterprise-identity.controller';
     }),
   ],
   controllers: [EnterpriseIdentityController, SCIMController],
-  providers: [SSOConfigService, OIDCService, SCIMService],
-  exports: [SSOConfigService, SCIMService],
+  providers: [SSOConfigService, OIDCService, SamlService, SCIMService],
+  exports: [SSOConfigService, SamlService, SCIMService],
 })
 export class EnterpriseIdentityModule {}

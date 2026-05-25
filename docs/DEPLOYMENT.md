@@ -145,6 +145,22 @@ After configuration, every push to `master`:
 5. Callback URL: `https://yourgift-api.onrender.com/enterprise-identity/oidc/:tenantId/callback`
 6. Email domains: `acme.com, acme.co.uk`
 
+### SAML 2.0 (Okta, Azure AD, ADFS, PingFederate, OneLogin)
+
+Native implementation — no additional packages required.
+
+1. Admin panel → **SSO / SCIM** → **Add SSO Config**
+2. Protocol: SAML
+3. **IdP Entry Point URL**: from IdP app config (e.g. Okta → Sign On → Identity Provider SSO URL)
+4. **SP Issuer / Entity ID**: `https://api.yourgift.pt/enterprise-identity/saml/<tenantId>`
+5. **IdP Signing Certificate**: paste the PEM from the IdP (Okta → Sign On → Signing Certificates → Download)
+6. **ACS URL** (set in IdP app): `https://api.yourgift.pt/enterprise-identity/saml/<tenantId>/callback`
+7. **SP Metadata** (set in IdP app if required):
+   - Entity ID: same as SP Issuer above
+   - NameID format: `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`
+   - Assertion signature algorithm: `RSA-SHA256`
+8. Email domains: `acme.com, acme.co.uk`
+
 ### SCIM (automated user provisioning)
 
 1. Set env var: `SCIM_TOKEN_<TENANT_ID>=<bearer_token>` in Render
