@@ -11,6 +11,7 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IsString, IsNumber, IsPositive, IsInt, Min } from 'class-validator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtOrInternalGuard } from '../common/guards/jwt-or-internal.guard';
 import { ArtworkService } from './artwork.service';
 
 // ─── DTOs ─────────────────────────────────────────────────────────────────────
@@ -130,11 +131,14 @@ export class ArtworkController {
   }
 
   // ── POST /artwork/:id/process ─────────────────────────────────────────────
+  // Accepts JWT (dashboard) and x-internal-token (admin worker).
 
   @Post(':id/process')
-  @ApiOperation({ summary: 'Admin: process artwork — transitions pending → approved' })
+  @UseGuards(JwtOrInternalGuard)
+  @ApiOperation({ summary: 'Admin: process artwork — transitions pending -> approved' })
   processArtwork(@Request() req: AuthRequest, @Param('id') id: string) {
-    if (req.user.role !== 'admin') {
+    const isInternal = req.user.role === 'internal';
+    if (!isInternal && req.user.role !== 'admin') {
       throw new ForbiddenException('Admin role required');
     }
     return this.artwork.processArtwork(id, req.user.id);

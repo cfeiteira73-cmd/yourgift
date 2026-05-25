@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Param,
   Query,
   UseGuards,
   Request,
@@ -11,6 +12,7 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IsString, IsOptional, IsObject } from 'class-validator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtOrInternalGuard } from '../common/guards/jwt-or-internal.guard';
 import { NotificationsService } from './notifications.service';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -51,12 +53,21 @@ export class NotificationsController {
     private readonly prisma: PrismaService,
   ) {}
 
-  // ── POST /notifications/send ──────────────────────────────────────────────
+  // ── POST /notifications/send  (and alias POST /notifications/:id/send) ───────
+  // Worker calls POST /notifications/:id/send — the :id is the notificationId.
+  // Both routes delegate to the same service method.
+  // Accepts JWT (dashboard) and x-internal-token (admin worker).
 
-  @Post('send')
+  @Post(['send', ':id/send'])
+  @UseGuards(JwtOrInternalGuard)
   @ApiOperation({ summary: 'Admin: enqueue a notification' })
-  send(@Request() req: AuthRequest, @Body() dto: SendNotificationDto) {
-    if (req.user.role !== 'admin') {
+  send(
+    @Request() req: AuthRequest,
+    @Body() dto: SendNotificationDto,
+    @Param('id') _notificationId?: string,
+  ) {
+    const isInternal = req.user.role === 'internal';
+    if (!isInternal && req.user.role !== 'admin') {
       throw new ForbiddenException('Admin role required');
     }
     return this.notifications.sendNotification(dto);

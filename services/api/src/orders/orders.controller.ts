@@ -15,6 +15,7 @@ import {
 import { Response } from 'express';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtOrInternalGuard } from '../common/guards/jwt-or-internal.guard';
 import { OrdersService, AnalyticsFilters, OrderFilters } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
@@ -116,10 +117,14 @@ export class OrdersController {
   }
 
   // ─── POST /orders/:id/fulfill ─────────────────────────────────────────────
+  // Accepts JWT (dashboard) and x-internal-token (admin worker).
+  // Internal callers get req.user = { id: 'system', role: 'internal' } from InternalGuard.
 
   @Post(':id/fulfill')
+  @UseGuards(JwtOrInternalGuard)
   fulfillOrder(@Request() req: AuthRequest, @Param('id') id: string) {
-    if (req.user.role !== 'admin') {
+    const isInternal = req.user.role === 'internal';
+    if (!isInternal && req.user.role !== 'admin') {
       throw new ForbiddenException('Admin role required');
     }
     return this.orders.fulfillOrder(id, req.user.id);

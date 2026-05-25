@@ -184,6 +184,9 @@ services:
       - key: NEXT_PUBLIC_SITE_URL
         value: https://www.yourgift.pt
 
+      - key: NEXT_PUBLIC_APP_URL
+        value: https://www.yourgift.pt
+
       - key: NEXT_PUBLIC_SUPABASE_URL
         sync: false    # ← Same as API
 
@@ -226,6 +229,17 @@ services:
 
       - key: NEXT_PUBLIC_SITE_URL
         value: https://admin.yourgift.pt
+
+      # Internal API calls (server-side routes calling the NestJS API)
+      - key: INTERNAL_API_URL
+        value: https://yourgift-api.onrender.com
+
+      - key: INTERNAL_TOKEN
+        sync: false    # <- SET THIS: shared secret for x-internal-token header
+
+      # Cron job protection (Render cron passes this as Bearer token)
+      - key: CRON_SECRET
+        sync: false    # <- SET THIS: random string, e.g. openssl rand -hex 32
 
       - key: SENTRY_DSN
         sync: false    # <- Same as API
