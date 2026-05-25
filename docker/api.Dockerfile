@@ -7,7 +7,8 @@ RUN npm install -g pnpm@9
 WORKDIR /app
 
 # Copy monorepo root manifests first (layer cache)
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+# .npmrc must be included so pnpm respects shamefully-hoist=true
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml .npmrc ./
 
 # Copy workspace package manifests
 COPY packages/shared/package.json ./packages/shared/
