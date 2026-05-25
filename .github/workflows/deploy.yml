@@ -80,13 +80,14 @@ jobs:
       - name: Build pf-concept
         run: pnpm --filter @yourgift/pf-concept run build
 
-      - name: Prisma generate
+      - name: Prisma generate and validate
         working-directory: services/api
-        run: pnpm exec prisma generate
-
-      - name: Prisma schema validate
-        working-directory: services/api
-        run: pnpm exec prisma validate
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db
+          DIRECT_URL: postgresql://user:pass@localhost:5432/db
+        run: |
+          pnpm exec prisma generate
+          pnpm exec prisma validate
 
       - name: Check env vars documented
         run: |
