@@ -118,6 +118,10 @@ import { ShipmentTrackingModule } from './shipment-tracking/shipment-tracking.mo
 import { CustomerPortalModule } from './customer-portal/customer-portal.module';
 import { SupportTicketsModule } from './support-tickets/support-tickets.module';
 import { OperationsHubModule } from './operations-hub/operations-hub.module';
+import { SupplierRoutingModule } from './supplier-routing/supplier-routing.module';
+import { SupplierIntelligenceModule } from './supplier-intelligence/supplier-intelligence.module';
+import { FilePipelineModule } from './file-pipeline/file-pipeline.module';
+import { ProductionSimulationModule } from './production-simulation/production-simulation.module';
 import { APP_GUARD } from '@nestjs/core';
 import { TenantGuard } from './common/guards/tenant.guard';
 import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard';
@@ -254,6 +258,10 @@ import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard'
     CustomerPortalModule,
     SupportTicketsModule,
     OperationsHubModule,
+    SupplierRoutingModule,
+    SupplierIntelligenceModule,
+    FilePipelineModule,
+    ProductionSimulationModule,
   ],
   providers: [
     // Rate limiting — per tenant (not per IP) for authenticated requests
