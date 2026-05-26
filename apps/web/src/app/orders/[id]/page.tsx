@@ -82,7 +82,7 @@ export default async function OrderDetailPage({
     return enriched;
   });
 
-  const items = (order.order_items ?? []) as Array<{
+  const items = (order.order_items ?? []) as unknown as Array<{
     id: string;
     quantity: number;
     unit_price: number;
@@ -90,7 +90,7 @@ export default async function OrderDetailPage({
     product_variants: { sku: string; color: string | null } | null;
   }>;
 
-  const artworks = (order.artworks ?? []) as Array<{
+  const artworks = (order.artworks ?? []) as unknown as Array<{
     id: string;
     url: string;
     filename: string;

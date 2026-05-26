@@ -1,3 +1,188 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg: #07111f;
+  --surface: #0b1526;
+  --surface-2: #102131;
+  --surface-3: #152840;
+  --border: #1a2f48;
+  --border-2: #1f3855;
+  --text-primary: #f0f6ff;
+  --text-secondary: #8ba8c7;
+  --text-muted: #4d6a87;
+  --accent-blue: #4da3ff;
+  --accent-cyan: #74e7ff;
+  --accent-emerald: #63e6be;
+  --accent-amber: #f59e0b;
+  --accent-red: #f87171;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Skeleton animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface) 25%,
+    var(--surface-2) 50%,
+    var(--surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ── Inter Tight as primary font for headings ── */
+.font-tight {
+  font-family: 'Inter Tight', 'Inter', system-ui, sans-serif;
+}
+
+/* ── Motion tokens ── */
+:root {
+  --motion-fast: 120ms;
+  --motion-base: 180ms;
+  --motion-slow: 300ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+/* ── Pulse animation for live indicators ── */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+  50% { opacity: 0.8; box-shadow: 0 0 0 4px rgba(34, 197, 94, 0); }
+}
+.pulse-live {
+  animation: pulse-glow 2s infinite;
+}
+
+/* ── Fade in animation ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn var(--motion-base) var(--ease-out) forwards;
+}
+
+/* ── Command bar backdrop ── */
+@keyframes cmdOverlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.cmd-overlay {
+  animation: cmdOverlayIn var(--motion-fast) ease forwards;
+}
+
+/* ── Card hover lift ── */
+.card-hover {
+  transition: border-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
+}
+.card-hover:hover {
+  border-color: var(--border-2);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Focus ring ── */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ── Scrollbar thin variant ── */
+.scrollbar-thin::-webkit-scrollbar { width: 4px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ── Sprint 13: Enhanced Color System ── */
+:root {
+  /* Deeper dark mode (additive — new pages can use these) */
+  --bg-deep: #070B14;
+  --surface-elevated: #111827;
+
+  /* Semantic procurement colors */
+  --margin-safe: #10b981;    /* emerald */
+  --margin-warning: #f59e0b; /* amber */
+  --margin-critical: #ef4444;/* red */
+
+  /* SLA severity gradient */
+  --sla-ok: #22c55e;
+  --sla-warning: #f59e0b;
+  --sla-breach: #ef4444;
+  --sla-critical: #dc2626;
+
+  /* Supplier risk palette */
+  --supplier-trusted: #4da3ff;
+  --supplier-watch: #f59e0b;
+  --supplier-risk: #ef4444;
+
+  /* AI/Intelligence accent */
+  --ai-primary: #a855f7;
+  --ai-secondary: #7c3aed;
+  --ai-glow: rgba(168, 85, 247, 0.15);
+
+  /* Heatmap scale (5 steps) */
+  --heat-1: #1e3a5f;
+  --heat-2: #1d4ed8;
+  --heat-3: #f59e0b;
+  --heat-4: #dc2626;
+  --heat-5: #7f1d1d;
+}
+
+/* Margin indicator classes */
+.margin-safe { color: var(--margin-safe); }
+.margin-warning { color: var(--margin-warning); }
+.margin-critical { color: var(--margin-critical); }
+
+/* AI glow effect */
+.ai-glow {
+  box-shadow: 0 0 20px var(--ai-glow), 0 0 40px rgba(168, 85, 247, 0.05);
+}
+
+/* Risk row highlighting */
+.row-critical {
+  background: rgba(239, 68, 68, 0.04);
+  border-left: 2px solid rgba(239, 68, 68, 0.4);
+}
+.row-warning {
+  background: rgba(245, 158, 11, 0.04);
+  border-left: 2px solid rgba(245, 158, 11, 0.3);
+}

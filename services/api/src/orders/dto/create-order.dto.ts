@@ -1,4 +1,13 @@
-import { IsArray, IsObject, ValidateNested, IsString, IsNumber, IsUUID, Min } from 'class-validator';
+import {
+  IsArray,
+  IsObject,
+  ValidateNested,
+  IsString,
+  IsNumber,
+  IsUUID,
+  IsOptional,
+  Min,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 class OrderItemDto {
@@ -35,4 +44,20 @@ export class CreateOrderDto {
   @ValidateNested()
   @Type(() => AddressDto)
   shippingAddress: AddressDto;
+
+  @IsOptional()
+  @IsUUID()
+  companyId?: string;
+
+  @IsOptional()
+  @IsUUID()
+  departmentId?: string;
+
+  @IsOptional()
+  @IsUUID()
+  campaignId?: string;
+
+  @IsOptional()
+  @IsObject()
+  pricingSnapshot?: Record<string, unknown>;
 }

@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mainNav } from "@/config/navigation";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { type Lang } from "@/lib/i18n";
 
 const solutionIcons: Record<string, React.ReactNode> = {
   "/corporate-gifts": <Gift className="h-4 w-4" />,
@@ -31,6 +33,12 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [currentLang, setCurrentLang] = useState<Lang>('pt');
+
+  useEffect(() => {
+    const match = document.cookie.match(/lang=(pt|en)/);
+    if (match) setCurrentLang(match[1] as Lang);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 20);
@@ -145,6 +153,10 @@ export function Header() {
 
           {/* Right side */}
           <div className="flex items-center gap-3">
+            <div className="hidden md:block">
+              <LanguageSwitcher currentLang={currentLang} />
+            </div>
+
             <Link
               href="/auth/login"
               className="hidden md:block text-sm text-white/70 hover:text-white px-4 py-2 rounded-xl transition-all hover:bg-white/[0.06]"
@@ -229,6 +241,9 @@ export function Header() {
                 >
                   Entrar
                 </Link>
+                <div className="flex justify-center pt-1">
+                  <LanguageSwitcher currentLang={currentLang} />
+                </div>
               </div>
             </div>
           </motion.div>

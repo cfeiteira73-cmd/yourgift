@@ -1,25 +1,70 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventBusService } from '../events/event-bus.service';
+import { EventSourcingService } from '../event-sourcing/event-sourcing.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { generateOrderRef } from '@yourgift/shared';
+import {
+  OrderStatus,
+  validateTransition,
+} from './order-state-machine';
+
+export interface OrderFilters {
+  status?: OrderStatus;
+  companyId?: string;
+  dateRange?: { from: Date; to: Date };
+}
+
+export interface AnalyticsFilters {
+  companyId?: string;
+  dateRange?: { from: Date; to: Date };
+}
+
+function buildOrderRef(): string {
+  const now = new Date();
+  const datePart = now.toISOString().slice(0, 10).replace(/-/g, '');
+  const rand = Math.floor(1000 + Math.random() * 9000);
+  return `YGO-${datePart}-${rand}`;
+}
+
+function startOfMonth(d: Date): Date {
+  return new Date(d.getFullYear(), d.getMonth(), 1);
+}
+
+function startOfLastMonth(d: Date): Date {
+  return new Date(d.getFullYear(), d.getMonth() - 1, 1);
+}
+
+function endOfLastMonth(d: Date): Date {
+  return new Date(d.getFullYear(), d.getMonth(), 0, 23, 59, 59, 999);
+}
 
 @Injectable()
 export class OrdersService {
   constructor(
-    private prisma: PrismaService,
-    private events: EventBusService,
+    private readonly prisma: PrismaService,
+    private readonly events: EventBusService,
+    private readonly eventSourcing: EventSourcingService,
   ) {}
 
+  // ─── CREATE ────────────────────────────────────────────────────────────────
+
   async create(clientId: string, dto: CreateOrderDto) {
-    const ref = generateOrderRef();
+    const ref = buildOrderRef();
 
     const order = await this.prisma.order.create({
       data: {
         ref,
         clientId,
-        status: 'pending',
-        shippingAddress: dto.shippingAddress as any,
+        status: 'created',
+        companyId: dto.companyId,
+        departmentId: dto.departmentId,
+        campaignId: dto.campaignId,
+        shippingAddress: dto.shippingAddress as object,
+        pricingSnapshot: dto.pricingSnapshot as object ?? {},
         items: {
           create: dto.items.map((item) => ({
             productId: item.productId,
@@ -32,34 +77,538 @@ export class OrdersService {
       include: { items: true },
     });
 
-    this.events.emit('order.created', order);
+    await this.prisma.eventLog.create({
+      data: {
+        entity: 'order',
+        entityId: order.id,
+        event: 'order.created',
+        actorId: clientId,
+        payload: { ref: order.ref, status: 'created' },
+      },
+    });
 
+    await this.eventSourcing.append(
+      order.id,
+      'order',
+      'order.created',
+      { orderId: order.id, ref: order.ref, clientId, status: 'created' },
+      { actorId: clientId, actorType: 'client' },
+    );
+
+    this.events.emit('order.created', order);
     return order;
   }
 
-  async findAll(clientId: string) {
+  // ─── LIST ──────────────────────────────────────────────────────────────────
+
+  async findAll(clientId: string, filters?: OrderFilters) {
+    const where: Record<string, unknown> = { clientId };
+
+    if (filters?.status) {
+      where['status'] = filters.status;
+    }
+    if (filters?.companyId) {
+      where['companyId'] = filters.companyId;
+    }
+    if (filters?.dateRange) {
+      where['createdAt'] = {
+        gte: filters.dateRange.from,
+        lte: filters.dateRange.to,
+      };
+    }
+
     return this.prisma.order.findMany({
-      where: { clientId },
+      where,
       include: { items: true },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async findOne(id: string, clientId: string) {
+  // ─── DETAIL ────────────────────────────────────────────────────────────────
+
+  async findOne(id: string, clientId?: string) {
+    const where: Record<string, unknown> = { id };
+    if (clientId) where['clientId'] = clientId;
+
     const order = await this.prisma.order.findFirst({
-      where: { id, clientId },
-      include: { items: true },
+      where,
+      include: {
+        items: true,
+        artworks: true,
+        approvals: true,
+        eventLogs: { orderBy: { createdAt: 'asc' } },
+        client: true,
+      },
     });
-    if (!order) throw new NotFoundException('Order not found');
+
+    if (!order) throw new NotFoundException(`Order ${id} not found`);
     return order;
   }
 
-  async updateStatus(id: string, status: string) {
+  // ─── UPDATE STATUS ─────────────────────────────────────────────────────────
+
+  async updateStatus(id: string, status: OrderStatus, actorId?: string) {
+    const existing = await this.prisma.order.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`Order ${id} not found`);
+
+    const from = existing.status as OrderStatus;
+    if (!validateTransition(from, status)) {
+      throw new BadRequestException(
+        `Invalid status transition: ${from} → ${status}`,
+      );
+    }
+
+    const updateData: Record<string, unknown> = { status };
+    if (status === 'approved') {
+      updateData['approvedAt'] = new Date();
+      if (actorId) updateData['approvedById'] = actorId;
+    }
+    if (status === 'shipped') {
+      updateData['shippedAt'] = new Date();
+    }
+    if (status === 'delivered') {
+      updateData['deliveredAt'] = new Date();
+    }
+
     const order = await this.prisma.order.update({
       where: { id },
-      data: { status },
+      data: updateData,
+      include: { items: true },
     });
+
+    await this.prisma.eventLog.create({
+      data: {
+        entity: 'order',
+        entityId: id,
+        event: `order.${status}`,
+        actorId: actorId ?? null,
+        payload: { from, to: status },
+      },
+    });
+
+    await this.eventSourcing.append(
+      id,
+      'order',
+      'order.status_changed',
+      { orderId: id, previousStatus: from, newStatus: status, actorId: actorId ?? null },
+      { actorId: actorId ?? undefined, actorType: 'admin' },
+    );
+
     this.events.emit(`order.${status}`, order);
     return order;
+  }
+
+  // ─── TIMELINE ─────────────────────────────────────────────────────────────
+
+  async getTimeline(id: string) {
+    const order = await this.prisma.order.findUnique({ where: { id } });
+    if (!order) throw new NotFoundException(`Order ${id} not found`);
+
+    const logs = await this.prisma.eventLog.findMany({
+      where: { entity: 'order', entityId: id },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    return logs.map((log) => ({
+      id: log.id,
+      event: log.event,
+      actorId: log.actorId,
+      payload: log.payload,
+      timestamp: log.createdAt,
+      label: this.humaniseEvent(log.event),
+    }));
+  }
+
+  private humaniseEvent(event: string): string {
+    const map: Record<string, string> = {
+      'order.created': 'Order created',
+      'order.paid': 'Payment confirmed',
+      'order.approved': 'Order approved',
+      'order.producing': 'Production started',
+      'order.shipped': 'Order shipped',
+      'order.delivered': 'Order delivered',
+      'order.cancelled': 'Order cancelled',
+      'order.cancellation_requested': 'Cancellation requested',
+    };
+    return map[event] ?? event;
+  }
+
+  // ─── CANCEL ────────────────────────────────────────────────────────────────
+
+  async cancelOrder(id: string, reason: string, actorId: string) {
+    const existing = await this.prisma.order.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`Order ${id} not found`);
+
+    if (!validateTransition(existing.status as OrderStatus, 'cancelled')) {
+      throw new BadRequestException(
+        `Order in status "${existing.status}" cannot be cancelled`,
+      );
+    }
+
+    const order = await this.prisma.order.update({
+      where: { id },
+      data: { status: 'cancelled' },
+    });
+
+    await this.prisma.eventLog.create({
+      data: {
+        entity: 'order',
+        entityId: id,
+        event: 'order.cancelled',
+        actorId,
+        payload: { reason, previousStatus: existing.status },
+      },
+    });
+
+    await this.eventSourcing.append(
+      id,
+      'order',
+      'order.cancelled',
+      { orderId: id, reason, previousStatus: existing.status, actorId },
+      { actorId, actorType: 'admin' },
+    );
+
+    this.events.emit('order.cancelled', { ...order, reason });
+    return order;
+  }
+
+  // ─── FULFILL ──────────────────────────────────────────────────────────────
+
+  async fulfillOrder(id: string, actorId: string) {
+    const existing = await this.prisma.order.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`Order ${id} not found`);
+
+    const from = existing.status as OrderStatus;
+    const to: OrderStatus = 'producing';
+
+    if (!validateTransition(from, to)) {
+      throw new BadRequestException(
+        `Invalid status transition: ${from} → ${to}. Order must be in "approved" status to start fulfillment.`,
+      );
+    }
+
+    const order = await this.prisma.order.update({
+      where: { id },
+      data: { status: to },
+      include: { items: true },
+    });
+
+    await this.prisma.eventLog.create({
+      data: {
+        entity: 'order',
+        entityId: id,
+        event: 'order.fulfillment_started',
+        actorId,
+        payload: { from, to },
+      },
+    });
+
+    await this.eventSourcing.append(
+      id,
+      'order',
+      'order.fulfillment_started',
+      { orderId: id, previousStatus: from, newStatus: to, actorId },
+      { actorId, actorType: 'admin' },
+    );
+
+    this.events.emit('order.fulfillment_started', order);
+    return order;
+  }
+
+  // ─── ANALYTICS ────────────────────────────────────────────────────────────
+
+  async getAnalytics(filters: AnalyticsFilters) {
+    const now = new Date();
+    const mtdStart = startOfMonth(now);
+
+    const where: Record<string, unknown> = {};
+    if (filters.companyId) where['companyId'] = filters.companyId;
+    if (filters.dateRange) {
+      where['createdAt'] = {
+        gte: filters.dateRange.from,
+        lte: filters.dateRange.to,
+      };
+    }
+
+    const mtdWhere: Record<string, unknown> = {
+      ...where,
+      createdAt: { gte: mtdStart },
+    };
+
+    const [allOrders, mtdOrders, statusGroups, supplierGroups, recentOrders] =
+      await Promise.all([
+        this.prisma.order.findMany({
+          where,
+          include: { items: true },
+        }),
+        this.prisma.order.findMany({
+          where: mtdWhere,
+          include: { items: true },
+        }),
+        this.prisma.order.groupBy({
+          by: ['status'],
+          where,
+          _count: { id: true },
+          _sum: { totalAmount: true },
+        }),
+        this.prisma.order.groupBy({
+          by: ['supplier'],
+          where,
+          _count: { supplier: true },
+          _sum: { totalAmount: true },
+        }),
+        this.prisma.order.findMany({
+          where,
+          take: 10,
+          orderBy: { createdAt: 'desc' },
+          include: { items: true },
+        }),
+      ]);
+
+    const sumAmount = (orders: typeof allOrders) =>
+      orders.reduce((acc, o) => acc + (o.totalAmount ?? 0), 0);
+
+    const sumMargin = (orders: typeof allOrders) =>
+      orders.reduce((acc, o) => acc + (o.marginAmount ?? 0), 0);
+
+    // Top clients by spend
+    const clientMap = new Map<
+      string,
+      { clientId: string; name: string; totalSpent: number; orderCount: number }
+    >();
+    for (const o of allOrders) {
+      const entry = clientMap.get(o.clientId) ?? {
+        clientId: o.clientId,
+        name: o.clientId,
+        totalSpent: 0,
+        orderCount: 0,
+      };
+      entry.totalSpent += o.totalAmount ?? 0;
+      entry.orderCount += 1;
+      clientMap.set(o.clientId, entry);
+    }
+    const topClients = [...clientMap.values()]
+      .sort((a, b) => b.totalSpent - a.totalSpent)
+      .slice(0, 10);
+
+    const byStatus = statusGroups.map((g) => ({
+      status: g.status,
+      count: g._count.id,
+      revenue: g._sum.totalAmount ?? 0,
+    }));
+
+    const bySupplier = supplierGroups.map((g) => ({
+      supplier: g.supplier ?? 'unknown',
+      count: g._count.supplier,
+      revenue: g._sum.totalAmount ?? 0,
+    }));
+
+    return {
+      revenueMtd: sumAmount(mtdOrders),
+      revenueTotal: sumAmount(allOrders),
+      orderCount: allOrders.length,
+      avgOrderValue:
+        allOrders.length > 0 ? sumAmount(allOrders) / allOrders.length : 0,
+      marginMtd: sumMargin(mtdOrders),
+      marginTotal: sumMargin(allOrders),
+      byStatus,
+      bySupplier,
+      recentOrders,
+      topClients,
+    };
+  }
+
+  // ─── INVOICE HTML ─────────────────────────────────────────────────────────
+
+  async generateInvoiceHtml(orderId: string): Promise<string> {
+    const order = await this.prisma.order.findUniqueOrThrow({
+      where: { id: orderId },
+      include: {
+        client: true,
+        items: { include: { product: true, variant: true } },
+        company: true,
+      },
+    });
+
+    const items = order.items.map(item => `
+    <tr>
+      <td>${item.product?.title ?? 'Produto'}</td>
+      <td>${item.variant?.sku ?? '-'}</td>
+      <td style="text-align:center">${item.quantity}</td>
+      <td style="text-align:right">€${item.unitPrice.toFixed(2)}</td>
+      <td style="text-align:right">€${(item.quantity * item.unitPrice).toFixed(2)}</td>
+    </tr>
+  `).join('');
+
+    const total = order.totalAmount ?? order.items.reduce((s, i) => s + i.quantity * i.unitPrice, 0);
+    const addr = order.shippingAddress as Record<string, string>;
+    const createdAt = new Date(order.createdAt).toLocaleDateString('pt-PT');
+
+    return `<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Fatura ${order.ref}</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #1a1a2e; padding: 40px; max-width: 800px; margin: 0 auto; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
+  .logo { font-size: 28px; font-weight: 800; color: #07111f; }
+  .logo span { color: #4da3ff; }
+  .invoice-info { text-align: right; }
+  .invoice-info h1 { font-size: 22px; color: #07111f; margin-bottom: 4px; }
+  .invoice-info .ref { font-size: 18px; color: #4da3ff; font-weight: 700; }
+  .addresses { display: flex; gap: 40px; margin-bottom: 32px; }
+  .address-box { flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; }
+  .address-box h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 8px; }
+  .address-box p { color: #1e293b; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  thead tr { background: #07111f; color: white; }
+  thead th { padding: 12px 16px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  tbody tr:nth-child(even) { background: #f8fafc; }
+  tbody td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; }
+  .totals { margin-left: auto; width: 280px; }
+  .totals table { margin: 0; }
+  .totals td { padding: 8px 16px; }
+  .totals .total-row { background: #07111f; color: white; font-weight: 700; font-size: 16px; }
+  .footer { margin-top: 40px; padding-top: 24px; border-top: 1px solid #e2e8f0; text-align: center; color: #64748b; font-size: 12px; }
+  .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: #dcfce7; color: #16a34a; }
+  @media print {
+    body { padding: 0; }
+    .no-print { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo">Your<span>Gift</span></div>
+  <div class="invoice-info">
+    <h1>FATURA / RECIBO</h1>
+    <div class="ref">${order.ref}</div>
+    <p style="color:#64748b;margin-top:4px;">Data: ${createdAt}</p>
+    <span class="status-badge">${order.status}</span>
+  </div>
+</div>
+<div class="addresses">
+  <div class="address-box">
+    <h3>De</h3>
+    <p><strong>YourGift Lda.</strong><br>
+    NIF: 510 000 000<br>
+    Rua do Comércio, 1<br>
+    1000-001 Lisboa, Portugal<br>
+    geral@yourgift.pt</p>
+  </div>
+  <div class="address-box">
+    <h3>Para</h3>
+    <p><strong>${order.client?.name ?? 'Cliente'}</strong><br>
+    ${order.company?.name ? order.company.name + '<br>' : ''}
+    ${order.client?.email ?? ''}<br>
+    ${addr?.street ? addr.street + '<br>' : ''}
+    ${addr?.postalCode ?? ''} ${addr?.city ?? ''}<br>
+    ${addr?.country ?? ''}</p>
+  </div>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>Produto</th>
+      <th>SKU / Referência</th>
+      <th style="text-align:center">Qtd</th>
+      <th style="text-align:right">Preço Unit.</th>
+      <th style="text-align:right">Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${items}
+  </tbody>
+</table>
+<div class="totals">
+  <table>
+    <tr><td>Subtotal</td><td style="text-align:right">€${total.toFixed(2)}</td></tr>
+    <tr><td>IVA (23%)</td><td style="text-align:right">€${(total * 0.23).toFixed(2)}</td></tr>
+    <tr class="total-row"><td>TOTAL</td><td style="text-align:right">€${(total * 1.23).toFixed(2)}</td></tr>
+  </table>
+</div>
+<div class="footer">
+  <p>YourGift Lda. | NIF 510 000 000 | IBAN PT50 0000 0000 0000 0000 0000 0 | geral@yourgift.pt</p>
+  <p style="margin-top:4px">Documento gerado automaticamente por YourGift OS · ${new Date().toISOString()}</p>
+</div>
+</body>
+</html>`;
+  }
+
+  // ─── DASHBOARD KPIs ───────────────────────────────────────────────────────
+
+  async getDashboardKpis() {
+    const now = new Date();
+    const mtdStart = startOfMonth(now);
+    const lastMonthStart = startOfLastMonth(now);
+    const lastMonthEnd = endOfLastMonth(now);
+
+    const [mtdOrders, lastMonthOrders, activeOrders, pendingApprovals, allOrders] =
+      await Promise.all([
+        this.prisma.order.findMany({
+          where: { createdAt: { gte: mtdStart } },
+        }),
+        this.prisma.order.findMany({
+          where: {
+            createdAt: { gte: lastMonthStart, lte: lastMonthEnd },
+          },
+        }),
+        this.prisma.order.count({
+          where: {
+            status: { in: ['paid', 'approved', 'producing', 'shipped'] },
+          },
+        }),
+        this.prisma.order.count({ where: { status: 'paid' } }),
+        this.prisma.order.findMany({
+          where: { marginAmount: { not: null }, totalAmount: { gt: 0 } },
+          select: { marginAmount: true, totalAmount: true },
+        }),
+      ]);
+
+    const revenueMtd = mtdOrders.reduce(
+      (acc, o) => acc + (o.totalAmount ?? 0),
+      0,
+    );
+    const revenueLastMonth = lastMonthOrders.reduce(
+      (acc, o) => acc + (o.totalAmount ?? 0),
+      0,
+    );
+
+    const revenueGrowth =
+      revenueLastMonth > 0
+        ? ((revenueMtd - revenueLastMonth) / revenueLastMonth) * 100
+        : 0;
+
+    const avgMargin =
+      allOrders.length > 0
+        ? allOrders.reduce((acc, o) => {
+            const margin = (o.marginAmount ?? 0) / (o.totalAmount ?? 1);
+            return acc + margin;
+          }, 0) /
+          allOrders.length *
+          100
+        : 0;
+
+    // Top supplier by revenue this month (using groupBy)
+    const supplierGroups = await this.prisma.order.groupBy({
+      by: ['supplier'],
+      where: { createdAt: { gte: mtdStart }, supplier: { not: null } },
+      _sum: { totalAmount: true },
+      orderBy: { _sum: { totalAmount: 'desc' } },
+      take: 1,
+    });
+
+    const topSupplier = supplierGroups[0]?.supplier ?? 'N/A';
+
+    return {
+      revenueMtd,
+      revenueGrowth: Math.round(revenueGrowth * 100) / 100,
+      activeOrders,
+      pendingApprovals,
+      avgMargin: Math.round(avgMargin * 100) / 100,
+      topSupplier,
+    };
   }
 }

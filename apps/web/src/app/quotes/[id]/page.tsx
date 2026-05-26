@@ -531,6 +531,30 @@ export default function QuoteDetailPage() {
                 </button>
               )}
 
+              {(quote.status === 'approved' || quote.status === 'pricing') && (
+                <a
+                  href={`/quotes/${id}/decision`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    width: '100%',
+                    padding: '0.625rem 1rem',
+                    borderRadius: '10px',
+                    fontSize: '0.875rem',
+                    fontWeight: 700,
+                    background: 'rgba(77,163,255,0.1)',
+                    color: 'rgb(77,163,255)',
+                    border: '1px solid rgba(77,163,255,0.25)',
+                    textDecoration: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  ⚡ Ver cartão de decisão
+                </a>
+              )}
+
               {quote.status === 'approved' && (
                 <button
                   type="button"

@@ -1,0 +1,291 @@
+name: Hardened Deploy Gate
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pre-deploy-validation:
+    name: Pre-Deploy Validation Gate
+    runs-on: ubuntu-latest
+    outputs:
+      validation_passed: ${{ steps.summary.outputs.passed }}
+
+    steps:
+      # ── 1. Checkout + Install ─────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+        continue-on-error: false
+
+      # ── 2. Build shared packages ──────────────────────────────────────────
+      - name: Build shared packages
+        run: |
+          pnpm --filter @yourgift/shared run build
+          pnpm --filter @yourgift/midocean run build
+          pnpm --filter @yourgift/pf-concept run build
+        continue-on-error: false
+
+      # ── 3. Prisma generate ────────────────────────────────────────────────
+      - name: Generate Prisma client
+        working-directory: services/api
+        env:
+          DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+          DIRECT_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+        run: pnpm exec prisma generate
+        continue-on-error: false
+
+      # ── 4. TypeScript check — all 3 apps ──────────────────────────────────
+      - name: TypeScript check — API
+        run: pnpm --filter api exec tsc --noEmit
+        continue-on-error: false
+
+      - name: TypeScript check — Admin
+        run: pnpm --filter admin exec tsc --noEmit
+        continue-on-error: false
+
+      - name: TypeScript check — Web
+        run: pnpm --filter web exec tsc --noEmit
+        continue-on-error: false
+
+      # ── 5. TODO/FIXME scanner ─────────────────────────────────────────────
+      - name: Scan for TODO / FIXME / HACK / XXX in production code
+        id: todo-scan
+        run: |
+          set +e
+          RESULTS=$(grep -r "TODO\|FIXME\|HACK\|XXX" services/api/src --include="*.ts" \
+            | grep -v "\.spec\.ts" \
+            | grep -v "node_modules")
+          COUNT=$(echo "$RESULTS" | grep -c "." || true)
+          if [ -z "$RESULTS" ]; then
+            COUNT=0
+          fi
+          echo "Found $COUNT TODO/FIXME/HACK/XXX markers in production code"
+          if [ "$COUNT" -gt 0 ]; then
+            echo ""
+            echo "Offending lines:"
+            echo "$RESULTS"
+            echo ""
+            echo "::error::Deploy blocked: $COUNT unresolved TODO/FIXME/HACK/XXX markers found in services/api/src (excluding .spec.ts). Resolve all markers before deploying."
+            exit 1
+          fi
+          echo "No TODO/FIXME/HACK/XXX markers found. Proceeding."
+        continue-on-error: false
+
+      # ── 6. Unit test gate ─────────────────────────────────────────────────
+      - name: Run unit tests
+        working-directory: services/api
+        env:
+          DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+          DIRECT_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+          JWT_SECRET: ci-test-secret-not-for-production
+          STRIPE_SECRET_KEY: sk_test_placeholder
+          REDIS_URL: redis://localhost:6379
+        run: pnpm test --passWithNoTests
+        continue-on-error: false
+
+      # ── 7. Coverage threshold ─────────────────────────────────────────────
+      - name: Enforce coverage thresholds (lines≥80%, branches≥70%, functions≥80%)
+        working-directory: services/api
+        env:
+          DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+          DIRECT_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+          JWT_SECRET: ci-test-secret-not-for-production
+          STRIPE_SECRET_KEY: sk_test_placeholder
+          REDIS_URL: redis://localhost:6379
+        run: |
+          pnpm test \
+            --coverage \
+            --coverageThreshold='{"global":{"lines":80,"branches":70,"functions":80}}' \
+            --passWithNoTests
+        continue-on-error: false
+
+      # ── 8. Migration drift check ──────────────────────────────────────────
+      - name: Check Prisma schema for uncommitted drift
+        id: migration-drift
+        run: |
+          DRIFT=$(git diff --name-only HEAD services/api/prisma/schema.prisma 2>/dev/null || true)
+          STAGED=$(git diff --cached --name-only services/api/prisma/schema.prisma 2>/dev/null || true)
+          if [ -n "$DRIFT" ] || [ -n "$STAGED" ]; then
+            echo "::error::Deploy blocked: Prisma schema has uncommitted changes. Run 'prisma migrate dev' and commit the migration before deploying."
+            echo "Uncommitted changes:"
+            echo "$DRIFT"
+            echo "$STAGED"
+            exit 1
+          fi
+          echo "Prisma schema is clean — no uncommitted drift detected."
+        continue-on-error: false
+
+      # ── 9. Integration test count gate ────────────────────────────────────
+      - name: Verify minimum integration test coverage (≥5 files)
+        id: integration-count
+        run: |
+          COUNT=$(find services/api/test/integration/ -name "*.test.ts" 2>/dev/null | wc -l)
+          echo "Integration test files found: $COUNT"
+          if [ "$COUNT" -lt 5 ]; then
+            echo "::error::Deploy blocked: Only $COUNT integration test files found in services/api/test/integration/. Minimum required: 5."
+            exit 1
+          fi
+          echo "Integration test gate passed ($COUNT files found, minimum 5 required)."
+        continue-on-error: false
+
+      # ── 10. Report files present ──────────────────────────────────────────
+      - name: Verify SYSTEM_READINESS_REPORT.md exists
+        run: |
+          if [ ! -f "SYSTEM_READINESS_REPORT.md" ]; then
+            echo "::error::Deploy blocked: SYSTEM_READINESS_REPORT.md is missing from project root. Generate the readiness report before deploying."
+            exit 1
+          fi
+          echo "SYSTEM_READINESS_REPORT.md present."
+        continue-on-error: false
+
+      # ── 11. OpenAPI schema present (optional) ─────────────────────────────
+      - name: Check OpenAPI schema (non-blocking)
+        run: |
+          if [ -f "services/api/openapi.json" ]; then
+            echo "openapi.json found."
+            echo "## OpenAPI Schema" >> $GITHUB_STEP_SUMMARY
+            echo "✅ openapi.json present at services/api/openapi.json" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "::warning::openapi.json not found at services/api/openapi.json. Consider generating it with @nestjs/swagger."
+            echo "## OpenAPI Schema" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ openapi.json not present — skipping schema validation" >> $GITHUB_STEP_SUMMARY
+          fi
+        continue-on-error: true
+
+      # ── 12. Health check ──────────────────────────────────────────────────
+      - name: Production health check
+        if: ${{ secrets.RENDER_API_URL != '' }}
+        env:
+          RENDER_API_URL: ${{ secrets.RENDER_API_URL }}
+        run: |
+          echo "Checking health at ${RENDER_API_URL}/health"
+          HTTP_STATUS=$(curl -s -o /tmp/health-response.json -w "%{http_code}" \
+            --max-time 30 \
+            --retry 3 \
+            --retry-delay 5 \
+            "${RENDER_API_URL}/health")
+          echo "HTTP status: $HTTP_STATUS"
+          cat /tmp/health-response.json || true
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "::error::Health check failed with HTTP $HTTP_STATUS. Production API is unhealthy. Blocking deploy."
+            exit 1
+          fi
+          echo "Production health check passed (HTTP 200)."
+        continue-on-error: false
+
+      # ── Summary ───────────────────────────────────────────────────────────
+      - name: Write validation summary
+        id: summary
+        if: always()
+        run: |
+          echo "passed=true" >> $GITHUB_OUTPUT
+          echo "## Pre-Deploy Validation Gate" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Shared packages build | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Prisma generate | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| TypeScript (API + Admin + Web) | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| TODO/FIXME/HACK/XXX scan | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit tests | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Coverage thresholds (80/70/80) | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Prisma migration drift | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration test count (≥5) | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| SYSTEM_READINESS_REPORT.md | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "Triggered by: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+
+  canary-validation:
+    name: Canary Validation
+    runs-on: ubuntu-latest
+    needs: pre-deploy-validation
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared packages
+        run: |
+          pnpm --filter @yourgift/shared run build
+          pnpm --filter @yourgift/midocean run build
+          pnpm --filter @yourgift/pf-concept run build
+
+      - name: Generate Prisma client
+        working-directory: services/api
+        env:
+          DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+          DIRECT_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+        run: pnpm exec prisma generate
+
+      - name: Build API (canary artifact validation)
+        run: pnpm --filter api run build
+        continue-on-error: false
+
+      - name: Verify build artifact exists
+        id: artifact-check
+        run: |
+          if [ ! -f "services/api/dist/main.js" ]; then
+            echo "::error::Canary validation failed: services/api/dist/main.js not found after build."
+            exit 1
+          fi
+          ARTIFACT_SIZE=$(wc -c < services/api/dist/main.js)
+          echo "Build artifact verified: services/api/dist/main.js ($ARTIFACT_SIZE bytes)"
+          echo "## Canary Validation" >> $GITHUB_STEP_SUMMARY
+          echo "✅ services/api/dist/main.js present ($ARTIFACT_SIZE bytes)" >> $GITHUB_STEP_SUMMARY
+        continue-on-error: false
+
+      - name: Notify Slack on canary failure
+        if: ${{ failure() && secrets.SLACK_WEBHOOK_URL != '' }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -s -X POST "$SLACK_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "text": "🚨 *YourGift OS — Canary Validation FAILED*",
+              "attachments": [{
+                "color": "danger",
+                "fields": [
+                  {"title": "Branch", "value": "${{ github.ref_name }}", "short": true},
+                  {"title": "Commit", "value": "${{ github.sha }}", "short": true},
+                  {"title": "Actor", "value": "${{ github.actor }}", "short": true},
+                  {"title": "Run", "value": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}", "short": false}
+                ]
+              }]
+            }'

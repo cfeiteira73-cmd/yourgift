@@ -35,11 +35,23 @@ export class MidoceanClient {
     const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
     try {
+      // Follow redirects manually so S3 presigned URLs don't get our API headers
       const res = await fetch(`${BASE_URL}${path}`, {
         ...options,
         headers: { ...this.headers, ...options.headers },
         signal: controller.signal,
+        redirect: 'manual',
       });
+
+      // Midocean redirects stock/products/pricelist to S3 presigned URLs via 303 — follow cleanly
+      if (res.status === 301 || res.status === 302 || res.status === 303 || res.status === 307 || res.status === 308) {
+        const location = res.headers.get('location');
+        if (location) {
+          const s3Res = await fetch(location, { signal: controller.signal });
+          if (!s3Res.ok) throw new Error(`S3 fetch failed ${s3Res.status} on ${location}`);
+          return s3Res.json() as Promise<T>;
+        }
+      }
 
       if (res.status === 429 && attempt <= MAX_RETRIES) {
         const wait = parseInt(res.headers.get('Retry-After') ?? '5', 10) * 1_000;

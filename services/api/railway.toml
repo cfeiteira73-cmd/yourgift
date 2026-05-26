@@ -1,0 +1,13 @@
+# Railway config when rootDirectory = services/api
+# NOTE: Use rootDirectory = "/" (repo root) + root railway.toml for Dockerfile builds
+# This file is a fallback for nixpacks standalone builds
+
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "node dist/main.js"
+healthcheckPath = "/api/v1/health"
+healthcheckTimeout = 60
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

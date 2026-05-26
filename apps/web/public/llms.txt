@@ -1,0 +1,163 @@
+# YourGift OS — B2B Procurement Infrastructure
+
+> YourGift OS is enterprise procurement infrastructure for B2B companies in Portugal and Spain.
+> It handles the full procurement lifecycle: quote → approval → order → production → delivery → invoice.
+
+## What YourGift OS does
+
+YourGift OS replaces manual B2B procurement with a structured platform that:
+
+- Accepts RFQs (Request for Quotation) from corporate buyers
+- Generates AI-assisted supplier quotes with pricing, lead times and landed cost
+- Routes approvals through configurable budget hierarchies
+- Manages branded merchandise orders with artwork proofing
+- Tracks production stages and shipping in real time
+- Issues invoices, tracks payments and generates ROI reports for CFOs
+
+## Who uses it
+
+- **Corporate Procurement Teams** — HR, Marketing, Operations buyers at mid-to-large companies
+- **Procurement Managers** — who need budget visibility, supplier performance and compliance reporting
+- **CFOs / Finance** — who need spend consolidation, savings tracking and audit trails
+- **Employees** — who access curated company stores to order branded merchandise within policy
+
+## Core capabilities
+
+### Procurement
+- Multi-supplier RFQ with automated comparison tables
+- AI-powered quote analysis and recommendation engine
+- Budget hierarchy: individual → team → department → company limits
+- Approval workflows with escalation and delegation
+- PO generation, order confirmation, supplier communication
+
+### Suppliers
+- Midocean and PF Concept catalog integration (50,000+ products)
+- Real-time stock sync and availability checking
+- Carrier integrations: DHL, DPD, GLS, UPS, FedEx
+- Landed cost calculation (product + shipping + customs + duties)
+- Supplier performance scoring and reliability metrics
+
+### Finance
+- Double-entry ledger for all procurement transactions
+- Stripe payment processing with fraud detection (Radar)
+- Invoice lifecycle management (draft → sent → paid → reconciled)
+- Multi-currency support with live FX rates
+- Period-based financial aggregation with CFO-ready PDF reports
+
+### AI & Intelligence
+- Procurement decision engine with predicted vs actual tracking
+- AI brief parsing to extract product specs from natural language
+- Benchmark reports: compare your pricing vs market rates
+- Spend pattern analysis and savings opportunity identification
+
+### Enterprise Identity
+- JWT-based authentication with refresh token rotation
+- Google OAuth + OIDC SSO (Okta, Azure AD, Google Workspace, Auth0)
+- SCIM 2.0 automated provisioning (RFC 7643/7644) — Okta + Azure AD compatible
+- SAML 2.0: Native implementation — RSA-SHA256, Exclusive C14N, HTTP-Redirect + HTTP-POST bindings. No passport-saml required. Compatible with Okta, Azure AD, ADFS, PingFederate, OneLogin
+- Role-based access: admin, manager, buyer, viewer
+- Multi-tenant isolation with per-tenant rate limiting
+- Per-tenant SSO configuration with email domain routing
+
+### Operations
+- 16-queue BullMQ job system backed by Redis (Upstash)
+- Dead Letter Queue with manual replay for failed jobs
+- Sentry error tracking with distributed tracing
+- Structured JSON logging with correlation IDs
+- Health checks at /api/v1/health
+
+## API
+
+Base URL: https://yourgift-api.onrender.com/api/v1
+Docs (non-production): /docs (Swagger UI)
+
+Authentication: Bearer JWT token in Authorization header
+All responses: { success: boolean, data: T, meta: { requestId, ts } }
+
+Key endpoints:
+- POST /auth/login                                    — email/password auth
+- POST /auth/google                                   — Google OAuth
+- GET  /enterprise-identity/oidc/:tenantId/login      — initiate OIDC SSO (Okta, Azure AD, Google)
+- GET  /enterprise-identity/oidc/:tenantId/callback   — OIDC callback → issues JWT pair
+- POST /enterprise-identity/sso/:tenantId/config      — configure IdP per tenant (admin)
+- GET  /scim/v2/ServiceProviderConfig                 — SCIM discovery (Okta/Azure AD compatible)
+- GET  /scim/v2/tenants/:tenantId/Users               — SCIM user provisioning (RFC 7643)
+- GET  /scim/v2/tenants/:tenantId/Groups              — SCIM group provisioning
+- GET  /products                                      — browse catalog (20,000+ products)
+- GET  /products/:id                                  — product detail with variants and images
+- POST /quotes                                        — create RFQ
+- GET  /quotes/:id                                    — quote with pricing breakdown and landed cost
+- POST /logistics/landed-cost                         — calculate landed cost (product + freight + duties + VAT)
+- POST /decision-engine/card                          — procurement decision card (APPROVE/REJECT/CONDITIONS)
+- POST /orders                                        — place order
+- GET  /orders/:id                                    — track order status and production stage
+- GET  /orders/:id/invoice                            — download order invoice (HTML → print to PDF)
+- GET  /analytics/spend                               — spend dashboard data
+- GET  /intelligence/suppliers/:id/trust              — supplier trust score (GOLD/SILVER/BRONZE/PROBATION)
+- POST /intelligence/suppliers/:id/actuals            — record actual vs predicted cost (accuracy tracking)
+- POST /intelligence/roi                              — generate CFO ROI report (shareable link)
+- GET  /intelligence/roi/:shareToken                  — retrieve ROI report by share token (public)
+- GET  /admin/queues                                  — BullMQ queue health — 16 queues (admin only)
+- GET  /admin/queues/dlq                              — dead letter queue items (admin only)
+- POST /admin/queues/dlq/:id/replay                   — replay failed job (admin only)
+- GET  /notifications/stats                           — email delivery statistics (admin only)
+- POST /payments/webhook                              — Stripe webhook endpoint (signature verified)
+- GET  /api/v1/health                                 — API health check (used by Render + BetterStack)
+- GET  /health/deep                                   — deep dependency health check (DB + Redis + queues + Midocean)
+- GET  /failsafe/status                               — circuit breaker state + failsafe mode (admin only)
+- POST /failsafe/recover                              — reset circuit breaker + restore normal mode (admin only)
+- GET  /governance/policies                           — list governance policies (admin only)
+- POST /governance/check                              — evaluate a decision against active policies
+- GET  /governance/violations                         — recent policy violations
+- GET  /governance/stats                              — governance statistics
+- GET  /governance/trust                              — all trust scores
+- GET  /governance/traces                             — decision trace list
+- POST /governance/traces                             — create decision trace
+- GET  /tracing/spans                                 — distributed trace explorer
+- GET  /tracing/stats                                 — latency percentiles
+- GET  /incidents                                     — incident list
+- POST /incidents                                     — create incident
+- GET  /reconciliation/runs                           — reconciliation history
+- POST /reconciliation/run                            — trigger reconciliation (delta or full)
+- GET  /recovery/circuit-breakers                     — circuit breaker states
+- GET  /reliability/latest                            — system trust score
+
+## Enterprise features
+
+- **SSO**: OIDC (Okta, Azure AD, Google Workspace, Auth0) → issues JWT pair on callback
+- **SCIM 2.0**: Automated user/group provisioning, RFC 7643/7644, async DB write for speed
+- **SAML 2.0**: Native implementation — RSA-SHA256, Exclusive C14N, HTTP-Redirect + HTTP-POST bindings. No passport-saml required. Compatible with Okta, Azure AD, ADFS, PingFederate, OneLogin
+- **Multi-tenant**: Complete data isolation per tenant, per-tenant rate limits at edge
+- **Budget hierarchy**: individual → team → department → company limits with escalation
+- **Audit trail**: every procurement event sourced, immutable log
+- **PDF generation**: self-contained print-ready HTML uploaded to S3 / CloudFront
+- **Email delivery**: Resend with branded templates, queued via BullMQ, DLQ on failure
+- **Distributed tracing**: OpenTelemetry SDK via Sentry — trace spans across all modules with correlation IDs
+- **Incident engine**: Failsafe mode engine with auto-detection (normal / degraded / emergency) and circuit breaker
+- **Financial reconciliation**: 4 check types (orphan payments, amount mismatch, duplicate Stripe IDs, ghost orders) with integrity scoring
+- **Circuit breakers**: State machine (CLOSED → OPEN → HALF_OPEN) with 5-failure threshold and 30s reset timeout
+- **Redis rate limiting**: Per-tenant sliding-window rate limiting via TenantThrottlerGuard (20 req/s + 200 req/min)
+- **GDPR / Data governance**: Governance policies with violation tracking, decision traces, trust engine, and retention module
+- **Reliability scoring**: Composite trust scoring via TrustEngineService — tracks outcome accuracy, override rates, violation rates
+
+## Technology stack
+
+- **API**: NestJS 10, TypeScript, Prisma ORM, PostgreSQL (Supabase)
+- **Web**: Next.js 14 App Router, TypeScript, Tailwind CSS
+- **Admin**: Next.js 14, enterprise dashboard (57 pages)
+- **Queue**: BullMQ + Redis (Upstash), 16 named queues, DLQ + replay
+- **Payments**: Stripe (checkout, webhooks, Radar fraud)
+- **Email**: Resend, 6 branded transactional templates
+- **Storage**: AWS S3 + CloudFront CDN (eu-west-1, DR to eu-west-2)
+- **Observability**: Sentry, BetterStack (uptime + RUM), structured JSON logs
+- **Edge security**: Cloudflare Worker (SQLi blocking, rate limiting, security headers)
+- **Hosting**: Render (API + web, Frankfurt), Blueprint IaC in render.yaml
+- **CI/CD**: GitHub Actions (TypeScript check → Render deploy hooks)
+- **Monorepo**: pnpm workspaces, Turborepo, shared packages (@yourgift/shared, @yourgift/midocean)
+
+## Contact & Links
+
+- Website: https://www.yourgift.pt
+- API: https://yourgift-api.onrender.com
+- Admin: https://admin.yourgift.pt
+- GitHub: https://github.com/cfeiteira73-cmd/yourgift

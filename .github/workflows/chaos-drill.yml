@@ -1,0 +1,113 @@
+name: Chaos Drill
+
+on:
+  schedule:
+    - cron: '0 3 * * 0' # Every Sunday 03:00 UTC
+  workflow_dispatch:
+    inputs:
+      drill_type:
+        description: 'Drill type'
+        required: true
+        default: 'latency_injection'
+        type: choice
+        options:
+          - latency_injection
+          - redis_outage
+          - db_failover
+          - queue_corruption
+          - memory_pressure
+      target_service:
+        description: 'Target service'
+        required: false
+        default: 'api'
+      duration_seconds:
+        description: 'Duration in seconds'
+        required: false
+        default: '30'
+
+jobs:
+  run-drill:
+    name: Execute Chaos Drill
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Run chaos drill via API
+        id: start-drill
+        env:
+          API_URL: ${{ secrets.PRODUCTION_API_URL }}
+          ADMIN_TOKEN: ${{ secrets.ADMIN_JWT_TOKEN }}
+        run: |
+          DRILL_TYPE="${{ github.event.inputs.drill_type || 'latency_injection' }}"
+          DURATION="${{ github.event.inputs.duration_seconds || '30' }}"
+
+          echo "Starting chaos drill: $DRILL_TYPE for ${DURATION}s"
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+            "${API_URL}/admin/chaos/drills" \
+            -H "Authorization: Bearer ${ADMIN_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"drillType\": \"${DRILL_TYPE}\",
+              \"targetService\": \"${{ github.event.inputs.target_service || 'api' }}\",
+              \"triggeredBy\": \"github-actions\",
+              \"config\": {
+                \"durationSeconds\": ${DURATION},
+                \"latencyMs\": 500,
+                \"mbToAllocate\": 256
+              }
+            }")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -1)
+
+          echo "Response: $BODY"
+          echo "HTTP Status: $HTTP_CODE"
+
+          if [ "$HTTP_CODE" != "201" ] && [ "$HTTP_CODE" != "200" ]; then
+            echo "Drill failed with status $HTTP_CODE"
+            exit 1
+          fi
+
+          DRILL_ID=$(echo "$BODY" | jq -r '.id // .drillId // "unknown"')
+          echo "Drill ID: $DRILL_ID"
+          echo "DRILL_ID=$DRILL_ID" >> $GITHUB_OUTPUT
+
+      - name: Wait for drill completion
+        run: sleep ${{ github.event.inputs.duration_seconds || '30' }}
+
+      - name: Verify system recovery
+        env:
+          API_URL: ${{ secrets.PRODUCTION_API_URL }}
+          ADMIN_TOKEN: ${{ secrets.ADMIN_JWT_TOKEN }}
+        run: |
+          echo "Checking system health post-drill..."
+
+          HEALTH=$(curl -s -o /dev/null -w "%{http_code}" "${API_URL}/health")
+
+          if [ "$HEALTH" != "200" ]; then
+            echo "CRITICAL: System not recovered after drill! Health: $HEALTH"
+            exit 1
+          fi
+
+          echo "System recovered successfully. Health: $HEALTH"
+
+      - name: Post drill report to Slack
+        if: always()
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_CHAOS_WEBHOOK }}
+        run: |
+          STATUS="${{ job.status }}"
+          COLOR="good"
+          [ "$STATUS" == "failure" ] && COLOR="danger"
+
+          curl -s -X POST "$SLACK_WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"attachments\": [{
+                \"color\": \"$COLOR\",
+                \"title\": \"Chaos Drill Completed: ${{ github.event.inputs.drill_type || 'latency_injection' }}\",
+                \"text\": \"Status: $STATUS | Duration: ${{ github.event.inputs.duration_seconds || '30' }}s | Triggered by: ${{ github.actor }}\",
+                \"footer\": \"YourGift OS SRE\",
+                \"ts\": $(date +%s)
+              }]
+            }"

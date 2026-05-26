@@ -1,33 +1,146 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Request,
+  ForbiddenException,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { IsString, IsNumber, IsPositive, IsInt, Min } from 'class-validator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtOrInternalGuard } from '../common/guards/jwt-or-internal.guard';
 import { ArtworkService } from './artwork.service';
-import { IsString } from 'class-validator';
 
-class UploadUrlDto {
-  @IsString() filename: string;
-  @IsString() mimeType: string;
+// ─── DTOs ─────────────────────────────────────────────────────────────────────
+
+class InitiateUploadDto {
+  @IsString()
+  orderId: string;
+
+  @IsString()
+  filename: string;
+
+  @IsString()
+  mimeType: string;
+
+  @IsInt()
+  @IsPositive()
+  sizeBytes: number;
+}
+
+class RevisionDto {
+  @IsString()
+  notes: string;
+}
+
+class RejectDto {
+  @IsString()
+  notes: string;
 }
 
 class MockupDto {
-  @IsString() artworkUrl: string;
-  @IsString() productId: string;
+  @IsString()
+  mockupUrl: string;
 }
+
+// ─── interface ────────────────────────────────────────────────────────────────
+
+interface AuthRequest extends Request {
+  user: { id: string; role?: string };
+}
+
+// ─── controller ───────────────────────────────────────────────────────────────
 
 @ApiTags('artwork')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('artwork')
 export class ArtworkController {
-  constructor(private artwork: ArtworkService) {}
+  constructor(private readonly artwork: ArtworkService) {}
 
-  @Post('upload-url')
-  getUploadUrl(@Body() dto: UploadUrlDto) {
-    return this.artwork.getUploadUrl(dto.filename, dto.mimeType);
+  // ── POST /artwork/initiate ────────────────────────────────────────────────
+
+  @Post('initiate')
+  @ApiOperation({ summary: 'Initiate artwork upload — returns presigned S3 URL' })
+  initiateUpload(@Body() dto: InitiateUploadDto) {
+    return this.artwork.initiateUpload(
+      dto.orderId,
+      dto.filename,
+      dto.mimeType,
+      dto.sizeBytes,
+    );
   }
 
-  @Post('mockup')
-  generateMockup(@Body() dto: MockupDto) {
-    return this.artwork.generateMockup(dto.artworkUrl, dto.productId);
+  // ── GET /artwork/order/:orderId ───────────────────────────────────────────
+
+  @Get('order/:orderId')
+  @ApiOperation({ summary: 'List all artworks for an order' })
+  getForOrder(@Param('orderId') orderId: string) {
+    return this.artwork.getForOrder(orderId);
+  }
+
+  // ── POST /artwork/:id/confirm ─────────────────────────────────────────────
+
+  @Post(':id/confirm')
+  @ApiOperation({ summary: 'Confirm S3 upload is complete' })
+  confirmUpload(@Param('id') id: string) {
+    return this.artwork.confirmUpload(id);
+  }
+
+  // ── POST /artwork/:id/revision ────────────────────────────────────────────
+
+  @Post(':id/revision')
+  @ApiOperation({ summary: 'Request a revision on an artwork' })
+  requestRevision(
+    @Request() req: AuthRequest,
+    @Param('id') id: string,
+    @Body() dto: RevisionDto,
+  ) {
+    return this.artwork.requestRevision(id, dto.notes, req.user.id);
+  }
+
+  // ── POST /artwork/:id/approve ─────────────────────────────────────────────
+
+  @Post(':id/approve')
+  @ApiOperation({ summary: 'Approve an artwork' })
+  approve(@Request() req: AuthRequest, @Param('id') id: string) {
+    return this.artwork.approve(id, req.user.id);
+  }
+
+  // ── POST /artwork/:id/reject ──────────────────────────────────────────────
+
+  @Post(':id/reject')
+  @ApiOperation({ summary: 'Reject an artwork' })
+  reject(
+    @Request() req: AuthRequest,
+    @Param('id') id: string,
+    @Body() dto: RejectDto,
+  ) {
+    return this.artwork.reject(id, dto.notes, req.user.id);
+  }
+
+  // ── POST /artwork/:id/mockup ──────────────────────────────────────────────
+
+  @Post(':id/mockup')
+  @ApiOperation({ summary: 'Save a mockup URL for an artwork' })
+  saveMockup(@Param('id') id: string, @Body() dto: MockupDto) {
+    return this.artwork.saveMockup(id, dto.mockupUrl);
+  }
+
+  // ── POST /artwork/:id/process ─────────────────────────────────────────────
+  // Accepts JWT (dashboard) and x-internal-token (admin worker).
+
+  @Post(':id/process')
+  @UseGuards(JwtOrInternalGuard)
+  @ApiOperation({ summary: 'Admin: process artwork — transitions pending -> approved' })
+  processArtwork(@Request() req: AuthRequest, @Param('id') id: string) {
+    const isInternal = req.user.role === 'internal';
+    if (!isInternal && req.user.role !== 'admin') {
+      throw new ForbiddenException('Admin role required');
+    }
+    return this.artwork.processArtwork(id, req.user.id);
   }
 }

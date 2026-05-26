@@ -1,0 +1,51 @@
+name: Deploy Shadow Replay
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths: ['terraform/shadow-replay/**']
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Package & Deploy Shadow Replay Infrastructure
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: terraform/shadow-replay
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_TERRAFORM_ROLE_ARN }}
+          aws-region: eu-west-1
+
+      - name: Package Lambda function
+        run: cd function && zip -j shadow-forwarder.zip index.js && mv shadow-forwarder.zip ../
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.8.0"
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan -input=false
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
+
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shadow-replay-plan
+          path: terraform/shadow-replay/tfplan
+          retention-days: 7

@@ -3,11 +3,15 @@ import { ConfigService } from '@nestjs/config';
 import { EventBusService } from '../events/event-bus.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { MidoceanClient, MidoceanSyncService, transformProduct } from '@yourgift/midocean';
+import { PFConceptClient, PFSyncService } from '@yourgift/pf-concept';
+import type { TransformedPFProduct } from '@yourgift/pf-concept';
+type SyncableProduct = ReturnType<typeof transformProduct>;
 
 @Injectable()
 export class SuppliersService {
   private readonly logger = new Logger(SuppliersService.name);
   private midocean: MidoceanClient;
+  private pfConcept?: PFConceptClient;
 
   constructor(
     private config: ConfigService,
@@ -15,6 +19,13 @@ export class SuppliersService {
     private prisma: PrismaService,
   ) {
     this.midocean = new MidoceanClient(this.config.getOrThrow('MIDOCEAN_KEY'));
+    const pfKey = this.config.get<string>('PF_CONCEPT_KEY');
+    const pfUser = this.config.get<string>('PF_CONCEPT_USER') || this.config.get<string>('PF_CONCEPT_USERNAME');
+    if (pfKey && pfUser) {
+      this.pfConcept = new PFConceptClient(pfKey, pfUser);
+    } else {
+      this.logger.warn('PF Concept: PF_CONCEPT_KEY or PF_CONCEPT_USER not set — integration disabled');
+    }
     this.events.on('payment.confirmed', this.routeToSupplier.bind(this));
   }
 
@@ -22,7 +33,7 @@ export class SuppliersService {
   async syncMidocean() {
     const syncer = new MidoceanSyncService(this.config.getOrThrow('MIDOCEAN_KEY'));
 
-    const result = await syncer.sync(async (data) => {
+    const result = await syncer.sync(async (data: SyncableProduct) => {
       const product = await this.prisma.product.upsert({
         where: { supplierRef: data.supplierRef },
         create: {
@@ -86,6 +97,107 @@ export class SuppliersService {
     return result;
   }
 
+  /** Sync all PF Concept products into the database and log the result */
+  async syncPfConcept() {
+    const syncer = new PFSyncService(
+      this.config.getOrThrow('PF_CONCEPT_KEY'),
+      this.config.getOrThrow('PF_CONCEPT_USERNAME'),
+    );
+
+    const result = await syncer.sync(async (data: TransformedPFProduct) => {
+      const product = await this.prisma.product.upsert({
+        where: { supplierRef: data.supplierRef },
+        create: {
+          supplierRef: data.supplierRef,
+          supplier: data.supplier,
+          title: data.title,
+          description: data.description,
+          category: data.category,
+          basePrice: data.basePrice,
+          images: data.images,
+          printAreas: data.printAreas as object,
+        },
+        update: {
+          title: data.title,
+          description: data.description,
+          category: data.category,
+          basePrice: data.basePrice,
+          images: data.images,
+          printAreas: data.printAreas as object,
+          updatedAt: new Date(),
+        },
+      });
+
+      for (const v of data.variants) {
+        await this.prisma.productVariant.upsert({
+          where: { sku: v.sku },
+          create: {
+            productId: product.id,
+            sku: v.sku,
+            color: v.color,
+            colorGroup: v.colorGroup,
+            colorCode: v.colorCode,
+            gtin: v.gtin,
+            price: v.price,
+            stock: v.stock,
+            images: v.images,
+            categoryLevel1: v.categoryLevel1,
+            categoryLevel2: v.categoryLevel2,
+            categoryLevel3: v.categoryLevel3,
+          },
+          update: {
+            price: v.price,
+            stock: v.stock,
+            images: v.images,
+          },
+        });
+      }
+    });
+
+    await this.prisma.syncLog.create({
+      data: {
+        supplier: 'pf_concept',
+        productsUpserted: result.productsUpserted,
+        variantsUpserted: result.variantsUpserted,
+        stockUpdated: result.stockUpdated,
+        errors: result.errors,
+        durationMs: result.durationMs,
+      },
+    });
+
+    return result;
+  }
+
+  /** Get recent sync logs (last N, optionally filtered by supplier) */
+  async getSyncLogs(limit = 50, supplier?: string) {
+    return this.prisma.syncLog.findMany({
+      where: supplier ? { supplier } : undefined,
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
+  }
+
+  /** Get product/variant counts per supplier */
+  async getStats() {
+    const suppliers = ['midocean', 'pf_concept', 'stricker'];
+    const results = await Promise.all(
+      suppliers.map(async (s) => {
+        const [products, variants, lastSync] = await Promise.all([
+          this.prisma.product.count({ where: { supplier: s } }),
+          this.prisma.productVariant.count({
+            where: { product: { supplier: s } },
+          }),
+          this.prisma.syncLog.findFirst({
+            where: { supplier: s },
+            orderBy: { createdAt: 'desc' },
+          }),
+        ]);
+        return { supplier: s, products, variants, lastSync };
+      }),
+    );
+    return results;
+  }
+
   /** Route confirmed order to the correct supplier */
   private async routeToSupplier({ orderId }: { orderId: string }) {
     const order = await this.prisma.order.findUniqueOrThrow({
@@ -97,6 +209,8 @@ export class SuppliersService {
 
     if (supplier === 'midocean') {
       await this.dispatchToMidocean(order);
+    } else if (supplier === 'pf_concept') {
+      await this.dispatchToPfConcept(order);
     }
 
     await this.prisma.order.update({
@@ -134,6 +248,41 @@ export class SuppliersService {
       this.logger.log(`Midocean order created: ${response.order_id} for order ${order.ref}`);
     } catch (err) {
       this.logger.error(`Failed to dispatch ${order.ref} to Midocean: ${err}`);
+      throw err;
+    }
+  }
+
+  private async dispatchToPfConcept(order: any) {
+    if (!this.pfConcept) {
+      this.logger.warn(`PF Concept not configured — cannot dispatch order ${order.ref}`);
+      return;
+    }
+    try {
+      const response = await this.pfConcept.createOrder({
+        reference: order.ref,
+        items: order.items.map((item: any) => ({
+          articleCode: item.variant?.sku ?? item.variantId,
+          quantity: item.quantity,
+        })),
+        shippingAddress: {
+          company: order.shippingAddress.company ?? order.shippingAddress.name,
+          name: order.shippingAddress.name,
+          street: order.shippingAddress.street,
+          city: order.shippingAddress.city,
+          postalCode: order.shippingAddress.postalCode,
+          country: order.shippingAddress.country,
+          phone: order.shippingAddress.phone ?? '',
+        },
+      });
+
+      await this.prisma.order.update({
+        where: { id: order.id },
+        data: { supplierOrderId: response.orderId },
+      });
+
+      this.logger.log(`PF Concept order created: ${response.orderId} for order ${order.ref}`);
+    } catch (err) {
+      this.logger.error(`Failed to dispatch ${order.ref} to PF Concept: ${err}`);
       throw err;
     }
   }

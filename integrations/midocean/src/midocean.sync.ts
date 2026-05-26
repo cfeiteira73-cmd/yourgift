@@ -15,16 +15,26 @@ export interface SyncResult {
   durationMs: number;
 }
 
-function extractImages(assets: MidoceanProduct['digital_assets']): string[] {
-  return assets
+function variantImages(variant: MidoceanVariant): string[] {
+  return (variant.digital_assets ?? [])
     .filter((a) => a.type === 'image')
     .map((a) => a.url_highress ?? a.url);
 }
 
-function variantImages(variant: MidoceanVariant): string[] {
-  return variant.digital_assets
-    .filter((a) => a.type === 'image')
-    .map((a) => a.url_highress ?? a.url);
+// Product-level digital_assets only contain documents — images live in variant assets
+function extractProductImages(variants: MidoceanProduct['variants']): string[] {
+  const seen = new Set<string>();
+  const urls: string[] = [];
+  for (const v of variants ?? []) {
+    for (const a of v.digital_assets ?? []) {
+      if (a.type === 'image' && !seen.has(a.url)) {
+        seen.add(a.url);
+        urls.push(a.url_highress ?? a.url);
+        if (urls.length >= 8) return urls;
+      }
+    }
+  }
+  return urls;
 }
 
 /**
@@ -46,12 +56,12 @@ export function transformProduct(
     description: p.long_description || p.short_description,
     category: p.category_code,
     basePrice,
-    images: extractImages(p.digital_assets),
+    images: extractProductImages(p.variants),
     printAreas: {
       positions: parseInt(p.number_of_print_positions, 10) || 1,
       printable: p.printable === 'yes',
     },
-    variants: p.variants
+    variants: (p.variants ?? [])
       .filter((v) => v.plc_status_description === 'COLLECTION') // active only
       .map((v) => ({
         sku: v.sku,

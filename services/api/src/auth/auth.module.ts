@@ -6,6 +6,15 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
+import { AppleStrategy } from './strategies/apple.strategy';
+import { IdentityResolverService } from './identity-resolver.service';
+import { AuthRiskService } from './auth-risk.service';
+import { SessionAuthorityService } from './session-authority.service';
+import { IdentityGraphService } from './identity-graph.service';
+import { IdentityGraphController } from './identity-graph.controller';
+import { DelegationValidatorService } from './delegation/delegation-validator.service';
+import { DeviceFingerprintService } from './device-fingerprint.service';
 
 @Module({
   imports: [
@@ -14,13 +23,25 @@ import { LocalStrategy } from './strategies/local.strategy';
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
         secret: config.get('JWT_SECRET'),
-        signOptions: { expiresIn: config.get('JWT_EXPIRES_IN', '7d') },
+        signOptions: { expiresIn: '15m' },
       }),
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, JwtStrategy, LocalStrategy],
-  controllers: [AuthController],
-  exports: [AuthService],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    LocalStrategy,
+    GoogleStrategy,
+    AppleStrategy,
+    IdentityResolverService,
+    AuthRiskService,
+    SessionAuthorityService,
+    IdentityGraphService,
+    DelegationValidatorService,
+    DeviceFingerprintService,
+  ],
+  controllers: [AuthController, IdentityGraphController],
+  exports: [AuthService, IdentityResolverService, AuthRiskService, SessionAuthorityService, IdentityGraphService, DelegationValidatorService, DeviceFingerprintService],
 })
 export class AuthModule {}

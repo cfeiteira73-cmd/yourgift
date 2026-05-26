@@ -13,7 +13,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   price_class         = "PriceClass_100"
 
   origin {
-    domain_name              = aws_s3_bucket.assets.bucket_regional_domain_name
+    domain_name              = var.s3_bucket_regional_domain_name
     origin_id                = "S3-yourgift-assets"
     origin_access_control_id = aws_cloudfront_origin_access_control.assets.id
   }
@@ -40,13 +40,45 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.cdn.arn
-    ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2021"
+    acm_certificate_arn      = var.acm_certificate_arn != "" ? var.acm_certificate_arn : null
+    cloudfront_default_certificate = var.acm_certificate_arn == ""
+    ssl_support_method       = var.acm_certificate_arn != "" ? "sni-only" : null
+    minimum_protocol_version = var.acm_certificate_arn != "" ? "TLSv1.2_2021" : "TLSv1"
   }
 
   tags = {
     Environment = var.environment
     Project     = "yourgift-os"
   }
+}
+
+# ── Variables ─────────────────────────────────────────────────────────────────
+variable "environment" {
+  type    = string
+  default = "production"
+}
+
+variable "domain" {
+  type    = string
+  default = "yourgift.pt"
+}
+
+variable "s3_bucket_regional_domain_name" {
+  description = "Regional domain name of the S3 assets bucket"
+  type        = string
+}
+
+variable "acm_certificate_arn" {
+  description = "ACM certificate ARN (must be in us-east-1)"
+  type        = string
+  default     = ""
+}
+
+# ── Outputs ───────────────────────────────────────────────────────────────────
+output "distribution_domain" {
+  value = aws_cloudfront_distribution.cdn.domain_name
+}
+
+output "distribution_id" {
+  value = aws_cloudfront_distribution.cdn.id
 }

@@ -1,108 +1,117 @@
+/**
+ * /auth/callback — PKCE code exchange for session
+ *
+ * Called by Supabase after:
+ *  - Magic link clicks
+ *  - Google / Apple OAuth consent
+ *  - Email confirmation links (signUp)
+ *
+ * CRITICAL: The redirect response must be created BEFORE the supabase client,
+ * then cookies are written to that response via setAll. Writing to cookieStore
+ * instead of the response silently drops the session (Next.js App Router bug).
+ */
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.yourgift.pt';
 
 // Only allow relative paths — prevents open redirect attacks
 function sanitizeNext(next: string | null): string {
   if (!next) return '/dashboard';
-  try {
-    // If it parses as an absolute URL, reject it
-    const url = new URL(next);
-    if (url.origin !== 'null') return '/dashboard';
-  } catch {
-    // Good — it's a relative path
-  }
   if (!next.startsWith('/') || next.startsWith('//')) return '/dashboard';
-  return next;
+  try {
+    new URL(next); // if it parses as absolute URL, reject it
+    return '/dashboard';
+  } catch {
+    return next; // relative path — safe
+  }
 }
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const errorParam = searchParams.get('error');
-  const errorDescription = searchParams.get('error_description');
+  const error = searchParams.get('error');
   const next = sanitizeNext(searchParams.get('next'));
 
   console.log('[auth/callback] started', {
     hasCode: !!code,
-    hasError: !!errorParam,
+    hasError: !!error,
     next,
     origin,
     ts: new Date().toISOString(),
   });
 
-  // Supabase may redirect here with ?error= directly
-  if (errorParam) {
-    console.error('[auth/callback] provider error', { errorParam, errorDescription });
-    const loginUrl = new URL('/auth/login', origin);
-    loginUrl.searchParams.set('error', errorParam);
-    loginUrl.searchParams.set('error_description', errorDescription ?? 'Auth provider returned an error');
-    return NextResponse.redirect(loginUrl);
+  // Error from OAuth provider (e.g. user denied Google consent)
+  if (!code && error) {
+    console.warn('[auth/callback] provider error', { error });
+    return NextResponse.redirect(
+      `${APP_URL}/auth/recover?reason=${encodeURIComponent(error)}`,
+    );
   }
 
   if (!code) {
-    console.warn('[auth/callback] no code param — redirecting to error');
-    return NextResponse.redirect(new URL('/auth/login?error=no_code', origin));
+    console.warn('[auth/callback] no code param');
+    return NextResponse.redirect(`${APP_URL}/auth/recover?reason=missing_code`);
   }
 
-  // ── CRITICAL: Create redirect response FIRST, then pass its cookie setter
-  // to the supabase client. This is the only way cookies get written to the
-  // HTTP response in Next.js App Router Route Handlers.
-  const redirectTarget = new URL(next, origin);
-  const response = NextResponse.redirect(redirectTarget);
+  // ── CRITICAL FIX: Create redirect response FIRST ───────────────────────────
+  // The supabase client's setAll must write to THIS response's cookies.
+  // Creating NextResponse.redirect() after setAll silently drops the session.
+  const response = NextResponse.redirect(`${APP_URL}${next}`);
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        // Read from the incoming request
+        // Read from the incoming request (not cookieStore)
         getAll() {
           return request.cookies.getAll();
         },
-        // Write to the outgoing response — NOT to cookieStore
-        setAll(cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }>) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, {
-              ...(options ?? {}),
-              httpOnly: true,
-              secure: process.env.NODE_ENV === 'production',
-              sameSite: 'lax',
-              path: '/',
-            } as Parameters<typeof response.cookies.set>[2]);
-          });
-          console.log('[auth/callback] cookies written to response', {
+        // Write to the outgoing response (not cookieStore)
+        setAll(
+          cookiesToSet: Array<{
+            name: string;
+            value: string;
+            options?: Record<string, unknown>;
+          }>,
+        ) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(
+              name,
+              value,
+              options as Parameters<typeof response.cookies.set>[2],
+            ),
+          );
+          console.log('[auth/callback] session cookies written to response', {
             count: cookiesToSet.length,
-            names: cookiesToSet.map((c: { name: string }) => c.name),
           });
         },
       },
     },
   );
 
-  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+  const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
-  if (error) {
+  if (exchangeError) {
     console.error('[auth/callback] exchangeCodeForSession failed', {
-      message: error.message,
-      status: error.status,
-      code,
+      message: exchangeError.message,
+      status: exchangeError.status,
     });
-    const loginUrl = new URL('/auth/login', origin);
-    loginUrl.searchParams.set('error', 'auth_failed');
-    loginUrl.searchParams.set('error_description', error.message);
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.redirect(
+      `${APP_URL}/auth/recover?reason=callback_failed`,
+    );
   }
 
-  // Verify we actually have a user
   if (!data.user) {
     console.error('[auth/callback] no user in session after exchange');
-    return NextResponse.redirect(new URL('/auth/login?error=no_user', origin));
+    return NextResponse.redirect(`${APP_URL}/auth/recover?reason=no_user`);
   }
 
   console.log('[auth/callback] success', {
     userId: data.user.id,
     email: data.user.email,
-    redirectTo: redirectTarget.toString(),
+    redirectTo: `${APP_URL}${next}`,
   });
 
   return response;

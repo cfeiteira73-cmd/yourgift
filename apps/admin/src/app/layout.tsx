@@ -1,35 +1,32 @@
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 import './globals.css';
+import ShellLayout from '@/components/ShellLayout';
+import { CommandBarProvider } from '@/components/CommandBar';
+import { AICopilotProvider } from '@/components/AICopilotPanel';
 
 export const metadata: Metadata = {
-  title: 'YourGift Admin',
-  description: 'Painel de administracao YourGift',
+  title: { default: 'YourGift OS', template: '%s — YourGift OS' },
+  description: 'Enterprise Procurement Operating System',
 };
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt">
-      <body className="bg-gray-950 text-white min-h-screen">
-        <aside className="fixed left-0 top-0 h-full w-60 bg-gray-900 border-r border-gray-800 p-6">
-          <h1 className="text-lg font-bold text-white mb-8">YG Admin</h1>
-          <nav className="space-y-2">
-            {[
-              { href: '/dashboard', label: 'Dashboard' },
-              { href: '/orders', label: 'Encomendas' },
-              { href: '/products', label: 'Produtos' },
-              { href: '/clients', label: 'Clientes' },
-            ].map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="block px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors text-sm"
-              >
-                {item.label}
-              </a>
-            ))}
-          </nav>
-        </aside>
-        <main className="ml-60 p-8">{children}</main>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="bg-[#07111f] text-[#f0f6ff] min-h-screen antialiased">
+        <CommandBarProvider>
+          <AICopilotProvider>
+            <ShellLayout>{children}</ShellLayout>
+          </AICopilotProvider>
+        </CommandBarProvider>
       </body>
     </html>
   );

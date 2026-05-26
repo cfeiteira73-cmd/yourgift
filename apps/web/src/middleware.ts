@@ -1,40 +1,37 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const PROTECTED = ['/dashboard', '/orders', '/quotes'];
-
-// Public auth paths — never intercept these
-const PUBLIC_AUTH_PATHS = [
-  '/auth/login',
-  '/auth/register',
-  '/auth/callback',
-  '/auth/confirm',
-  '/auth/logout',
-];
-
-// Canonical domain: always redirect www → non-www
-const CANONICAL_HOST = 'yourgift.pt';
+const PROTECTED = ['/dashboard', '/orders', '/account', '/quotes'];
 
 export async function middleware(request: NextRequest) {
-  const url = request.nextUrl.clone();
-  const host = request.headers.get('host') ?? '';
+  const { pathname, hostname } = request.nextUrl;
 
-  // ── 1. Canonical domain redirect (www → non-www) ─────────────────────────
-  if (
-    process.env.NODE_ENV === 'production' &&
-    (host === `www.${CANONICAL_HOST}` || host.startsWith(`www.${CANONICAL_HOST}:`))
-  ) {
-    url.host = CANONICAL_HOST;
-    return NextResponse.redirect(url, { status: 301 });
+  // ── 1. Canonical domain: redirect bare domain to www ──────────────────────
+  if (hostname === 'yourgift.pt') {
+    const wwwUrl = request.nextUrl.clone();
+    wwwUrl.hostname = 'www.yourgift.pt';
+    return NextResponse.redirect(wwwUrl, { status: 301 });
   }
 
-  // ── 2. Skip auth routes entirely — let them handle themselves ─────────────
-  const isPublicAuth = PUBLIC_AUTH_PATHS.some((p) => request.nextUrl.pathname.startsWith(p));
-  if (isPublicAuth) {
+  // ── 2. Bypass ALL /auth/* routes (including /auth/confirm) ───────────────
+  if (pathname.startsWith('/auth/')) {
     return NextResponse.next();
   }
 
-  // ── 3. Session check for protected routes ────────────────────────────────
+  // ── 3. Bypass health + API routes ─────────────────────────────────────────
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
+
+  // ── 4. Redirect loop protection ───────────────────────────────────────────
+  const redirectedFrom = request.cookies.get('redirectedFrom')?.value;
+  if (redirectedFrom === pathname) {
+    const response = NextResponse.next();
+    response.cookies.delete('redirectedFrom');
+    return response;
+  }
+
+  // ── 5. Supabase session refresh ───────────────────────────────────────────
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -45,12 +42,17 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
-          // Mutate request cookies so the new response carries them
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          // Rebuild response with the updated request (for token refresh propagation)
+        setAll(
+          cookiesToSet: Array<{
+            name: string;
+            value: string;
+            options?: Record<string, unknown>;
+          }>,
+        ) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value),
+          );
           supabaseResponse = NextResponse.next({ request });
-          // Also write to the response cookies
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(
               name,
@@ -63,23 +65,38 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  // getUser() is required — do NOT use getSession() as it's not verified server-side
+  // Use getUser() — verified server-side. Do NOT use getSession() (unverified).
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isProtected = PROTECTED.some((p) => request.nextUrl.pathname.startsWith(p));
-
+  // ── 6. Protect routes ─────────────────────────────────────────────────────
+  const isProtected = PROTECTED.some((p) => pathname.startsWith(p));
   if (isProtected && !user) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = '/auth/login';
-    loginUrl.searchParams.set('next', request.nextUrl.pathname);
-    return NextResponse.redirect(loginUrl);
+    loginUrl.searchParams.set('next', pathname);
+
+    const redirectResponse = NextResponse.redirect(loginUrl);
+    // Mark where we came from so we can detect redirect loops
+    redirectResponse.cookies.set('redirectedFrom', pathname, {
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 30,
+      path: '/',
+    });
+    return redirectResponse;
   }
+
+  // ── 7. Security headers ───────────────────────────────────────────────────
+  supabaseResponse.headers.set('X-Frame-Options', 'DENY');
+  supabaseResponse.headers.set('X-Content-Type-Options', 'nosniff');
 
   return supabaseResponse;
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 };
