@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { PortalLayout } from '@/components/portal/PortalLayout';
 import { CommandCenter } from '@/components/portal/dashboard/CommandCenter';
+import { RealtimeWatcher } from '@/components/portal/RealtimeWatcher';
 
 export const metadata = { title: 'Dashboard — YourGift OS' };
 
@@ -96,6 +97,8 @@ export default async function DashboardPage() {
       companyName={(client as { company?: string } | null)?.company ?? undefined}
       tier={(client as { tier?: string } | null)?.tier ?? undefined}
     >
+      {/* Live updates: refreshes server data when orders/quotes change */}
+      <RealtimeWatcher clientId={client?.id ?? ''} />
       <CommandCenter
         userName={(client as { name?: string } | null)?.name ?? undefined}
         companyName={(client as { company?: string } | null)?.company ?? undefined}
@@ -104,7 +107,7 @@ export default async function DashboardPage() {
         activeOrders={activeOrders}
         pendingQuotes={pendingQuotes ?? 0}
         budgetDisplay={budgetDisplay}
-        orders={(orders ?? []) as Parameters<typeof CommandCenter>[0]['orders']}
+        orders={(orders ?? []) as unknown as Parameters<typeof CommandCenter>[0]['orders']}
         pipeline={pipeline}
         dailyRevenue={dailyRevenue}
       />

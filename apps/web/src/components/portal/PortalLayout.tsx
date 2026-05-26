@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { GlobalSearch } from './GlobalSearch';
+import { AICopilot } from './AICopilot';
 
 // ── SVG Icon helper ───────────────────────────────────────────────────────────
 
@@ -20,45 +22,56 @@ function Icon({ d, size = 16 }: { d: string | string[]; size?: number }) {
 // ── Icon paths ─────────────────────────────────────────────────────────────────
 
 const ICONS = {
-  dashboard:  ['M3 3h7v7H3z', 'M14 3h7v7h-7z', 'M3 14h7v7H3z', 'M14 14h7v7h-7z'],
-  orders:     ['M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z', 'M3 6h18', 'M16 10a4 4 0 01-8 0'],
-  production: ['M2 20h20M4 20V10l8-8 8 8v10', 'M9 20v-5h6v5'],
-  mockups:    ['M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'],
-  products:   ['M4 6h16M4 12h16M4 18h16'],
-  assets:     ['M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'],
-  clients:    ['M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2', 'M23 21v-2a4 4 0 00-3-3.87', 'M16 3.13a4 4 0 010 7.75', 'M9 7a4 4 0 100 8 4 4 0 000-8z'],
-  quotes:     ['M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z', 'M14 2v6h6', 'M16 13H8', 'M16 17H8', 'M10 9H8'],
-  billing:    ['M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z'],
-  suppliers:  ['M1 3h15v13H1z', 'M16 8h4l3 3v5h-7V8z', 'M5.5 21a2.5 2.5 0 100-5 2.5 2.5 0 000 5zm11 0a2.5 2.5 0 100-5 2.5 2.5 0 000 5z'],
-  reports:    ['M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'],
-  marketing:  ['M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z'],
+  dashboard:    ['M3 3h7v7H3z', 'M14 3h7v7h-7z', 'M3 14h7v7H3z', 'M14 14h7v7h-7z'],
+  orders:       ['M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z', 'M3 6h18', 'M16 10a4 4 0 01-8 0'],
+  production:   ['M2 20h20M4 20V10l8-8 8 8v10', 'M9 20v-5h6v5'],
+  mockups:      ['M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'],
+  products:     ['M4 6h16M4 12h16M4 18h16'],
+  assets:       ['M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'],
+  clients:      ['M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2', 'M23 21v-2a4 4 0 00-3-3.87', 'M16 3.13a4 4 0 010 7.75', 'M9 7a4 4 0 100 8 4 4 0 000-8z'],
+  quotes:       ['M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z', 'M14 2v6h6', 'M16 13H8', 'M16 17H8', 'M10 9H8'],
+  billing:      ['M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z'],
+  suppliers:    ['M1 3h15v13H1z', 'M16 8h4l3 3v5h-7V8z', 'M5.5 21a2.5 2.5 0 100-5 2.5 2.5 0 000 5zm11 0a2.5 2.5 0 100-5 2.5 2.5 0 000 5z'],
+  reports:      ['M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'],
+  marketing:    ['M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z'],
   integrations: ['M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4'],
-  settings:   ['M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z', 'M15 12a3 3 0 11-6 0 3 3 0 016 0z'],
-  logout:     ['M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4', 'M16 17l5-5-5-5', 'M21 12H9'],
-  chevronDown: 'M19 9l-7 7-7-7',
+  settings:     ['M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z', 'M15 12a3 3 0 11-6 0 3 3 0 016 0z'],
+  logout:       ['M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4', 'M16 17l5-5-5-5', 'M21 12H9'],
+  search:       ['M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z'],
+  plus:         ['M12 5v14M5 12h14'],
+  chevronDown:  'M19 9l-7 7-7-7',
 };
 
 // ── Nav config ─────────────────────────────────────────────────────────────────
 
 const NAV_ITEMS = [
-  { href: '/dashboard', label: 'Dashboard', icon: 'dashboard', exact: true },
+  { href: '/dashboard',    label: 'Dashboard',             icon: 'dashboard',    exact: true },
   { divider: 'Operações' },
-  { href: '/orders', label: 'Encomendas', icon: 'orders', badgeKey: 'orders' },
-  { href: '/production', label: 'Produção', icon: 'production' },
-  { href: '/assets', label: 'Maquetes & Artes', icon: 'mockups' },
-  { href: '/products', label: 'Catálogo de Produtos', icon: 'products' },
-  { href: '/assets', label: 'Logótipos & Assets', icon: 'assets' },
+  { href: '/orders',       label: 'Encomendas',            icon: 'orders',       badgeKey: 'orders' },
+  { href: '/production',   label: 'Produção',              icon: 'production' },
+  { href: '/assets',       label: 'Maquetes & Artes',      icon: 'mockups' },
+  { href: '/products',     label: 'Catálogo de Produtos',  icon: 'products' },
+  { href: '/assets',       label: 'Logótipos & Assets',    icon: 'assets' },
   { divider: 'Gestão' },
-  { href: '/clients', label: 'Clientes', icon: 'clients' },
-  { href: '/quotes', label: 'Orçamentos', icon: 'quotes', badgeKey: 'quotes' },
-  { href: '/billing', label: 'Faturação', icon: 'billing' },
-  { href: '/suppliers', label: 'Fornecedores', icon: 'suppliers' },
+  { href: '/clients',      label: 'Clientes',              icon: 'clients' },
+  { href: '/quotes',       label: 'Orçamentos',            icon: 'quotes',       badgeKey: 'quotes' },
+  { href: '/billing',      label: 'Faturação',             icon: 'billing' },
+  { href: '/suppliers',    label: 'Fornecedores',          icon: 'suppliers' },
   { divider: 'Crescimento' },
-  { href: '/reports', label: 'Relatórios & Analytics', icon: 'reports' },
-  { href: '/marketing', label: 'Marketing & Promoções', icon: 'marketing' },
-  { href: '/integrations', label: 'Integrações', icon: 'integrations' },
-  { href: '/settings', label: 'Definições', icon: 'settings' },
+  { href: '/reports',      label: 'Relatórios & Analytics',icon: 'reports' },
+  { href: '/marketing',    label: 'Marketing & Promoções', icon: 'marketing' },
+  { href: '/integrations', label: 'Integrações',           icon: 'integrations' },
+  { href: '/settings',     label: 'Definições',            icon: 'settings' },
 ] as const;
+
+// Mobile bottom nav items (most important 5)
+const MOBILE_NAV = [
+  { href: '/dashboard',  label: 'Dashboard', icon: 'dashboard', exact: true },
+  { href: '/orders',     label: 'Encomendas', icon: 'orders' },
+  { href: '/quotes',     label: 'Orçamentos', icon: 'quotes' },
+  { href: '/assets',     label: 'Assets', icon: 'assets' },
+  { href: '/settings',   label: 'Definições', icon: 'settings' },
+];
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -140,6 +153,19 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
   const pathname = usePathname();
   const [loggingOut, setLoggingOut] = useState(false);
   const [badges, setBadges] = useState<Record<string, number>>({});
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // Ctrl+K / Cmd+K keyboard shortcut
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(o => !o);
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Fetch badge counts
   useEffect(() => {
@@ -178,14 +204,16 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
   const displayEmail = userEmail || 'geral@yourgift.pt';
   const initials = displayName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase() || 'YG';
   const company = companyName || 'YOURGIFT LDA';
-
-  const usagePct = 78; // Could be computed from real data
-
-  // Mobile: flat item list
-  const flatItems = NAV_ITEMS.filter((item): item is Extract<typeof NAV_ITEMS[number], { href: string }> => 'href' in item);
+  const usagePct = 78;
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'rgb(7,17,31)' }}>
+
+      {/* ════ GLOBAL SEARCH ════ */}
+      <GlobalSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+
+      {/* ════ AI COPILOT ════ */}
+      <AICopilot />
 
       {/* ════ DESKTOP SIDEBAR ════ */}
       <aside
@@ -234,7 +262,7 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
           }}>
             <div style={{
               width: '24px', height: '24px', borderRadius: '6px', flexShrink: 0,
-              background: 'linear-gradient(135deg, rgb(77,163,255,0.3), rgba(116,100,255,0.3))',
+              background: 'rgba(77,163,255,0.2)',
               border: '1px solid rgba(77,163,255,0.2)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '0.6rem', fontWeight: 800, color: 'rgb(77,163,255)',
@@ -249,6 +277,27 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
               <Icon d={ICONS.chevronDown} size={12} />
             </span>
           </div>
+        </div>
+
+        {/* ⌘K Search trigger */}
+        <div style={{ padding: '0.5rem 0.875rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%',
+              padding: '0.4rem 0.625rem', borderRadius: '8px',
+              background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)',
+              cursor: 'pointer', color: 'rgb(100,112,130)', transition: 'all 150ms',
+              fontSize: '0.75rem',
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(77,163,255,0.3)'; (e.currentTarget as HTMLElement).style.color = 'rgb(77,163,255)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'; (e.currentTarget as HTMLElement).style.color = 'rgb(100,112,130)'; }}
+          >
+            <Icon d={ICONS.search} size={13} />
+            <span style={{ flex: 1, textAlign: 'left', fontSize: '0.72rem' }}>Pesquisar...</span>
+            <kbd style={{ fontSize: '0.58rem', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', padding: '0.1rem 0.35rem', fontFamily: 'monospace', letterSpacing: '0.02em' }}>⌘K</kbd>
+          </button>
         </div>
 
         {/* Nav */}
@@ -271,8 +320,8 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
                 href={item.href}
                 label={item.label}
                 iconKey={item.icon}
-                exact={item.exact}
-                badge={item.badgeKey ? badges[item.badgeKey] : undefined}
+                exact={'exact' in item ? item.exact : undefined}
+                badge={'badgeKey' in item && item.badgeKey ? badges[item.badgeKey] : undefined}
               />
             );
           })}
@@ -356,32 +405,82 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
       {/* ════ MOBILE TOP BAR ════ */}
       <div className="flex md:hidden" style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, height: '52px',
-        background: 'rgba(8,15,28,0.95)', backdropFilter: 'blur(20px)',
+        background: 'rgba(8,15,28,0.97)', backdropFilter: 'blur(20px)',
         borderBottom: '1px solid rgba(255,255,255,0.06)',
         alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem',
       }}>
         <span style={{ fontSize: '1rem', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.02em' }}>
           your<span style={{ color: 'rgb(77,163,255)' }}>gift</span>
         </span>
-        <div style={{ display: 'flex', gap: '0.25rem' }}>
-          {flatItems.slice(0, 5).map((item) => {
-            const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
-            return (
-              <Link key={item.href + item.label} href={item.href} style={{
-                padding: '0.375rem', borderRadius: '8px',
-                color: isActive ? 'rgb(77,163,255)' : 'rgb(100,112,130)',
-                background: isActive ? 'rgba(77,163,255,0.1)' : 'transparent',
-                display: 'flex', alignItems: 'center',
-              }}>
-                <Icon d={ICONS[item.icon as keyof typeof ICONS]} size={18} />
-              </Link>
-            );
-          })}
-        </div>
+        <button
+          type="button"
+          onClick={() => setSearchOpen(true)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '0.5rem',
+            background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '10px', padding: '0.4rem 0.75rem', cursor: 'pointer',
+            color: 'rgb(140,155,175)', fontSize: '0.75rem',
+          }}
+        >
+          <Icon d={ICONS.search} size={14} />
+          <span>Pesquisar</span>
+          <kbd style={{ fontSize: '0.58rem', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', padding: '0.1rem 0.3rem', fontFamily: 'monospace' }}>⌘K</kbd>
+        </button>
+        <Link href="/quotes/new" style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          width: '32px', height: '32px', borderRadius: '9px',
+          background: 'rgba(77,163,255,0.15)', border: '1px solid rgba(77,163,255,0.3)',
+          color: 'rgb(77,163,255)',
+        }}>
+          <Icon d={ICONS.plus} size={16} />
+        </Link>
       </div>
 
+      {/* ════ MOBILE BOTTOM NAV ════ */}
+      <nav className="flex md:hidden" style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
+        height: '64px',
+        background: 'rgba(8,15,28,0.97)', backdropFilter: 'blur(20px)',
+        borderTop: '1px solid rgba(255,255,255,0.06)',
+        alignItems: 'center', justifyContent: 'space-around', padding: '0 0.5rem',
+      }}>
+        {MOBILE_NAV.map((item) => {
+          const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+          const d = ICONS[item.icon as keyof typeof ICONS];
+          const badge = item.icon === 'orders' ? badges.orders : item.icon === 'quotes' ? badges.quotes : 0;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                gap: '0.2rem', padding: '0.5rem 0.75rem', borderRadius: '12px',
+                color: isActive ? 'rgb(77,163,255)' : 'rgb(100,112,130)',
+                background: isActive ? 'rgba(77,163,255,0.1)' : 'transparent',
+                transition: 'all 150ms', textDecoration: 'none', position: 'relative',
+                minWidth: '52px', flexShrink: 0,
+              }}
+            >
+              <Icon d={d} size={20} />
+              <span style={{ fontSize: '0.55rem', fontWeight: isActive ? 700 : 400, letterSpacing: '0.02em' }}>
+                {item.label}
+              </span>
+              {badge > 0 && (
+                <div style={{
+                  position: 'absolute', top: '4px', right: '8px',
+                  width: '14px', height: '14px', borderRadius: '50%',
+                  background: 'rgb(77,163,255)', border: '2px solid rgb(8,15,28)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '0.45rem', fontWeight: 800, color: 'rgb(7,17,31)',
+                }}>{badge > 9 ? '9+' : badge}</div>
+              )}
+            </Link>
+          );
+        })}
+      </nav>
+
       {/* ════ MAIN CONTENT ════ */}
-      <main style={{ flex: 1, minWidth: 0 }} className="pt-[52px] md:pt-0">
+      <main style={{ flex: 1, minWidth: 0 }} className="pt-[52px] md:pt-0 pb-[64px] md:pb-0">
         {children}
       </main>
     </div>
