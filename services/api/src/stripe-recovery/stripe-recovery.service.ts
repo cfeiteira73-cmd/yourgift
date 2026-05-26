@@ -599,4 +599,154 @@ export class StripeRecoveryService {
           : `No ledger drift detected for order ${orderId}. Balance: €${ledgerBalance.toFixed(2)}.`,
     };
   }
+
+  // ── rebuildLedgerFromStripe ────────────────────────────────────────────────
+  /**
+   * Fetches Stripe balance transactions for a date range and identifies
+   * paid orders that are missing a corresponding 4000 (revenue) ledger entry.
+   * Emits 'ledger.rebuild.required' for each gap — actual ledger writes are
+   * handled by the ledger service via EventBus to preserve double-entry integrity.
+   */
+  async rebuildLedgerFromStripe(
+    fromDate: Date,
+    toDate: Date,
+  ): Promise<{
+    scannedTransactions: number;
+    missingLedgerEntries: number;
+    repairEventsEmitted: string[];
+    rangeStart: string;
+    rangeEnd: string;
+  }> {
+    const repairEventsEmitted: string[] = [];
+
+    // Fetch Stripe balance transactions in range (charges only)
+    const txns = await this.stripe.balanceTransactions.list({
+      limit: 100,
+      type: 'charge',
+      created: {
+        gte: Math.floor(fromDate.getTime() / 1000),
+        lte: Math.floor(toDate.getTime() / 1000),
+      },
+    });
+
+    let missingLedgerEntries = 0;
+
+    for (const txn of txns.data) {
+      // Match to an order via stripePaymentId (charge source)
+      const chargeId = typeof txn.source === 'string' ? txn.source : txn.source?.id;
+      if (!chargeId) continue;
+
+      // Find the charge to get the PI
+      let piId: string | null = null;
+      try {
+        const charge = await this.stripe.charges.retrieve(chargeId);
+        piId = typeof charge.payment_intent === 'string'
+          ? charge.payment_intent
+          : (charge.payment_intent?.id ?? null);
+      } catch {
+        continue;
+      }
+      if (!piId) continue;
+
+      const order = await this.prisma.order.findFirst({
+        where: { stripePaymentId: piId },
+      });
+      if (!order) continue;
+
+      // Check if a 4000 ledger credit exists for this order
+      const existingEntry = await this.prisma.ledgerEntry.findFirst({
+        where: {
+          referenceId: order.id,
+          accountCode: '4000',
+          entryType: 'credit',
+        },
+      });
+
+      if (!existingEntry) {
+        missingLedgerEntries++;
+        const eventId = randomUUID();
+        this.events.emit('ledger.rebuild.required', {
+          eventId,
+          orderId: order.id,
+          stripePaymentIntentId: piId,
+          amountEur: txn.net / 100, // Stripe net in cents
+          source: 'stripe_balance_transaction',
+          stripeBalanceTxId: txn.id,
+          requestedAt: new Date().toISOString(),
+        });
+        repairEventsEmitted.push(eventId);
+        this.logger.warn(
+          `Missing ledger entry for order ${order.id} (PI: ${piId}). Emitted rebuild event ${eventId}.`,
+        );
+      }
+    }
+
+    return {
+      scannedTransactions: txns.data.length,
+      missingLedgerEntries,
+      repairEventsEmitted,
+      rangeStart: fromDate.toISOString(),
+      rangeEnd: toDate.toISOString(),
+    };
+  }
+
+  // ── reprocessDeadLetterQueue ───────────────────────────────────────────────
+  /**
+   * Finds all failed Jobs that have exhausted their retry attempts and
+   * re-enqueues them by resetting status to 'pending', clearing errors,
+   * and zeroing the attempt counter. Safe to call repeatedly — idempotent
+   * because only 'failed' jobs with attempts >= maxAttempts are touched.
+   */
+  async reprocessDeadLetterQueue(maxJobsToRequeue = 50): Promise<{
+    foundDeadLetters: number;
+    requeued: number;
+    jobIds: string[];
+    requeuedAt: string;
+  }> {
+    // Identify dead-letter jobs: failed and attempts >= maxAttempts
+    const deadLetters = await this.prisma.job.findMany({
+      where: {
+        status: 'failed',
+        attempts: { gte: 3 }, // maxAttempts default
+      },
+      orderBy: { createdAt: 'asc' },
+      take: maxJobsToRequeue,
+    });
+
+    if (deadLetters.length === 0) {
+      return {
+        foundDeadLetters: 0,
+        requeued: 0,
+        jobIds: [],
+        requeuedAt: new Date().toISOString(),
+      };
+    }
+
+    const jobIds = deadLetters.map((j) => j.id);
+
+    await this.prisma.job.updateMany({
+      where: { id: { in: jobIds } },
+      data: {
+        status: 'pending',
+        attempts: 0,
+        error: null,
+        scheduledAt: new Date(),
+      },
+    });
+
+    this.events.emit('dead.letter.requeued', {
+      jobIds,
+      requeuedAt: new Date().toISOString(),
+      count: jobIds.length,
+    });
+
+    this.logger.log(`Requeued ${jobIds.length} dead-letter jobs: ${jobIds.join(', ')}`);
+
+    return {
+      foundDeadLetters: deadLetters.length,
+      requeued: jobIds.length,
+      jobIds,
+      requeuedAt: new Date().toISOString(),
+    };
+  }
 }

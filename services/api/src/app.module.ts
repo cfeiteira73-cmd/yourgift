@@ -110,6 +110,8 @@ import { SupportOpsModule } from './support-ops/support-ops.module';
 import { BusinessRealityModule } from './business-reality/business-reality.module';
 import { FailureLabModule } from './failure-lab/failure-lab.module';
 import { ReportGeneratorModule } from './report-generator/report-generator.module';
+import { SystemStateModule } from './system-state/system-state.module';
+import { FinancialCausalityModule } from './financial-causality/financial-causality.module';
 import { APP_GUARD } from '@nestjs/core';
 import { TenantGuard } from './common/guards/tenant.guard';
 import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard';
@@ -238,6 +240,8 @@ import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard'
     BusinessRealityModule,
     FailureLabModule,
     ReportGeneratorModule,
+    SystemStateModule,
+    FinancialCausalityModule,
   ],
   providers: [
     // Rate limiting — per tenant (not per IP) for authenticated requests

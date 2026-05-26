@@ -55,4 +55,25 @@ export class StripeRecoveryController {
   async repairDrift(@Param('orderId') orderId: string) {
     return this.service.repairPaymentDrift(orderId);
   }
+
+  /** Rebuild ledger from Stripe balance transactions for a date range */
+  @Post('ledger/rebuild-from-stripe')
+  @HttpCode(HttpStatus.OK)
+  async rebuildLedgerFromStripe(
+    @Body() body: { fromDate?: string; toDate?: string },
+  ) {
+    const from = body.fromDate ? new Date(body.fromDate) : new Date(Date.now() - 7 * 86_400_000);
+    const to = body.toDate ? new Date(body.toDate) : new Date();
+    return this.service.rebuildLedgerFromStripe(from, to);
+  }
+
+  /** Reprocess dead-letter queue — reset failed exhausted jobs to pending */
+  @Post('dead-letter/reprocess')
+  @HttpCode(HttpStatus.OK)
+  async reprocessDeadLetterQueue(
+    @Query('limit') limit?: string,
+  ) {
+    const maxJobs = limit ? Math.min(parseInt(limit, 10), 200) : 50;
+    return this.service.reprocessDeadLetterQueue(maxJobs);
+  }
 }
