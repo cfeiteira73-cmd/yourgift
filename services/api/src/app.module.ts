@@ -102,6 +102,14 @@ import { OperationalDashboardModule } from './operational-dashboard/operational-
 import { ErrorBudgetModule } from './error-budget/error-budget.module';
 import { CustomerOpsModule } from './customer-ops/customer-ops.module';
 import { DeploymentSafetyModule } from './deployment-safety/deployment-safety.module';
+import { GoLiveModule } from './go-live/go-live.module';
+import { LiveValidationModule } from './live-validation/live-validation.module';
+import { FinancialTruthModule } from './financial-truth/financial-truth.module';
+import { OperationsCenterModule } from './operations-center/operations-center.module';
+import { SupportOpsModule } from './support-ops/support-ops.module';
+import { BusinessRealityModule } from './business-reality/business-reality.module';
+import { FailureLabModule } from './failure-lab/failure-lab.module';
+import { ReportGeneratorModule } from './report-generator/report-generator.module';
 import { APP_GUARD } from '@nestjs/core';
 import { TenantGuard } from './common/guards/tenant.guard';
 import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard';
@@ -222,6 +230,14 @@ import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard'
     ErrorBudgetModule,
     CustomerOpsModule,
     DeploymentSafetyModule,
+    GoLiveModule,
+    LiveValidationModule,
+    FinancialTruthModule,
+    OperationsCenterModule,
+    SupportOpsModule,
+    BusinessRealityModule,
+    FailureLabModule,
+    ReportGeneratorModule,
   ],
   providers: [
     // Rate limiting — per tenant (not per IP) for authenticated requests
