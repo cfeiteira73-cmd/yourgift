@@ -112,6 +112,12 @@ import { FailureLabModule } from './failure-lab/failure-lab.module';
 import { ReportGeneratorModule } from './report-generator/report-generator.module';
 import { SystemStateModule } from './system-state/system-state.module';
 import { FinancialCausalityModule } from './financial-causality/financial-causality.module';
+import { ProductionPipelineModule } from './production-pipeline/production-pipeline.module';
+import { FulfillmentEngineModule } from './fulfillment-engine/fulfillment-engine.module';
+import { ShipmentTrackingModule } from './shipment-tracking/shipment-tracking.module';
+import { CustomerPortalModule } from './customer-portal/customer-portal.module';
+import { SupportTicketsModule } from './support-tickets/support-tickets.module';
+import { OperationsHubModule } from './operations-hub/operations-hub.module';
 import { APP_GUARD } from '@nestjs/core';
 import { TenantGuard } from './common/guards/tenant.guard';
 import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard';
@@ -242,6 +248,12 @@ import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard'
     ReportGeneratorModule,
     SystemStateModule,
     FinancialCausalityModule,
+    ProductionPipelineModule,
+    FulfillmentEngineModule,
+    ShipmentTrackingModule,
+    CustomerPortalModule,
+    SupportTicketsModule,
+    OperationsHubModule,
   ],
   providers: [
     // Rate limiting — per tenant (not per IP) for authenticated requests

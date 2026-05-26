@@ -26,10 +26,11 @@ model Client {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  orders       Order[]
-  quotes       Quote[]
-  approvals    Approval[]
-  companyRef   Company?   @relation(fields: [companyId], references: [id])
+  orders         Order[]
+  quotes         Quote[]
+  approvals      Approval[]
+  companyRef     Company?       @relation(fields: [companyId], references: [id])
+  supportTickets SupportTicket[]
 
   @@index([tenantId])
   @@map("clients")
@@ -217,12 +218,15 @@ model Order {
   company     Company?    @relation(fields: [companyId], references: [id])
   department  Department? @relation(fields: [departmentId], references: [id])
   campaign    Campaign?   @relation(fields: [campaignId], references: [id])
-  items       OrderItem[]
-  artworks    Artwork[]
-  approvals   Approval[]
-  eventLogs   EventLog[]
-  quote       Quote?
-  refunds     Refund[]
+  items           OrderItem[]
+  artworks        Artwork[]
+  approvals       Approval[]
+  eventLogs       EventLog[]
+  quote           Quote?
+  refunds         Refund[]
+  productionJobs  ProductionJob[]
+  shipmentEvents  ShipmentEvent[]
+  supportTickets  SupportTicket[]
 
   @@index([clientId])
   @@index([companyId])
@@ -3414,4 +3418,98 @@ model StripeEvent {
 
   @@index([processedAt])
   @@map("stripe_events")
+}
+
+// ─────────────────────────────────────────────
+// PRODUCTION JOBS
+// Physical production state machine — append-only status log.
+// idempotencyKey prevents duplicate physical production runs.
+// ─────────────────────────────────────────────
+
+model ProductionJob {
+  id             String    @id @default(cuid())
+  orderId        String    @map("order_id")
+  idempotencyKey String    @unique @map("idempotency_key")
+  status         String    @default("queued")
+  // queued | in_production | completed | failed | requeued | cancelled
+  priority       Int       @default(5)          // 1=urgent, 5=normal, 10=low
+  provider       String?                        // midocean | pf_concept | manual
+  externalJobId  String?   @map("external_job_id")
+  slaHours       Int       @default(48)         @map("sla_hours")
+  startedAt      DateTime? @map("started_at")
+  completedAt    DateTime? @map("completed_at")
+  failedAt       DateTime? @map("failed_at")
+  retryCount     Int       @default(0)          @map("retry_count")
+  notes          String?
+  metadata       Json      @default("{}")
+  createdAt      DateTime  @default(now())      @map("created_at")
+  updatedAt      DateTime  @updatedAt           @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
+  @@index([status])
+  @@index([priority, createdAt])
+  @@map("production_jobs")
+}
+
+// ─────────────────────────────────────────────
+// SHIPMENT EVENTS
+// Append-only carrier event log. One row per carrier scan event.
+// ─────────────────────────────────────────────
+
+model ShipmentEvent {
+  id             String   @id @default(cuid())
+  orderId        String   @map("order_id")
+  event          String
+  // created | dispatched | in_transit | out_for_delivery | delivered | failed_delivery | returned
+  carrier        String?
+  trackingNumber String?  @map("tracking_number")
+  location       String?
+  description    String?
+  metadata       Json     @default("{}")
+  occurredAt     DateTime @default(now())        @map("occurred_at")
+  recordedAt     DateTime @default(now())        @map("recorded_at")
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
+  @@index([event])
+  @@index([occurredAt])
+  @@map("shipment_events")
+}
+
+// ─────────────────────────────────────────────
+// SUPPORT TICKETS
+// Internal customer ops ticket system.
+// ─────────────────────────────────────────────
+
+model SupportTicket {
+  id              String    @id @default(cuid())
+  clientId        String    @map("client_id")
+  orderId         String?   @map("order_id")
+  category        String
+  // payment_issue | production_issue | shipping_delay | refund_request | other
+  title           String
+  description     String
+  status          String    @default("open")
+  // open | in_progress | resolved | closed | escalated
+  escalationLevel String    @default("L1")  @map("escalation_level")
+  // L1 = auto-resolve | L2 = human review | L3 = financial override
+  assignedTo      String?   @map("assigned_to")
+  resolvedAt      DateTime? @map("resolved_at")
+  resolutionNotes String?   @map("resolution_notes")
+  metadata        Json      @default("{}")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt      @map("updated_at")
+
+  client Client  @relation(fields: [clientId], references: [id])
+  order  Order?  @relation(fields: [orderId], references: [id])
+
+  @@index([clientId])
+  @@index([orderId])
+  @@index([status])
+  @@index([category])
+  @@index([escalationLevel])
+  @@map("support_tickets")
 }
