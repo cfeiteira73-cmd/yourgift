@@ -97,7 +97,7 @@ function LoginForm() {
   const [view, setView] = useState<AuthView>('oauth');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string>(urlError ? 'Authentication failed. Please try again.' : '');
+  const [error, setError] = useState<string>(urlError ? 'Autenticação falhou. Por favor tenta novamente.' : '');
   const [magicSent, setMagicSent] = useState(false);
   const [loading, setLoading] = useState<LoadingProvider>(null);
   const [failedProvider, setFailedProvider] = useState<FailedProvider>(null);
@@ -319,7 +319,7 @@ function LoginForm() {
               className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:shadow-md transition-shadow disabled:opacity-50 disabled:cursor-not-allowed mb-3"
             >
               {loading === 'google' ? <Spinner /> : <GoogleIcon />}
-              Continue with Google
+              Continuar com Google
             </button>
 
             {/* Apple */}
@@ -330,7 +330,7 @@ function LoginForm() {
               className="w-full flex items-center justify-center gap-3 bg-black rounded-xl px-4 py-3 text-sm font-medium text-white hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-3"
             >
               {loading === 'apple' ? <Spinner /> : <AppleIcon />}
-              Continue with Apple
+              Continuar com Apple
             </button>
 
             {/* Magic link */}
@@ -343,13 +343,13 @@ function LoginForm() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              Sign in with email link
+              Entrar com link por email
             </button>
 
             {/* Separator */}
             <div className="flex items-center gap-3 my-5">
               <div className="flex-1 h-px bg-gray-200" />
-              <span className="text-xs text-gray-400">or</span>
+              <span className="text-xs text-gray-400">ou</span>
               <div className="flex-1 h-px bg-gray-200" />
             </div>
 
@@ -359,7 +359,7 @@ function LoginForm() {
               onClick={() => setView('password')}
               className="w-full text-center text-sm text-gray-500 hover:text-gray-700 transition-colors"
             >
-              Sign in with password instead
+              Entrar com password
             </button>
           </>
         )}
