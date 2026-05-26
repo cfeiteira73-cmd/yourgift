@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ email: '', name: '', company: '', password: '', confirm: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
   function set(key: string, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -29,11 +30,12 @@ export default function RegisterPage() {
     setError('');
 
     const supabase = createClient();
-    const { error: authError } = await supabase.auth.signUp({
+    const { data, error: authError } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
       options: {
         data: { name: form.name, company: form.company },
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
       },
     });
 
@@ -43,8 +45,45 @@ export default function RegisterPage() {
       return;
     }
 
-    router.push('/dashboard');
-    router.refresh();
+    // If session is immediately set (email confirmation disabled), go to dashboard
+    if (data.session) {
+      router.push('/dashboard');
+      router.refresh();
+      return;
+    }
+
+    // Email confirmation required — show "check email" UI
+    setRegisteredEmail(form.email);
+    setLoading(false);
+  }
+
+  // "Check your email" state
+  if (registeredEmail) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-md text-center">
+          <Link href="/" className="text-xl font-black text-gray-900">
+            your<span className="text-brand-600">gift</span>
+          </Link>
+          <div className="text-5xl mt-8 mb-4">📬</div>
+          <h1 className="text-xl font-bold text-gray-900 mb-2">Verifica o teu email</h1>
+          <p className="text-sm text-gray-600 mb-1">
+            Enviámos um link de confirmação para:
+          </p>
+          <p className="text-sm font-semibold text-gray-900 mb-5">{registeredEmail}</p>
+          <p className="text-xs text-gray-500 mb-6">
+            Clica no link no email para activar a tua conta. O link expira em 60 minutos.
+            Verifica também a pasta de spam.
+          </p>
+          <p className="text-sm text-gray-500">
+            Já verificaste?{' '}
+            <Link href="/auth/login" className="text-brand-600 hover:underline font-medium">
+              Entrar
+            </Link>
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

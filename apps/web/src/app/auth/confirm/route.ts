@@ -1,15 +1,25 @@
+/**
+ * /auth/confirm — handles OTP token_hash magic links
+ *
+ * Supabase uses this URL pattern for:
+ *  - Email confirmation links (signUp with email confirmation enabled)
+ *  - Magic link OTPs sent via signInWithOtp
+ *  - Password reset links
+ *
+ * URL form: /auth/confirm?token_hash=pkce_...&type=email&next=/dashboard
+ */
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+// EmailOtpType values: 'signup' | 'invite' | 'magiclink' | 'recovery' | 'email_change' | 'email'
+type EmailOtpType = 'signup' | 'invite' | 'magiclink' | 'recovery' | 'email_change' | 'email';
 
-// Only allow relative paths — prevents open redirect attacks
 function sanitizeNext(next: string | null): string {
   if (!next) return '/dashboard';
   try {
-    // If it parses as an absolute URL, reject it
     const url = new URL(next);
     if (url.origin !== 'null') return '/dashboard';
   } catch {
-    // Good — it's a relative path
+    // relative path — ok
   }
   if (!next.startsWith('/') || next.startsWith('//')) return '/dashboard';
   return next;
@@ -17,36 +27,22 @@ function sanitizeNext(next: string | null): string {
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
-  const code = searchParams.get('code');
-  const errorParam = searchParams.get('error');
-  const errorDescription = searchParams.get('error_description');
+  const token_hash = searchParams.get('token_hash');
+  const type = searchParams.get('type') as EmailOtpType | null;
   const next = sanitizeNext(searchParams.get('next'));
 
-  console.log('[auth/callback] started', {
-    hasCode: !!code,
-    hasError: !!errorParam,
+  console.log('[auth/confirm] started', {
+    hasToken: !!token_hash,
+    type,
     next,
-    origin,
     ts: new Date().toISOString(),
   });
 
-  // Supabase may redirect here with ?error= directly
-  if (errorParam) {
-    console.error('[auth/callback] provider error', { errorParam, errorDescription });
-    const loginUrl = new URL('/auth/login', origin);
-    loginUrl.searchParams.set('error', errorParam);
-    loginUrl.searchParams.set('error_description', errorDescription ?? 'Auth provider returned an error');
-    return NextResponse.redirect(loginUrl);
+  if (!token_hash || !type) {
+    console.warn('[auth/confirm] missing token_hash or type');
+    return NextResponse.redirect(new URL('/auth/login?error=invalid_link', origin));
   }
 
-  if (!code) {
-    console.warn('[auth/callback] no code param — redirecting to error');
-    return NextResponse.redirect(new URL('/auth/login?error=no_code', origin));
-  }
-
-  // ── CRITICAL: Create redirect response FIRST, then pass its cookie setter
-  // to the supabase client. This is the only way cookies get written to the
-  // HTTP response in Next.js App Router Route Handlers.
   const redirectTarget = new URL(next, origin);
   const response = NextResponse.redirect(redirectTarget);
 
@@ -55,11 +51,9 @@ export async function GET(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        // Read from the incoming request
         getAll() {
           return request.cookies.getAll();
         },
-        // Write to the outgoing response — NOT to cookieStore
         setAll(cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }>) {
           cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, {
@@ -70,39 +64,36 @@ export async function GET(request: NextRequest) {
               path: '/',
             } as Parameters<typeof response.cookies.set>[2]);
           });
-          console.log('[auth/callback] cookies written to response', {
+          console.log('[auth/confirm] cookies written', {
             count: cookiesToSet.length,
-            names: cookiesToSet.map((c: { name: string }) => c.name),
           });
         },
       },
     },
   );
 
-  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+  const { data, error } = await supabase.auth.verifyOtp({ token_hash, type });
 
   if (error) {
-    console.error('[auth/callback] exchangeCodeForSession failed', {
+    console.error('[auth/confirm] verifyOtp failed', {
       message: error.message,
-      status: error.status,
-      code,
+      type,
     });
     const loginUrl = new URL('/auth/login', origin);
-    loginUrl.searchParams.set('error', 'auth_failed');
+    loginUrl.searchParams.set('error', 'link_expired');
     loginUrl.searchParams.set('error_description', error.message);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Verify we actually have a user
   if (!data.user) {
-    console.error('[auth/callback] no user in session after exchange');
+    console.error('[auth/confirm] no user after verifyOtp');
     return NextResponse.redirect(new URL('/auth/login?error=no_user', origin));
   }
 
-  console.log('[auth/callback] success', {
+  console.log('[auth/confirm] success', {
     userId: data.user.id,
     email: data.user.email,
-    redirectTo: redirectTarget.toString(),
+    type,
   });
 
   return response;
