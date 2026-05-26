@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const PROTECTED = ['/dashboard', '/orders', '/account', '/quotes'];
+const PROTECTED = ['/dashboard', '/orders', '/account'];
 
 export async function middleware(request: NextRequest) {
   const { pathname, hostname } = request.nextUrl;
@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(wwwUrl, { status: 301 });
   }
 
-  // ── 2. Bypass ALL /auth/* routes (including /auth/confirm) ───────────────
+  // ── 2. Bypass ALL /auth/* routes (including /auth/confirm) ──────────────
   if (pathname.startsWith('/auth/')) {
     return NextResponse.next();
   }
@@ -26,6 +26,7 @@ export async function middleware(request: NextRequest) {
   // ── 4. Redirect loop protection ───────────────────────────────────────────
   const redirectedFrom = request.cookies.get('redirectedFrom')?.value;
   if (redirectedFrom === pathname) {
+    // We already tried to redirect to this path; break the loop
     const response = NextResponse.next();
     response.cookies.delete('redirectedFrom');
     return response;
@@ -65,7 +66,7 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  // Use getUser() — verified server-side. Do NOT use getSession() (unverified).
+  // getUser() also refreshes the session if the token is expired
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -78,7 +79,7 @@ export async function middleware(request: NextRequest) {
     loginUrl.searchParams.set('next', pathname);
 
     const redirectResponse = NextResponse.redirect(loginUrl);
-    // Mark where we came from so we can detect redirect loops
+    // Mark where we came from so we can detect loops
     redirectResponse.cookies.set('redirectedFrom', pathname, {
       httpOnly: true,
       sameSite: 'lax',

@@ -1,50 +1,46 @@
-/**
- * /auth/confirm — handles OTP token_hash magic links
- *
- * Supabase uses this URL pattern for:
- *  - Email confirmation links (signUp with email confirmation enabled)
- *  - Magic link OTPs sent via signInWithOtp
- *  - Password reset links
- *
- * URL form: /auth/confirm?token_hash=pkce_...&type=email&next=/dashboard
- */
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
-// EmailOtpType values: 'signup' | 'invite' | 'magiclink' | 'recovery' | 'email_change' | 'email'
-type EmailOtpType = 'signup' | 'invite' | 'magiclink' | 'recovery' | 'email_change' | 'email';
 
-function sanitizeNext(next: string | null): string {
-  if (!next) return '/dashboard';
-  try {
-    const url = new URL(next);
-    if (url.origin !== 'null') return '/dashboard';
-  } catch {
-    // relative path — ok
-  }
-  if (!next.startsWith('/') || next.startsWith('//')) return '/dashboard';
-  return next;
-}
+// Inline type to avoid import issues with different @supabase/auth-js versions
+type EmailOtpType =
+  | 'signup'
+  | 'invite'
+  | 'magiclink'
+  | 'recovery'
+  | 'email_change'
+  | 'email';
 
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.yourgift.pt';
+
+/**
+ * GET /auth/confirm
+ *
+ * Handles Supabase OTP/token_hash flows:
+ *  - Magic link emails (implicit flow, token_hash in URL)
+ *  - Email confirmation after signUp (token_hash in URL)
+ *
+ * These differ from PKCE OAuth (/auth/callback) because there is no
+ * `code` exchange — Supabase embeds a `token_hash` directly in the link.
+ * This route verifies the OTP and sets the session cookie on the response.
+ */
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = request.nextUrl;
   const token_hash = searchParams.get('token_hash');
   const type = searchParams.get('type') as EmailOtpType | null;
-  const next = sanitizeNext(searchParams.get('next'));
+  const next = searchParams.get('next') ?? '/dashboard';
 
-  console.log('[auth/confirm] started', {
-    hasToken: !!token_hash,
-    type,
-    next,
-    ts: new Date().toISOString(),
-  });
+  // Sanitise `next` — only allow relative paths
+  const safeNext = next.startsWith('/') ? next : '/dashboard';
 
   if (!token_hash || !type) {
-    console.warn('[auth/confirm] missing token_hash or type');
-    return NextResponse.redirect(new URL('/auth/login?error=invalid_link', origin));
+    return NextResponse.redirect(
+      `${APP_URL}/auth/recover?reason=missing_token`,
+    );
   }
 
-  const redirectTarget = new URL(next, origin);
-  const response = NextResponse.redirect(redirectTarget);
+  // Create redirect response FIRST — cookies must be set on the response object
+  const response = NextResponse.redirect(`${APP_URL}${safeNext}`);
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -54,47 +50,33 @@ export async function GET(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }>) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, {
-              ...(options ?? {}),
-              httpOnly: true,
-              secure: process.env.NODE_ENV === 'production',
-              sameSite: 'lax',
-              path: '/',
-            } as Parameters<typeof response.cookies.set>[2]);
-          });
-          console.log('[auth/confirm] cookies written', {
-            count: cookiesToSet.length,
-          });
+        setAll(
+          cookiesToSet: Array<{
+            name: string;
+            value: string;
+            options?: Record<string, unknown>;
+          }>,
+        ) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(
+              name,
+              value,
+              options as Parameters<typeof response.cookies.set>[2],
+            ),
+          );
         },
       },
     },
   );
 
-  const { data, error } = await supabase.auth.verifyOtp({ token_hash, type });
+  const { error } = await supabase.auth.verifyOtp({ token_hash, type });
 
   if (error) {
-    console.error('[auth/confirm] verifyOtp failed', {
-      message: error.message,
-      type,
-    });
-    const loginUrl = new URL('/auth/login', origin);
-    loginUrl.searchParams.set('error', 'link_expired');
-    loginUrl.searchParams.set('error_description', error.message);
-    return NextResponse.redirect(loginUrl);
+    console.error('[auth/confirm] verifyOtp error:', error.message);
+    return NextResponse.redirect(
+      `${APP_URL}/auth/recover?reason=link_expired`,
+    );
   }
-
-  if (!data.user) {
-    console.error('[auth/confirm] no user after verifyOtp');
-    return NextResponse.redirect(new URL('/auth/login?error=no_user', origin));
-  }
-
-  console.log('[auth/confirm] success', {
-    userId: data.user.id,
-    email: data.user.email,
-    type,
-  });
 
   return response;
 }
