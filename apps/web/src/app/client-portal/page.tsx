@@ -3,63 +3,40 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { ClientPortalLayout } from '@/components/client-portal/ClientPortalLayout';
 
-interface ClientProfile {
-  id: string;
-  name: string | null;
-  company: string | null;
-  tier: string | null;
-}
+interface ClientProfile { id: string; name: string | null; company: string | null; tier: string | null; budget_limit: number | null; }
+interface Order { id: string; ref: string; status: string; total_amount: number | null; created_at: string; }
+interface Quote { id: string; ref: string; status: string; total_amount: number | null; created_at: string; }
 
-interface Order {
-  id: string;
-  ref: string;
-  status: string;
-  total_amount: number | null;
-  created_at: string;
-}
-
-interface Quote {
-  id: string;
-  ref: string;
-  status: string;
-  total_amount: number | null;
-  created_at: string;
-}
-
-const STATUS_LABEL: Record<string, { label: string; color: string; bg: string }> = {
-  draft:        { label: 'Rascunho',      color: 'rgb(120,130,150)', bg: 'rgba(120,130,150,0.12)' },
-  pending:      { label: 'Pendente',      color: 'rgb(245,158,11)',  bg: 'rgba(245,158,11,0.12)'  },
-  confirmed:    { label: 'Confirmado',    color: 'rgb(77,163,255)',  bg: 'rgba(77,163,255,0.12)'  },
-  producing:    { label: 'Em Produção',   color: 'rgb(116,231,255)', bg: 'rgba(116,231,255,0.12)' },
-  shipped:      { label: 'Enviado',       color: 'rgb(77,163,255)',  bg: 'rgba(77,163,255,0.12)'  },
-  delivered:    { label: 'Entregue',      color: 'rgb(99,230,190)',  bg: 'rgba(99,230,190,0.12)'  },
-  cancelled:    { label: 'Cancelado',     color: 'rgb(239,68,68)',   bg: 'rgba(239,68,68,0.12)'   },
-  submitted:    { label: 'Submetido',     color: 'rgb(245,158,11)',  bg: 'rgba(245,158,11,0.12)'  },
-  pricing:      { label: 'Em análise',    color: 'rgb(116,231,255)', bg: 'rgba(116,231,255,0.12)' },
-  proposed:     { label: 'Proposto',      color: 'rgb(77,163,255)',  bg: 'rgba(77,163,255,0.12)'  },
-  approved:     { label: 'Aprovado',      color: 'rgb(99,230,190)',  bg: 'rgba(99,230,190,0.12)'  },
+const STATUS: Record<string, { label: string; color: string; bg: string }> = {
+  draft:     { label: 'Rascunho',    color: 'rgb(120,130,150)', bg: 'rgba(120,130,150,0.12)' },
+  pending:   { label: 'Pendente',    color: 'rgb(245,158,11)',  bg: 'rgba(245,158,11,0.12)'  },
+  confirmed: { label: 'Confirmado',  color: 'rgb(77,163,255)',  bg: 'rgba(77,163,255,0.12)'  },
+  producing: { label: 'Em Produção', color: 'rgb(116,231,255)', bg: 'rgba(116,231,255,0.12)' },
+  shipped:   { label: 'Enviado',     color: 'rgb(77,163,255)',  bg: 'rgba(77,163,255,0.12)'  },
+  delivered: { label: 'Entregue',    color: 'rgb(99,230,190)',  bg: 'rgba(99,230,190,0.12)'  },
+  cancelled: { label: 'Cancelado',   color: 'rgb(239,68,68)',   bg: 'rgba(239,68,68,0.12)'   },
+  submitted: { label: 'Submetido',   color: 'rgb(245,158,11)',  bg: 'rgba(245,158,11,0.12)'  },
+  pricing:   { label: 'Em análise',  color: 'rgb(116,231,255)', bg: 'rgba(116,231,255,0.12)' },
+  proposed:  { label: 'Proposto',    color: 'rgb(77,163,255)',  bg: 'rgba(77,163,255,0.12)'  },
+  approved:  { label: 'Aprovado',    color: 'rgb(99,230,190)',  bg: 'rgba(99,230,190,0.12)'  },
 };
 
-function StatusBadge({ status }: { status: string }) {
-  const s = STATUS_LABEL[status] ?? { label: status, color: 'rgb(120,130,150)', bg: 'rgba(120,130,150,0.12)' };
-  return (
-    <span style={{
-      fontSize: '0.65rem', fontWeight: 700,
-      color: s.color, background: s.bg,
-      borderRadius: '9999px', padding: '0.2rem 0.625rem',
-      whiteSpace: 'nowrap',
-    }}>{s.label}</span>
-  );
+function StatusPill({ status }: { status: string }) {
+  const s = STATUS[status] ?? { label: status, color: 'rgb(120,130,150)', bg: 'rgba(120,130,150,0.12)' };
+  return <span style={{ fontSize: '0.62rem', fontWeight: 700, color: s.color, background: s.bg, borderRadius: '9999px', padding: '0.15rem 0.55rem', whiteSpace: 'nowrap' }}>{s.label}</span>;
 }
 
-export default function ClientPortalPage() {
+export default function ClientDashboard() {
   const router = useRouter();
   const [client, setClient] = useState<ClientProfile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [userEmail, setUserEmail] = useState('');
+  const [totalSpent, setTotalSpent] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -68,161 +45,100 @@ export default function ClientPortalPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push('/auth/login?next=/client-portal'); return; }
       setUserEmail(user.email ?? '');
-
-      const { data: c } = await supabase
-        .from('clients').select('id,name,company,tier')
-        .eq('auth_user_id', user.id).single();
-
+      const { data: c } = await supabase.from('clients').select('*').eq('auth_user_id', user.id).single();
       if (c) {
         setClient(c as ClientProfile);
-
         const [{ data: ord }, { data: quot }] = await Promise.all([
-          supabase.from('orders')
-            .select('id,ref,status,total_amount,created_at')
-            .eq('client_id', c.id)
-            .order('created_at', { ascending: false })
-            .limit(5),
-          supabase.from('quotes')
-            .select('id,ref,status,total_amount,created_at')
-            .eq('client_id', c.id)
-            .order('created_at', { ascending: false })
-            .limit(5),
+          supabase.from('orders').select('id,ref,status,total_amount,created_at').eq('client_id', c.id).order('created_at', { ascending: false }).limit(4),
+          supabase.from('quotes').select('id,ref,status,total_amount,created_at').eq('client_id', c.id).order('created_at', { ascending: false }).limit(4),
         ]);
-
         setOrders((ord ?? []) as Order[]);
         setQuotes((quot ?? []) as Quote[]);
+        const spent = (ord ?? []).filter((o: any) => o.status !== 'cancelled').reduce((s: number, o: any) => s + (o.total_amount ?? 0), 0);
+        setTotalSpent(spent);
       }
       setLoading(false);
     }
     load();
   }, [router]);
 
-  async function handleLogout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push('/auth/login');
-  }
-
-  const displayName = client?.name ?? userEmail.split('@')[0] ?? 'Cliente';
-  const initials = displayName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase() || 'CL';
+  const firstName = client?.name?.split(' ')[0] ?? userEmail.split('@')[0] ?? 'Cliente';
+  const activeOrders = orders.filter(o => !['delivered', 'cancelled'].includes(o.status)).length;
+  const pendingQuotes = quotes.filter(q => ['submitted', 'pricing', 'proposed'].includes(q.status)).length;
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Bom dia' : hour < 19 ? 'Boa tarde' : 'Boa noite';
 
   return (
-    <div style={{ minHeight: '100vh', background: 'rgb(7,17,31)', color: 'rgb(220,230,245)', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <ClientPortalLayout userName={client?.name ?? undefined} userEmail={userEmail} companyName={client?.company ?? undefined}>
+      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
+      <div style={{ padding: '1.5rem 2rem 3rem', maxWidth: '900px' }}>
 
-      {/* Header */}
-      <header style={{
-        background: 'rgb(8,15,28)', borderBottom: '1px solid rgba(255,255,255,0.06)',
-        padding: '0 2rem', height: '58px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        position: 'sticky', top: 0, zIndex: 50,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-          <div style={{
-            width: '28px', height: '28px', borderRadius: '7px',
-            background: 'linear-gradient(135deg, rgb(77,163,255), rgb(99,230,190))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 10px rgba(77,163,255,0.3)',
-          }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgb(7,17,31)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 12V22H4V12" /><path d="M22 7H2v5h20V7z" /><path d="M12 22V7" />
-              <path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z" />
-              <path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" />
-            </svg>
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '1.75rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
+                {greeting}, {firstName} 👋
+              </h1>
+              <p style={{ fontSize: '0.78rem', color: 'rgb(80,92,110)' }}>
+                {client?.company ? `${client.company} · ` : ''}Bem-vindo ao teu portal YourGift
+              </p>
+            </div>
+            <Link href="/client-portal/quotes" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', background: 'linear-gradient(135deg,rgb(77,163,255),rgb(116,100,255))', color: '#fff', padding: '0.5rem 1.125rem', borderRadius: '10px', fontSize: '0.82rem', fontWeight: 700, textDecoration: 'none', boxShadow: '0 4px 14px rgba(77,163,255,0.25)' }}>
+              + Pedir Orçamento
+            </Link>
           </div>
-          <span style={{ fontSize: '1rem', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.02em' }}>
-            your<span style={{ color: 'rgb(77,163,255)' }}>gift</span>
-          </span>
-          <span style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)', marginLeft: '0.25rem', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', padding: '0.1rem 0.5rem' }}>Portal Cliente</span>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'rgb(210,220,235)' }}>{displayName}</div>
-            <div style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)' }}>{userEmail}</div>
-          </div>
-          <div style={{
-            width: '34px', height: '34px', borderRadius: '10px',
-            background: 'linear-gradient(135deg, rgb(77,163,255), rgb(116,231,255))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '0.75rem', fontWeight: 800, color: 'rgb(7,17,31)',
-          }}>{initials}</div>
-          <button type="button" onClick={handleLogout} style={{
-            background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
-            borderRadius: '8px', padding: '0.35rem 0.75rem', cursor: 'pointer',
-            fontSize: '0.72rem', color: 'rgb(239,68,68)', fontWeight: 600,
-          }}>Sair</button>
-        </div>
-      </header>
-
-      <main style={{ padding: '2rem', maxWidth: '900px', margin: '0 auto' }}>
-
-        {/* Welcome */}
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-          style={{ marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '0.25rem' }}>
-            Olá, {client?.name?.split(' ')[0] ?? 'Cliente'} 👋
-          </h1>
-          <p style={{ fontSize: '0.8rem', color: 'rgb(80,92,110)' }}>
-            {client?.company ? `${client.company} · ` : ''}Bem-vindo ao teu portal YourGift
-          </p>
         </motion.div>
 
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {[1, 2].map(i => (
-              <div key={i} style={{ height: '140px', borderRadius: '14px', background: 'rgba(255,255,255,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+            {[1, 2, 3].map(i => <div key={i} style={{ height: '100px', borderRadius: '14px', background: 'rgba(255,255,255,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
+          </div>
+        ) : (<>
+
+          {/* KPIs */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '0.625rem', marginBottom: '1.5rem' }}>
+            {[
+              { label: 'Encomendas Ativas', value: activeOrders, color: 'rgb(77,163,255)', icon: '📦', href: '/client-portal/orders' },
+              { label: 'Orçamentos Pendentes', value: pendingQuotes, color: 'rgb(245,158,11)', icon: '📋', href: '/client-portal/quotes' },
+              { label: 'Entregas Concluídas', value: orders.filter(o => o.status === 'delivered').length, color: 'rgb(99,230,190)', icon: '✅', href: '/client-portal/orders' },
+              { label: 'Total Gasto', value: `€${totalSpent.toLocaleString('pt-PT')}`, color: 'rgb(116,231,255)', icon: '💶', href: '/client-portal/billing' },
+            ].map((kpi, i) => (
+              <motion.div key={kpi.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 + i * 0.05 }}>
+                <Link href={kpi.href} style={{ textDecoration: 'none', display: 'block' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', padding: '1rem 1.125rem', transition: 'border-color 150ms', cursor: 'pointer' }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(77,163,255,0.25)'}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'}>
+                    <div style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{kpi.icon}</div>
+                    <div style={{ fontSize: typeof kpi.value === 'string' ? '1.1rem' : '1.75rem', fontWeight: 800, color: kpi.color, letterSpacing: '-0.04em', lineHeight: 1 }}>{kpi.value}</div>
+                    <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)', marginTop: '0.3rem' }}>{kpi.label}</div>
+                  </div>
+                </Link>
+              </motion.div>
             ))}
           </div>
-        ) : (
-          <>
-            {/* Quick stats */}
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-              style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '1.5rem' }}>
-              {[
-                { label: 'Encomendas', value: orders.length, color: 'rgb(77,163,255)', icon: '📦' },
-                { label: 'Orçamentos', value: quotes.length, color: 'rgb(245,158,11)', icon: '📋' },
-                { label: 'Em Produção', value: orders.filter(o => ['producing', 'confirmed', 'pending'].includes(o.status)).length, color: 'rgb(116,231,255)', icon: '🏭' },
-              ].map((s, i) => (
-                <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.05 }}
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', padding: '1.125rem' }}>
-                  <div style={{ fontSize: '1.25rem', marginBottom: '0.375rem' }}>{s.icon}</div>
-                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: s.color, letterSpacing: '-0.04em', lineHeight: 1 }}>{s.value}</div>
-                  <div style={{ fontSize: '0.7rem', color: 'rgb(80,92,110)', marginTop: '0.2rem' }}>{s.label}</div>
-                </motion.div>
-              ))}
-            </motion.div>
+
+          {/* Two columns */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
 
             {/* Recent orders */}
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
-              style={{ marginBottom: '1.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.875rem' }}>
-                <h2 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(160,175,195)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Encomendas Recentes</h2>
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.625rem' }}>
+                <h2 style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgb(160,175,195)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Encomendas Recentes</h2>
+                <Link href="/client-portal/orders" style={{ fontSize: '0.68rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}>Ver todas →</Link>
               </div>
               <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', overflow: 'hidden' }}>
                 {orders.length === 0 ? (
-                  <div style={{ padding: '2rem', textAlign: 'center', color: 'rgb(80,92,110)', fontSize: '0.82rem' }}>
-                    Ainda não tens encomendas. <a href="mailto:geral@yourgift.pt" style={{ color: 'rgb(77,163,255)', textDecoration: 'none' }}>Fala connosco →</a>
-                  </div>
-                ) : orders.map((order, i) => (
-                  <div key={order.id} style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '0.875rem 1.125rem',
-                    borderBottom: i < orders.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <div style={{ width: '34px', height: '34px', borderRadius: '9px', background: 'rgba(77,163,255,0.1)', border: '1px solid rgba(77,163,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem' }}>📦</div>
-                      <div>
-                        <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'rgb(220,230,245)' }}>{order.ref}</div>
-                        <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>{new Date(order.created_at).toLocaleDateString('pt-PT')}</div>
-                      </div>
+                  <div style={{ padding: '1.5rem', textAlign: 'center', color: 'rgb(80,92,110)', fontSize: '0.78rem' }}>Nenhuma encomenda ainda</div>
+                ) : orders.map((o, i) => (
+                  <div key={o.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', borderBottom: i < orders.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+                    <div>
+                      <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'rgb(210,220,235)' }}>{o.ref}</div>
+                      <div style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)' }}>{new Date(o.created_at).toLocaleDateString('pt-PT')}</div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                      {order.total_amount && (
-                        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(99,230,190)' }}>
-                          €{order.total_amount.toLocaleString('pt-PT')}
-                        </span>
-                      )}
-                      <StatusBadge status={order.status} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      {o.total_amount ? <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgb(99,230,190)' }}>€{o.total_amount.toLocaleString('pt-PT')}</span> : null}
+                      <StatusPill status={o.status} />
                     </div>
                   </div>
                 ))}
@@ -230,62 +146,67 @@ export default function ClientPortalPage() {
             </motion.div>
 
             {/* Recent quotes */}
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}>
-              <div style={{ marginBottom: '0.875rem' }}>
-                <h2 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(160,175,195)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Orçamentos Recentes</h2>
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.625rem' }}>
+                <h2 style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgb(160,175,195)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Orçamentos Recentes</h2>
+                <Link href="/client-portal/quotes" style={{ fontSize: '0.68rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}>Ver todos →</Link>
               </div>
               <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', overflow: 'hidden' }}>
                 {quotes.length === 0 ? (
-                  <div style={{ padding: '2rem', textAlign: 'center', color: 'rgb(80,92,110)', fontSize: '0.82rem' }}>
-                    Nenhum orçamento ainda. <a href="mailto:geral@yourgift.pt" style={{ color: 'rgb(77,163,255)', textDecoration: 'none' }}>Pede um orçamento →</a>
-                  </div>
-                ) : quotes.map((quote, i) => (
-                  <div key={quote.id} style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '0.875rem 1.125rem',
-                    borderBottom: i < quotes.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <div style={{ width: '34px', height: '34px', borderRadius: '9px', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem' }}>📋</div>
-                      <div>
-                        <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'rgb(220,230,245)' }}>{quote.ref}</div>
-                        <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>{new Date(quote.created_at).toLocaleDateString('pt-PT')}</div>
-                      </div>
+                  <div style={{ padding: '1.5rem', textAlign: 'center', color: 'rgb(80,92,110)', fontSize: '0.78rem' }}>Nenhum orçamento ainda</div>
+                ) : quotes.map((q, i) => (
+                  <div key={q.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', borderBottom: i < quotes.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+                    <div>
+                      <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'rgb(210,220,235)' }}>{q.ref}</div>
+                      <div style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)' }}>{new Date(q.created_at).toLocaleDateString('pt-PT')}</div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                      {quote.total_amount && (
-                        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(99,230,190)' }}>
-                          €{quote.total_amount.toLocaleString('pt-PT')}
-                        </span>
-                      )}
-                      <StatusBadge status={quote.status} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      {q.total_amount ? <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgb(99,230,190)' }}>€{q.total_amount.toLocaleString('pt-PT')}</span> : null}
+                      <StatusPill status={q.status} />
                     </div>
                   </div>
                 ))}
               </div>
             </motion.div>
+          </div>
 
-            {/* Contact CTA */}
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24 }}
-              style={{ marginTop: '1.5rem', padding: '1.25rem', background: 'rgba(77,163,255,0.06)', border: '1px solid rgba(77,163,255,0.15)', borderRadius: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-              <div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'rgb(77,163,255)', marginBottom: '0.2rem' }}>Precisas de ajuda?</div>
-                <div style={{ fontSize: '0.72rem', color: 'rgb(100,112,130)' }}>A nossa equipa responde em menos de 2 horas úteis.</div>
-              </div>
-              <a href="mailto:geral@yourgift.pt" style={{
-                display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
-                background: 'rgba(77,163,255,0.15)', border: '1px solid rgba(77,163,255,0.3)',
-                borderRadius: '9px', padding: '0.5rem 1rem',
-                fontSize: '0.78rem', fontWeight: 700, color: 'rgb(77,163,255)', textDecoration: 'none',
-              }}>
-                ✉️ geral@yourgift.pt
-              </a>
-            </motion.div>
-          </>
-        )}
-      </main>
+          {/* Quick actions */}
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} style={{ marginTop: '1rem' }}>
+            <h2 style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgb(160,175,195)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.625rem' }}>Acesso Rápido</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '0.5rem' }}>
+              {[
+                { icon: '📋', label: 'Novo Orçamento', desc: 'Pede um orçamento personalizado', href: '/client-portal/quotes', color: 'rgb(77,163,255)' },
+                { icon: '🎨', label: 'Upload de Logo', desc: 'Envia os teus ficheiros de arte', href: '/client-portal/assets', color: 'rgb(99,230,190)' },
+                { icon: '🛍️', label: 'Ver Catálogo', desc: 'Explora os nossos produtos', href: '/client-portal/products', color: 'rgb(116,231,255)' },
+                { icon: '🧾', label: 'Faturas', desc: 'Consulta os teus pagamentos', href: '/client-portal/billing', color: 'rgb(167,139,250)' },
+              ].map((a, i) => (
+                <motion.div key={a.label} whileHover={{ y: -2 }}>
+                  <Link href={a.href} style={{ textDecoration: 'none', display: 'block', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '1rem', transition: 'border-color 150ms', cursor: 'pointer' }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = `${a.color}40`}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'}>
+                    <div style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{a.icon}</div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgb(210,220,235)', marginBottom: '0.25rem' }}>{a.label}</div>
+                    <div style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)', lineHeight: 1.4 }}>{a.desc}</div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
 
-      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
-    </div>
+          {/* Support banner */}
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+            style={{ marginTop: '1rem', padding: '1rem 1.25rem', background: 'rgba(77,163,255,0.05)', border: '1px solid rgba(77,163,255,0.12)', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            <div>
+              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(77,163,255)' }}>Precisas de ajuda?</div>
+              <div style={{ fontSize: '0.7rem', color: 'rgb(100,112,130)' }}>Resposta garantida em menos de 2 horas úteis — Seg. a Sex. 9h-18h</div>
+            </div>
+            <a href="mailto:geral@yourgift.pt" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', background: 'rgba(77,163,255,0.12)', border: '1px solid rgba(77,163,255,0.25)', borderRadius: '8px', padding: '0.45rem 0.875rem', fontSize: '0.75rem', fontWeight: 700, color: 'rgb(77,163,255)', textDecoration: 'none' }}>
+              ✉️ Contactar equipa
+            </a>
+          </motion.div>
+
+        </>)}
+      </div>
+    </ClientPortalLayout>
   );
 }
