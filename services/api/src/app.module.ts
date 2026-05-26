@@ -96,6 +96,12 @@ import { SecurityCertificationModule } from './security-certification/security-c
 import { FinancialTraceModule } from './financial-trace/financial-trace.module';
 import { LifecycleModule } from './lifecycle/lifecycle.module';
 import { MaturityModule } from './maturity/maturity.module';
+import { ProductionActivationModule } from './production-activation/production-activation.module';
+import { StripeRecoveryModule } from './stripe-recovery/stripe-recovery.module';
+import { OperationalDashboardModule } from './operational-dashboard/operational-dashboard.module';
+import { ErrorBudgetModule } from './error-budget/error-budget.module';
+import { CustomerOpsModule } from './customer-ops/customer-ops.module';
+import { DeploymentSafetyModule } from './deployment-safety/deployment-safety.module';
 import { APP_GUARD } from '@nestjs/core';
 import { TenantGuard } from './common/guards/tenant.guard';
 import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard';
@@ -210,6 +216,12 @@ import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard'
     FinancialTraceModule,
     LifecycleModule,
     MaturityModule,
+    ProductionActivationModule,
+    StripeRecoveryModule,
+    OperationalDashboardModule,
+    ErrorBudgetModule,
+    CustomerOpsModule,
+    DeploymentSafetyModule,
   ],
   providers: [
     // Rate limiting — per tenant (not per IP) for authenticated requests
