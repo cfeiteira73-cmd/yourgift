@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { createClient, createImplicitClient } from '@/lib/supabase/client';
 import { detectBrowserEnv, BrowserEnv } from '@/lib/auth/in-app-browser';
 
 // ── Inline SVG icons ──────────────────────────────────────────────────────────
@@ -134,11 +134,14 @@ function LoginForm() {
     if (!email) return;
     setLoading('magic');
     setError('');
-    const supabase = createClient();
+    // Use implicit flow: magic links are opened in email clients (different browser
+    // session) so PKCE code-verifier would be missing. Implicit flow sends a
+    // token_hash that /auth/confirm handles without needing a verifier.
+    const supabase = createImplicitClient();
     const { error: magicError } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNext)}`,
+        emailRedirectTo: `${window.location.origin}/auth/confirm?next=${encodeURIComponent(safeNext)}`,
       },
     });
     if (magicError) {
