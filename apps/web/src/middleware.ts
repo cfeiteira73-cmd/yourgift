@@ -1,10 +1,23 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const PROTECTED = [
+// ── Admin-only emails — the full enterprise portal is restricted to these ──────
+const ADMIN_EMAILS = [
+  'geral@yourgift.pt',
+  'geral@agencygroup.pt',
+];
+
+// ── Admin portal routes (full enterprise dashboard) ───────────────────────────
+const ADMIN_ROUTES = [
   '/dashboard', '/orders', '/quotes', '/products', '/reports', '/assets', '/account',
   '/production', '/clients', '/billing', '/suppliers', '/marketing', '/integrations', '/settings',
 ];
+
+// ── Client portal routes (simpler portal — future) ────────────────────────────
+const CLIENT_ROUTES = ['/client-portal'];
+
+// ── All protected routes (require auth) ───────────────────────────────────────
+const PROTECTED = [...ADMIN_ROUTES, ...CLIENT_ROUTES];
 
 export async function middleware(request: NextRequest) {
   const { pathname, hostname } = request.nextUrl;
@@ -29,7 +42,6 @@ export async function middleware(request: NextRequest) {
   // ── 4. Redirect loop protection ───────────────────────────────────────────
   const redirectedFrom = request.cookies.get('redirectedFrom')?.value;
   if (redirectedFrom === pathname) {
-    // We already tried to redirect to this path; break the loop
     const response = NextResponse.next();
     response.cookies.delete('redirectedFrom');
     return response;
@@ -74,15 +86,18 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // ── 6. Protect routes ─────────────────────────────────────────────────────
   const isProtected = PROTECTED.some((p) => pathname.startsWith(p));
+  const isAdminRoute = ADMIN_ROUTES.some((p) => pathname.startsWith(p));
+  const isClientRoute = CLIENT_ROUTES.some((p) => pathname.startsWith(p));
+  const isAdmin = user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase());
+
+  // ── 6. Auth gate — redirect unauthenticated users to login ───────────────
   if (isProtected && !user) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = '/auth/login';
     loginUrl.searchParams.set('next', pathname);
 
     const redirectResponse = NextResponse.redirect(loginUrl);
-    // Mark where we came from so we can detect loops
     redirectResponse.cookies.set('redirectedFrom', pathname, {
       httpOnly: true,
       sameSite: 'lax',
@@ -92,7 +107,22 @@ export async function middleware(request: NextRequest) {
     return redirectResponse;
   }
 
-  // ── 7. Security headers ───────────────────────────────────────────────────
+  // ── 7. Role gate — non-admin users cannot access admin routes ─────────────
+  if (isAdminRoute && user && !isAdmin) {
+    // Redirect to client portal
+    const clientUrl = request.nextUrl.clone();
+    clientUrl.pathname = '/client-portal';
+    return NextResponse.redirect(clientUrl);
+  }
+
+  // ── 8. Admin users don't need the client portal — redirect to dashboard ───
+  if (isClientRoute && user && isAdmin) {
+    const dashUrl = request.nextUrl.clone();
+    dashUrl.pathname = '/dashboard';
+    return NextResponse.redirect(dashUrl);
+  }
+
+  // ── 9. Security headers ───────────────────────────────────────────────────
   supabaseResponse.headers.set('X-Frame-Options', 'DENY');
   supabaseResponse.headers.set('X-Content-Type-Options', 'nosniff');
 
