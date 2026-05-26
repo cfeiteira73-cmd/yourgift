@@ -1,56 +1,64 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
-// ── Icons ────────────────────────────────────────────────────────────────────
+// ── SVG Icon helper ───────────────────────────────────────────────────────────
 
-const Icon = ({ d, size = 18 }: { d: string | string[]; size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    {Array.isArray(d) ? d.map((path, i) => <path key={i} d={path} />) : <path d={d} />}
-  </svg>
-);
+function Icon({ d, size = 16 }: { d: string | string[]; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {Array.isArray(d) ? d.map((p, i) => <path key={i} d={p} />) : <path d={d} />}
+    </svg>
+  );
+}
 
-const icons = {
-  dashboard: ['M3 3h7v7H3z', 'M14 3h7v7h-7z', 'M3 14h7v7H3z', 'M14 14h7v7h-7z'],
-  orders: ['M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z', 'M3 6h18', 'M16 10a4 4 0 01-8 0'],
-  quotes: ['M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z', 'M14 2v6h6', 'M16 13H8', 'M16 17H8', 'M10 9H9H8'],
-  products: ['M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z', 'M2 9v11a2 2 0 002 2h12a2 2 0 002-2V9H2z'],
-  assets: ['M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'],
-  reports: ['M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'],
-  logout: ['M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4', 'M16 17l5-5-5-5', 'M21 12H9'],
-  settings: ['M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z', 'M15 12a3 3 0 11-6 0 3 3 0 016 0z'],
+// ── Icon paths ─────────────────────────────────────────────────────────────────
+
+const ICONS = {
+  dashboard:  ['M3 3h7v7H3z', 'M14 3h7v7h-7z', 'M3 14h7v7H3z', 'M14 14h7v7h-7z'],
+  orders:     ['M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z', 'M3 6h18', 'M16 10a4 4 0 01-8 0'],
+  production: ['M2 20h20M4 20V10l8-8 8 8v10', 'M9 20v-5h6v5'],
+  mockups:    ['M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'],
+  products:   ['M4 6h16M4 12h16M4 18h16'],
+  assets:     ['M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'],
+  clients:    ['M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2', 'M23 21v-2a4 4 0 00-3-3.87', 'M16 3.13a4 4 0 010 7.75', 'M9 7a4 4 0 100 8 4 4 0 000-8z'],
+  quotes:     ['M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z', 'M14 2v6h6', 'M16 13H8', 'M16 17H8', 'M10 9H8'],
+  billing:    ['M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z'],
+  suppliers:  ['M1 3h15v13H1z', 'M16 8h4l3 3v5h-7V8z', 'M5.5 21a2.5 2.5 0 100-5 2.5 2.5 0 000 5zm11 0a2.5 2.5 0 100-5 2.5 2.5 0 000 5z'],
+  reports:    ['M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'],
+  marketing:  ['M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z'],
+  integrations: ['M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4'],
+  settings:   ['M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z', 'M15 12a3 3 0 11-6 0 3 3 0 016 0z'],
+  logout:     ['M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4', 'M16 17l5-5-5-5', 'M21 12H9'],
+  chevronDown: 'M19 9l-7 7-7-7',
 };
 
-// ── Nav config ────────────────────────────────────────────────────────────────
+// ── Nav config ─────────────────────────────────────────────────────────────────
 
-const NAV = [
-  {
-    section: null,
-    items: [
-      { href: '/dashboard', label: 'Dashboard', key: 'dashboard', exact: true },
-    ],
-  },
-  {
-    section: 'Operações',
-    items: [
-      { href: '/orders', label: 'Encomendas', key: 'orders' },
-      { href: '/quotes', label: 'Orçamentos', key: 'quotes' },
-      { href: '/products', label: 'Catálogo', key: 'products' },
-    ],
-  },
-  {
-    section: 'Recursos',
-    items: [
-      { href: '/assets', label: 'Ficheiros', key: 'assets' },
-      { href: '/reports', label: 'Relatórios', key: 'reports' },
-    ],
-  },
-];
+const NAV_ITEMS = [
+  { href: '/dashboard', label: 'Dashboard', icon: 'dashboard', exact: true },
+  { divider: 'Operações' },
+  { href: '/orders', label: 'Encomendas', icon: 'orders', badgeKey: 'orders' },
+  { href: '/production', label: 'Produção', icon: 'production' },
+  { href: '/assets', label: 'Maquetes & Artes', icon: 'mockups' },
+  { href: '/products', label: 'Catálogo de Produtos', icon: 'products' },
+  { href: '/assets', label: 'Logótipos & Assets', icon: 'assets' },
+  { divider: 'Gestão' },
+  { href: '/clients', label: 'Clientes', icon: 'clients' },
+  { href: '/quotes', label: 'Orçamentos', icon: 'quotes', badgeKey: 'quotes' },
+  { href: '/billing', label: 'Faturação', icon: 'billing' },
+  { href: '/suppliers', label: 'Fornecedores', icon: 'suppliers' },
+  { divider: 'Crescimento' },
+  { href: '/reports', label: 'Relatórios & Analytics', icon: 'reports' },
+  { href: '/marketing', label: 'Marketing & Promoções', icon: 'marketing' },
+  { href: '/integrations', label: 'Integrações', icon: 'integrations' },
+  { href: '/settings', label: 'Definições', icon: 'settings' },
+] as const;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -64,10 +72,12 @@ interface PortalLayoutProps {
 
 // ── NavItem ───────────────────────────────────────────────────────────────────
 
-function NavItem({ href, label, iconKey, exact }: { href: string; label: string; iconKey: string; exact?: boolean }) {
+function NavItem({
+  href, label, iconKey, exact, badge,
+}: { href: string; label: string; iconKey: string; exact?: boolean; badge?: number }) {
   const pathname = usePathname();
   const isActive = exact ? pathname === href : pathname.startsWith(href);
-  const d = icons[iconKey as keyof typeof icons];
+  const d = ICONS[iconKey as keyof typeof ICONS];
 
   return (
     <Link href={href} style={{ textDecoration: 'none', display: 'block' }}>
@@ -75,52 +85,49 @@ function NavItem({ href, label, iconKey, exact }: { href: string; label: string;
         whileHover={{ x: 2 }}
         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.625rem',
-          padding: '0.5rem 0.75rem',
-          borderRadius: '10px',
-          fontSize: '0.875rem',
+          display: 'flex', alignItems: 'center', gap: '0.5rem',
+          padding: '0.4rem 0.625rem',
+          borderRadius: '8px',
+          fontSize: '0.8rem',
           fontWeight: isActive ? 600 : 400,
-          color: isActive ? 'rgb(77,163,255)' : 'rgb(160,172,190)',
-          background: isActive
-            ? 'linear-gradient(135deg, rgba(77,163,255,0.12) 0%, rgba(77,163,255,0.06) 100%)'
-            : 'transparent',
-          border: isActive ? '1px solid rgba(77,163,255,0.18)' : '1px solid transparent',
-          boxShadow: isActive ? 'inset 0 1px 0 rgba(255,255,255,0.05)' : 'none',
-          transition: 'color 150ms, background 150ms, border-color 150ms',
+          color: isActive ? 'rgb(255,255,255)' : 'rgb(140,155,175)',
+          background: isActive ? 'rgba(77,163,255,0.14)' : 'transparent',
+          border: isActive ? '1px solid rgba(77,163,255,0.2)' : '1px solid transparent',
+          transition: 'all 120ms ease',
           cursor: 'pointer',
           position: 'relative',
-          overflow: 'hidden',
         }}
         onMouseEnter={(e) => {
           if (!isActive) {
-            (e.currentTarget as HTMLElement).style.color = 'rgb(200,210,225)';
+            (e.currentTarget as HTMLElement).style.color = 'rgb(210,220,235)';
             (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)';
           }
         }}
         onMouseLeave={(e) => {
           if (!isActive) {
-            (e.currentTarget as HTMLElement).style.color = 'rgb(160,172,190)';
+            (e.currentTarget as HTMLElement).style.color = 'rgb(140,155,175)';
             (e.currentTarget as HTMLElement).style.background = 'transparent';
           }
         }}
       >
         {isActive && (
-          <motion.div
-            layoutId="nav-glow"
-            style={{
-              position: 'absolute', left: 0, top: 0, bottom: 0,
-              width: '2px', background: 'rgb(77,163,255)',
-              borderRadius: '0 2px 2px 0',
-              boxShadow: '0 0 8px rgba(77,163,255,0.8)',
-            }}
-          />
+          <motion.div layoutId="active-bar" style={{
+            position: 'absolute', left: 0, top: '15%', bottom: '15%',
+            width: '2.5px', background: 'rgb(77,163,255)', borderRadius: '0 2px 2px 0',
+            boxShadow: '0 0 8px rgba(77,163,255,0.7)',
+          }} />
         )}
-        <span style={{ opacity: isActive ? 1 : 0.65, flexShrink: 0 }}>
-          <Icon d={d} />
+        <span style={{ flexShrink: 0, opacity: isActive ? 1 : 0.7, color: isActive ? 'rgb(77,163,255)' : 'inherit' }}>
+          <Icon d={d} size={15} />
         </span>
-        <span>{label}</span>
+        <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
+        {badge && badge > 0 ? (
+          <span style={{
+            fontSize: '0.6rem', fontWeight: 700, lineHeight: 1,
+            background: 'rgb(77,163,255)', color: 'rgb(7,17,31)',
+            borderRadius: '9999px', padding: '0.15rem 0.45rem', flexShrink: 0,
+          }}>{badge}</span>
+        ) : null}
       </motion.div>
     </Link>
   );
@@ -132,13 +139,32 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
   const router = useRouter();
   const pathname = usePathname();
   const [loggingOut, setLoggingOut] = useState(false);
-  const [time, setTime] = useState('');
+  const [badges, setBadges] = useState<Record<string, number>>({});
 
+  // Fetch badge counts
   useEffect(() => {
-    const update = () => setTime(new Date().toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }));
-    update();
-    const t = setInterval(update, 30000);
-    return () => clearInterval(t);
+    async function fetchBadges() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: client } = await supabase
+        .from('clients').select('id').eq('auth_user_id', user.id).single();
+      if (!client) return;
+
+      const [ordersRes, quotesRes] = await Promise.all([
+        supabase.from('orders').select('id', { count: 'exact', head: true })
+          .eq('client_id', client.id)
+          .not('status', 'in', '(delivered,cancelled)'),
+        supabase.from('quotes').select('id', { count: 'exact', head: true })
+          .eq('client_id', client.id)
+          .in('status', ['submitted', 'pricing', 'proposed']),
+      ]);
+      setBadges({
+        orders: ordersRes.count ?? 0,
+        quotes: quotesRes.count ?? 0,
+      });
+    }
+    fetchBadges();
   }, []);
 
   async function handleLogout() {
@@ -149,133 +175,154 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
   }
 
   const displayName = userName || userEmail?.split('@')[0] || 'Utilizador';
-  const initials = displayName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase();
+  const displayEmail = userEmail || 'geral@yourgift.pt';
+  const initials = displayName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase() || 'YG';
+  const company = companyName || 'YOURGIFT LDA';
 
-  const tierConfig = {
-    premium: { label: 'PRO', color: 'rgb(99,230,190)', bg: 'rgba(99,230,190,0.12)', border: 'rgba(99,230,190,0.25)' },
-    enterprise: { label: 'ENT', color: 'rgb(116,231,255)', bg: 'rgba(116,231,255,0.12)', border: 'rgba(116,231,255,0.25)' },
-    standard: { label: 'STD', color: 'rgb(120,130,150)', bg: 'rgba(120,130,150,0.1)', border: 'rgba(120,130,150,0.2)' },
-  };
-  const tc = tierConfig[(tier as keyof typeof tierConfig) ?? 'standard'] ?? tierConfig.standard;
+  const usagePct = 78; // Could be computed from real data
 
-  // flat list of all nav items for mobile
-  const allNavItems = NAV.flatMap(s => s.items);
+  // Mobile: flat item list
+  const flatItems = NAV_ITEMS.filter((item): item is Extract<typeof NAV_ITEMS[number], { href: string }> => 'href' in item);
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'rgb(7,17,31)' }}>
 
-      {/* ════════════════════════════════════════════
-          DESKTOP SIDEBAR
-      ════════════════════════════════════════════ */}
+      {/* ════ DESKTOP SIDEBAR ════ */}
       <aside
         className="hidden md:flex"
         style={{
-          width: '232px',
+          width: '196px',
           flexShrink: 0,
           flexDirection: 'column',
-          background: 'linear-gradient(180deg, rgb(9,19,35) 0%, rgb(8,17,30) 100%)',
-          borderRight: '1px solid rgba(255,255,255,0.055)',
+          background: 'rgb(8,15,28)',
+          borderRight: '1px solid rgba(255,255,255,0.06)',
           position: 'sticky',
           top: 0,
           height: '100vh',
           overflowY: 'auto',
-          boxShadow: 'inset -1px 0 0 rgba(255,255,255,0.03)',
+          overflowX: 'hidden',
         }}
       >
-        {/* Logo bar */}
-        <div style={{
-          padding: '1.375rem 1.25rem 0.875rem',
-          borderBottom: '1px solid rgba(255,255,255,0.05)',
-          display: 'flex', alignItems: 'center', gap: '0.625rem',
-        }}>
-          <div style={{
-            width: '30px', height: '30px', borderRadius: '8px',
-            background: 'linear-gradient(135deg, rgb(77,163,255) 0%, rgb(99,230,190) 100%)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            boxShadow: '0 0 12px rgba(77,163,255,0.35)',
-          }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgb(7,17,31)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-            </svg>
-          </div>
-          <div>
-            <div style={{ fontSize: '0.95rem', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.02em', lineHeight: 1 }}>
+        {/* Logo */}
+        <div style={{ padding: '1.125rem 1rem 0.875rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{
+              width: '28px', height: '28px', borderRadius: '7px', flexShrink: 0,
+              background: 'linear-gradient(135deg, rgb(77,163,255) 0%, rgb(99,230,190) 100%)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 0 10px rgba(77,163,255,0.3)',
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgb(7,17,31)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 12V22H4V12" /><path d="M22 7H2v5h20V7z" /><path d="M12 22V7" />
+                <path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z" />
+                <path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" />
+              </svg>
+            </div>
+            <span style={{ fontSize: '1.05rem', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.02em' }}>
               your<span style={{ color: 'rgb(77,163,255)' }}>gift</span>
-            </div>
-            <div style={{ fontSize: '0.6rem', color: 'rgb(100,112,130)', letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: '1px' }}>
-              Portal B2B
-            </div>
-          </div>
-          <div style={{ marginLeft: 'auto', fontSize: '0.7rem', color: 'rgb(80,92,110)', fontVariantNumeric: 'tabular-nums' }}>
-            {time}
+            </span>
           </div>
         </div>
 
-        {/* Navigation */}
-        <nav style={{ flex: 1, padding: '1rem 0.75rem', display: 'flex', flexDirection: 'column', gap: '0' }}>
-          {NAV.map((section, si) => (
-            <div key={si} style={{ marginBottom: '0.25rem' }}>
-              {section.section && (
-                <div style={{
-                  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.1em',
-                  textTransform: 'uppercase', color: 'rgb(70,82,100)',
-                  padding: '0.5rem 0.75rem 0.375rem',
-                  marginTop: si > 0 ? '0.5rem' : 0,
-                }}>
-                  {section.section}
-                </div>
-              )}
-              {section.items.map((item) => (
-                <NavItem
-                  key={item.href}
-                  href={item.href}
-                  label={item.label}
-                  iconKey={item.key}
-                  exact={item.exact}
-                />
-              ))}
+        {/* Company selector */}
+        <div style={{ padding: '0.625rem 0.875rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '0.5rem',
+            padding: '0.5rem 0.625rem', borderRadius: '8px',
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.07)', cursor: 'pointer',
+          }}>
+            <div style={{
+              width: '24px', height: '24px', borderRadius: '6px', flexShrink: 0,
+              background: 'linear-gradient(135deg, rgb(77,163,255,0.3), rgba(116,100,255,0.3))',
+              border: '1px solid rgba(77,163,255,0.2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '0.6rem', fontWeight: 800, color: 'rgb(77,163,255)',
+            }}>
+              {initials.charAt(0)}
             </div>
-          ))}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: '0.55rem', color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Empresa</div>
+              <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'rgb(200,210,225)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{company}</div>
+            </div>
+            <span style={{ color: 'rgb(80,92,110)', flexShrink: 0 }}>
+              <Icon d={ICONS.chevronDown} size={12} />
+            </span>
+          </div>
+        </div>
+
+        {/* Nav */}
+        <nav style={{ flex: 1, padding: '0.5rem 0.625rem', overflowY: 'auto', overflowX: 'hidden' }}>
+          {NAV_ITEMS.map((item, i) => {
+            if ('divider' in item) {
+              return (
+                <div key={i} style={{
+                  fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.1em',
+                  textTransform: 'uppercase', color: 'rgb(60,72,90)',
+                  padding: '0.75rem 0.625rem 0.25rem',
+                }}>
+                  {item.divider}
+                </div>
+              );
+            }
+            return (
+              <NavItem
+                key={`${item.href}-${item.label}`}
+                href={item.href}
+                label={item.label}
+                iconKey={item.icon}
+                exact={item.exact}
+                badge={item.badgeKey ? badges[item.badgeKey] : undefined}
+              />
+            );
+          })}
         </nav>
 
-        {/* User card */}
-        <div style={{
-          margin: '0 0.75rem 0.75rem',
-          padding: '0.875rem',
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.06)',
-          borderRadius: '14px',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem' }}>
-            {/* Avatar */}
+        {/* Bottom section */}
+        <div style={{ padding: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          {/* Plan info */}
+          <div style={{ marginBottom: '0.625rem', padding: '0 0.125rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+              <div>
+                <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Plano Empresarial</div>
+                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(99,230,190)' }}>Enterprise</div>
+              </div>
+              <span style={{ fontSize: '0.65rem', color: 'rgb(120,130,150)' }}>Utilização</span>
+            </div>
+            <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${usagePct}%` }}
+                transition={{ duration: 1.2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                style={{ height: '100%', borderRadius: '9999px', background: 'linear-gradient(90deg, rgb(77,163,255), rgb(99,230,190))' }}
+              />
+            </div>
+            <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginTop: '0.2rem', textAlign: 'right' }}>{usagePct}%</div>
+          </div>
+
+          {/* User */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '0.5rem',
+            padding: '0.5rem 0.5rem',
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.06)',
+            borderRadius: '10px',
+          }}>
             <div style={{
-              width: '34px', height: '34px', borderRadius: '10px', flexShrink: 0,
+              width: '30px', height: '30px', borderRadius: '8px', flexShrink: 0,
               background: 'linear-gradient(135deg, rgb(77,163,255), rgb(116,231,255))',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.75rem', fontWeight: 800, color: 'rgb(7,17,31)',
-              boxShadow: '0 0 10px rgba(77,163,255,0.3)',
+              fontSize: '0.7rem', fontWeight: 800, color: 'rgb(7,17,31)',
+              boxShadow: '0 0 8px rgba(77,163,255,0.25)',
             }}>
               {initials}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'rgb(230,237,245)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {displayName}
+              <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'rgb(220,230,245)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {displayEmail}
               </div>
-              {companyName && (
-                <div style={{ fontSize: '0.68rem', color: 'rgb(100,112,130)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {companyName}
-                </div>
-              )}
+              <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)' }}>Administrador</div>
             </div>
-            {tier && (
-              <span style={{
-                fontSize: '0.55rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase',
-                color: tc.color, background: tc.bg, border: `1px solid ${tc.border}`,
-                borderRadius: '6px', padding: '0.2rem 0.4rem', flexShrink: 0,
-              }}>
-                {tc.label}
-              </span>
-            )}
           </div>
 
           {/* Logout */}
@@ -284,58 +331,56 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
             onClick={handleLogout}
             disabled={loggingOut}
             style={{
-              display: 'flex', alignItems: 'center', gap: '0.5rem',
-              width: '100%', background: 'none', border: 'none', cursor: 'pointer',
-              fontSize: '0.78rem', color: 'rgb(90,100,118)', padding: '0.375rem 0',
-              transition: 'color 150ms',
+              display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center',
+              width: '100%', marginTop: '0.5rem',
+              background: 'none', border: 'none', cursor: 'pointer',
+              fontSize: '0.72rem', color: 'rgb(70,82,100)', padding: '0.3rem',
+              transition: 'color 150ms', borderRadius: '6px',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = 'rgb(239,68,68)')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = loggingOut ? 'rgb(239,68,68)' : 'rgb(90,100,118)')}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgb(239,68,68)'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = loggingOut ? 'rgb(239,68,68)' : 'rgb(70,82,100)'; }}
           >
             {loggingOut ? (
-              <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <svg className="animate-spin" width="12" height="12" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.25" />
                 <path d="M12 2a10 10 0 019.6 7.3" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
               </svg>
             ) : (
-              <Icon d={icons.logout} size={14} />
+              <Icon d={ICONS.logout} size={12} />
             )}
             {loggingOut ? 'A sair...' : 'Terminar sessão'}
           </button>
         </div>
       </aside>
 
-      {/* ════════════════════════════════════════════
-          MOBILE TOP BAR
-      ════════════════════════════════════════════ */}
-      <div
-        className="flex md:hidden"
-        style={{
-          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, height: '52px',
-          background: 'rgba(9,19,35,0.95)', backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-          alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem',
-        }}
-      >
+      {/* ════ MOBILE TOP BAR ════ */}
+      <div className="flex md:hidden" style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, height: '52px',
+        background: 'rgba(8,15,28,0.95)', backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem',
+      }}>
         <span style={{ fontSize: '1rem', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.02em' }}>
           your<span style={{ color: 'rgb(77,163,255)' }}>gift</span>
         </span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          {allNavItems.map((item) => {
+        <div style={{ display: 'flex', gap: '0.25rem' }}>
+          {flatItems.slice(0, 5).map((item) => {
             const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
-            const d = icons[item.key as keyof typeof icons];
             return (
-              <Link key={item.href} href={item.href} style={{ padding: '0.375rem', borderRadius: '8px', color: isActive ? 'rgb(77,163,255)' : 'rgb(100,112,130)', background: isActive ? 'rgba(77,163,255,0.1)' : 'transparent', display: 'flex', alignItems: 'center' }}>
-                <Icon d={d} />
+              <Link key={item.href + item.label} href={item.href} style={{
+                padding: '0.375rem', borderRadius: '8px',
+                color: isActive ? 'rgb(77,163,255)' : 'rgb(100,112,130)',
+                background: isActive ? 'rgba(77,163,255,0.1)' : 'transparent',
+                display: 'flex', alignItems: 'center',
+              }}>
+                <Icon d={ICONS[item.icon as keyof typeof ICONS]} size={18} />
               </Link>
             );
           })}
         </div>
       </div>
 
-      {/* ════════════════════════════════════════════
-          MAIN CONTENT
-      ════════════════════════════════════════════ */}
+      {/* ════ MAIN CONTENT ════ */}
       <main style={{ flex: 1, minWidth: 0 }} className="pt-[52px] md:pt-0">
         {children}
       </main>
