@@ -15,6 +15,16 @@ const REASON_MESSAGES: Record<string, string> = {
     'The authentication link is incomplete. Please request a new one.',
   access_denied:
     'Access was denied. If this was a mistake, please try signing in again.',
+  server_error:
+    'An error occurred with the sign-in provider. Please try again.',
+  no_user:
+    'Sign-in succeeded but we could not load your account. Please try again.',
+  missing_token:
+    'The magic link is incomplete or has expired. Please request a new one.',
+  link_expired:
+    'This link has expired. Please request a new magic link.',
+  no_code:
+    'The authentication link is incomplete. Please try signing in again.',
 };
 
 function RecoverContent() {
