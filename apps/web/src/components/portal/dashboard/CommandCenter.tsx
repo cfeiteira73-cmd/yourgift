@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRef, useEffect, useState, useMemo } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -22,6 +22,23 @@ interface RecentOrder {
   order_items: OrderItem[];
 }
 
+export interface SupplierScore {
+  supplier_name: string;
+  overall_score: number;
+  quality_score?: number | null;
+  delivery_score?: number | null;
+  [key: string]: unknown;
+}
+
+export interface SlaDefinition {
+  stage: string;
+  display_name: string;
+  expected_hours: number;
+  warning_hours: number;
+  critical_hours: number;
+  color: string;
+}
+
 export interface CommandCenterProps {
   userName?: string;
   companyName?: string;
@@ -33,6 +50,13 @@ export interface CommandCenterProps {
   orders: RecentOrder[];
   pipeline: Record<string, number>;
   dailyRevenue: number[];
+  // ── Operational intelligence — real DB data ──────────────────────────────
+  inventoryAlerts?: { critical: number; lowStock: number; total: number };
+  supplierScores?: SupplierScore[];
+  slaDefinitions?: SlaDefinition[];
+  totalClients?: number;
+  premiumClients?: number;
+  allTimeRevenue?: number;
 }
 
 // ── useCountUp ────────────────────────────────────────────────────────────────
@@ -91,10 +115,7 @@ function Sparkline({ data, color, width = 80, height = 28 }: { data: number[]; c
 // ── Donut Chart ───────────────────────────────────────────────────────────────
 
 function DonutChart({ segments, total }: { segments: { label: string; value: number; color: string }[]; total: number }) {
-  const r = 44;
-  const cx = 56;
-  const cy = 56;
-  const stroke = 13;
+  const r = 44; const cx = 56; const cy = 56; const stroke = 13;
   const circumference = 2 * Math.PI * r;
   let acc = 0;
   return (
@@ -168,6 +189,22 @@ function PerformanceChart({ series, labels }: { series: { label: string; data: n
   );
 }
 
+// ── Supplier Score Bar ────────────────────────────────────────────────────────
+
+function ScoreBar({ score, color }: { score: number; color: string }) {
+  const pct = Math.min(Math.max(score, 0), 100);
+  return (
+    <div style={{ height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', overflow: 'hidden', width: '100%' }}>
+      <motion.div
+        initial={{ width: 0 }}
+        animate={{ width: `${pct}%` }}
+        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        style={{ height: '100%', background: color, borderRadius: '9999px' }}
+      />
+    </div>
+  );
+}
+
 // ── Status pill ───────────────────────────────────────────────────────────────
 
 const STATUS_CFG: Record<string, { label: string; color: string; bg: string }> = {
@@ -193,7 +230,7 @@ function StatusPill({ status }: { status: string }) {
   );
 }
 
-// ── Mock data ─────────────────────────────────────────────────────────────────
+// ── Static mock data ───────────────────────────────────────────────────────────
 
 const NOTIFS = [
   { icon: '📦', title: 'Nova encomenda recebida', sub: '#YG-2024-1025', time: '2 min atrás', dot: 'rgb(77,163,255)' },
@@ -210,39 +247,57 @@ const TOP_PRODUCTS = [
   { rank: 5, name: 'Hoodie Personalizado',    units: 150, revenue: '€3.750', color: 'rgb(116,231,255)' },
 ];
 const MOCKUPS = [
-  { client: 'TechSolutions - T-shirt',  time: 'Criada há 2 horas', ok: true  },
-  { client: 'DesignStudio - Caneca',    time: 'Criada há 4 horas', ok: false },
-  { client: 'MarketingBoost - Tote Bag',time: 'Criada há 6 horas', ok: true  },
-  { client: 'StartuoHub - Hoodie',      time: 'Criada há 1 dia',   ok: true  },
-];
-const AI_ITEMS = [
-  { icon: '🎨', title: 'Verificação de Artes',     desc: 'Todas as artes aprovadas',          ok: true  },
-  { icon: '⚡', title: 'Otimização de Produção',   desc: '3 sugestões de otimização',         ok: false },
-  { icon: '📅', title: 'Previsão de Entregas',     desc: '98% das entregas no prazo',         ok: false },
-  { icon: '🖨️', title: 'Qualidade de Impressão',  desc: 'Índice de qualidade: 98,5%',        ok: false },
+  { client: 'TechSolutions - T-shirt',   time: 'Criada há 2 horas', ok: true  },
+  { client: 'DesignStudio - Caneca',     time: 'Criada há 4 horas', ok: false },
+  { client: 'MarketingBoost - Tote Bag', time: 'Criada há 6 horas', ok: true  },
+  { client: 'StartuoHub - Hoodie',       time: 'Criada há 1 dia',   ok: true  },
 ];
 const QUICK_ACTIONS = [
-  { icon: '📦', label: 'Nova Encomenda',       href: '/quotes/new' },
-  { icon: '🖼️', label: 'Upload de Logótipo',  href: '/assets'     },
-  { icon: '🎨', label: 'Criar Maquete',        href: '/assets'     },
-  { icon: '💬', label: 'Orçamento Rápido',     href: '/quotes'     },
-  { icon: '📊', label: 'Relatório de Produção',href: '/reports'    },
-  { icon: '🧾', label: 'Fatura Rápida',        href: '/billing'    },
+  { icon: '📦', label: 'Nova Encomenda',        href: '/quotes/new' },
+  { icon: '🖼️', label: 'Upload de Logótipo',   href: '/assets'     },
+  { icon: '🎨', label: 'Criar Maquete',         href: '/assets'     },
+  { icon: '💬', label: 'Orçamento Rápido',      href: '/quotes'     },
+  { icon: '📊', label: 'Relatório de Produção', href: '/reports'    },
+  { icon: '🧾', label: 'Fatura Rápida',         href: '/billing'    },
 ];
 const FEATURES = [
-  { icon: '💎', label: 'Qualidade Premium',    desc: 'Materiais de alta qualidade e impressão profissional' },
-  { icon: '⚡', label: 'Entregas Rápidas',     desc: '99% das encomendas entregues no prazo' },
-  { icon: '🌿', label: 'Sustentabilidade',     desc: 'Produtos ecológicos e processos sustentáveis' },
-  { icon: '🎧', label: 'Suporte Dedicado',     desc: 'Equipa especializada sempre disponível' },
-  { icon: '🤖', label: 'Tecnologia Avançada',  desc: 'IA e automação para melhores resultados' },
-  { icon: '🛡️', label: 'Garantia Total',      desc: '100% de satisfação garantida' },
+  { icon: '💎', label: 'Qualidade Premium',  desc: 'Materiais de alta qualidade e impressão profissional' },
+  { icon: '⚡', label: 'Entregas Rápidas',   desc: '99% das encomendas entregues no prazo' },
+  { icon: '🌿', label: 'Sustentabilidade',   desc: 'Produtos ecológicos e processos sustentáveis' },
+  { icon: '🎧', label: 'Suporte Dedicado',   desc: 'Equipa especializada sempre disponível' },
+  { icon: '🤖', label: 'Tecnologia Avançada',desc: 'IA e automação para melhores resultados' },
+  { icon: '🛡️', label: 'Garantia Total',    desc: '100% de satisfação garantida' },
 ];
 const PERF_LABELS = ['1 Mai','3','5','8','10','12','15','17','19','22','24','26','29 Mai'];
 const PERF_SERIES = [
-  { label: 'Qualidade',      data: [96,97,98,97,99,98,98,99,99,98,99,98,99], color: 'rgb(99,230,190)'   },
-  { label: 'Pontualidade',   data: [92,94,95,93,96,95,97,96,96,95,97,96,96], color: 'rgb(77,163,255)'   },
-  { label: 'Produtividade',  data: [88,90,93,91,94,92,95,94,94,93,95,94,94], color: 'rgb(167,139,250)'  },
+  { label: 'Qualidade',     data: [96,97,98,97,99,98,98,99,99,98,99,98,99], color: 'rgb(99,230,190)'  },
+  { label: 'Pontualidade',  data: [92,94,95,93,96,95,97,96,96,95,97,96,96], color: 'rgb(77,163,255)'  },
+  { label: 'Produtividade', data: [88,90,93,91,94,92,95,94,94,93,95,94,94], color: 'rgb(167,139,250)' },
 ];
+
+// ── Supplier score color helper ────────────────────────────────────────────────
+
+function scoreColor(s: number): string {
+  if (s >= 85) return 'rgb(99,230,190)';
+  if (s >= 70) return 'rgb(77,163,255)';
+  if (s >= 55) return 'rgb(245,158,11)';
+  return 'rgb(239,68,68)';
+}
+
+// ── SLA color helper ──────────────────────────────────────────────────────────
+
+function slaStatusColor(dbColor: string): string {
+  // Database colors from sla_definitions.color — normalize to our palette
+  const c = (dbColor ?? '').toLowerCase();
+  if (c.includes('green') || c === '#10b981' || c === '#22c55e') return 'rgb(99,230,190)';
+  if (c.includes('blue')  || c === '#3b82f6' || c === '#60a5fa') return 'rgb(77,163,255)';
+  if (c.includes('yellow')|| c === '#f59e0b' || c === '#eab308') return 'rgb(245,158,11)';
+  if (c.includes('red')   || c === '#ef4444' || c === '#dc2626') return 'rgb(239,68,68)';
+  if (c.includes('purple')|| c === '#8b5cf6') return 'rgb(167,139,250)';
+  if (c.includes('cyan')  || c === '#06b6d4') return 'rgb(116,231,255)';
+  // Fallback: try to use the color directly if it's an RGB/hex value
+  return dbColor.startsWith('#') || dbColor.startsWith('rgb') ? dbColor : 'rgb(77,163,255)';
+}
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
@@ -250,22 +305,28 @@ export function CommandCenter({
   userName, companyName, tier,
   totalThisMonth, activeOrders, pendingQuotes,
   budgetDisplay, orders, pipeline, dailyRevenue,
+  inventoryAlerts, supplierScores, slaDefinitions,
+  totalClients, premiumClients, allTimeRevenue,
 }: CommandCenterProps) {
 
-  const animRevenue  = useCountUp(totalThisMonth, 1400, 200);
-  const animOrders   = useCountUp(orders.length,  1000, 300);
-  const animActive   = useCountUp(activeOrders,    900,  400);
-  const animDelivered = useCountUp(
-    Object.entries(pipeline).filter(([k]) => k === 'delivered').reduce((s, [,v]) => s + v, 0) + 120,
-    900, 450
+  const animRevenue     = useCountUp(totalThisMonth,      1400, 200);
+  const animOrders      = useCountUp(orders.length,       1000, 300);
+  const animActive      = useCountUp(activeOrders,         900, 400);
+  const animDelivered   = useCountUp(
+    Object.entries(pipeline).filter(([k]) => k === 'delivered').reduce((s, [, v]) => s + v, 0) + 120,
+    900, 450,
   );
+  const animGlobalRev   = useCountUp(allTimeRevenue ?? 0, 1600, 250);
+  const animTotalClients= useCountUp(totalClients ?? 0,    900, 350);
+
+  const fmt = (n: number) => new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n);
 
   const kpis = [
-    { label: 'Receita (Mês)', value: new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(animRevenue), trend: '+18,2% vs mês anterior', color: 'rgb(77,163,255)',   icon: '📈', data: dailyRevenue },
-    { label: 'Encomendas (Mês)', value: String(Math.round(animOrders)), trend: '+12,5% vs mês anterior', color: 'rgb(116,231,255)', icon: '📦', data: dailyRevenue.map((_,i)=>i*3+100) },
-    { label: 'Produção Ativa', value: String(Math.round(animActive)), trend: 'Em produção', color: 'rgb(99,230,190)', icon: '🏭', data: null },
-    { label: 'Entregas (Mês)', value: String(Math.round(animDelivered)), trend: '+22% vs mês anterior', color: 'rgb(167,243,208)', icon: '🚚', data: dailyRevenue.map(v => v * 0.8) },
-    { label: 'Margem Média', value: '38,5%', trend: '+15,3% vs mês anterior', color: 'rgb(167,139,250)', icon: '📊', data: null },
+    { label: 'Receita (Mês)',      value: fmt(animRevenue),             trend: '+18,2% vs mês anterior',  color: 'rgb(77,163,255)',   icon: '📈', data: dailyRevenue },
+    { label: 'Encomendas (Mês)',   value: String(Math.round(animOrders)), trend: '+12,5% vs mês anterior', color: 'rgb(116,231,255)', icon: '📦', data: dailyRevenue.map((_, i) => i * 3 + 100) },
+    { label: 'Produção Ativa',     value: String(Math.round(animActive)), trend: 'Em produção agora',       color: 'rgb(99,230,190)',   icon: '🏭', data: null },
+    { label: 'Entregas (Mês)',     value: String(Math.round(animDelivered)), trend: '+22% vs mês anterior', color: 'rgb(167,243,208)', icon: '🚚', data: dailyRevenue.map(v => v * 0.8) },
+    { label: 'Receita Global',     value: fmt(animGlobalRev),           trend: 'Todas as transacções',     color: 'rgb(167,139,250)',  icon: '💰', data: null },
   ];
 
   const pipeSegs = [
@@ -283,6 +344,24 @@ export function CommandCenter({
     { id:'4', ref:'#YG-2024-1021', status:'delivered', total_amount:450,  created_at:'', order_items:[{id:'d',quantity:50, unit_price:9,  products:{title:'Startup Hub',images:[]}}] },
     { id:'5', ref:'#YG-2024-1020', status:'shipped',   total_amount:1020, created_at:'', order_items:[{id:'e',quantity:200,unit_price:5.1,products:{title:'Eventos Premium',images:[]}}] },
   ] as RecentOrder[]);
+
+  // Real SLA stages or fallback
+  const slaItems = slaDefinitions && slaDefinitions.length > 0
+    ? slaDefinitions.slice(0, 5).map(s => ({
+        icon: '⏱️',
+        title: s.display_name,
+        desc: `SLA: ${s.expected_hours}h · Alerta: ${s.warning_hours}h`,
+        color: slaStatusColor(s.color),
+        ok: true,
+      }))
+    : [
+        { icon: '🎨', title: 'Verificação de Artes',    desc: 'Todas as artes aprovadas',  color: 'rgb(99,230,190)',  ok: true  },
+        { icon: '⚡', title: 'Otimização de Produção',  desc: '3 sugestões de otimização', color: 'rgb(77,163,255)',  ok: false },
+        { icon: '📅', title: 'Previsão de Entregas',    desc: '98% das entregas no prazo', color: 'rgb(77,163,255)',  ok: false },
+        { icon: '🖨️', title: 'Qualidade de Impressão', desc: 'Índice de qualidade: 98,5%',color: 'rgb(77,163,255)',  ok: false },
+      ];
+
+  const hasInventoryAlert = (inventoryAlerts?.total ?? 0) > 0;
 
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'rgb(7,17,31)' }}>
@@ -361,11 +440,59 @@ export function CommandCenter({
 
         <div style={{ padding: '1rem 1.25rem' }}>
 
-          {/* KPI strip */}
+          {/* ── Inventory Alert Banner ── */}
+          <AnimatePresence>
+            {hasInventoryAlert && (
+              <motion.div
+                initial={{ opacity: 0, y: -8, height: 0 }}
+                animate={{ opacity: 1, y: 0, height: 'auto' }}
+                exit={{ opacity: 0, y: -8, height: 0 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                style={{ marginBottom: '0.75rem' }}
+              >
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: '0.75rem',
+                  padding: '0.625rem 1rem',
+                  background: 'rgba(239,68,68,0.08)',
+                  border: '1px solid rgba(239,68,68,0.25)',
+                  borderRadius: '10px',
+                }}>
+                  <span style={{ fontSize: '1rem', flexShrink: 0 }}>🚨</span>
+                  <div style={{ flex: 1 }}>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(252,165,165)' }}>
+                      Alertas de Inventário Ativos&nbsp;—&nbsp;
+                    </span>
+                    {(inventoryAlerts?.critical ?? 0) > 0 && (
+                      <span style={{ fontSize: '0.68rem', color: 'rgb(239,68,68)', fontWeight: 700, marginRight: '0.75rem' }}>
+                        {inventoryAlerts!.critical} produto{inventoryAlerts!.critical !== 1 ? 's' : ''} em rutura
+                      </span>
+                    )}
+                    {(inventoryAlerts?.lowStock ?? 0) > 0 && (
+                      <span style={{ fontSize: '0.68rem', color: 'rgb(245,158,11)', fontWeight: 600 }}>
+                        {inventoryAlerts!.lowStock} stock{inventoryAlerts!.lowStock !== 1 ? 's' : ''} baixo
+                      </span>
+                    )}
+                  </div>
+                  <Link href="/suppliers" style={{
+                    fontSize: '0.65rem', fontWeight: 700,
+                    color: 'rgb(252,165,165)',
+                    background: 'rgba(239,68,68,0.12)',
+                    border: '1px solid rgba(239,68,68,0.25)',
+                    borderRadius: '6px', padding: '0.25rem 0.625rem',
+                    textDecoration: 'none', whiteSpace: 'nowrap',
+                  }}>
+                    Gerir inventário →
+                  </Link>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ── KPI strip ── */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
             {kpis.map((kpi, i) => (
               <motion.div key={kpi.label} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.07, ease: [0.16,1,0.3,1] }}
+                transition={{ duration: 0.4, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
                 className="yg-card" style={{ padding: '0.75rem 0.875rem', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
                   <span style={{ fontSize: '0.6rem', fontWeight: 600, color: 'rgb(100,112,130)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{kpi.label}</span>
@@ -382,22 +509,102 @@ export function CommandCenter({
             ))}
           </div>
 
-          {/* Middle row: orders | pipeline | AI system */}
+          {/* ── Operational Intelligence: Client Portfolio + Inventory ── */}
+          {(totalClients != null || (inventoryAlerts?.total ?? 0) > 0) && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.18 }}
+              style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', marginBottom: '0.75rem' }}
+            >
+              {/* Total Clients */}
+              <div style={{
+                padding: '0.625rem 0.875rem', borderRadius: '10px',
+                background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.05)',
+                display: 'flex', alignItems: 'center', gap: '0.625rem',
+              }}>
+                <span style={{ fontSize: '1.2rem' }}>👥</span>
+                <div>
+                  <div style={{ fontSize: '1rem', fontWeight: 800, color: 'rgb(77,163,255)', letterSpacing: '-0.03em', lineHeight: 1 }}>
+                    {Math.round(animTotalClients)}
+                  </div>
+                  <div style={{ fontSize: '0.58rem', color: 'rgb(90,102,120)', marginTop: '0.1rem' }}>Clientes Ativos</div>
+                </div>
+              </div>
+
+              {/* Premium Clients */}
+              <div style={{
+                padding: '0.625rem 0.875rem', borderRadius: '10px',
+                background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.05)',
+                display: 'flex', alignItems: 'center', gap: '0.625rem',
+              }}>
+                <span style={{ fontSize: '1.2rem' }}>💎</span>
+                <div>
+                  <div style={{ fontSize: '1rem', fontWeight: 800, color: 'rgb(167,139,250)', letterSpacing: '-0.03em', lineHeight: 1 }}>
+                    {premiumClients ?? 0}
+                  </div>
+                  <div style={{ fontSize: '0.58rem', color: 'rgb(90,102,120)', marginTop: '0.1rem' }}>Premium / Enterprise</div>
+                </div>
+              </div>
+
+              {/* Inventory critical */}
+              <div style={{
+                padding: '0.625rem 0.875rem', borderRadius: '10px',
+                background: (inventoryAlerts?.critical ?? 0) > 0
+                  ? 'rgba(239,68,68,0.06)' : 'rgba(255,255,255,0.025)',
+                border: `1px solid ${(inventoryAlerts?.critical ?? 0) > 0 ? 'rgba(239,68,68,0.18)' : 'rgba(255,255,255,0.05)'}`,
+                display: 'flex', alignItems: 'center', gap: '0.625rem',
+              }}>
+                <span style={{ fontSize: '1.2rem' }}>📦</span>
+                <div>
+                  <div style={{
+                    fontSize: '1rem', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1,
+                    color: (inventoryAlerts?.critical ?? 0) > 0 ? 'rgb(239,68,68)' : 'rgb(99,230,190)',
+                  }}>
+                    {inventoryAlerts?.critical ?? 0}
+                  </div>
+                  <div style={{ fontSize: '0.58rem', color: 'rgb(90,102,120)', marginTop: '0.1rem' }}>Ruturas de Stock</div>
+                </div>
+              </div>
+
+              {/* Low stock */}
+              <div style={{
+                padding: '0.625rem 0.875rem', borderRadius: '10px',
+                background: (inventoryAlerts?.lowStock ?? 0) > 0
+                  ? 'rgba(245,158,11,0.06)' : 'rgba(255,255,255,0.025)',
+                border: `1px solid ${(inventoryAlerts?.lowStock ?? 0) > 0 ? 'rgba(245,158,11,0.18)' : 'rgba(255,255,255,0.05)'}`,
+                display: 'flex', alignItems: 'center', gap: '0.625rem',
+              }}>
+                <span style={{ fontSize: '1.2rem' }}>⚠️</span>
+                <div>
+                  <div style={{
+                    fontSize: '1rem', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1,
+                    color: (inventoryAlerts?.lowStock ?? 0) > 0 ? 'rgb(245,158,11)' : 'rgb(99,230,190)',
+                  }}>
+                    {inventoryAlerts?.lowStock ?? 0}
+                  </div>
+                  <div style={{ fontSize: '0.58rem', color: 'rgb(90,102,120)', marginTop: '0.1rem' }}>Stock Baixo</div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── Middle row: orders | pipeline | SLA / AI system ── */}
           <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1.1fr', gap: '0.625rem', marginBottom: '0.625rem' }}>
 
             {/* Encomendas recentes */}
-            <motion.div initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }}
-              transition={{ duration:0.5, delay:0.25, ease:[0.16,1,0.3,1] }}
+            <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
               className="yg-card" style={{ padding: '0.875rem 1rem' }}>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'0.75rem' }}>
-                <h3 style={{ fontSize:'0.82rem', fontWeight:700, color:'rgb(245,247,251)' }}>Encomendas Recentes</h3>
-                <Link href="/orders" style={{ fontSize:'0.65rem', color:'rgb(77,163,255)', textDecoration:'none', fontWeight:600 }}>Ver todas →</Link>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Encomendas Recentes</h3>
+                <Link href="/orders" style={{ fontSize: '0.65rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}>Ver todas →</Link>
               </div>
               {displayOrders.map((order, i) => {
                 const clientName = order.order_items?.[0]?.products?.title ?? '—';
                 const qty = order.order_items?.reduce((s, it) => s + it.quantity, 0) ?? 0;
                 return (
-                  <motion.div key={order.id} initial={{ opacity:0, x:-8 }} animate={{ opacity:1, x:0 }}
+                  <motion.div key={order.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 + i * 0.06 }}
                     style={{
                       display: 'grid', gridTemplateColumns: '88px 1fr 44px 68px 82px',
@@ -405,10 +612,10 @@ export function CommandCenter({
                       padding: '0.4rem 0',
                       borderBottom: i < displayOrders.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
                     }}>
-                    <span style={{ fontSize:'0.67rem', fontFamily:'monospace', fontWeight:700, color:'rgb(200,210,225)' }}>{order.ref}</span>
-                    <span style={{ fontSize:'0.67rem', color:'rgb(110,122,140)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{clientName}</span>
-                    <span style={{ fontSize:'0.67rem', color:'rgb(90,102,120)' }}>{qty} Un.</span>
-                    <span style={{ fontSize:'0.68rem', fontWeight:700, color:'rgb(99,230,190)' }}>
+                    <span style={{ fontSize: '0.67rem', fontFamily: 'monospace', fontWeight: 700, color: 'rgb(200,210,225)' }}>{order.ref}</span>
+                    <span style={{ fontSize: '0.67rem', color: 'rgb(110,122,140)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{clientName}</span>
+                    <span style={{ fontSize: '0.67rem', color: 'rgb(90,102,120)' }}>{qty} Un.</span>
+                    <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgb(99,230,190)' }}>
                       {order.total_amount ? `€${order.total_amount.toFixed(2).replace('.', ',')}` : '—'}
                     </span>
                     <StatusPill status={order.status} />
@@ -418,133 +625,195 @@ export function CommandCenter({
             </motion.div>
 
             {/* Produção Pipeline */}
-            <motion.div initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }}
-              transition={{ duration:0.5, delay:0.3, ease:[0.16,1,0.3,1] }}
+            <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
               className="yg-card" style={{ padding: '0.875rem 1rem' }}>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'0.75rem' }}>
-                <h3 style={{ fontSize:'0.82rem', fontWeight:700, color:'rgb(245,247,251)' }}>Produção — Pipeline</h3>
-                <Link href="/production" style={{ fontSize:'0.65rem', color:'rgb(77,163,255)', textDecoration:'none', fontWeight:600 }}>Ver pipeline →</Link>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Produção — Pipeline</h3>
+                <Link href="/production" style={{ fontSize: '0.65rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}>Ver pipeline →</Link>
               </div>
-              <div style={{ display:'flex', justifyContent:'center', marginBottom:'0.75rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.75rem' }}>
                 <DonutChart segments={pipeSegs} total={pipeTotal} />
               </div>
-              <div style={{ display:'flex', flexDirection:'column', gap:'0.3rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                 {pipeSegs.map((seg) => {
                   const pct = pipeTotal > 0 ? Math.round((seg.value / pipeTotal) * 100) : 0;
                   return (
-                    <div key={seg.label} style={{ display:'flex', alignItems:'center', gap:'0.4rem' }}>
-                      <div style={{ width:'7px', height:'7px', borderRadius:'50%', background:seg.color, flexShrink:0 }} />
-                      <span style={{ fontSize:'0.63rem', color:'rgb(130,142,160)', flex:1 }}>{seg.label}</span>
-                      <span style={{ fontSize:'0.63rem', fontWeight:700, color:seg.color }}>{pct}%</span>
+                    <div key={seg.label} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: seg.color, flexShrink: 0 }} />
+                      <span style={{ fontSize: '0.63rem', color: 'rgb(130,142,160)', flex: 1 }}>{seg.label}</span>
+                      <span style={{ fontSize: '0.63rem', fontWeight: 700, color: seg.color }}>{pct}%</span>
                     </div>
                   );
                 })}
               </div>
             </motion.div>
 
-            {/* AI sistema */}
-            <motion.div initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }}
-              transition={{ duration:0.5, delay:0.35, ease:[0.16,1,0.3,1] }}
+            {/* SLA Monitor (real data) / AI Sistema (fallback) */}
+            <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
               className="yg-card" style={{ padding: '0.875rem 1rem' }}>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'0.75rem' }}>
-                <h3 style={{ fontSize:'0.78rem', fontWeight:700, color:'rgb(245,247,251)', lineHeight:1.3 }}>Sistema de Produção Inteligente</h3>
-                <span style={{ fontSize:'0.55rem', fontWeight:700, color:'rgb(99,230,190)', background:'rgba(99,230,190,0.1)', border:'1px solid rgba(99,230,190,0.2)', borderRadius:'9999px', padding:'0.12rem 0.45rem', flexShrink:0, marginLeft:'0.375rem' }}>
-                  IA Ativa
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(245,247,251)', lineHeight: 1.3 }}>
+                  {slaDefinitions && slaDefinitions.length > 0 ? 'Monitor SLA — Produção' : 'Sistema de Produção Inteligente'}
+                </h3>
+                <span style={{
+                  fontSize: '0.55rem', fontWeight: 700,
+                  color: slaDefinitions && slaDefinitions.length > 0 ? 'rgb(116,231,255)' : 'rgb(99,230,190)',
+                  background: slaDefinitions && slaDefinitions.length > 0 ? 'rgba(116,231,255,0.1)' : 'rgba(99,230,190,0.1)',
+                  border: `1px solid ${slaDefinitions && slaDefinitions.length > 0 ? 'rgba(116,231,255,0.2)' : 'rgba(99,230,190,0.2)'}`,
+                  borderRadius: '9999px', padding: '0.12rem 0.45rem', flexShrink: 0, marginLeft: '0.375rem',
+                }}>
+                  {slaDefinitions && slaDefinitions.length > 0 ? `${slaDefinitions.length} Estágios` : 'IA Ativa'}
                 </span>
               </div>
-              {AI_ITEMS.map((item, i) => (
-                <div key={i} style={{ display:'flex', alignItems:'flex-start', gap:'0.5rem', padding:'0.4rem 0', borderBottom: i < AI_ITEMS.length-1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
+              {slaItems.map((item, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', padding: '0.4rem 0', borderBottom: i < slaItems.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
                   <div style={{
-                    width:'28px', height:'28px', borderRadius:'8px', flexShrink:0,
-                    background: item.ok ? 'rgba(99,230,190,0.1)' : 'rgba(77,163,255,0.08)',
-                    border: `1px solid ${item.ok ? 'rgba(99,230,190,0.2)' : 'rgba(77,163,255,0.12)'}`,
-                    display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.75rem',
+                    width: '28px', height: '28px', borderRadius: '8px', flexShrink: 0,
+                    background: `${item.color}18`,
+                    border: `1px solid ${item.color}30`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem',
                   }}>{item.icon}</div>
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:'0.7rem', fontWeight:600, color:'rgb(200,215,235)', lineHeight:1.3 }}>{item.title}</div>
-                    <div style={{ fontSize:'0.6rem', color:'rgb(80,92,110)', marginTop:'0.1rem' }}>{item.desc}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'rgb(200,215,235)', lineHeight: 1.3 }}>{item.title}</div>
+                    <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginTop: '0.1rem' }}>{item.desc}</div>
                   </div>
-                  {item.ok
-                    ? <span style={{ fontSize:'0.75rem', color:'rgb(99,230,190)', flexShrink:0 }}>✓</span>
-                    : <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgb(70,82,100)" strokeWidth="2" style={{ flexShrink:0 }}><path d="M9 18l6-6-6-6"/></svg>
-                  }
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.color, flexShrink: 0, marginTop: '0.35rem', boxShadow: `0 0 6px ${item.color}60` }} />
                 </div>
               ))}
             </motion.div>
           </div>
 
-          {/* Bottom row: top products | perf chart | mockups */}
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1.5fr 1fr', gap:'0.625rem', marginBottom:'0.875rem' }}>
+          {/* ── Supplier Health row (real data) ── */}
+          {supplierScores && supplierScores.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.38, ease: [0.16, 1, 0.3, 1] }}
+              className="yg-card"
+              style={{ padding: '0.875rem 1rem', marginBottom: '0.625rem' }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.625rem' }}>
+                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>
+                  Saúde dos Fornecedores — Score Global
+                </h3>
+                <Link href="/suppliers" style={{ fontSize: '0.65rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}>
+                  Ver todos →
+                </Link>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(supplierScores.length, 6)}, 1fr)`, gap: '0.5rem' }}>
+                {supplierScores.slice(0, 6).map((s, i) => {
+                  const sc = Math.round(s.overall_score ?? 0);
+                  const col = scoreColor(sc);
+                  return (
+                    <motion.div
+                      key={s.supplier_name ?? i}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 + i * 0.05 }}
+                      style={{
+                        padding: '0.5rem 0.625rem', borderRadius: '9px',
+                        background: `${col}08`,
+                        border: `1px solid ${col}20`,
+                      }}
+                    >
+                      <div style={{ fontSize: '0.58rem', color: 'rgb(90,102,120)', marginBottom: '0.35rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {s.supplier_name ?? `Fornecedor ${i + 1}`}
+                      </div>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 800, color: col, letterSpacing: '-0.03em', lineHeight: 1, marginBottom: '0.35rem' }}>
+                        {sc}<span style={{ fontSize: '0.55rem', fontWeight: 500, color: 'rgb(80,92,110)' }}>/100</span>
+                      </div>
+                      <ScoreBar score={sc} color={col} />
+                      {(s.quality_score != null || s.delivery_score != null) && (
+                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.3rem' }}>
+                          {s.quality_score != null && (
+                            <span style={{ fontSize: '0.55rem', color: 'rgb(80,92,110)' }}>Q: <span style={{ color: scoreColor(s.quality_score) }}>{Math.round(s.quality_score)}</span></span>
+                          )}
+                          {s.delivery_score != null && (
+                            <span style={{ fontSize: '0.55rem', color: 'rgb(80,92,110)' }}>E: <span style={{ color: scoreColor(s.delivery_score) }}>{Math.round(s.delivery_score)}</span></span>
+                          )}
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── Bottom row: top products | perf chart | mockups ── */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr 1fr', gap: '0.625rem', marginBottom: '0.875rem' }}>
 
             {/* Top produtos */}
-            <motion.div initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }}
-              transition={{ duration:0.5, delay:0.4, ease:[0.16,1,0.3,1] }}
-              className="yg-card" style={{ padding:'0.875rem 1rem' }}>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'0.75rem' }}>
-                <h3 style={{ fontSize:'0.82rem', fontWeight:700, color:'rgb(245,247,251)' }}>Top Produtos (Mês)</h3>
-                <Link href="/products" style={{ fontSize:'0.65rem', color:'rgb(77,163,255)', textDecoration:'none', fontWeight:600 }}>Ver catálogo →</Link>
+            <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="yg-card" style={{ padding: '0.875rem 1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Top Produtos (Mês)</h3>
+                <Link href="/products" style={{ fontSize: '0.65rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}>Ver catálogo →</Link>
               </div>
-              <div style={{ display:'flex', flexDirection:'column', gap:'0.4rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 {TOP_PRODUCTS.map((p, i) => (
-                  <motion.div key={p.name} initial={{ opacity:0, x:-6 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.45+i*0.05 }}
-                    style={{ display:'flex', alignItems:'center', gap:'0.4rem' }}>
-                    <span style={{ fontSize:'0.6rem', fontWeight:800, color:p.color, width:'12px', textAlign:'center' }}>{p.rank}</span>
-                    <div style={{ width:'26px', height:'26px', borderRadius:'7px', background:`${p.color}15`, border:`1px solid ${p.color}25`, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.7rem' }}>🎁</div>
-                    <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontSize:'0.68rem', fontWeight:600, color:'rgb(200,210,225)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.name}</div>
-                      <div style={{ fontSize:'0.58rem', color:'rgb(80,92,110)' }}>{p.units} un.</div>
+                  <motion.div key={p.name} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.45 + i * 0.05 }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <span style={{ fontSize: '0.6rem', fontWeight: 800, color: p.color, width: '12px', textAlign: 'center' }}>{p.rank}</span>
+                    <div style={{ width: '26px', height: '26px', borderRadius: '7px', background: `${p.color}15`, border: `1px solid ${p.color}25`, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem' }}>🎁</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '0.68rem', fontWeight: 600, color: 'rgb(200,210,225)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                      <div style={{ fontSize: '0.58rem', color: 'rgb(80,92,110)' }}>{p.units} un.</div>
                     </div>
-                    <span style={{ fontSize:'0.68rem', fontWeight:700, color:p.color }}>{p.revenue}</span>
+                    <span style={{ fontSize: '0.68rem', fontWeight: 700, color: p.color }}>{p.revenue}</span>
                   </motion.div>
                 ))}
               </div>
             </motion.div>
 
             {/* Performance chart */}
-            <motion.div initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }}
-              transition={{ duration:0.5, delay:0.45, ease:[0.16,1,0.3,1] }}
-              className="yg-card" style={{ padding:'0.875rem 1rem' }}>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'0.75rem' }}>
-                <h3 style={{ fontSize:'0.82rem', fontWeight:700, color:'rgb(245,247,251)' }}>Performance de Produção</h3>
-                <Link href="/reports" style={{ fontSize:'0.65rem', color:'rgb(77,163,255)', textDecoration:'none', fontWeight:600 }}>Ver relatório →</Link>
+            <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className="yg-card" style={{ padding: '0.875rem 1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Performance de Produção</h3>
+                <Link href="/reports" style={{ fontSize: '0.65rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}>Ver relatório →</Link>
               </div>
-              <div style={{ paddingLeft:'20px' }}>
+              <div style={{ paddingLeft: '20px' }}>
                 <PerformanceChart series={PERF_SERIES} labels={PERF_LABELS} />
               </div>
-              <div style={{ display:'flex', gap:'1rem', marginTop:'0.5rem', justifyContent:'center' }}>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem', justifyContent: 'center' }}>
                 {PERF_SERIES.map((s) => (
-                  <div key={s.label} style={{ display:'flex', alignItems:'center', gap:'0.3rem' }}>
-                    <div style={{ width:'7px', height:'7px', borderRadius:'50%', background:s.color }} />
-                    <span style={{ fontSize:'0.58rem', color:'rgb(130,142,160)' }}>{s.label}</span>
-                    <span style={{ fontSize:'0.58rem', fontWeight:700, color:s.color }}>{s.data[s.data.length-1]}%</span>
+                  <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: s.color }} />
+                    <span style={{ fontSize: '0.58rem', color: 'rgb(130,142,160)' }}>{s.label}</span>
+                    <span style={{ fontSize: '0.58rem', fontWeight: 700, color: s.color }}>{s.data[s.data.length - 1]}%</span>
                   </div>
                 ))}
               </div>
             </motion.div>
 
             {/* Mockups */}
-            <motion.div initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }}
-              transition={{ duration:0.5, delay:0.5, ease:[0.16,1,0.3,1] }}
-              className="yg-card" style={{ padding:'0.875rem 1rem' }}>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'0.75rem' }}>
-                <h3 style={{ fontSize:'0.82rem', fontWeight:700, color:'rgb(245,247,251)' }}>Maquetes Recentes</h3>
-                <Link href="/assets" style={{ fontSize:'0.65rem', color:'rgb(77,163,255)', textDecoration:'none', fontWeight:600 }}>Ver todas →</Link>
+            <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="yg-card" style={{ padding: '0.875rem 1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Maquetes Recentes</h3>
+                <Link href="/assets" style={{ fontSize: '0.65rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}>Ver todas →</Link>
               </div>
-              <div style={{ display:'flex', flexDirection:'column', gap:'0.4rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 {MOCKUPS.map((m, i) => (
-                  <motion.div key={i} initial={{ opacity:0, x:-6 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.5+i*0.06 }}
-                    style={{ display:'flex', alignItems:'center', gap:'0.4rem' }}>
-                    <div style={{ width:'34px', height:'34px', borderRadius:'8px', flexShrink:0, background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.06)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.9rem' }}>🎨</div>
-                    <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontSize:'0.68rem', fontWeight:600, color:'rgb(200,210,225)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{m.client}</div>
-                      <div style={{ fontSize:'0.6rem', color:'rgb(80,92,110)' }}>{m.time}</div>
+                  <motion.div key={i} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 + i * 0.06 }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <div style={{ width: '34px', height: '34px', borderRadius: '8px', flexShrink: 0, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem' }}>🎨</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '0.68rem', fontWeight: 600, color: 'rgb(200,210,225)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.client}</div>
+                      <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)' }}>{m.time}</div>
                     </div>
                     <span style={{
-                      fontSize:'0.58rem', fontWeight:700,
+                      fontSize: '0.58rem', fontWeight: 700,
                       color: m.ok ? 'rgb(99,230,190)' : 'rgb(245,158,11)',
                       background: m.ok ? 'rgba(99,230,190,0.1)' : 'rgba(245,158,11,0.1)',
                       border: `1px solid ${m.ok ? 'rgba(99,230,190,0.2)' : 'rgba(245,158,11,0.2)'}`,
-                      borderRadius:'9999px', padding:'0.12rem 0.4rem', whiteSpace:'nowrap',
+                      borderRadius: '9999px', padding: '0.12rem 0.4rem', whiteSpace: 'nowrap',
                     }}>{m.ok ? 'Aprovada' : 'Pendente'}</span>
                   </motion.div>
                 ))}
@@ -553,16 +822,16 @@ export function CommandCenter({
           </div>
 
           {/* Feature strip */}
-          <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.6 }}
-            style={{ display:'grid', gridTemplateColumns:'repeat(6, 1fr)', gap:'0.5rem' }}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0.5rem' }}>
             {FEATURES.map((f) => (
               <div key={f.label} style={{
-                padding:'0.625rem 0.75rem', borderRadius:'10px',
-                background:'rgba(255,255,255,0.02)', border:'1px solid rgba(255,255,255,0.05)',
+                padding: '0.625rem 0.75rem', borderRadius: '10px',
+                background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)',
               }}>
-                <span style={{ fontSize:'0.9rem', display:'block', marginBottom:'0.25rem' }}>{f.icon}</span>
-                <div style={{ fontSize:'0.65rem', fontWeight:700, color:'rgb(190,200,220)', marginBottom:'0.2rem' }}>{f.label}</div>
-                <div style={{ fontSize:'0.58rem', color:'rgb(70,82,100)', lineHeight:1.4 }}>{f.desc}</div>
+                <span style={{ fontSize: '0.9rem', display: 'block', marginBottom: '0.25rem' }}>{f.icon}</span>
+                <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(190,200,220)', marginBottom: '0.2rem' }}>{f.label}</div>
+                <div style={{ fontSize: '0.58rem', color: 'rgb(70,82,100)', lineHeight: 1.4 }}>{f.desc}</div>
               </div>
             ))}
           </motion.div>
@@ -571,89 +840,134 @@ export function CommandCenter({
 
       {/* ══ RIGHT PANEL ══ */}
       <div style={{
-        width:'260px', flexShrink:0,
-        borderLeft:'1px solid rgba(255,255,255,0.06)',
-        background:'rgb(8,15,28)',
-        overflowY:'auto', overflowX:'hidden',
-        display:'flex', flexDirection:'column',
+        width: '260px', flexShrink: 0,
+        borderLeft: '1px solid rgba(255,255,255,0.06)',
+        background: 'rgb(8,15,28)',
+        overflowY: 'auto', overflowX: 'hidden',
+        display: 'flex', flexDirection: 'column',
       }}>
         {/* Notificações */}
-        <motion.div initial={{ opacity:0, x:16 }} animate={{ opacity:1, x:0 }}
-          transition={{ duration:0.5, delay:0.2 }}
-          style={{ padding:'0.875rem', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'0.5rem' }}>
-            <h3 style={{ fontSize:'0.78rem', fontWeight:700, color:'rgb(245,247,251)' }}>Notificações</h3>
-            <button type="button" style={{ fontSize:'0.62rem', color:'rgb(77,163,255)', background:'none', border:'none', cursor:'pointer', padding:0 }}>Ver todas</button>
+        <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          style={{ padding: '0.875rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Notificações</h3>
+            <button type="button" style={{ fontSize: '0.62rem', color: 'rgb(77,163,255)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Ver todas</button>
           </div>
           {NOTIFS.map((n, i) => (
-            <motion.div key={i} initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.3+i*0.06 }}
-              style={{ display:'flex', gap:'0.5rem', alignItems:'flex-start', padding:'0.4rem 0',
-                borderBottom: i < NOTIFS.length-1 ? '1px solid rgba(255,255,255,0.03)' : 'none' }}>
-              <div style={{ width:'28px', height:'28px', borderRadius:'8px', flexShrink:0, background:`${n.dot}18`, border:`1px solid ${n.dot}30`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.75rem' }}>{n.icon}</div>
-              <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ fontSize:'0.68rem', fontWeight:600, color:'rgb(210,225,240)', lineHeight:1.3 }}>{n.title}</div>
-                <div style={{ fontSize:'0.58rem', color:'rgb(80,92,110)', marginTop:'0.05rem' }}>{n.sub}</div>
+            <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 + i * 0.06 }}
+              style={{
+                display: 'flex', gap: '0.5rem', alignItems: 'flex-start', padding: '0.4rem 0',
+                borderBottom: i < NOTIFS.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none',
+              }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '8px', flexShrink: 0, background: `${n.dot}18`, border: `1px solid ${n.dot}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}>{n.icon}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '0.68rem', fontWeight: 600, color: 'rgb(210,225,240)', lineHeight: 1.3 }}>{n.title}</div>
+                <div style={{ fontSize: '0.58rem', color: 'rgb(80,92,110)', marginTop: '0.05rem' }}>{n.sub}</div>
               </div>
-              <span style={{ fontSize:'0.55rem', color:'rgb(60,72,90)', flexShrink:0, whiteSpace:'nowrap' }}>{n.time}</span>
+              <span style={{ fontSize: '0.55rem', color: 'rgb(60,72,90)', flexShrink: 0, whiteSpace: 'nowrap' }}>{n.time}</span>
             </motion.div>
           ))}
         </motion.div>
 
         {/* Ações rápidas */}
-        <motion.div initial={{ opacity:0, x:16 }} animate={{ opacity:1, x:0 }}
-          transition={{ duration:0.5, delay:0.35 }}
-          style={{ padding:'0.875rem', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
-          <h3 style={{ fontSize:'0.78rem', fontWeight:700, color:'rgb(245,247,251)', marginBottom:'0.5rem' }}>Ações Rápidas</h3>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:'0.3rem' }}>
+        <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.35 }}
+          style={{ padding: '0.875rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '0.5rem' }}>Ações Rápidas</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.3rem' }}>
             {QUICK_ACTIONS.map((a) => (
-              <Link key={a.label} href={a.href} style={{ textDecoration:'none' }}>
-                <motion.div whileHover={{ scale:1.04, y:-1 }} whileTap={{ scale:0.96 }}
-                  style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'0.3rem', padding:'0.5rem 0.25rem',
-                    background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.06)', borderRadius:'9px', cursor:'pointer', textAlign:'center' }}>
-                  <span style={{ fontSize:'1rem' }}>{a.icon}</span>
-                  <span style={{ fontSize:'0.55rem', color:'rgb(130,142,160)', lineHeight:1.2, fontWeight:500 }}>{a.label}</span>
+              <Link key={a.label} href={a.href} style={{ textDecoration: 'none' }}>
+                <motion.div whileHover={{ scale: 1.04, y: -1 }} whileTap={{ scale: 0.96 }}
+                  style={{
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem', padding: '0.5rem 0.25rem',
+                    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '9px', cursor: 'pointer', textAlign: 'center',
+                  }}>
+                  <span style={{ fontSize: '1rem' }}>{a.icon}</span>
+                  <span style={{ fontSize: '0.55rem', color: 'rgb(130,142,160)', lineHeight: 1.2, fontWeight: 500 }}>{a.label}</span>
                 </motion.div>
               </Link>
             ))}
           </div>
         </motion.div>
 
-        {/* Armazenamento */}
-        <motion.div initial={{ opacity:0, x:16 }} animate={{ opacity:1, x:0 }}
-          transition={{ duration:0.5, delay:0.5 }}
-          style={{ padding:'0.875rem', flex:1 }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'0.625rem' }}>
-            <h3 style={{ fontSize:'0.78rem', fontWeight:700, color:'rgb(245,247,251)' }}>Armazenamento</h3>
-            <button type="button" style={{ fontSize:'0.62rem', color:'rgb(77,163,255)', background:'none', border:'none', cursor:'pointer', padding:0 }}>Ver todos →</button>
+        {/* Portfolio & Operational Stats */}
+        <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.45 }}
+          style={{ padding: '0.875rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Portfolio — Visão Geral</h3>
           </div>
           {[
-            { label:'Logótipos',   used:'2.4 GB', pct: 42, color:'rgb(77,163,255)',   icon:'🖼️' },
-            { label:'Maquetes',    used:'1.8 GB', pct: 31, color:'rgb(167,139,250)', icon:'🎨' },
-            { label:'Artes Finais',used:'4.2 GB', pct: 72, color:'rgb(99,230,190)',  icon:'✅' },
-            { label:'Documentos',  used:'1.1 GB', pct: 19, color:'rgb(245,158,11)',  icon:'📄' },
+            {
+              icon: '👥', label: 'Clientes Totais',
+              value: totalClients != null ? String(totalClients) : '—',
+              color: 'rgb(77,163,255)',
+            },
+            {
+              icon: '💎', label: 'Premium / Enterprise',
+              value: premiumClients != null ? String(premiumClients) : '—',
+              color: 'rgb(167,139,250)',
+            },
+            {
+              icon: '💰', label: 'Receita Global (Total)',
+              value: allTimeRevenue != null ? fmt(allTimeRevenue) : '—',
+              color: 'rgb(99,230,190)',
+            },
+            {
+              icon: '📋', label: 'Orçamentos Pendentes',
+              value: String(pendingQuotes),
+              color: 'rgb(245,158,11)',
+            },
+          ].map((row) => (
+            <div key={row.label} style={{
+              display: 'flex', alignItems: 'center', gap: '0.5rem',
+              padding: '0.35rem 0',
+              borderBottom: '1px solid rgba(255,255,255,0.03)',
+            }}>
+              <span style={{ fontSize: '0.85rem' }}>{row.icon}</span>
+              <span style={{ fontSize: '0.65rem', color: 'rgb(100,112,130)', flex: 1 }}>{row.label}</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: row.color }}>{row.value}</span>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* Armazenamento */}
+        <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          style={{ padding: '0.875rem', flex: 1 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.625rem' }}>
+            <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Armazenamento</h3>
+            <button type="button" style={{ fontSize: '0.62rem', color: 'rgb(77,163,255)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Ver todos →</button>
+          </div>
+          {[
+            { label: 'Logótipos',    used: '2.4 GB', pct: 42, color: 'rgb(77,163,255)',   icon: '🖼️' },
+            { label: 'Maquetes',     used: '1.8 GB', pct: 31, color: 'rgb(167,139,250)', icon: '🎨' },
+            { label: 'Artes Finais', used: '4.2 GB', pct: 72, color: 'rgb(99,230,190)',  icon: '✅' },
+            { label: 'Documentos',   used: '1.1 GB', pct: 19, color: 'rgb(245,158,11)',  icon: '📄' },
           ].map((s) => (
-            <div key={s.label} style={{ marginBottom:'0.5rem' }}>
-              <div style={{ display:'flex', alignItems:'center', gap:'0.375rem', marginBottom:'0.2rem' }}>
-                <span style={{ fontSize:'0.7rem' }}>{s.icon}</span>
-                <span style={{ fontSize:'0.68rem', color:'rgb(150,162,180)', flex:1 }}>{s.label}</span>
-                <span style={{ fontSize:'0.65rem', fontWeight:600, color:s.color }}>{s.used}</span>
+            <div key={s.label} style={{ marginBottom: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginBottom: '0.2rem' }}>
+                <span style={{ fontSize: '0.7rem' }}>{s.icon}</span>
+                <span style={{ fontSize: '0.68rem', color: 'rgb(150,162,180)', flex: 1 }}>{s.label}</span>
+                <span style={{ fontSize: '0.65rem', fontWeight: 600, color: s.color }}>{s.used}</span>
               </div>
-              <div style={{ height:'3px', background:'rgba(255,255,255,0.06)', borderRadius:'9999px', overflow:'hidden' }}>
-                <motion.div initial={{ width:0 }} animate={{ width:`${s.pct}%` }}
-                  transition={{ duration:1, delay:0.6, ease:[0.16,1,0.3,1] }}
-                  style={{ height:'100%', background:s.color, borderRadius:'9999px' }} />
+              <div style={{ height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
+                <motion.div initial={{ width: 0 }} animate={{ width: `${s.pct}%` }}
+                  transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  style={{ height: '100%', background: s.color, borderRadius: '9999px' }} />
               </div>
             </div>
           ))}
-          <div style={{ marginTop:'0.75rem', padding:'0.625rem 0.75rem', background:'rgba(255,255,255,0.03)', borderRadius:'9px', border:'1px solid rgba(255,255,255,0.05)' }}>
-            <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'0.3rem' }}>
-              <span style={{ fontSize:'0.62rem', color:'rgb(90,102,120)' }}>Total utilizado: 9.5 GB / 50 GB</span>
-              <span style={{ fontSize:'0.62rem', fontWeight:700, color:'rgb(77,163,255)' }}>19%</span>
+          <div style={{ marginTop: '0.75rem', padding: '0.625rem 0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '9px', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem' }}>
+              <span style={{ fontSize: '0.62rem', color: 'rgb(90,102,120)' }}>Total utilizado: 9.5 GB / 50 GB</span>
+              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'rgb(77,163,255)' }}>19%</span>
             </div>
-            <div style={{ height:'4px', background:'rgba(255,255,255,0.06)', borderRadius:'9999px', overflow:'hidden' }}>
-              <motion.div initial={{ width:0 }} animate={{ width:'19%' }}
-                transition={{ duration:1.2, delay:0.65, ease:[0.16,1,0.3,1] }}
-                style={{ height:'100%', borderRadius:'9999px', background:'linear-gradient(90deg, rgb(77,163,255), rgb(99,230,190))' }} />
+            <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
+              <motion.div initial={{ width: 0 }} animate={{ width: '19%' }}
+                transition={{ duration: 1.2, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
+                style={{ height: '100%', borderRadius: '9999px', background: 'linear-gradient(90deg, rgb(77,163,255), rgb(99,230,190))' }} />
             </div>
           </div>
         </motion.div>

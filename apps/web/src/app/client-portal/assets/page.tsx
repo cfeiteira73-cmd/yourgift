@@ -30,7 +30,7 @@ export default function ClientAssetsPage() {
         setClient(c);
         // List files in client-assets bucket under client's folder
         const { data: files } = await supabase.storage.from('client-assets').list(`${c.id}/`, { sortBy: { column: 'updated_at', order: 'desc' } });
-        setAssets((files ?? []).filter((f: any) => f.name !== '.emptyFolderPlaceholder') as Asset[]);
+        setAssets((files ?? []).filter((f: any) => f.name !== '.emptyFolderPlaceholder') as unknown as Asset[]);
       }
       setLoading(false);
     }
@@ -63,7 +63,7 @@ export default function ClientAssetsPage() {
       setUploadMsg(`✓ ${results.join(', ')} enviado com sucesso!`);
       // Refresh list
       const { data: files } = await supabase.storage.from('client-assets').list(`${client.id}/`, { sortBy: { column: 'updated_at', order: 'desc' } });
-      setAssets((files ?? []).filter((f: any) => f.name !== '.emptyFolderPlaceholder') as Asset[]);
+      setAssets((files ?? []).filter((f: any) => f.name !== '.emptyFolderPlaceholder') as unknown as Asset[]);
     }
     setUploading(false);
   }
