@@ -18,16 +18,32 @@ export default function PortalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Fire-and-forget: log to notification system
+    const payload = {
+      message: error.message?.slice(0, 200) ?? 'Unknown error',
+      digest: error.digest,
+    };
+
+    // Log to notification system (real-time alert)
     fetch('/api/notifications', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         type: 'portal_error',
         title: 'Portal Error',
-        message: error.message?.slice(0, 200) ?? 'Unknown error',
+        message: payload.message,
         priority: 3,
-        metadata: { digest: error.digest },
+        metadata: payload,
+      }),
+    }).catch(() => { /* silent */ });
+
+    // Log to immutable audit trail
+    fetch('/api/audit', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        action: 'portal_error',
+        entity_type: 'ui',
+        metadata: payload,
       }),
     }).catch(() => { /* silent */ });
   }, [error]);

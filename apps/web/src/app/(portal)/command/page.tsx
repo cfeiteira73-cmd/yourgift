@@ -331,7 +331,7 @@ export default function CommandPage() {
       {/* Quick navigation */}
       <div>
         <p className="text-white/40 text-[10px] font-medium uppercase tracking-wider mb-3">Acesso Rápido</p>
-        <div className="grid grid-cols-11 gap-2">
+        <div className="grid grid-cols-12 gap-2">
           {[
             { href: '/autopilot',      label: 'Autopilot',    icon: '🤖' },
             { href: '/intel',          label: 'Intelligence', icon: '🔮' },
@@ -341,6 +341,7 @@ export default function CommandPage() {
             { href: '/control-tower',  label: 'Supply Chain', icon: '🗼' },
             { href: '/ecosystem',      label: 'Ecosystem',    icon: '🌐' },
             { href: '/disputes',       label: 'Disputas',     icon: '⚖️' },
+            { href: '/mobile',         label: 'Mobile Ops',   icon: '📱' },
             { href: '/approvals',      label: 'Approvals',    icon: '✅' },
             { href: '/support',        label: 'Support',      icon: '🎧' },
             { href: '/audit',          label: 'Audit',        icon: '🔒' },

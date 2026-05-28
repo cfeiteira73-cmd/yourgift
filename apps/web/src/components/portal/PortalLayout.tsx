@@ -237,6 +237,7 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
   const [badges, setBadges] = useState<Record<string, number>>({});
   const [searchOpen, setSearchOpen] = useState(false);
   const [cmdOpen, setCmdOpen] = useState(false);
+  const [authEmail, setAuthEmail] = useState<string>('');
 
   // Ctrl+K → CommandPalette | Ctrl+Shift+K → GlobalSearch
   useEffect(() => {
@@ -253,12 +254,16 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Fetch badge counts
+  // Fetch session user + badge counts
   useEffect(() => {
     async function fetchBadges() {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      // Store actual auth email for sidebar display
+      if (user.email) setAuthEmail(user.email);
+
       const { data: client } = await supabase
         .from('clients').select('id').eq('auth_user_id', user.id).single();
       if (!client) return;
@@ -286,8 +291,10 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
     router.push('/auth/login');
   }
 
-  const displayName = userName || userEmail?.split('@')[0] || 'Utilizador';
-  const displayEmail = userEmail || 'geral@yourgift.pt';
+  // Prefer prop values (from pages that still pass them), fall back to live auth state
+  const resolvedEmail = userEmail || authEmail || 'geral@yourgift.pt';
+  const displayName = userName || resolvedEmail.split('@')[0] || 'Utilizador';
+  const displayEmail = resolvedEmail;
   const initials = displayName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase() || 'YG';
   const company = companyName || 'YOURGIFT LDA';
   const usagePct = 78;

@@ -21,7 +21,7 @@ const ALLOWED_ACTIONS = new Set([
   'invoice_paid', 'client_profile_updated', 'artwork_uploaded', 'artwork_approved',
   'settings_changed', 'login', 'logout', 'export_requested',
   'integration_tested', 'integration_toggled', 'supplier_scored',
-  'cockpit_viewed', 'report_generated',
+  'cockpit_viewed', 'report_generated', 'portal_error',
 ]);
 
 type AuditEntry = {
