@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { checkRateLimitFast } from '@/lib/rate-limit';
 
 // ── AI Copilot — Phase 9: AI Operating Brain ───────────────────────────────────
 // Context-aware assistant that reads live DB state before responding
@@ -106,6 +107,15 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    // Rate limit: 30 AI requests per user per 60 seconds
+    const { limited } = checkRateLimitFast(`copilot:${user.id}`, 30, 60);
+    if (limited) {
+      return NextResponse.json(
+        { error: 'Demasiados pedidos. Aguarda um momento antes de continuar.' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      );
+    }
 
     const body = await request.json();
     const messages: ChatMessage[] = body.messages ?? [];

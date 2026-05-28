@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { checkRateLimitFast } from '@/lib/rate-limit';
 
 // ── OMEGA PROTOCOL — S17: Global Scale — Multi-currency + VAT Intelligence ───
 //
@@ -88,6 +89,12 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    // Rate limit: 60 currency conversions per user per 60 seconds
+    const { limited: rateLimited } = checkRateLimitFast(`currency:${user.id}`, 60, 60);
+    if (rateLimited) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429, headers: { 'Retry-After': '60' } });
+    }
 
     const params = request.nextUrl.searchParams;
     const mode   = params.get('mode') ?? 'convert';

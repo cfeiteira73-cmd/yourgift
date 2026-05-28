@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { checkRateLimitFast } from '@/lib/rate-limit';
 
 // ── OMEGA PROTOCOL — S9: AI Operating Brain ──────────────────────────────────
 //
@@ -41,6 +42,12 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    // Rate limit: 20 brain queries per user per 60 seconds
+    const { limited: rateLimited } = checkRateLimitFast(`brain:${user.id}`, 20, 60);
+    if (rateLimited) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429, headers: { 'Retry-After': '60' } });
+    }
 
     const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
     const mode = request.nextUrl.searchParams.get('mode') ?? 'insights';
@@ -104,6 +111,12 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    // Rate limit: 20 AI brain actions per user per 60 seconds
+    const { limited: rateLimited } = checkRateLimitFast(`brain:${user.id}`, 20, 60);
+    if (rateLimited) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429, headers: { 'Retry-After': '60' } });
+    }
 
     const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
     const body = await request.json() as { action: string; query?: string; context?: string; data?: Record<string, unknown>; limit?: number };
