@@ -111,15 +111,19 @@ export async function POST(request: NextRequest) {
 
     // ── Request approval ─────────────────────────────────────────────────────
     if (body.action === 'request') {
-      if (!body.entity_id || !body.entity_type) {
-        return NextResponse.json({ error: 'entity_id and entity_type required' }, { status: 400 });
+      if (!body.entity_type) {
+        return NextResponse.json({ error: 'entity_type required' }, { status: 400 });
       }
+
+      // Validate entity_id is a valid UUID if provided (column is uuid type, nullable)
+      const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const entityId = body.entity_id && UUID_REGEX.test(body.entity_id) ? body.entity_id : null;
 
       const expiresAt = new Date(Date.now() + 72 * 3600000).toISOString(); // 72h to approve
 
       const record = {
         entity_type: body.entity_type,
-        entity_id: body.entity_id,
+        entity_id: entityId,
         entity_ref: body.entity_ref ?? null,
         requester_id: user.id,
         requester_email: user.email ?? '',
