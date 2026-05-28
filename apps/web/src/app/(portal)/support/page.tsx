@@ -155,10 +155,10 @@ function ResolveModal({ ticket, onClose, onDone }: { ticket: Ticket; onClose: ()
 
   async function resolve() {
     setLoading(true);
-    await fetch(`/api/support/${ticket.id}`, {
+    await fetch('/api/support', {
       method: 'PATCH',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ status: 'resolved', resolution }),
+      body: JSON.stringify({ id: ticket.id, status: 'resolved', resolution }),
     });
     setLoading(false);
     onDone();
@@ -365,10 +365,10 @@ export default function SupportPage() {
                           </button>
                           <button type="button" onClick={async e => {
                             e.stopPropagation();
-                            await fetch(`/api/support/${ticket.id}`, {
+                            await fetch('/api/support', {
                               method: 'PATCH',
                               headers: { 'content-type': 'application/json' },
-                              body: JSON.stringify({ status: 'in_progress' }),
+                              body: JSON.stringify({ id: ticket.id, status: 'in_progress' }),
                             });
                             load();
                           }}

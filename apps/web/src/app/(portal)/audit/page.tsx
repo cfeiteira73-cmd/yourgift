@@ -71,14 +71,13 @@ export default function AuditPage() {
     try {
       const params = new URLSearchParams({ limit: String(limit) });
       if (filterAction) params.set('action', filterAction);
-      if (filterActor)  params.set('actor', filterActor);
       const res = await fetch(`/api/audit?${params}`);
       const d = await res.json();
       setEntries(d.entries ?? []);
     } finally {
       setLoading(false);
     }
-  }, [limit, filterAction, filterActor]);
+  }, [limit, filterAction]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -92,6 +91,7 @@ export default function AuditPage() {
   }, [autoRefresh, load]);
 
   const uniqueActors = [...new Set(entries.map(e => e.actor_email))];
+  const displayed = filterActor ? entries.filter(e => e.actor_email === filterActor) : entries;
 
   return (
     <div className="p-6 space-y-5 min-h-full">
@@ -119,10 +119,10 @@ export default function AuditPage() {
       {/* KPIs */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: 'Entradas',       value: entries.length },
+          { label: 'Entradas',       value: displayed.length },
           { label: 'Atores Únicos',  value: uniqueActors.length },
-          { label: 'Alto Risco',     value: entries.filter(e => HIGH_RISK.has(e.action)).length },
-          { label: 'Última Ação',    value: entries[0] ? timeAgo(entries[0].created_at) : '—' },
+          { label: 'Alto Risco',     value: displayed.filter(e => HIGH_RISK.has(e.action)).length },
+          { label: 'Última Ação',    value: displayed[0] ? timeAgo(displayed[0].created_at) : '—' },
         ].map(({ label, value }) => (
           <div key={label} className="rounded-xl border border-white/5 bg-white/3 p-4">
             <p className="text-2xl font-bold text-white">{loading ? '—' : String(value)}</p>
@@ -166,7 +166,7 @@ export default function AuditPage() {
             <div key={i} className="h-10 rounded-lg bg-white/5" />
           ))}
         </div>
-      ) : entries.length === 0 ? (
+      ) : displayed.length === 0 ? (
         <div className="rounded-2xl border border-white/5 bg-white/2 p-10 text-center">
           <p className="text-white/30 text-xs">Nenhuma entrada encontrada</p>
         </div>
@@ -179,7 +179,7 @@ export default function AuditPage() {
             ))}
           </div>
 
-          {entries.map(entry => {
+          {displayed.map(entry => {
             const meta = ACTION_META[entry.action] ?? { icon: '•', color: 'text-white/40' };
             const isHighRisk = HIGH_RISK.has(entry.action);
             const isExpanded = expanded === entry.id;
