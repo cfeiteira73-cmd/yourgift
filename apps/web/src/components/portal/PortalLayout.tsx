@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { GlobalSearch } from './GlobalSearch';
 import { AICopilot } from './AICopilot';
+import { CommandPalette } from './CommandPalette';
 import { ToastContainer } from './ToastNotification';
 import { RealtimeIndicator } from './RealtimeIndicator';
 
@@ -50,6 +51,7 @@ const ICONS = {
   executive:    ['M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z'],
   supply_chain: ['M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z', 'M3.27 6.96L12 12.01l8.73-5.05', 'M12 22.08V12'],
   flags:        ['M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z', 'M4 22v-7'],
+  org:          ['M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2', 'M23 21v-2a4 4 0 00-3-3.87', 'M9 7a4 4 0 100 8 4 4 0 000-8z', 'M16 3.13a4 4 0 010 7.75'],
   logout:       ['M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4', 'M16 17l5-5-5-5', 'M21 12H9'],
   search:       ['M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z'],
   plus:         ['M12 5v14M5 12h14'],
@@ -82,6 +84,7 @@ const NAV_ITEMS = [
   { href: '/sales',          label: 'AI Sales Intelligence',  icon: 'sales' },
   { href: '/supply-chain',   label: 'Supply Chain',           icon: 'supply_chain' },
   { href: '/flags',          label: 'Feature Flags',          icon: 'flags' },
+  { href: '/org',            label: 'Org & RBAC',             icon: 'org' },
   { href: '/strategist',   label: 'Estratega AI',           icon: 'strategist' },
   { href: '/financials',   label: 'Inteligência Financeira',icon: 'financials' },
   { href: '/reports',      label: 'Relatórios & Analytics',icon: 'reports' },
@@ -181,13 +184,17 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
   const [loggingOut, setLoggingOut] = useState(false);
   const [badges, setBadges] = useState<Record<string, number>>({});
   const [searchOpen, setSearchOpen] = useState(false);
+  const [cmdOpen, setCmdOpen] = useState(false);
 
-  // Ctrl+K / Cmd+K keyboard shortcut
+  // Ctrl+K → CommandPalette | Ctrl+Shift+K → GlobalSearch
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'k') {
         e.preventDefault();
         setSearchOpen(o => !o);
+      } else if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setCmdOpen(o => !o);
       }
     }
     window.addEventListener('keydown', handleKeyDown);
@@ -236,7 +243,10 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'rgb(7,17,31)' }}>
 
-      {/* ════ GLOBAL SEARCH ════ */}
+      {/* ════ COMMAND PALETTE (Cmd+K) ════ */}
+      <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} />
+
+      {/* ════ GLOBAL SEARCH (Cmd+Shift+K) ════ */}
       <GlobalSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
       {/* ════ AI COPILOT ════ */}
