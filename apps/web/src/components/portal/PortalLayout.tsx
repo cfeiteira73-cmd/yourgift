@@ -7,6 +7,8 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { GlobalSearch } from './GlobalSearch';
 import { AICopilot } from './AICopilot';
+import { ToastContainer } from './ToastNotification';
+import { RealtimeIndicator } from './RealtimeIndicator';
 
 // ── SVG Icon helper ───────────────────────────────────────────────────────────
 
@@ -72,12 +74,12 @@ const NAV_ITEMS = [
   { href: '/settings',     label: 'Definições',            icon: 'settings' },
 ] as const;
 
-// Mobile bottom nav items (most important 5)
+// Mobile bottom nav items (most important 5) — S13 Mobile Command Center
 const MOBILE_NAV = [
-  { href: '/dashboard',  label: 'Dashboard', icon: 'dashboard', exact: true },
-  { href: '/orders',     label: 'Encomendas', icon: 'orders' },
-  { href: '/quotes',     label: 'Orçamentos', icon: 'quotes' },
-  { href: '/assets',     label: 'Assets', icon: 'assets' },
+  { href: '/dashboard',  label: 'Home',      icon: 'dashboard',  exact: true },
+  { href: '/cockpit',    label: 'Cockpit',   icon: 'cockpit' },
+  { href: '/orders',     label: 'Encomendas',icon: 'orders' },
+  { href: '/quotes',     label: 'Orçamentos',icon: 'quotes' },
   { href: '/settings',   label: 'Definições', icon: 'settings' },
 ];
 
@@ -223,6 +225,9 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
       {/* ════ AI COPILOT ════ */}
       <AICopilot />
 
+      {/* ════ TOAST NOTIFICATIONS ════ */}
+      <ToastContainer />
+
       {/* ════ DESKTOP SIDEBAR ════ */}
       <aside
         className="hidden md:flex"
@@ -257,6 +262,7 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
             <span style={{ fontSize: '1.05rem', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.02em' }}>
               your<span style={{ color: 'rgb(77,163,255)' }}>gift</span>
             </span>
+            <RealtimeIndicator />
           </div>
         </div>
 
