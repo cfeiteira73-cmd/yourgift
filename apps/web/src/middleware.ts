@@ -131,8 +131,28 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── 9. Security headers ───────────────────────────────────────────────────
+  // Clickjacking
   supabaseResponse.headers.set('X-Frame-Options', 'DENY');
+  // MIME sniffing
   supabaseResponse.headers.set('X-Content-Type-Options', 'nosniff');
+  // Referrer — don't leak full URL cross-origin
+  supabaseResponse.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  // Legacy XSS filter
+  supabaseResponse.headers.set('X-XSS-Protection', '1; mode=block');
+  // DNS prefetch for performance
+  supabaseResponse.headers.set('X-DNS-Prefetch-Control', 'on');
+  // Disable dangerous browser APIs
+  supabaseResponse.headers.set(
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+  );
+  // HSTS — force HTTPS (only on production HTTPS, not localhost)
+  if (request.nextUrl.protocol === 'https:') {
+    supabaseResponse.headers.set(
+      'Strict-Transport-Security',
+      'max-age=31536000; includeSubDomains; preload',
+    );
+  }
 
   return supabaseResponse;
 }
