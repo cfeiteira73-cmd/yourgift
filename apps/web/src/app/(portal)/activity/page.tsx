@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
+
+const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 interface AuditEntry {
   id: string;
@@ -63,6 +66,8 @@ export default function ActivityPage() {
   const [filter, setFilter] = useState<'all' | 'error' | 'order' | 'quote' | 'client'>('all');
   const [offset, setOffset] = useState(0);
   const [total, setTotal] = useState(0);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const LIMIT = 50;
 
   const loadData = useCallback(async () => {
@@ -85,6 +90,31 @@ export default function ActivityPage() {
   useEffect(() => { loadData(); }, [loadData]);
   useEffect(() => { setOffset(0); }, [filter]);
 
+  // Check admin status on mount
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) setIsAdmin(ADMIN_EMAILS.includes((user.email ?? '').toLowerCase()));
+    });
+  }, []);
+
+  async function handleExportCsv() {
+    setExporting(true);
+    try {
+      const res = await fetch('/api/audit?mode=export');
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `yourgift-audit-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExporting(false);
+    }
+  }
+
   const filtered = filter === 'all' || filter === 'error'
     ? trail
     : trail.filter(e => e.action.includes(filter) || e.entity_type?.includes(filter));
@@ -98,8 +128,17 @@ export default function ActivityPage() {
           <p className="text-white/40 text-xs mt-0.5">Registo imutável de todas as acções da plataforma</p>
         </div>
         <div className="flex items-center gap-2">
+          {isAdmin && (
+            <button type="button"
+              onClick={handleExportCsv}
+              disabled={exporting}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {exporting ? '⏳ A exportar…' : '📤 CSV'}
+            </button>
+          )}
           {(['all', 'error', 'order', 'quote', 'client'] as const).map(f => (
-            <button type="button" key={f} 
+            <button type="button" key={f}
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 filter === f ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/60'

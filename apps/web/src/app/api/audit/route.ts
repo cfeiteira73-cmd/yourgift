@@ -120,6 +120,53 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ trail, total: count ?? 0, generatedAt: new Date().toISOString() });
     }
 
+    // ── Mode: export CSV (admin only) ────────────────────────────────────────
+    if (mode === 'export') {
+      if (!isAdmin) return NextResponse.json({ error: 'Admin only' }, { status: 403 });
+
+      const since    = params.get('since') ?? new Date(Date.now() - 90 * 86400000).toISOString();
+      const action   = params.get('action');
+
+      let query = supabase
+        .from('audit_log')
+        .select('id, actor_email, action, entity_type, entity_id, metadata, ip, created_at')
+        .gte('created_at', since)
+        .order('created_at', { ascending: false })
+        .limit(5000); // Max 5000 rows per export
+
+      if (action) query = query.eq('action', action);
+
+      const { data, error: exportErr } = await query;
+      if (exportErr) {
+        if (exportErr.code === '42P01') return new Response('No audit data', { status: 404 });
+        throw exportErr;
+      }
+
+      const rows = data ?? [];
+      const header = 'id,timestamp,actor_email,action,entity_type,entity_id,ip,metadata\n';
+      const csvRows = rows.map(r =>
+        [
+          r.id,
+          r.created_at,
+          `"${(r.actor_email ?? '').replace(/"/g, '""')}"`,
+          r.action,
+          r.entity_type ?? '',
+          r.entity_id ?? '',
+          r.ip ?? '',
+          `"${JSON.stringify(r.metadata ?? {}).replace(/"/g, '""')}"`,
+        ].join(',')
+      ).join('\n');
+
+      const filename = `yourgift-audit-${new Date().toISOString().slice(0, 10)}.csv`;
+      return new Response(header + csvRows, {
+        headers: {
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': `attachment; filename="${filename}"`,
+          'Cache-Control': 'no-store',
+        },
+      });
+    }
+
     // ── Default mode: list (for Audit Trail page) ────────────────────────────
     const limit       = Math.min(parseInt(params.get('limit') ?? '50'), 200);
     const since       = params.get('since') ?? new Date(Date.now() - 30 * 86400000).toISOString();
