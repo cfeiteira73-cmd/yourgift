@@ -38,6 +38,8 @@ const ICONS = {
   settings:     ['M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z', 'M15 12a3 3 0 11-6 0 3 3 0 016 0z'],
   cockpit:      ['M12 2a10 10 0 100 20A10 10 0 0012 2zm0 4a6 6 0 110 12A6 6 0 0112 6zm0 3a3 3 0 100 6 3 3 0 000-6z', 'M12 12l4-4'],
   strategist:   ['M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18'],
+  runbooks:     ['M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4'],
+  financials:   ['M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
   logout:       ['M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4', 'M16 17l5-5-5-5', 'M21 12H9'],
   search:       ['M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z'],
   plus:         ['M12 5v14M5 12h14'],
@@ -62,9 +64,11 @@ const NAV_ITEMS = [
   { href: '/suppliers',    label: 'Fornecedores',          icon: 'suppliers' },
   { divider: 'Crescimento' },
   { href: '/strategist',   label: 'Estratega AI',          icon: 'strategist' },
+  { href: '/financials',   label: 'Inteligência Financeira',icon: 'financials' },
   { href: '/reports',      label: 'Relatórios & Analytics',icon: 'reports' },
   { href: '/marketing',    label: 'Marketing & Promoções', icon: 'marketing' },
   { href: '/integrations', label: 'Integrações',           icon: 'integrations' },
+  { href: '/runbooks',     label: 'Runbooks Ops',          icon: 'runbooks' },
   { href: '/settings',     label: 'Definições',            icon: 'settings' },
 ] as const;
 
