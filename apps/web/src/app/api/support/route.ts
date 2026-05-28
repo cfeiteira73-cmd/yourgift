@@ -68,9 +68,9 @@ export async function GET(request: NextRequest) {
       const body    = (ticket.body ?? ticket.description ?? '') as string;
       return { ...ticket, subject, body };
     }).map((ticket: Record<string, unknown>) => {
-      const slaDue = ticket.sla_due_at ? new Date(ticket.sla_due_at).getTime() : null;
-      const breached = slaDue && now > slaDue && !['resolved', 'closed'].includes(ticket.status);
-      const hoursElapsed = (now - new Date(ticket.created_at).getTime()) / 3600000;
+      const slaDue = ticket.sla_due_at ? new Date(ticket.sla_due_at as string).getTime() : null;
+      const breached = slaDue && now > slaDue && !['resolved', 'closed'].includes(ticket.status as string);
+      const hoursElapsed = (now - new Date(ticket.created_at as string).getTime()) / 3600000;
       const slaTargets = SLA_TARGETS[(ticket.priority as TicketPriority) ?? 'normal'];
       return {
         ...ticket,
