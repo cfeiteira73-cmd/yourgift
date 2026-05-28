@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client';
 import { GlobalSearch } from './GlobalSearch';
 import { AICopilot } from './AICopilot';
 import { CommandPalette } from './CommandPalette';
+import { NotificationCenter } from './NotificationCenter';
 import { ToastContainer } from './ToastNotification';
 import { RealtimeIndicator } from './RealtimeIndicator';
 
@@ -55,6 +56,11 @@ const ICONS = {
   infra:        ['M5 12H3l9-9 9 9h-2M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7', 'M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6'],
   marketplace:  ['M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'M12 22v-4'],
   ml:           ['M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2'],
+  activity:     ['M22 12h-4l-3 9L9 3l-3 9H2'],
+  ops:          ['M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'],
+  reconcil:     ['M9 7H6a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-3', 'M9 7V4a1 1 0 011-1h9a1 1 0 011 1v9a1 1 0 01-1 1h-3', 'M9 12l2 2 4-4'],
+  autopilot:    ['M12 2a10 10 0 100 20A10 10 0 0012 2z', 'M12 6v6l4 2'],
+  intel:        ['M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3M6.343 6.343l-.707-.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z'],
   logout:       ['M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4', 'M16 17l5-5-5-5', 'M21 12H9'],
   search:       ['M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z'],
   plus:         ['M12 5v14M5 12h14'],
@@ -89,9 +95,14 @@ const NAV_ITEMS = [
   { href: '/flags',          label: 'Feature Flags',          icon: 'flags' },
   { href: '/org',            label: 'Org & RBAC',             icon: 'org' },
   { href: '/infra',          label: 'Infraestrutura',          icon: 'infra' },
-  { href: '/marketplace',  label: 'Marketplace B2B',         icon: 'marketplace' },
-  { href: '/ml',           label: 'ML Platform',             icon: 'ml' },
-  { href: '/strategist',   label: 'Estratega AI',           icon: 'strategist' },
+  { href: '/marketplace',     label: 'Marketplace B2B',       icon: 'marketplace' },
+  { href: '/ml',             label: 'ML Platform',           icon: 'ml' },
+  { href: '/activity',       label: 'Activity Stream',       icon: 'activity' },
+  { href: '/ops',            label: 'War Room Ops',          icon: 'ops' },
+  { href: '/reconciliation', label: 'Reconciliação',         icon: 'reconcil' },
+  { href: '/autopilot',      label: 'AI Autopilot',          icon: 'autopilot' },
+  { href: '/intel',          label: 'Intelligence',          icon: 'intel' },
+  { href: '/strategist',     label: 'Estratega AI',          icon: 'strategist' },
   { href: '/financials',   label: 'Inteligência Financeira',icon: 'financials' },
   { href: '/reports',      label: 'Relatórios & Analytics',icon: 'reports' },
   { href: '/marketing',    label: 'Marketing & Promoções', icon: 'marketing' },
@@ -295,7 +306,10 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
             <span style={{ fontSize: '1.05rem', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.02em' }}>
               your<span style={{ color: 'rgb(77,163,255)' }}>gift</span>
             </span>
-            <RealtimeIndicator />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+              <NotificationCenter />
+              <RealtimeIndicator />
+            </div>
           </div>
         </div>
 
@@ -473,14 +487,17 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
           <span>Pesquisar</span>
           <kbd style={{ fontSize: '0.58rem', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', padding: '0.1rem 0.3rem', fontFamily: 'monospace' }}>⌘K</kbd>
         </button>
-        <Link href="/quotes/new" style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          width: '32px', height: '32px', borderRadius: '9px',
-          background: 'rgba(77,163,255,0.15)', border: '1px solid rgba(77,163,255,0.3)',
-          color: 'rgb(77,163,255)',
-        }}>
-          <Icon d={ICONS.plus} size={16} />
-        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <NotificationCenter />
+          <Link href="/quotes/new" style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: '32px', height: '32px', borderRadius: '9px',
+            background: 'rgba(77,163,255,0.15)', border: '1px solid rgba(77,163,255,0.3)',
+            color: 'rgb(77,163,255)',
+          }}>
+            <Icon d={ICONS.plus} size={16} />
+          </Link>
+        </div>
       </div>
 
       {/* ════ MOBILE BOTTOM NAV ════ */}
