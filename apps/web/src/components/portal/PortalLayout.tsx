@@ -80,6 +80,7 @@ const ICONS = {
   support:      ['M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z'],
   audit:        ['M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01'],
   mobile:       ['M12 18h.01', 'M8 6h8a1 1 0 011 1v12a2 2 0 01-2 2H9a2 2 0 01-2-2V7a1 1 0 011-1z'],
+  account:      ['M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2', 'M12 11a4 4 0 100-8 4 4 0 000 8z'],
   logout:       ['M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4', 'M16 17l5-5-5-5', 'M21 12H9'],
   search:       ['M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z'],
   plus:         ['M12 5v14M5 12h14'],
@@ -142,6 +143,7 @@ const NAV_ITEMS = [
   { href: '/marketing',        label: 'Marketing',              icon: 'marketing' },
   { href: '/integrations',     label: 'Integrações',            icon: 'integrations' },
   { href: '/runbooks',         label: 'Runbooks',               icon: 'runbooks' },
+  { href: '/account',          label: 'Minha Conta',            icon: 'account' },
   { href: '/settings',         label: 'Definições',             icon: 'settings' },
 ] as const;
 
