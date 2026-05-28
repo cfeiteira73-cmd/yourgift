@@ -11,6 +11,14 @@ const ADMIN_EMAILS = [
 const ADMIN_ROUTES = [
   '/dashboard', '/orders', '/quotes', '/products', '/reports', '/assets', '/account',
   '/production', '/clients', '/billing', '/suppliers', '/marketing', '/integrations', '/settings',
+  // OMEGA ABSOLUTE FINAL routes
+  '/cockpit', '/strategist', '/financials', '/runbooks', '/configurator', '/artwork',
+  '/procurement', '/inventory', '/qc', '/sales', '/executive', '/supply-chain',
+  '/flags', '/org', '/infra', '/marketplace', '/ml', '/activity', '/ops',
+  '/reconciliation', '/autopilot', '/intel', '/mobile',
+  '/payments', '/disputes', '/postmortems', '/forecasting', '/control-tower',
+  '/client-success', '/security', '/ecosystem', '/command',
+  '/approvals', '/support', '/audit',
 ];
 
 // ── Client portal routes (simpler portal — future) ────────────────────────────

@@ -1,8 +1,14 @@
 'use client';
 
+import { createContext, useContext } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+
+// ── Portal nesting guard ──────────────────────────────────────────────────────
+// Prevents double-chrome when a page renders its own PortalLayout inside the
+// group layout that already provides one. Inner instances just pass through.
+const PortalLayoutContext = createContext(false);
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { GlobalSearch } from './GlobalSearch';
@@ -220,6 +226,10 @@ function NavItem({
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export function PortalLayout({ children, userName, userEmail, companyName, tier }: PortalLayoutProps) {
+  // ── Nesting guard: if already inside a PortalLayout, just render children ──
+  const alreadyMounted = useContext(PortalLayoutContext);
+  if (alreadyMounted) return <>{children}</>;
+
   const router = useRouter();
   const pathname = usePathname();
   const [loggingOut, setLoggingOut] = useState(false);
@@ -282,6 +292,7 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
   const usagePct = 78;
 
   return (
+    <PortalLayoutContext.Provider value={true}>
     <div style={{ display: 'flex', minHeight: '100vh', background: 'rgb(7,17,31)' }}>
 
       {/* ════ COMMAND PALETTE (Cmd+K) ════ */}
@@ -572,5 +583,6 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
         {children}
       </main>
     </div>
+    </PortalLayoutContext.Provider>
   );
 }
