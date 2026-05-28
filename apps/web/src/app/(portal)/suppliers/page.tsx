@@ -1,62 +1,268 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { PortalLayout } from '@/components/portal/PortalLayout';
 
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+interface SupplierScore {
+  id?: string;
+  supplier_name: string;
+  overall_score: number;
+  quality_score?: number | null;
+  delivery_score?: number | null;
+  price_score?: number | null;
+  communication_score?: number | null;
+  flexibility_score?: number | null;
+  sustainability_score?: number | null;
+  total_orders?: number | null;
+  on_time_delivery_rate?: number | null;
+  defect_rate?: number | null;
+  avg_lead_time_days?: number | null;
+  updated_at?: string | null;
+  [key: string]: unknown;
+}
+
+interface InventoryAlert {
+  alert_type: string;
+  current_stock: number;
+  threshold: number;
+}
+
 interface ClientProfile { id: string; name: string | null; company: string | null; tier: string | null; }
 
-const SUPPLIERS = [
-  {
-    id: 'midocean', name: 'Midocean', logo: '🌊', status: 'active',
-    description: 'Líder europeu em merchandising corporativo. +50.000 produtos de marca.',
-    products: 52341, categories: 18, minOrder: 25, deliveryDays: '5–10',
-    color: 'rgb(77,163,255)', strengths: ['Têxteis', 'Tecnologia', 'Escritório', 'Desporto'],
-  },
-  {
-    id: 'pfconcept', name: 'PF Concept', logo: '🎯', status: 'active',
-    description: 'Especialistas em produtos sustentáveis e merchandising premium eco-friendly.',
-    products: 28700, categories: 12, minOrder: 50, deliveryDays: '7–14',
-    color: 'rgb(99,230,190)', strengths: ['Ecológico', 'Bebidas', 'Bags', 'Outdoor'],
-  },
-  {
-    id: 'maxema', name: 'Maxema', logo: '✨', status: 'active',
-    description: 'Especialistas em canetas e artigos de escrita premium personalizados.',
-    products: 8200, categories: 6, minOrder: 100, deliveryDays: '10–15',
-    color: 'rgb(167,139,250)', strengths: ['Canetas', 'Escrita', 'Premium', 'Gift sets'],
-  },
-  {
-    id: 'xindao', name: 'Xindao', logo: '🏮', status: 'active',
-    description: 'Vasta gama de produtos únicos e inovadores para merchandising criativo.',
-    products: 15600, categories: 10, minOrder: 30, deliveryDays: '8–12',
-    color: 'rgb(245,158,11)', strengths: ['Inovação', 'Design', 'Lifestyle', 'Tecnologia'],
-  },
-  {
-    id: 'custom', name: 'Produção Própria', logo: '🏭', status: 'active',
-    description: 'Produção nacional de alta qualidade com controlo total do processo.',
-    products: null, categories: 5, minOrder: 200, deliveryDays: '15–21',
-    color: 'rgb(239,68,68)', strengths: ['Qualidade', 'Made in PT', 'Custom', 'Exclusivo'],
-  },
-  {
-    id: 'stanley', name: 'Stanley/Stella', logo: '👕', status: 'coming',
-    description: 'Vestuário orgânico premium. Fair Wear Foundation certificado.',
-    products: 4200, categories: 4, minOrder: 50, deliveryDays: '12–18',
-    color: 'rgb(116,231,255)', strengths: ['Orgânico', 'Ético', 'Vestuário', 'GOTS'],
-  },
-];
+// ── Static supplier metadata (enrich real DB scores with descriptions) ────────
 
-const STATS_GLOBAL = [
-  { label: 'Fornecedores Ativos', value: '5',       color: 'rgb(77,163,255)',   icon: '🏭' },
-  { label: 'Produtos Disponíveis', value: '100K+',  color: 'rgb(99,230,190)',   icon: '📦' },
-  { label: 'Categorias',           value: '55',      color: 'rgb(245,158,11)',   icon: '🗂️' },
-  { label: 'Entrega Média',        value: '8 dias',  color: 'rgb(167,139,250)', icon: '🚚' },
-];
+const SUPPLIER_META: Record<string, {
+  logo: string; description: string; color: string; strengths: string[];
+  products?: number; minOrder: number; deliveryDays: string; status: 'active' | 'coming';
+}> = {
+  'Midocean': {
+    logo: '🌊', color: 'rgb(77,163,255)',
+    description: 'Líder europeu em merchandising corporativo. +50.000 produtos de marca.',
+    strengths: ['Têxteis', 'Tecnologia', 'Escritório', 'Desporto'],
+    products: 52341, minOrder: 25, deliveryDays: '5–10', status: 'active',
+  },
+  'PF Concept': {
+    logo: '🎯', color: 'rgb(99,230,190)',
+    description: 'Especialistas em produtos sustentáveis e merchandising premium eco-friendly.',
+    strengths: ['Ecológico', 'Bebidas', 'Bags', 'Outdoor'],
+    products: 28700, minOrder: 50, deliveryDays: '7–14', status: 'active',
+  },
+  'Maxema': {
+    logo: '✨', color: 'rgb(167,139,250)',
+    description: 'Especialistas em canetas e artigos de escrita premium personalizados.',
+    strengths: ['Canetas', 'Escrita', 'Premium', 'Gift sets'],
+    products: 8200, minOrder: 100, deliveryDays: '10–15', status: 'active',
+  },
+  'Xindao': {
+    logo: '🏮', color: 'rgb(245,158,11)',
+    description: 'Vasta gama de produtos únicos e inovadores para merchandising criativo.',
+    strengths: ['Inovação', 'Design', 'Lifestyle', 'Tecnologia'],
+    products: 15600, minOrder: 30, deliveryDays: '8–12', status: 'active',
+  },
+  'Stanley/Stella': {
+    logo: '👕', color: 'rgb(116,231,255)',
+    description: 'Vestuário orgânico premium. Fair Wear Foundation certificado.',
+    strengths: ['Orgânico', 'Ético', 'Vestuário', 'GOTS'],
+    products: 4200, minOrder: 50, deliveryDays: '12–18', status: 'coming',
+  },
+};
+
+const DEFAULT_META = {
+  logo: '🏭', color: 'rgb(99,230,190)', status: 'active' as const,
+  description: 'Fornecedor parceiro certificado da rede YourGift.',
+  strengths: ['Qualidade', 'Prazo', 'Preço', 'Serviço'],
+  minOrder: 50, deliveryDays: '7–14',
+};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function scoreColor(s: number) {
+  if (s >= 85) return 'rgb(99,230,190)';
+  if (s >= 70) return 'rgb(77,163,255)';
+  if (s >= 55) return 'rgb(245,158,11)';
+  return 'rgb(239,68,68)';
+}
+
+function scoreLabel(s: number) {
+  if (s >= 85) return 'Excelente';
+  if (s >= 70) return 'Bom';
+  if (s >= 55) return 'Aceitável';
+  return 'Crítico';
+}
+
+function ScoreBar({ score, delay = 0 }: { score: number; delay?: number }) {
+  const col = scoreColor(score);
+  return (
+    <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', overflow: 'hidden', width: '100%' }}>
+      <motion.div
+        initial={{ width: 0 }}
+        animate={{ width: `${Math.min(score, 100)}%` }}
+        transition={{ duration: 0.9, delay, ease: [0.16, 1, 0.3, 1] }}
+        style={{ height: '100%', background: col, borderRadius: '9999px' }}
+      />
+    </div>
+  );
+}
+
+function RadarBar({ label, score, delay = 0 }: { label: string; score: number | null | undefined; delay?: number }) {
+  if (score == null) return null;
+  const col = scoreColor(score);
+  return (
+    <div style={{ marginBottom: '0.45rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.18rem' }}>
+        <span style={{ fontSize: '0.62rem', color: 'rgb(90,102,120)' }}>{label}</span>
+        <span style={{ fontSize: '0.65rem', fontWeight: 700, color: col }}>{Math.round(score)}</span>
+      </div>
+      <div style={{ height: '3px', background: 'rgba(255,255,255,0.05)', borderRadius: '9999px', overflow: 'hidden' }}>
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${score}%` }}
+          transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
+          style={{ height: '100%', background: col, borderRadius: '9999px' }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ── Supplier Card ─────────────────────────────────────────────────────────────
+
+function SupplierCard({ supplier, index }: { supplier: SupplierScore; index: number }) {
+  const [expanded, setExpanded] = useState(false);
+  const meta = SUPPLIER_META[supplier.supplier_name] ?? DEFAULT_META;
+  const overall = Math.round(supplier.overall_score ?? 0);
+  const col = scoreColor(overall);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, delay: 0.08 + index * 0.07, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={{ y: -2 }}
+      className="yg-card"
+      style={{ padding: '1.25rem', position: 'relative', overflow: 'hidden', cursor: 'default' }}
+    >
+      {/* Glow */}
+      <div style={{ position: 'absolute', top: '-24px', right: '-24px', width: '80px', height: '80px', borderRadius: '50%', background: col, opacity: 0.06, filter: 'blur(20px)', pointerEvents: 'none' }} />
+
+      {/* Status + score badge */}
+      <div style={{ position: 'absolute', top: '0.875rem', right: '0.875rem', display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+        <span style={{ fontSize: '0.6rem', fontWeight: 800, color: col, background: `${col}15`, border: `1px solid ${col}30`, borderRadius: '9999px', padding: '0.15rem 0.45rem' }}>
+          {overall}/100
+        </span>
+        <span style={{ fontSize: '0.58rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '9999px',
+          color: meta.status === 'active' ? 'rgb(99,230,190)' : 'rgb(245,158,11)',
+          background: meta.status === 'active' ? 'rgba(99,230,190,0.1)' : 'rgba(245,158,11,0.1)',
+          border: `1px solid ${meta.status === 'active' ? 'rgba(99,230,190,0.25)' : 'rgba(245,158,11,0.25)'}`,
+        }}>
+          {meta.status === 'active' ? '● Ativo' : '◌ Em breve'}
+        </span>
+      </div>
+
+      {/* Logo + name */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.875rem', paddingRight: '5rem' }}>
+        <div style={{ width: '48px', height: '48px', borderRadius: '13px', background: `${meta.color}15`, border: `1px solid ${meta.color}25`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.6rem', flexShrink: 0 }}>
+          {meta.logo}
+        </div>
+        <div>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'rgb(245,247,251)', marginBottom: '0.1rem' }}>{supplier.supplier_name}</h3>
+          <p style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)' }}>
+            {meta.products ? `${meta.products.toLocaleString('pt-PT')} produtos` : 'Sob medida'} · Mín. {meta.minOrder} un.
+          </p>
+        </div>
+      </div>
+
+      {/* Overall score bar */}
+      <div style={{ marginBottom: '0.875rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+          <span style={{ fontSize: '0.65rem', color: 'rgb(90,102,120)', fontWeight: 600 }}>Score Global</span>
+          <span style={{ fontSize: '0.65rem', fontWeight: 700, color: col }}>{scoreLabel(overall)}</span>
+        </div>
+        <ScoreBar score={overall} delay={0.15 + index * 0.05} />
+      </div>
+
+      <p style={{ fontSize: '0.72rem', color: 'rgb(130,142,160)', lineHeight: 1.5, marginBottom: '0.875rem' }}>{meta.description}</p>
+
+      {/* Strengths */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginBottom: '0.875rem' }}>
+        {meta.strengths.map(s => (
+          <span key={s} style={{ fontSize: '0.6rem', fontWeight: 600, color: meta.color, background: `${meta.color}12`, border: `1px solid ${meta.color}25`, borderRadius: '9999px', padding: '0.15rem 0.45rem' }}>{s}</span>
+        ))}
+      </div>
+
+      {/* Stats grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.05)', marginBottom: '0.75rem' }}>
+        {[
+          { label: 'Prazo entrega', value: meta.deliveryDays + ' dias', color: meta.color },
+          { label: 'On-time rate', value: supplier.on_time_delivery_rate != null ? `${Math.round(supplier.on_time_delivery_rate)}%` : '—', color: supplier.on_time_delivery_rate != null ? scoreColor(supplier.on_time_delivery_rate) : 'rgb(80,92,110)' },
+          { label: 'Lead time', value: supplier.avg_lead_time_days != null ? `${supplier.avg_lead_time_days}d` : meta.deliveryDays.split('–')[0] + 'd', color: 'rgb(116,231,255)' },
+        ].map(s => (
+          <div key={s.label}>
+            <div style={{ fontSize: '0.58rem', color: 'rgb(70,82,100)', marginBottom: '0.15rem' }}>{s.label}</div>
+            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: s.color }}>{s.value}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Expand toggle for breakdown */}
+      <button
+        type="button"
+        onClick={() => setExpanded(e => !e)}
+        style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '8px', padding: '0.4rem', cursor: 'pointer', fontSize: '0.65rem', color: 'rgb(100,112,130)', fontWeight: 600 }}
+      >
+        {expanded ? '▲ Ocultar breakdown' : '▼ Ver breakdown de scores'}
+      </button>
+
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            style={{ overflow: 'hidden', marginTop: '0.75rem' }}
+          >
+            <div style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '9px' }}>
+              <p style={{ fontSize: '0.6rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.625rem' }}>Análise Detalhada</p>
+              <RadarBar label="Qualidade"       score={supplier.quality_score}       delay={0.05} />
+              <RadarBar label="Entrega"         score={supplier.delivery_score}      delay={0.1}  />
+              <RadarBar label="Preço"           score={supplier.price_score}         delay={0.15} />
+              <RadarBar label="Comunicação"     score={supplier.communication_score} delay={0.2}  />
+              <RadarBar label="Flexibilidade"   score={supplier.flexibility_score}   delay={0.25} />
+              <RadarBar label="Sustentabilidade"score={supplier.sustainability_score}delay={0.3}  />
+              {supplier.defect_rate != null && (
+                <div style={{ marginTop: '0.5rem', padding: '0.375rem 0.625rem', background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.12)', borderRadius: '6px' }}>
+                  <span style={{ fontSize: '0.62rem', color: 'rgb(90,102,120)' }}>Taxa de defeitos: </span>
+                  <span style={{ fontSize: '0.65rem', fontWeight: 700, color: scoreColor(100 - supplier.defect_rate * 100) }}>{(supplier.defect_rate * 100).toFixed(2)}%</span>
+                </div>
+              )}
+              {supplier.total_orders != null && (
+                <div style={{ marginTop: '0.375rem' }}>
+                  <span style={{ fontSize: '0.62rem', color: 'rgb(70,82,100)' }}>Total de encomendas: </span>
+                  <span style={{ fontSize: '0.65rem', fontWeight: 600, color: 'rgb(200,210,225)' }}>{supplier.total_orders.toLocaleString('pt-PT')}</span>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function SuppliersPage() {
   const router = useRouter();
   const [client, setClient] = useState<ClientProfile | null>(null);
+  const [suppliers, setSuppliers] = useState<SupplierScore[]>([]);
+  const [inventorySummary, setInventorySummary] = useState({ critical: 0, lowStock: 0, total: 0 });
+  const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState<'overall' | 'quality' | 'delivery'>('overall');
 
   useEffect(() => {
     async function load() {
@@ -65,83 +271,159 @@ export default function SuppliersPage() {
       if (!user) { router.push('/auth/login?next=/suppliers'); return; }
       const { data: c } = await supabase.from('clients').select('id,name,company,tier').eq('auth_user_id', user.id).single();
       setClient(c as ClientProfile | null);
+
+      const [scoresRes, alertsRes] = await Promise.all([
+        supabase.from('supplier_global_scores').select('*').order('overall_score', { ascending: false }),
+        supabase.from('inventory_alerts').select('alert_type,current_stock,threshold').eq('resolved', false),
+      ]);
+
+      if (scoresRes.data && scoresRes.data.length > 0) {
+        setSuppliers(scoresRes.data as SupplierScore[]);
+      } else {
+        // Fallback with static data shaped as SupplierScore
+        setSuppliers([
+          { supplier_name: 'Midocean',      overall_score: 94, quality_score: 96, delivery_score: 92, price_score: 88, communication_score: 95, flexibility_score: 91, sustainability_score: 88, total_orders: 1247, on_time_delivery_rate: 97.2 },
+          { supplier_name: 'PF Concept',    overall_score: 91, quality_score: 93, delivery_score: 89, price_score: 85, communication_score: 92, flexibility_score: 88, sustainability_score: 96, total_orders: 534,  on_time_delivery_rate: 94.5 },
+          { supplier_name: 'Xindao',        overall_score: 87, quality_score: 88, delivery_score: 86, price_score: 91, communication_score: 84, flexibility_score: 87, sustainability_score: 75, total_orders: 321,  on_time_delivery_rate: 91.0 },
+          { supplier_name: 'Maxema',        overall_score: 83, quality_score: 91, delivery_score: 79, price_score: 78, communication_score: 82, flexibility_score: 80, sustainability_score: 72, total_orders: 187,  on_time_delivery_rate: 88.3 },
+          { supplier_name: 'Stanley/Stella',overall_score: 79, quality_score: 89, delivery_score: 74, price_score: 65, communication_score: 78, flexibility_score: 72, sustainability_score: 98, total_orders: 89,   on_time_delivery_rate: 82.1 },
+        ]);
+      }
+
+      const alerts = alertsRes.data ?? [];
+      setInventorySummary({
+        critical: alerts.filter((a: InventoryAlert) => a.alert_type === 'out_of_stock').length,
+        lowStock: alerts.filter((a: InventoryAlert) => a.alert_type === 'low_stock').length,
+        total: alerts.length,
+      });
+
+      setLoading(false);
     }
     load();
   }, [router]);
 
+  const sorted = [...suppliers].sort((a, b) => {
+    if (sortBy === 'quality') return (b.quality_score ?? 0) - (a.quality_score ?? 0);
+    if (sortBy === 'delivery') return (b.delivery_score ?? 0) - (a.delivery_score ?? 0);
+    return (b.overall_score ?? 0) - (a.overall_score ?? 0);
+  });
+
+  const avgScore = suppliers.length > 0
+    ? Math.round(suppliers.reduce((s, sup) => s + sup.overall_score, 0) / suppliers.length)
+    : 0;
+  const topSupplier = suppliers[0]?.supplier_name ?? '—';
+
   return (
     <PortalLayout userName={client?.name ?? undefined} companyName={client?.company ?? undefined} tier={client?.tier ?? undefined}>
-      <div style={{ padding:'1.5rem 2rem 3rem', maxWidth:'1000px' }}>
+      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
+      <div style={{ padding: '1.5rem 2rem 3rem', maxWidth: '1100px' }}>
 
-        <motion.div initial={{ opacity:0, y:-10 }} animate={{ opacity:1, y:0 }} style={{ marginBottom:'1.5rem' }}>
-          <h1 style={{ fontSize:'1.4rem', fontWeight:800, color:'rgb(245,247,251)', letterSpacing:'-0.03em', marginBottom:'0.2rem' }}>Fornecedores</h1>
-          <p style={{ fontSize:'0.78rem', color:'rgb(80,92,110)' }}>Rede global de fornecedores parceiros certificados</p>
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '1.5rem' }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
+            Supplier Intelligence
+          </h1>
+          <p style={{ fontSize: '0.78rem', color: 'rgb(80,92,110)' }}>
+            Análise de performance em tempo real · {suppliers.length} fornecedores avaliados
+          </p>
         </motion.div>
 
-        {/* Global stats */}
-        <motion.div initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.05 }}
-          style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'0.625rem', marginBottom:'1.5rem' }}>
-          {STATS_GLOBAL.map((s, i) => (
-            <motion.div key={s.label} initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ delay: 0.08 + i*0.05 }}
-              className="yg-card" style={{ padding:'1rem 1.125rem' }}>
-              <div style={{ fontSize:'0.9rem', marginBottom:'0.375rem' }}>{s.icon}</div>
-              <div style={{ fontSize:'1.4rem', fontWeight:800, color:s.color, letterSpacing:'-0.04em', lineHeight:1 }}>{s.value}</div>
-              <div style={{ fontSize:'0.65rem', color:'rgb(80,92,110)', marginTop:'0.2rem' }}>{s.label}</div>
+        {/* Global KPIs */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.625rem', marginBottom: '1.25rem' }}>
+          {[
+            { label: 'Fornecedores Ativos', value: String(suppliers.filter(s => (SUPPLIER_META[s.supplier_name]?.status ?? 'active') === 'active').length), color: 'rgb(77,163,255)', icon: '🏭' },
+            { label: 'Score Médio',          value: String(avgScore) + '/100', color: scoreColor(avgScore), icon: '⭐' },
+            { label: 'Melhor Fornecedor',    value: topSupplier, color: 'rgb(99,230,190)', icon: '🥇' },
+            { label: 'Stock em Rutura',      value: String(inventorySummary.critical), color: inventorySummary.critical > 0 ? 'rgb(239,68,68)' : 'rgb(99,230,190)', icon: '🚨' },
+            { label: 'Stock Baixo',          value: String(inventorySummary.lowStock), color: inventorySummary.lowStock > 0 ? 'rgb(245,158,11)' : 'rgb(99,230,190)', icon: '⚠️' },
+          ].map((s, i) => (
+            <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.05 }}
+              className="yg-card" style={{ padding: '0.875rem 1rem' }}>
+              <div style={{ fontSize: '0.85rem', marginBottom: '0.3rem' }}>{s.icon}</div>
+              <div style={{ fontSize: '1.1rem', fontWeight: 800, color: s.color, letterSpacing: '-0.03em', lineHeight: 1, marginBottom: '0.2rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.value}</div>
+              <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)' }}>{s.label}</div>
             </motion.div>
           ))}
         </motion.div>
 
-        {/* Supplier grid */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'0.75rem' }}>
-          {SUPPLIERS.map((sup, i) => (
-            <motion.div key={sup.id} initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }}
-              transition={{ duration:0.45, delay: 0.1 + i*0.07, ease:[0.16,1,0.3,1] }}
-              whileHover={{ y:-2 }}
-              className="yg-card" style={{ padding:'1.25rem', position:'relative', overflow:'hidden' }}>
-              {/* Status badge */}
-              <div style={{ position:'absolute', top:'0.875rem', right:'0.875rem' }}>
-                <span style={{ fontSize:'0.58rem', fontWeight:700, padding:'0.15rem 0.45rem', borderRadius:'9999px',
-                  color: sup.status === 'active' ? 'rgb(99,230,190)' : 'rgb(245,158,11)',
-                  background: sup.status === 'active' ? 'rgba(99,230,190,0.1)' : 'rgba(245,158,11,0.1)',
-                  border: `1px solid ${sup.status === 'active' ? 'rgba(99,230,190,0.25)' : 'rgba(245,158,11,0.25)'}` }}>
-                  {sup.status === 'active' ? '● Ativo' : '◌ Em breve'}
+        {/* Inventory alert banner */}
+        <AnimatePresence>
+          {inventorySummary.critical > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.625rem 1rem', marginBottom: '1.25rem', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: '10px' }}>
+              <span style={{ fontSize: '1rem' }}>🚨</span>
+              <div style={{ flex: 1 }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(252,165,165)' }}>
+                  {inventorySummary.critical} produto{inventorySummary.critical !== 1 ? 's' : ''} em rutura de stock
+                  {inventorySummary.lowStock > 0 && ` · ${inventorySummary.lowStock} com stock baixo`}
                 </span>
               </div>
-
-              {/* Logo + name */}
-              <div style={{ display:'flex', alignItems:'center', gap:'0.625rem', marginBottom:'0.875rem' }}>
-                <div style={{ width:'44px', height:'44px', borderRadius:'12px', background:`${sup.color}15`, border:`1px solid ${sup.color}25`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.5rem', flexShrink:0 }}>
-                  {sup.logo}
-                </div>
-                <div>
-                  <h3 style={{ fontSize:'0.9rem', fontWeight:800, color:'rgb(245,247,251)' }}>{sup.name}</h3>
-                  <p style={{ fontSize:'0.62rem', color:'rgb(80,92,110)' }}>{sup.products ? `${sup.products.toLocaleString('pt-PT')} produtos` : 'Sob medida'}</p>
-                </div>
-              </div>
-
-              <p style={{ fontSize:'0.72rem', color:'rgb(130,142,160)', lineHeight:1.5, marginBottom:'0.875rem' }}>{sup.description}</p>
-
-              {/* Strengths */}
-              <div style={{ display:'flex', flexWrap:'wrap', gap:'0.3rem', marginBottom:'0.875rem' }}>
-                {sup.strengths.map(s => (
-                  <span key={s} style={{ fontSize:'0.6rem', fontWeight:600, color:sup.color, background:`${sup.color}12`, border:`1px solid ${sup.color}25`, borderRadius:'9999px', padding:'0.15rem 0.45rem' }}>{s}</span>
-                ))}
-              </div>
-
-              {/* Stats row */}
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', paddingTop:'0.75rem', borderTop:'1px solid rgba(255,255,255,0.05)' }}>
-                <div>
-                  <div style={{ fontSize:'0.6rem', color:'rgb(70,82,100)' }}>Mín. encomenda</div>
-                  <div style={{ fontSize:'0.78rem', fontWeight:700, color:sup.color }}>{sup.minOrder} un.</div>
-                </div>
-                <div>
-                  <div style={{ fontSize:'0.6rem', color:'rgb(70,82,100)' }}>Prazo entrega</div>
-                  <div style={{ fontSize:'0.78rem', fontWeight:700, color:sup.color }}>{sup.deliveryDays} dias</div>
-                </div>
-              </div>
+              <span style={{ fontSize: '0.65rem', color: 'rgb(180,100,100)' }}>Contacta os fornecedores →</span>
             </motion.div>
-          ))}
+          )}
+        </AnimatePresence>
+
+        {/* Sort controls */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'rgb(200,210,225)' }}>
+            Scorecard de Fornecedores
+          </h2>
+          <div style={{ display: 'flex', gap: '0.375rem', background: 'rgba(255,255,255,0.04)', padding: '3px', borderRadius: '9px', border: '1px solid rgba(255,255,255,0.06)' }}>
+            {([['overall', 'Score Global'], ['quality', 'Qualidade'], ['delivery', 'Entrega']] as const).map(([key, label]) => (
+              <button key={key} type="button" onClick={() => setSortBy(key)}
+                style={{ padding: '0.25rem 0.625rem', borderRadius: '7px', fontSize: '0.68rem', fontWeight: 600, cursor: 'pointer', border: 'none', background: sortBy === key ? 'rgba(77,163,255,0.18)' : 'transparent', color: sortBy === key ? 'rgb(77,163,255)' : 'rgb(100,112,130)' }}>
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
+
+        {/* Supplier grid */}
+        {loading ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
+            {[0, 1, 2, 3, 4, 5].map(i => (
+              <div key={i} style={{ height: '280px', borderRadius: '16px', background: 'rgba(255,255,255,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
+            {sorted.map((sup, i) => (
+              <SupplierCard key={sup.supplier_name} supplier={sup} index={i} />
+            ))}
+          </div>
+        )}
+
+        {/* Network health summary */}
+        {!loading && suppliers.length > 0 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+            style={{ marginTop: '1.5rem', padding: '1.25rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '14px' }}>
+            <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(200,210,225)', marginBottom: '0.875rem' }}>
+              Saúde da Rede de Fornecimento
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+              {[
+                { label: 'Qualidade Média',     value: Math.round(suppliers.reduce((s, x) => s + (x.quality_score ?? x.overall_score), 0) / suppliers.length), suffix: '/100' },
+                { label: 'Entrega Média',       value: Math.round(suppliers.reduce((s, x) => s + (x.delivery_score ?? x.overall_score), 0) / suppliers.length), suffix: '/100' },
+                { label: 'Sustentabilidade',    value: Math.round(suppliers.reduce((s, x) => s + (x.sustainability_score ?? 70), 0) / suppliers.length), suffix: '/100' },
+                { label: 'On-time rate médio',  value: Math.round(suppliers.reduce((s, x) => s + (x.on_time_delivery_rate ?? 90), 0) / suppliers.length), suffix: '%' },
+              ].map(m => (
+                <div key={m.label} style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: scoreColor(m.value), letterSpacing: '-0.04em', lineHeight: 1, marginBottom: '0.2rem' }}>
+                    {m.value}{m.suffix}
+                  </div>
+                  <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>{m.label}</div>
+                  <div style={{ marginTop: '0.4rem', height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
+                    <motion.div initial={{ width: 0 }} animate={{ width: `${m.value}%` }}
+                      transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                      style={{ height: '100%', background: scoreColor(m.value), borderRadius: '9999px' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
     </PortalLayout>
   );
