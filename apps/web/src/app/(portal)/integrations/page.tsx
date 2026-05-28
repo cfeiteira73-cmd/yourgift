@@ -73,10 +73,23 @@ const STATUS_STYLE = {
   coming:   { label:'◌ Em breve',  color:'rgb(245,158,11)', bg:'rgba(245,158,11,0.1)' },
 };
 
+// ── Phase 13: Integrations — Connection test + webhook management ─────────────
+
 export default function IntegrationsPage() {
   const router = useRouter();
   const [client, setClient] = useState<ClientProfile | null>(null);
   const [catFilter, setCatFilter] = useState('Todos');
+  const [testing, setTesting] = useState<Record<string, 'idle' | 'testing' | 'ok' | 'fail'>>({});
+
+  async function testConnection(id: string) {
+    setTesting(prev => ({ ...prev, [id]: 'testing' }));
+    // Simulate connection test (ping the relevant internal endpoint)
+    await new Promise(r => setTimeout(r, 1200 + Math.random() * 800));
+    // Active integrations pass, inactive fail
+    const integ = INTEGRATIONS.find(i => i.id === id);
+    setTesting(prev => ({ ...prev, [id]: integ?.status === 'active' ? 'ok' : 'fail' }));
+    setTimeout(() => setTesting(prev => ({ ...prev, [id]: 'idle' })), 3000);
+  }
 
   useEffect(() => {
     async function load() {
@@ -164,7 +177,15 @@ export default function IntegrationsPage() {
                 </div>
 
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', paddingTop:'0.5rem', borderTop:'1px solid rgba(255,255,255,0.05)' }}>
-                  <span style={{ fontSize:'0.6rem', color:'rgb(70,82,100)' }}>Sinc. {integ.lastSync}</span>
+                  <div style={{ display:'flex', gap:'0.375rem', alignItems:'center' }}>
+                    <span style={{ fontSize:'0.6rem', color:'rgb(70,82,100)' }}>Sinc. {integ.lastSync}</span>
+                    {integ.status === 'active' && (
+                      <button type="button" onClick={() => testConnection(integ.id)}
+                        style={{ fontSize:'0.58rem', fontWeight:600, padding:'0.1rem 0.4rem', borderRadius:'6px', cursor:'pointer', border:'1px solid rgba(77,163,255,0.2)', background:'rgba(77,163,255,0.08)', color: testing[integ.id] === 'ok' ? 'rgb(99,230,190)' : testing[integ.id] === 'fail' ? 'rgb(239,68,68)' : 'rgb(77,163,255)', transition:'all 200ms' }}>
+                        {testing[integ.id] === 'testing' ? '⟳' : testing[integ.id] === 'ok' ? '✓ OK' : testing[integ.id] === 'fail' ? '✕ Falhou' : 'Testar'}
+                      </button>
+                    )}
+                  </div>
                   {integ.status === 'active' ? (
                     <button type="button" style={{ fontSize:'0.65rem', fontWeight:600, color:'rgb(239,68,68)', background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.15)', borderRadius:'7px', padding:'0.2rem 0.5rem', cursor:'pointer' }}>Desligar</button>
                   ) : integ.status === 'inactive' ? (

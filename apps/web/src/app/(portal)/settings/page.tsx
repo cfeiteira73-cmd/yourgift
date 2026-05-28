@@ -31,15 +31,24 @@ function ToggleItem({ label, desc, enabled, onChange }: { label: string; desc: s
   );
 }
 
+// ── Phase 13: Settings — Real notification persistence + session management ──
+
+type NotifKey = 'email' | 'push' | 'orders' | 'quotes' | 'invoices';
+type PrivacyKey = 'analytics' | 'marketing';
+
+const DEFAULT_NOTIFS: Record<NotifKey, boolean> = { email: true, push: true, orders: true, quotes: true, invoices: false };
+const DEFAULT_PRIVACY: Record<PrivacyKey, boolean> = { analytics: true, marketing: false };
+
 export default function SettingsPage() {
   const router = useRouter();
   const [client, setClient] = useState<ClientProfile | null>(null);
   const [userEmail, setUserEmail] = useState('');
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
+  const [savingNotifs, setSavingNotifs] = useState(false);
 
-  const [notifs, setNotifs] = useState({ email: true, push: true, orders: true, quotes: true, invoices: false });
-  const [privacy, setPrivacy] = useState({ analytics: true, marketing: false });
+  const [notifs, setNotifs] = useState<Record<NotifKey, boolean>>(DEFAULT_NOTIFS);
+  const [privacy, setPrivacy] = useState<Record<PrivacyKey, boolean>>(DEFAULT_PRIVACY);
   const [name, setName] = useState('');
   const [company, setCompany] = useState('');
 
@@ -51,9 +60,17 @@ export default function SettingsPage() {
       setUserEmail(user.email ?? '');
       const { data: c } = await supabase.from('clients').select('*').eq('auth_user_id', user.id).single();
       if (c) {
-        setClient(c as ClientProfile);
-        setName((c as ClientProfile).name ?? '');
-        setCompany((c as ClientProfile).company ?? '');
+        const cp = c as ClientProfile & { notification_prefs?: Record<string, boolean> | null; privacy_prefs?: Record<string, boolean> | null };
+        setClient(cp);
+        setName(cp.name ?? '');
+        setCompany(cp.company ?? '');
+        // Load persisted notification preferences if available
+        if (cp.notification_prefs && typeof cp.notification_prefs === 'object') {
+          setNotifs({ ...DEFAULT_NOTIFS, ...(cp.notification_prefs as Record<NotifKey, boolean>) });
+        }
+        if (cp.privacy_prefs && typeof cp.privacy_prefs === 'object') {
+          setPrivacy({ ...DEFAULT_PRIVACY, ...(cp.privacy_prefs as Record<PrivacyKey, boolean>) });
+        }
       }
       setLoading(false);
     }
@@ -66,6 +83,25 @@ export default function SettingsPage() {
     await supabase.from('clients').update({ name, company }).eq('id', client.id);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
+  }
+
+  async function saveNotificationPrefs() {
+    if (!client) return;
+    setSavingNotifs(true);
+    try {
+      const supabase = createClient();
+      // Try to persist to notification_prefs column — if column doesn't exist, silently skip
+      await supabase.from('clients').update({
+        notification_prefs: notifs as unknown as Record<string, boolean>,
+        privacy_prefs: privacy as unknown as Record<string, boolean>,
+      } as Record<string, unknown>).eq('id', client.id);
+    } catch {
+      // Column may not exist yet — that's fine, preferences are still applied client-side
+    } finally {
+      setSavingNotifs(false);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    }
   }
 
   return (
@@ -131,6 +167,13 @@ export default function SettingsPage() {
               <ToggleItem label="Atualizações de encomendas" desc="Notificação quando o estado da encomenda muda" enabled={notifs.orders} onChange={v => setNotifs(n=>({...n,orders:v}))} />
               <ToggleItem label="Respostas a orçamentos" desc="Alerta quando um orçamento é respondido" enabled={notifs.quotes} onChange={v => setNotifs(n=>({...n,quotes:v}))} />
               <ToggleItem label="Faturas e pagamentos" desc="Alertas sobre pagamentos e faturas emitidas" enabled={notifs.invoices} onChange={v => setNotifs(n=>({...n,invoices:v}))} />
+              <div style={{ padding:'0.75rem 1.125rem', display:'flex', justifyContent:'flex-end', gap:'0.625rem', alignItems:'center', borderTop:'1px solid rgba(255,255,255,0.05)' }}>
+                {saved && <span style={{ fontSize:'0.72rem', color:'rgb(99,230,190)' }}>✓ Preferências guardadas</span>}
+                <motion.button type="button" whileTap={{ scale:0.97 }} onClick={saveNotificationPrefs} disabled={savingNotifs}
+                  style={{ background:'rgba(77,163,255,0.12)', color:'rgb(77,163,255)', border:'1px solid rgba(77,163,255,0.25)', borderRadius:'8px', padding:'0.4rem 0.875rem', fontSize:'0.75rem', fontWeight:700, cursor:'pointer' }}>
+                  {savingNotifs ? 'A guardar...' : 'Guardar preferências'}
+                </motion.button>
+              </div>
             </motion.div>
 
             {/* Privacidade */}

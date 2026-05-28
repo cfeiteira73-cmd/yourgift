@@ -309,6 +309,16 @@ export function CommandCenter({
   totalClients, premiumClients, allTimeRevenue,
 }: CommandCenterProps) {
 
+  // Compute SLA violations from orders + slaDefinitions
+  const slaViolations = slaDefinitions && slaDefinitions.length > 0
+    ? orders.filter(o => {
+        const sla = slaDefinitions.find(s => s.stage === o.status);
+        if (!sla) return false;
+        const hoursElapsed = (Date.now() - new Date(o.created_at).getTime()) / 3600000;
+        return hoursElapsed >= sla.critical_hours;
+      }).length
+    : 0;
+
   const animRevenue     = useCountUp(totalThisMonth,      1400, 200);
   const animOrders      = useCountUp(orders.length,       1000, 300);
   const animActive      = useCountUp(activeOrders,         900, 400);
@@ -969,6 +979,36 @@ export function CommandCenter({
                 transition={{ duration: 1.2, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
                 style={{ height: '100%', borderRadius: '9999px', background: 'linear-gradient(90deg, rgb(77,163,255), rgb(99,230,190))' }} />
             </div>
+          </div>
+        </motion.div>
+
+        {/* ── Phase 12: Analytics Quick View ─────────────────────────────────── */}
+        <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.55 }}
+          style={{ padding: '0.875rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.625rem' }}>
+            <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Analytics · 30 dias</h3>
+            <span style={{ fontSize: '0.58rem', color: 'rgb(77,163,255)', padding: '0.08rem 0.375rem', borderRadius: '9999px', background: 'rgba(77,163,255,0.1)', border: '1px solid rgba(77,163,255,0.2)' }}>LIVE</span>
+          </div>
+          {[
+            { label: 'Encomendas ativas', value: String(activeOrders), color: 'rgb(99,230,190)', icon: '📦' },
+            { label: 'Orçamentos pendentes', value: String(pendingQuotes), color: 'rgb(245,158,11)', icon: '💬' },
+            { label: 'Receita este mês', value: `€${totalThisMonth >= 1000 ? (totalThisMonth / 1000).toFixed(1) + 'k' : totalThisMonth.toFixed(0)}`, color: 'rgb(77,163,255)', icon: '💰' },
+            ...(slaViolations != null && slaViolations > 0
+              ? [{ label: 'SLA em violação', value: String(slaViolations), color: 'rgb(239,68,68)', icon: '⚠️' }]
+              : [{ label: 'SLA compliance', value: '100%', color: 'rgb(99,230,190)', icon: '✓' }]
+            ),
+          ].map((row) => (
+            <div key={row.label} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.35rem 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+              <span style={{ fontSize: '0.75rem', flexShrink: 0 }}>{row.icon}</span>
+              <span style={{ fontSize: '0.65rem', color: 'rgb(120,130,150)', flex: 1 }}>{row.label}</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: row.color }}>{row.value}</span>
+            </div>
+          ))}
+          <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.375rem' }}>
+            <a href="/reports" style={{ flex: 1, fontSize: '0.62rem', fontWeight: 600, color: 'rgb(77,163,255)', textAlign: 'center', padding: '0.3rem', background: 'rgba(77,163,255,0.08)', borderRadius: '7px', textDecoration: 'none', border: '1px solid rgba(77,163,255,0.15)', display: 'block' }}>
+              Relatórios →
+            </a>
           </div>
         </motion.div>
       </div>
