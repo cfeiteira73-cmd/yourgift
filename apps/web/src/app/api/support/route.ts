@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('support_tickets')
-      .select('id, subject, body, priority, category, status, created_at, updated_at, actor_id, actor_email, assignee_email, resolution, entity_id, sla_due_at')
+      .select('id, subject, title, body, description, priority, category, status, created_at, updated_at, actor_id, actor_email, assignee_email, resolution, entity_id, sla_due_at')
       .order('created_at', { ascending: false })
       .limit(limit);
 
@@ -60,9 +60,14 @@ export async function GET(request: NextRequest) {
       throw error;
     }
 
-    // Compute SLA breach for each open ticket
+    // Compute SLA breach for each open ticket, normalise subject/body
     const now = Date.now();
-    const enriched = (data ?? []).map(ticket => {
+    const enriched = (data ?? []).map((ticket: Record<string, unknown>) => {
+      // Normalise: prefer new columns, fall back to legacy Prisma columns
+      const subject = (ticket.subject ?? ticket.title ?? '') as string;
+      const body    = (ticket.body ?? ticket.description ?? '') as string;
+      return { ...ticket, subject, body };
+    }).map((ticket: Record<string, unknown>) => {
       const slaDue = ticket.sla_due_at ? new Date(ticket.sla_due_at).getTime() : null;
       const breached = slaDue && now > slaDue && !['resolved', 'closed'].includes(ticket.status);
       const hoursElapsed = (now - new Date(ticket.created_at).getTime()) / 3600000;
@@ -114,16 +119,31 @@ export async function POST(request: NextRequest) {
     const slaTarget = SLA_TARGETS[priority];
     const slaDueAt = new Date(Date.now() + slaTarget.first_response * 3600000).toISOString();
 
+    // Lookup client ID (needed for NOT NULL FK on support_tickets.client_id)
+    const { data: clientData } = await supabase.from('clients')
+      .select('id').eq('auth_user_id', user.id).maybeSingle();
+    const clientId = clientData?.id ?? user.id; // fallback to user UUID
+
+    const subjectTrimmed = body.subject.trim().slice(0, 200);
+    const bodyTrimmed    = body.body.trim().slice(0, 5000);
+
     const ticket = {
-      subject:     body.subject.trim().slice(0, 200),
-      body:        body.body.trim().slice(0, 5000),
+      // New semantic columns (for portal UI)
+      subject:          subjectTrimmed,
+      body:             bodyTrimmed,
       priority,
       category,
-      status:      'open' as TicketStatus,
-      actor_id:    user.id,
-      actor_email: user.email ?? '',
-      entity_id:   body.entity_id ?? null,
-      sla_due_at:  slaDueAt,
+      status:           'open' as TicketStatus,
+      actor_id:         user.id,
+      actor_email:      user.email ?? '',
+      entity_id:        body.entity_id ?? null,
+      sla_due_at:       slaDueAt,
+      // Legacy NOT NULL columns required by original Prisma schema
+      title:            subjectTrimmed,           // maps subject → title
+      description:      bodyTrimmed,              // maps body → description
+      client_id:        clientId,
+      escalation_level: 'standard',               // default tier
+      metadata:         {} as Record<string, unknown>,
     };
 
     const { data, error } = await supabase.from('support_tickets').insert(ticket).select().single();
