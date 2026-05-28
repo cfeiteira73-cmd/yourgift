@@ -35,6 +35,7 @@ async function tableExists(supabase: Awaited<ReturnType<typeof createClient>>, t
 }
 
 export async function GET(req: NextRequest) {
+  try {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -88,9 +89,14 @@ export async function GET(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json({ submissions: data ?? [], total: count ?? 0, isAdmin });
+  } catch (error) {
+    console.error('[artwork] GET error:', error);
+    return NextResponse.json({ error: 'Artwork service unavailable' }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
+  try {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -235,4 +241,8 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
+  } catch (error) {
+    console.error('[artwork] POST error:', error);
+    return NextResponse.json({ error: 'Artwork action failed' }, { status: 500 });
+  }
 }

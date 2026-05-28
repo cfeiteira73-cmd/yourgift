@@ -26,6 +26,7 @@ const CATEGORY_GROUP_PREFIXES: Record<string, string[]> = {
 };
 
 export async function GET(req: NextRequest) {
+  try {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -77,6 +78,10 @@ export async function GET(req: NextRequest) {
     limit,
     offset,
   });
+  } catch (error) {
+    console.error('[catalog] GET error:', error);
+    return NextResponse.json({ error: 'Catalog unavailable' }, { status: 500 });
+  }
 }
 
 function normalizeProduct(row: Record<string, unknown>) {

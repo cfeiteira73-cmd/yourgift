@@ -15,6 +15,7 @@ import { createClient } from '@/lib/supabase/server';
 const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 export async function GET(req: NextRequest) {
+  try {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -186,4 +187,8 @@ export async function GET(req: NextRequest) {
     },
     generated_at: now.toISOString(),
   });
+  } catch (error) {
+    console.error('[command] GET error:', error);
+    return NextResponse.json({ error: 'Command center unavailable' }, { status: 500 });
+  }
 }

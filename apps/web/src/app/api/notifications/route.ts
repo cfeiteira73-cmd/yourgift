@@ -20,6 +20,7 @@ import { createClient } from '@/lib/supabase/server';
 const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 export async function GET(req: NextRequest) {
+  try {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -72,9 +73,14 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json({ error: 'Invalid mode' }, { status: 400 });
+  } catch (error) {
+    console.error('[notifications] GET error:', error);
+    return NextResponse.json({ error: 'Notifications unavailable' }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
+  try {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -147,4 +153,8 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
+  } catch (error) {
+    console.error('[notifications] POST error:', error);
+    return NextResponse.json({ error: 'Notifications action failed' }, { status: 500 });
+  }
 }

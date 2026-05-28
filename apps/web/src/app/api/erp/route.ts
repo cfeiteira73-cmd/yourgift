@@ -20,6 +20,7 @@ import { createClient } from '@/lib/supabase/server';
 const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 export async function GET(req: NextRequest) {
+  try {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -57,9 +58,14 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json({ error: 'Invalid mode' }, { status: 400 });
+  } catch (error) {
+    console.error('[erp] GET error:', error);
+    return NextResponse.json({ error: 'ERP unavailable' }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
+  try {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -152,4 +158,8 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
+  } catch (error) {
+    console.error('[erp] POST error:', error);
+    return NextResponse.json({ error: 'ERP action failed' }, { status: 500 });
+  }
 }
