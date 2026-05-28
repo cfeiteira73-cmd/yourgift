@@ -98,36 +98,42 @@ export default function QuoteDetailPage() {
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        router.push('/auth/login?next=/quotes/' + id);
-        return;
+      try {
+        const supabase = createClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) {
+          router.push('/auth/login?next=/quotes/' + id);
+          return;
+        }
+
+        const { data: clientData } = await supabase
+          .from('clients')
+          .select('id, name, company, tier')
+          .eq('auth_user_id', user.id)
+          .single();
+
+        setClient(clientData as ClientProfile | null);
+
+        const { data, error: fetchErr } = await supabase
+          .from('quotes')
+          .select('id, ref, status, created_at, event_date, delivery_date, notes, artwork_urls, items, pricing, converted_order_ref')
+          .eq('id', id)
+          .eq('client_id', (clientData as { id: string } | null)?.id ?? '')
+          .single();
+
+        if (fetchErr || !data) {
+          setError('Orçamento não encontrado.');
+        } else {
+          setQuote(data as unknown as Quote);
+        }
+      } catch (err) {
+        console.error('[quotes/id] load error:', err);
+        setError('Erro ao carregar orçamento.');
+      } finally {
+        setLoading(false);
       }
-
-      const { data: clientData } = await supabase
-        .from('clients')
-        .select('id, name, company, tier')
-        .eq('auth_user_id', user.id)
-        .single();
-
-      setClient(clientData as ClientProfile | null);
-
-      const { data, error: fetchErr } = await supabase
-        .from('quotes')
-        .select('id, ref, status, created_at, event_date, delivery_date, notes, artwork_urls, items, pricing, converted_order_ref')
-        .eq('id', id)
-        .eq('client_id', (clientData as { id: string } | null)?.id ?? '')
-        .single();
-
-      if (fetchErr || !data) {
-        setError('Orçamento não encontrado.');
-      } else {
-        setQuote(data as unknown as Quote);
-      }
-      setLoading(false);
     }
     load();
   }, [id, router]);
