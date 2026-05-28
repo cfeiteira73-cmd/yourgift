@@ -1,0 +1,182 @@
+# TEST COVERAGE REPORT
+**YourGift OS — OMEGA INFINITE Phase 12**
+**Generated:** 2026-05-28
+
+---
+
+## Summary
+
+| Category | Count | Status |
+|---|---|---|
+| E2E Test Files | 6 | ✅ Active |
+| Total Test Cases (blocks) | ~206 | ✅ Present |
+| Total Test Lines | 643 | ✅ |
+| Unit Tests | 0 | ❌ Missing |
+| API Route Tests | 0 | ❌ Missing |
+| TypeScript Errors | 0 | ✅ Clean |
+| Test Framework | Playwright | ✅ Configured |
+
+---
+
+## E2E Test Coverage
+
+### auth.spec.ts (127 lines, ~39 test blocks)
+**Covers:**
+- Magic link login flow (happy path)
+- Magic link invalid token (sad path)
+- Expired token handling
+- Admin gate: `geral@yourgift.pt` access granted
+- Admin gate: non-admin redirected to dashboard
+- Auth redirect: unauthenticated user sent to `/auth/login`
+- Session persistence across page reload
+- Logout flow
+
+**Missing:**
+- Password reset flow (not applicable — magic link only)
+- SSO/OAuth login
+- Rate limit response on auth endpoints
+
+---
+
+### analytics.spec.ts (97 lines, ~29 test blocks)
+**Covers:**
+- Dashboard KPI cards load correctly
+- Analytics API returns valid JSON
+- Period filter (7d, 30d, 90d) changes data
+- Revenue chart renders
+- Loading state → data transition
+
+**Missing:**
+- Anomaly detection alerts
+- Export functionality
+- Admin vs client data scoping
+
+---
+
+### approvals.spec.ts (83 lines, ~25 test blocks)
+**Covers:**
+- Approvals page renders for admin
+- Approval action updates status
+- Rejection with reason
+- Empty state when no approvals pending
+
+**Missing:**
+- Non-admin blocked from approvals
+- Concurrent approval conflict handling
+- Notification sent on approval
+
+---
+
+### onboarding.spec.ts (98 lines, ~30 test blocks)
+**Covers:**
+- New client signup flow
+- Company profile completion
+- First order creation wizard
+- Portal welcome state for new user
+
+**Missing:**
+- Duplicate email handling
+- Profile picture upload
+- Incomplete profile warning
+
+---
+
+### procurement.spec.ts (151 lines, ~55 test blocks)
+**Covers:**
+- Supplier search and filtering
+- Quote request creation
+- Quote status transitions (pending → approved → converted)
+- Price comparison across suppliers
+- Lead time display
+
+**Missing:**
+- Supplier auto-routing logic
+- Minimum order quantity validation
+- Artwork requirement validation
+
+---
+
+### resilience.spec.ts (87 lines, ~28 test blocks)
+**Covers:**
+- API 500 returns graceful error UI (not white screen)
+- Network timeout shows error state
+- Supabase unavailable → page still renders skeleton
+- Retry mechanisms
+
+**Missing:**
+- Rate limit (429) UI feedback
+- Partial data load (some APIs succeed, some fail)
+- Concurrent session conflict
+
+---
+
+## Critical Coverage Gaps
+
+### ❌ No Unit Tests
+Zero unit tests exist for:
+- `lib/rate-limit.ts` (new utility)
+- `lib/api.ts` (API client)
+- `lib/motion.ts` (animation presets)
+- Financial calculation logic
+- VAT computation in `api/currency/route.ts`
+- Order status machine transitions
+
+### ❌ No API Route Tests
+None of the 48 API routes have isolated tests:
+- Auth guard tests (do all routes return 401 when unauthenticated?)
+- Rate limit tests (does copilot return 429 after 30 requests?)
+- Input validation tests (malformed bodies, SQL injection strings)
+- Admin-only route gate tests
+
+### ❌ No Financial Integrity Tests
+- `api/financial/route.ts` ledger calculations untested
+- `api/reconciliation/route.ts` zero-sum checks untested
+- Order `total_amount` NULL handling untested
+
+### ❌ Portal Pages Missing E2E
+57 portal pages total, but only ~6 flows tested:
+| Untested Pages | Risk |
+|---|---|
+| `/billing` — invoice list | Medium |
+| `/quotes/new` — form submission | High |
+| `/orders/[id]` — order detail | High |
+| `/production` — status updates | High |
+| `/suppliers` — CRUD | Medium |
+| `/clients` — admin view | High |
+| `/cockpit` — analytics dashboard | High |
+
+---
+
+## Recommended Test Additions (Priority Order)
+
+### Immediate
+1. **Auth gate unit test** — verify all 48 routes return 401 without valid session
+2. **Rate limit test** — verify copilot returns 429 on 31st request within 60s
+3. **Financial calculation unit** — VAT, currency conversion edge cases
+
+### Sprint 1
+4. **quotes/new E2E** — form validation, submission, status transition
+5. **orders/[id] E2E** — order detail load, production status update
+6. **billing E2E** — invoice list, status filter tabs
+
+### Sprint 2
+7. **API input sanitization** — test malformed JSON, oversized payloads
+8. **cockpit E2E** — KPI cards, period filter, admin vs client data
+9. **clients E2E** — admin-only access, client list, profile view
+
+---
+
+## Test Infrastructure Status
+
+| Tool | Status | Config |
+|---|---|---|
+| Playwright | ✅ Installed | `e2e/playwright.config.ts` |
+| TypeScript | ✅ 0 errors | `tsconfig.json` |
+| CI/CD | ✅ GitHub Actions | (Vercel deploy triggers) |
+| Test Database | ❓ Unknown | Needs staging Supabase project |
+| Test Secrets | ❓ Unknown | Needs `.env.test` setup |
+
+---
+
+*Report generated by OMEGA INFINITE Phase 12 — Testing Absolute*
+*Commit ref: 6eeaee3 | Branch: master*

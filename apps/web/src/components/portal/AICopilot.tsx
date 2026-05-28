@@ -144,6 +144,14 @@ export function AICopilot() {
         body: JSON.stringify({ messages: history }),
       });
 
+      if (res.status === 429) {
+        setMessages(prev => [...prev, {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: '⏳ Demasiados pedidos. Aguarda um momento antes de continuar.',
+        }]);
+        return;
+      }
       if (!res.ok) throw new Error('API error');
 
       const data = await res.json();
