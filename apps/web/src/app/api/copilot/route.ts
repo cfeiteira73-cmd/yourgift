@@ -113,9 +113,11 @@ export async function POST(request: NextRequest) {
 
     if (!messages.length) return NextResponse.json({ error: 'No messages provided' }, { status: 400 });
 
+    // Cap history to last 20 messages (token cost control); trim each to 3000 chars
     const validMessages = messages
       .filter(m => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
-      .map(m => ({ role: m.role, content: m.content.trim().slice(0, 3000) }));
+      .map(m => ({ role: m.role, content: m.content.trim().slice(0, 3000) }))
+      .slice(-20);
 
     if (!validMessages.length) return NextResponse.json({ error: 'Invalid messages' }, { status: 400 });
 
