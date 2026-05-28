@@ -136,7 +136,7 @@ export default function AccountPage() {
                 {userId}
               </code>
               <button type="button"
-                type="button"
+                
                 onClick={copyUserId}
                 className="px-3 py-2 rounded-lg border border-white/10 text-white/40 hover:text-white/70 text-[11px] transition-colors flex-shrink-0"
               >
@@ -155,7 +155,7 @@ export default function AccountPage() {
                 <p className="text-white/30 text-[10px] mt-0.5">Enviar link de redefinição por email</p>
               </div>
               <button type="button"
-                type="button"
+                
                 onClick={sendPasswordReset}
                 disabled={changingPwd}
                 className="px-3 py-1.5 rounded-lg border border-white/10 text-white/50 hover:text-white/80 hover:border-white/20 text-[11px] font-medium transition-colors disabled:opacity-40"
@@ -228,7 +228,7 @@ export default function AccountPage() {
                 <p className="text-white/25 text-[10px] mt-0.5">Encerra a sessão em todos os dispositivos</p>
               </div>
               <button type="button"
-                type="button"
+                
                 onClick={async () => {
                   const supabase = createClient();
                   await supabase.auth.signOut({ scope: 'global' });

@@ -368,7 +368,7 @@ export default function ClientsPage() {
             {Object.entries(TIER_CFG).map(([tier, cfg]) => {
               const count = tierCounts[tier] ?? 0;
               return count > 0 ? (
-                <button type="button" key={tier} type="button" onClick={() => setTierFilter(tierFilter === tier ? null : tier)}
+                <button type="button" key={tier}  onClick={() => setTierFilter(tierFilter === tier ? null : tier)}
                   style={{ fontSize: '0.7rem', fontWeight: 600, padding: '0.3rem 0.75rem', borderRadius: '9999px', border: `1px solid ${tierFilter === tier ? cfg.border : 'rgba(255,255,255,0.07)'}`, background: tierFilter === tier ? cfg.bg : 'rgba(255,255,255,0.02)', color: tierFilter === tier ? cfg.color : 'rgb(80,92,110)', cursor: 'pointer' }}>
                   {cfg.label} ({count})
                 </button>

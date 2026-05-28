@@ -211,7 +211,7 @@ function SupplierCard({ supplier, index }: { supplier: SupplierScore; index: num
 
       {/* Expand toggle for breakdown */}
       <button type="button"
-        type="button"
+        
         onClick={() => setExpanded(e => !e)}
         style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '8px', padding: '0.4rem', cursor: 'pointer', fontSize: '0.65rem', color: 'rgb(100,112,130)', fontWeight: 600 }}
       >
@@ -587,7 +587,7 @@ export default function SuppliersPage() {
           </h2>
           <div style={{ display: 'flex', gap: '0.375rem', background: 'rgba(255,255,255,0.04)', padding: '3px', borderRadius: '9px', border: '1px solid rgba(255,255,255,0.06)' }}>
             {([['overall', 'Score Global'], ['quality', 'Qualidade'], ['delivery', 'Entrega']] as const).map(([key, label]) => (
-              <button type="button" key={key} type="button" onClick={() => setSortBy(key)}
+              <button type="button" key={key}  onClick={() => setSortBy(key)}
                 style={{ padding: '0.25rem 0.625rem', borderRadius: '7px', fontSize: '0.68rem', fontWeight: 600, cursor: 'pointer', border: 'none', background: sortBy === key ? 'rgba(77,163,255,0.18)' : 'transparent', color: sortBy === key ? 'rgb(77,163,255)' : 'rgb(100,112,130)' }}>
                 {label}
               </button>

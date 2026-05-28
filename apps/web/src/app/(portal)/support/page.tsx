@@ -262,7 +262,7 @@ export default function SupportPage() {
           ['resolved', 'Resolvidos'],
           ['all', 'Todos'],
         ] as const).map(([key, label]) => (
-          <button type="button" key={key} type="button" onClick={() => setStatusFilter(key)}
+          <button type="button" key={key}  onClick={() => setStatusFilter(key)}
             className={`px-4 py-2 text-xs font-medium rounded-t-lg transition-colors ${
               statusFilter === key ? 'text-white bg-white/8 border-b-2 border-blue-400' : 'text-white/40 hover:text-white/70'
             }`}>

@@ -221,7 +221,7 @@ export default function RunbooksPage() {
             onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.09)')}
           />
           {categories.map(cat => (
-            <button type="button" key={cat} type="button" onClick={() => setCatFilter(cat)}
+            <button type="button" key={cat}  onClick={() => setCatFilter(cat)}
               style={{ padding: '0.35rem 0.75rem', borderRadius: '9999px', fontSize: '0.7rem', fontWeight: catFilter === cat ? 700 : 400, cursor: 'pointer', background: catFilter === cat ? 'rgba(77,163,255,0.14)' : 'rgba(255,255,255,0.04)', color: catFilter === cat ? 'rgb(77,163,255)' : 'rgb(120,130,150)', border: catFilter === cat ? '1px solid rgba(77,163,255,0.3)' : '1px solid rgba(255,255,255,0.07)', transition: 'all 150ms' }}>
               {cat}
             </button>

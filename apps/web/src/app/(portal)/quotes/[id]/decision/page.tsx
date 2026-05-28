@@ -164,7 +164,7 @@ export default function QuoteDecisionPage() {
             <p style={{ fontSize: '1rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '0.5rem' }}>Não foi possível gerar o cartão</p>
             <p style={{ fontSize: '0.875rem', color: 'rgb(170,180,198)', marginBottom: '1.5rem' }}>{error}</p>
             <button type="button"
-              type="button"
+              
               onClick={loadAndGenerate}
               style={{ padding: '0.625rem 1.25rem', borderRadius: '8px', background: 'rgb(77,163,255)', color: 'rgb(7,17,31)', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.875rem' }}
             >

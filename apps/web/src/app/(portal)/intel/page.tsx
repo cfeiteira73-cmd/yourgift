@@ -138,7 +138,7 @@ export default function IntelPage() {
         </div>
         <div className="flex gap-2">
           {(['health', 'maturity', 'reality'] as const).map(t => (
-            <button type="button" key={t} type="button" onClick={() => setTab(t)}
+            <button type="button" key={t}  onClick={() => setTab(t)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${tab === t ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/60'}`}>
               {t === 'health' ? 'Customer Health' : t === 'maturity' ? 'Maturidade' : 'Reality Check'}
             </button>
@@ -158,7 +158,7 @@ export default function IntelPage() {
             {(['low', 'medium', 'high', 'critical'] as const).map((risk, i) => {
               const colors = ['text-emerald-400', 'text-amber-400', 'text-orange-400', 'text-red-400'];
               return (
-                <button type="button" key={risk} type="button"
+                <button type="button" key={risk} 
                   onClick={() => setRiskFilter(riskFilter === risk ? 'all' : risk)}
                   className={`rounded-xl border p-4 text-left transition-colors ${
                     riskFilter === risk ? 'border-white/20 bg-white/8' : 'border-white/5 bg-white/3 hover:bg-white/5'

@@ -341,7 +341,7 @@ export default function QuotesPage() {
           {FILTERS.map((f) => (
             <button type="button"
               key={f.key}
-              type="button"
+              
               onClick={() => setFilter(f.key)}
               style={{
                 padding: '0.4rem 0.875rem', borderRadius: '9999px',

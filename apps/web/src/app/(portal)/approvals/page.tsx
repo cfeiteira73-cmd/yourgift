@@ -410,7 +410,7 @@ export default function ApprovalsPage() {
           { key: 'enterprise', label: 'Enterprise', color: 'text-blue-400',   bg: 'bg-blue-500/10 border-blue-500/20' },
           { key: 'vip',        label: 'VIP',        color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20' },
         ] as const).map(({ key, label, color, bg }) => (
-          <button type="button" key={key} type="button" onClick={() => setFilterTier(key)}
+          <button type="button" key={key}  onClick={() => setFilterTier(key)}
             className={`px-3 py-1 rounded-full border text-[10px] font-medium transition-all ${color} ${bg} ${
               filterTier === key ? 'ring-1 ring-white/20' : 'opacity-50 hover:opacity-100'
             }`}>

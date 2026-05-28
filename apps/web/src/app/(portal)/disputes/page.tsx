@@ -220,7 +220,7 @@ export default function DisputesPage() {
       {/* Filter tabs */}
       <div className="flex gap-1">
         {STATUS_FILTERS.map(f => (
-          <button type="button" key={f.key} type="button" onClick={() => setStatusFilter(f.key)}
+          <button type="button" key={f.key}  onClick={() => setStatusFilter(f.key)}
             className={`px-3 py-1.5 text-[10px] font-medium rounded-lg transition-colors ${
               statusFilter === f.key ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'
             }`}>

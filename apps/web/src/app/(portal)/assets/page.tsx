@@ -437,7 +437,7 @@ function AssetIntelligencePlatform() {
             {(['grid', 'list'] as const).map((v) => (
               <button type="button"
                 key={v}
-                type="button"
+                
                 onClick={() => setView(v)}
                 style={{
                   padding: '0.5rem 0.75rem', border: 'none', cursor: 'pointer',
@@ -471,7 +471,7 @@ function AssetIntelligencePlatform() {
         {filterOpts.map((opt) => (
           <button type="button"
             key={opt.key}
-            type="button"
+            
             onClick={() => setFilter(opt.key)}
             style={{
               padding: '0.4rem 0.875rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600,

@@ -506,7 +506,7 @@ export default function QuoteDetailPage() {
 
               {quote.status === 'draft' && (
                 <button type="button"
-                  type="button"
+                  
                   onClick={() => handleAction('submit')}
                   disabled={actionLoading}
                   style={{
@@ -557,7 +557,7 @@ export default function QuoteDetailPage() {
 
               {quote.status === 'approved' && (
                 <button type="button"
-                  type="button"
+                  
                   onClick={() => handleAction('convert')}
                   disabled={actionLoading}
                   style={{

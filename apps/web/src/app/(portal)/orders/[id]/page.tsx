@@ -196,7 +196,7 @@ export default async function OrderDetailPage({
 
           <div style={{ display: 'flex', gap: '0.625rem', flexWrap: 'wrap' }}>
             <button type="button"
-              type="button"
+              
               disabled
               style={{
                 padding: '0.5rem 1rem',

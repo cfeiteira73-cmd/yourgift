@@ -370,7 +370,7 @@ export default function NewQuotePage() {
                         </p>
                       )}
                       <button type="button"
-                        type="button"
+                        
                         onClick={() => addProduct(product)}
                         disabled={already}
                         style={{
@@ -421,7 +421,7 @@ export default function NewQuotePage() {
                       {/* Quantity */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
                         <button type="button"
-                          type="button"
+                          
                           onClick={() => updateItem(item.product.id, { quantity: Math.max(1, item.quantity - 10) })}
                           style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgb(170,180,198)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >
@@ -435,7 +435,7 @@ export default function NewQuotePage() {
                           style={{ width: '60px', textAlign: 'center', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', padding: '0.3rem', fontSize: '0.875rem', color: 'rgb(245,247,251)', outline: 'none' }}
                         />
                         <button type="button"
-                          type="button"
+                          
                           onClick={() => updateItem(item.product.id, { quantity: item.quantity + 10 })}
                           style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgb(170,180,198)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >
@@ -454,7 +454,7 @@ export default function NewQuotePage() {
                       </select>
                       {/* Remove */}
                       <button type="button"
-                        type="button"
+                        
                         onClick={() => removeProduct(item.product.id)}
                         style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid rgba(239,68,68,0.2)', background: 'rgba(239,68,68,0.08)', color: 'rgb(239,68,68)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
                       >
@@ -474,7 +474,7 @@ export default function NewQuotePage() {
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
               <button type="button"
-                type="button"
+                
                 onClick={() => setStep(2)}
                 disabled={selectedItems.length === 0}
                 style={{
@@ -612,7 +612,7 @@ export default function NewQuotePage() {
                           {file.name}
                         </span>
                         <button type="button"
-                          type="button"
+                          
                           onClick={() => setArtworkFiles((prev) => prev.filter((_, i) => i !== idx))}
                           style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgb(120,130,150)', padding: '0' }}
                         >
@@ -633,14 +633,14 @@ export default function NewQuotePage() {
 
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
               <button type="button"
-                type="button"
+                
                 onClick={() => setStep(1)}
                 style={{ padding: '0.625rem 1.25rem', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgb(170,180,198)' }}
               >
                 ← Anterior
               </button>
               <button type="button"
-                type="button"
+                
                 onClick={() => { setError(''); setStep(3); }}
                 style={{ padding: '0.625rem 1.5rem', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', background: 'rgb(77,163,255)', color: 'rgb(7,17,31)', border: 'none' }}
               >
@@ -756,14 +756,14 @@ export default function NewQuotePage() {
 
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
               <button type="button"
-                type="button"
+                
                 onClick={() => setStep(2)}
                 style={{ padding: '0.625rem 1.25rem', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgb(170,180,198)' }}
               >
                 ← Anterior
               </button>
               <button type="button"
-                type="button"
+                
                 onClick={handleSubmit}
                 disabled={!termsAccepted || submitting}
                 style={{

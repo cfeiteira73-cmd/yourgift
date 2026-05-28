@@ -103,7 +103,7 @@ function ScenarioModal({ live, onClose }: { live: LiveData; onClose: () => void 
         </div>
         <div className="flex flex-wrap gap-1.5">
           {SCENARIOS.map(s => (
-            <button type="button" key={s} type="button" onClick={() => setScenario(s)}
+            <button type="button" key={s}  onClick={() => setScenario(s)}
               className="px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-white/50 text-[9px] transition-colors">
               {s}
             </button>

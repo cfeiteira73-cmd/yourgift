@@ -383,7 +383,7 @@ export default function ProductionPage() {
             const count = byStage[stage.key]?.length ?? 0;
             const isBottleneck = stage.key === bottleneck && count > 0;
             return (
-              <button type="button" key={stage.key} type="button" onClick={() => setStageFilter(stageFilter === stage.key ? null : stage.key)}
+              <button type="button" key={stage.key}  onClick={() => setStageFilter(stageFilter === stage.key ? null : stage.key)}
                 style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.68rem', fontWeight: count > 0 ? 700 : 400, padding: '0.25rem 0.625rem', borderRadius: '9999px', border: `1px solid ${stageFilter === stage.key ? stage.border : count > 0 ? stage.border : 'rgba(255,255,255,0.07)'}`, background: stageFilter === stage.key ? stage.bg : 'rgba(255,255,255,0.02)', color: count > 0 ? stage.color : 'rgb(60,72,90)', cursor: 'pointer' }}>
                 {stage.icon} {count}
                 {isBottleneck && <span style={{ fontSize: '0.52rem', color: 'rgb(245,158,11)', fontWeight: 700 }}>▲</span>}

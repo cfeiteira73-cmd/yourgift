@@ -248,7 +248,7 @@ export default function ClientSuccessPage() {
           { key: 'portfolio', label: 'Portfolio' },
           { key: 'renewals',  label: 'Pipeline de Renovações' },
         ].map(({ key, label }) => (
-          <button type="button" key={key} type="button"
+          <button type="button" key={key} 
             onClick={() => key === 'renewals' ? loadRenewals() : setTab('portfolio')}
             className={`px-4 py-2 text-xs font-medium rounded-t-lg transition-colors ${
               tab === key ? 'text-white bg-white/8 border-b-2 border-blue-400' : 'text-white/40 hover:text-white/70'
