@@ -337,15 +337,20 @@ export default function CockpitPage() {
 
   useEffect(() => {
     async function init() {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push('/auth/login?next=/cockpit'); return; }
-      const admin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
-      setIsAdmin(admin);
-      const { data: c } = await supabase.from('clients').select('id,name,company,tier').eq('auth_user_id', user.id).single();
-      setClient(c as ClientProfile | null);
-      await load(period);
-      setLoading(false);
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { router.push('/auth/login?next=/cockpit'); return; }
+        const admin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+        setIsAdmin(admin);
+        const { data: c } = await supabase.from('clients').select('id,name,company,tier').eq('auth_user_id', user.id).single();
+        setClient(c as ClientProfile | null);
+        await load(period);
+      } catch (err) {
+        console.error('[cockpit] init error:', err);
+      } finally {
+        setLoading(false);
+      }
     }
     init();
   // eslint-disable-next-line react-hooks/exhaustive-deps

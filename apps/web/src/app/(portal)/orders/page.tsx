@@ -288,6 +288,7 @@ export default function OrdersPage() {
 
   useEffect(() => {
     async function load() {
+      try {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push('/auth/login?next=/orders'); return; }
@@ -310,7 +311,11 @@ export default function OrdersPage() {
 
       if (fetchError) setError('Erro ao carregar encomendas.');
       else setOrders((data ?? []) as unknown as Order[]);
-      setLoading(false);
+            } catch (err) {
+        console.error("[orders] load error:", err);
+      } finally {
+        setLoading(false);
+      }
     }
     load();
   }, [router]);

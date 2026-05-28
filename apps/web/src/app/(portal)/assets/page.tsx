@@ -268,6 +268,7 @@ function AssetIntelligencePlatform() {
   // Load user + assets from Supabase Storage
   useEffect(() => {
     async function load() {
+      try {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { setLoading(false); return; }
@@ -295,7 +296,11 @@ function AssetIntelligencePlatform() {
         );
         setAssets(mapped);
       }
-      setLoading(false);
+            } catch (err) {
+        console.error("[assets] load error:", err);
+      } finally {
+        setLoading(false);
+      }
     }
     load();
   }, []);

@@ -44,15 +44,20 @@ export default function BillingPage() {
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push('/auth/login?next=/billing'); return; }
-      const { data: c } = await supabase.from('clients').select('id,name,company,tier').eq('auth_user_id', user.id).single();
-      setClient(c as ClientProfile | null);
-      if (!c) { setLoading(false); return; }
-      const { data } = await supabase.from('orders').select('id,ref,status,total_amount,created_at').eq('client_id', c.id).not('status', 'eq', 'draft').order('created_at', { ascending: false });
-      setOrders((data ?? []) as Order[]);
-      setLoading(false);
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { router.push('/auth/login?next=/billing'); return; }
+        const { data: c } = await supabase.from('clients').select('id,name,company,tier').eq('auth_user_id', user.id).single();
+        setClient(c as ClientProfile | null);
+        if (!c) return;
+        const { data } = await supabase.from('orders').select('id,ref,status,total_amount,created_at').eq('client_id', c.id).not('status', 'eq', 'draft').order('created_at', { ascending: false });
+        setOrders((data ?? []) as Order[]);
+      } catch (err) {
+        console.error('[billing] load error:', err);
+      } finally {
+        setLoading(false);
+      }
     }
     load();
   }, [router]);

@@ -77,13 +77,18 @@ export default function MobileCommandPage() {
 
   useEffect(() => {
     async function init() {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push('/auth/login?next=/mobile'); return; }
-      const { data: c } = await supabase.from('clients').select('id,name,company,tier').eq('auth_user_id', user.id).single();
-      setClient(c as ClientProfile | null);
-      await loadData();
-      setLoading(false);
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { router.push('/auth/login?next=/mobile'); return; }
+        const { data: c } = await supabase.from('clients').select('id,name,company,tier').eq('auth_user_id', user.id).single();
+        setClient(c as ClientProfile | null);
+        await loadData();
+      } catch (err) {
+        console.error('[mobile] init error:', err);
+      } finally {
+        setLoading(false);
+      }
     }
     init();
   }, [router, loadData]);

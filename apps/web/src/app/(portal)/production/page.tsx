@@ -205,53 +205,59 @@ export default function ProductionPage() {
   const [stageFilter, setStageFilter] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push('/auth/login?next=/production'); return; }
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push('/auth/login?next=/production'); return; }
 
-    const admin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
-    setIsAdmin(admin);
+      const admin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+      setIsAdmin(admin);
 
-    // Fetch SLA definitions
-    const { data: slaData } = await supabase
-      .from('sla_definitions')
-      .select('stage,display_name,expected_hours,warning_hours,critical_hours,color')
-      .eq('is_active', true);
+      // Fetch SLA definitions
+      const { data: slaData } = await supabase
+        .from('sla_definitions')
+        .select('stage,display_name,expected_hours,warning_hours,critical_hours,color')
+        .eq('is_active', true);
 
-    const map: Record<string, SlaDefinition> = {};
-    for (const s of slaData ?? []) map[s.stage] = s as SlaDefinition;
-    setSlaMap(map);
+      const map: Record<string, SlaDefinition> = {};
+      for (const s of slaData ?? []) map[s.stage] = s as SlaDefinition;
+      setSlaMap(map);
 
-    if (admin) {
-      // Admin: all orders with client info
-      const { data } = await supabase
-        .from('orders')
-        .select(`id,ref,status,total_amount,created_at,updated_at,
-          order_items(id,quantity,products(title,images)),
-          clients(name,company)`)
-        .not('status', 'in', '("delivered","cancelled")')
-        .order('created_at', { ascending: false })
-        .limit(300);
+      if (admin) {
+        // Admin: all orders with client info
+        const { data } = await supabase
+          .from('orders')
+          .select(`id,ref,status,total_amount,created_at,updated_at,
+            order_items(id,quantity,products(title,images)),
+            clients(name,company)`)
+          .not('status', 'in', '("delivered","cancelled")')
+          .order('created_at', { ascending: false })
+          .limit(300);
 
-      setOrders((data ?? []).map((o: any) => ({
-        ...o,
-        client: o.clients ?? null,
-      })) as Order[]);
-    } else {
-      const { data: c } = await supabase.from('clients').select('id,name,company,tier').eq('auth_user_id', user.id).single();
-      setClient(c as ClientProfile | null);
-      if (!c) { setLoading(false); return; }
-      const { data } = await supabase
-        .from('orders')
-        .select('id,ref,status,total_amount,created_at,updated_at,order_items(id,quantity,products(title,images))')
-        .eq('client_id', c.id)
-        .not('status', 'in', '("delivered","cancelled")')
-        .order('created_at', { ascending: false });
-      setOrders((data ?? []) as unknown as Order[]);
+        setOrders((data ?? []).map((o: any) => ({
+          ...o,
+          client: o.clients ?? null,
+        })) as Order[]);
+      } else {
+        const { data: c } = await supabase.from('clients').select('id,name,company,tier').eq('auth_user_id', user.id).single();
+        setClient(c as ClientProfile | null);
+        if (c) {
+          const { data } = await supabase
+            .from('orders')
+            .select('id,ref,status,total_amount,created_at,updated_at,order_items(id,quantity,products(title,images))')
+            .eq('client_id', c.id)
+            .not('status', 'in', '("delivered","cancelled")')
+            .order('created_at', { ascending: false });
+          setOrders((data ?? []) as unknown as Order[]);
+        }
+      }
+
+      setLastRefresh(new Date());
+    } catch (err) {
+      console.error('[production] load error:', err);
+    } finally {
+      setLoading(false);
     }
-
-    setLastRefresh(new Date());
-    setLoading(false);
   }, [router]);
 
   useEffect(() => { load(); }, [load]);

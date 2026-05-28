@@ -476,6 +476,7 @@ export default function SuppliersPage() {
 
   useEffect(() => {
     async function load() {
+      try {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push('/auth/login?next=/suppliers'); return; }
@@ -507,7 +508,11 @@ export default function SuppliersPage() {
         total: alerts.length,
       });
 
-      setLoading(false);
+            } catch (err) {
+        console.error("[suppliers] load error:", err);
+      } finally {
+        setLoading(false);
+      }
     }
     load();
   }, [router]);

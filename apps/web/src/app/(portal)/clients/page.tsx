@@ -221,55 +221,59 @@ export default function ClientsPage() {
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push('/auth/login?next=/clients'); return; }
-      setUserEmail(user.email ?? '');
-      const admin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
-      setIsAdmin(admin);
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { router.push('/auth/login?next=/clients'); return; }
+        setUserEmail(user.email ?? '');
+        const admin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+        setIsAdmin(admin);
 
-      const { data: c } = await supabase.from('clients').select('*').eq('auth_user_id', user.id).single();
-      setClient(c as ClientProfile | null);
+        const { data: c } = await supabase.from('clients').select('*').eq('auth_user_id', user.id).single();
+        setClient(c as ClientProfile | null);
 
-      if (admin) {
-        // Fetch ALL clients
-        const { data: clients } = await supabase
-          .from('clients')
-          .select('id, name, company, tier, budget_limit, auth_user_id, created_at, phone, address')
-          .order('created_at', { ascending: false });
+        if (admin) {
+          // Fetch ALL clients
+          const { data: clients } = await supabase
+            .from('clients')
+            .select('id, name, company, tier, budget_limit, auth_user_id, created_at, phone, address')
+            .order('created_at', { ascending: false });
 
-        if (clients && clients.length > 0) {
-          // Fetch order/quote stats for each client in parallel
-          const withStats: ClientWithStats[] = await Promise.all(
-            (clients as ClientProfile[]).map(async (cli) => {
-              const [ordRes, quotRes, spendRes, activeRes] = await Promise.all([
-                supabase.from('orders').select('id', { count: 'exact', head: true }).eq('client_id', cli.id),
-                supabase.from('quotes').select('id', { count: 'exact', head: true }).eq('client_id', cli.id),
-                supabase.from('orders').select('total_amount').eq('client_id', cli.id).not('status', 'eq', 'cancelled'),
-                supabase.from('orders').select('id', { count: 'exact', head: true }).eq('client_id', cli.id).not('status', 'in', '("delivered","cancelled","draft")'),
-              ]);
-              return {
-                ...cli,
-                orders: ordRes.count ?? 0,
-                quotes: quotRes.count ?? 0,
-                totalSpend: (spendRes.data ?? []).reduce((s, o: any) => s + (o.total_amount ?? 0), 0),
-                activeOrders: activeRes.count ?? 0,
-              };
-            })
-          );
-          setAllClients(withStats);
+          if (clients && clients.length > 0) {
+            // Fetch order/quote stats for each client in parallel
+            const withStats: ClientWithStats[] = await Promise.all(
+              (clients as ClientProfile[]).map(async (cli) => {
+                const [ordRes, quotRes, spendRes, activeRes] = await Promise.all([
+                  supabase.from('orders').select('id', { count: 'exact', head: true }).eq('client_id', cli.id),
+                  supabase.from('quotes').select('id', { count: 'exact', head: true }).eq('client_id', cli.id),
+                  supabase.from('orders').select('total_amount').eq('client_id', cli.id).not('status', 'eq', 'cancelled'),
+                  supabase.from('orders').select('id', { count: 'exact', head: true }).eq('client_id', cli.id).not('status', 'in', '("delivered","cancelled","draft")'),
+                ]);
+                return {
+                  ...cli,
+                  orders: ordRes.count ?? 0,
+                  quotes: quotRes.count ?? 0,
+                  totalSpend: (spendRes.data ?? []).reduce((s, o: any) => s + (o.total_amount ?? 0), 0),
+                  activeOrders: activeRes.count ?? 0,
+                };
+              })
+            );
+            setAllClients(withStats);
+          }
+        } else if (c) {
+          const [ordersRes, quotesRes, spendRes] = await Promise.all([
+            supabase.from('orders').select('id', { count: 'exact', head: true }).eq('client_id', c.id),
+            supabase.from('quotes').select('id', { count: 'exact', head: true }).eq('client_id', c.id),
+            supabase.from('orders').select('total_amount').eq('client_id', c.id).not('status', 'eq', 'cancelled'),
+          ]);
+          const totalSpend = (spendRes.data ?? []).reduce((s, o: any) => s + (o.total_amount ?? 0), 0);
+          setStats({ orders: ordersRes.count ?? 0, quotes: quotesRes.count ?? 0, totalSpend });
         }
-      } else if (c) {
-        const [ordersRes, quotesRes, spendRes] = await Promise.all([
-          supabase.from('orders').select('id', { count: 'exact', head: true }).eq('client_id', c.id),
-          supabase.from('quotes').select('id', { count: 'exact', head: true }).eq('client_id', c.id),
-          supabase.from('orders').select('total_amount').eq('client_id', c.id).not('status', 'eq', 'cancelled'),
-        ]);
-        const totalSpend = (spendRes.data ?? []).reduce((s, o: any) => s + (o.total_amount ?? 0), 0);
-        setStats({ orders: ordersRes.count ?? 0, quotes: quotesRes.count ?? 0, totalSpend });
+      } catch (err) {
+        console.error('[clients] load error:', err);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     }
     load();
   }, [router]);

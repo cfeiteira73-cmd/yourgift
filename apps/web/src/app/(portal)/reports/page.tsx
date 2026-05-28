@@ -751,6 +751,7 @@ export default function ReportsPage() {
 
   useEffect(() => {
     async function load() {
+      try {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push('/auth/login?next=/reports'); return; }
@@ -805,7 +806,11 @@ export default function ReportsPage() {
         setQuotes((quotesRes.data ?? []) as Quote[]);
       }
 
-      setLoading(false);
+            } catch (err) {
+        console.error("[reports] load error:", err);
+      } finally {
+        setLoading(false);
+      }
     }
     load();
   }, [router]);
