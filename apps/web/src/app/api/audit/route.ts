@@ -64,21 +64,24 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ today: 0, week: 0, top_actions: [], results: { success: 0, error: 0 } });
       }
 
-      // Compute top actions from raw data
+      // Compute top actions + error count from raw data
       const actionCounts: Record<string, number> = {};
+      let errorCount = 0;
       for (const row of topRes.data ?? []) {
         actionCounts[row.action] = (actionCounts[row.action] ?? 0) + 1;
+        if (row.action === 'portal_error') errorCount++;
       }
       const top_actions = Object.entries(actionCounts)
         .map(([action, count]) => ({ action, count }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 10);
+      const weekTotal = weekRes.count ?? 0;
 
       return NextResponse.json({
         today: todayRes.count ?? 0,
-        week: weekRes.count ?? 0,
+        week: weekTotal,
         top_actions,
-        results: { success: weekRes.count ?? 0, error: 0 },
+        results: { success: weekTotal - errorCount, error: errorCount },
         generatedAt: new Date().toISOString(),
       });
     }
