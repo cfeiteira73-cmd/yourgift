@@ -28,6 +28,7 @@ export default function PortalError({
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
+        action: 'broadcast',         // broadcast to all admins via null user_email
         type: 'portal_error',
         title: 'Portal Error',
         message: payload.message,
