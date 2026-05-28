@@ -3,7 +3,11 @@
  * All calls include Bearer token from session.
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? (
+  process.env.NODE_ENV === 'production'
+    ? (() => { console.error('[api] NEXT_PUBLIC_API_URL is not set in production!'); return 'https://api.yourgift.pt'; })()
+    : 'http://localhost:3001'
+);
 
 async function getToken(): Promise<string | null> {
   // Get JWT from Supabase session cookie
