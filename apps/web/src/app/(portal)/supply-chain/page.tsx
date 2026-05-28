@@ -235,13 +235,13 @@ export default function SupplyChainPage() {
         </div>
         <div className="flex gap-2">
           {(['dashboard', 'risks', 'scorecards'] as const).map(v => (
-            <button key={v} onClick={() => setView(v)}
+            <button type="button" key={v} onClick={() => setView(v)}
               className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
                 view === v ? 'bg-white/10 border-white/20 text-white' : 'border-white/5 text-white/40 hover:text-white/70'}`}>
               {v === 'dashboard' ? 'Dashboard' : v === 'risks' ? 'Riscos' : 'Scorecards'}
             </button>
           ))}
-          <button onClick={() => setShowCreate(true)}
+          <button type="button" onClick={() => setShowCreate(true)}
             className="px-3 py-1.5 text-xs rounded-lg bg-red-500/20 border border-red-500/30 text-red-300 hover:bg-red-500/30 transition-colors">
             + Novo Risco
           </button>
@@ -298,7 +298,7 @@ export default function SupplyChainPage() {
               <p className="text-xs font-medium text-white/60 uppercase tracking-wider mb-4">Top Riscos</p>
               <div className="space-y-2">
                 {dash.top_risks.map(risk => (
-                  <button key={risk.id} onClick={() => { setView('risks'); loadRiskDetail(risk); }}
+                  <button type="button" key={risk.id} onClick={() => { setView('risks'); loadRiskDetail(risk); }}
                     className="w-full text-left rounded-xl bg-white/3 border border-white/5 p-3 hover:bg-white/5 transition-colors">
                     <div className="flex items-start justify-between gap-2">
                       <div>
@@ -334,7 +334,7 @@ export default function SupplyChainPage() {
             {/* Filter */}
             <div className="flex gap-2">
               {['open', 'mitigating', 'resolved', 'all'].map(s => (
-                <button key={s} onClick={() => setStatusFilter(s)}
+                <button type="button" key={s} onClick={() => setStatusFilter(s)}
                   className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
                     statusFilter === s ? 'bg-white/10 border-white/20 text-white' : 'border-white/5 text-white/40 hover:text-white/60'}`}>
                   {s === 'all' ? 'Todos' : s.charAt(0).toUpperCase() + s.slice(1)}
@@ -402,7 +402,7 @@ export default function SupplyChainPage() {
                     <p className="text-sm font-semibold text-white/90">{selectedRisk.title}</p>
                     <p className="text-xs text-white/40 mt-0.5">{selectedRisk.supplier_name ?? '—'}</p>
                   </div>
-                  <button onClick={() => setSelectedRisk(null)} className="text-white/30 hover:text-white/60 text-lg">×</button>
+                  <button type="button" onClick={() => setSelectedRisk(null)} className="text-white/30 hover:text-white/60 text-lg">×</button>
                 </div>
 
                 {selectedRisk.description && (
@@ -430,7 +430,7 @@ export default function SupplyChainPage() {
                     <p className="text-xs text-white/60 leading-relaxed">{selectedRisk.mitigation}</p>
                   </div>
                 ) : (
-                  <button onClick={() => handleMitigate(selectedRisk.id)}
+                  <button type="button" onClick={() => handleMitigate(selectedRisk.id)}
                     disabled={mitigating === selectedRisk.id}
                     className="w-full py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-medium hover:bg-amber-500/20 transition-colors disabled:opacity-50">
                     {mitigating === selectedRisk.id ? '✨ A gerar plano...' : '✨ Gerar plano AI'}
@@ -467,7 +467,7 @@ export default function SupplyChainPage() {
                 )}
 
                 {selectedRisk.status !== 'resolved' && (
-                  <button onClick={() => resolveRisk(selectedRisk.id)}
+                  <button type="button" onClick={() => resolveRisk(selectedRisk.id)}
                     className="w-full py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-medium hover:bg-emerald-500/20 transition-colors">
                     ✅ Marcar como Resolvido
                   </button>
@@ -580,11 +580,11 @@ export default function SupplyChainPage() {
               </div>
 
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setShowCreate(false)}
+                <button type="button" onClick={() => setShowCreate(false)}
                   className="flex-1 py-2 rounded-xl border border-white/10 text-white/50 text-sm hover:text-white/70 transition-colors">
                   Cancelar
                 </button>
-                <button onClick={createRisk} disabled={!form.title || creating}
+                <button type="button" onClick={createRisk} disabled={!form.title || creating}
                   className="flex-1 py-2 rounded-xl bg-red-500/20 border border-red-500/30 text-red-300 text-sm font-medium hover:bg-red-500/30 transition-colors disabled:opacity-40">
                   {creating ? 'A registar...' : 'Registar Risco'}
                 </button>

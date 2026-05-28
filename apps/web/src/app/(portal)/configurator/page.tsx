@@ -341,7 +341,7 @@ export default function ConfiguratorPage() {
             const done = step > i + 1;
             return (
               <div key={s} style={{ display: 'flex', alignItems: 'center', flex: i < 2 ? 1 : 'none' }}>
-                <button
+                <button type="button"
                   onClick={() => {
                     if (done) setStep((i + 1) as 1 | 2 | 3);
                     if (i === 0) setStep(1);
@@ -408,7 +408,7 @@ export default function ConfiguratorPage() {
                 </div>
                 <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                   {CATEGORIES.slice(0, 8).map(cat => (
-                    <button
+                    <button type="button"
                       key={cat.id}
                       onClick={() => handleCategoryChange(cat.id)}
                       style={{
@@ -469,7 +469,7 @@ export default function ConfiguratorPage() {
                     const pageOffset = i * LIMIT;
                     const active = pageOffset === offset;
                     return (
-                      <button key={i} onClick={() => handlePageChange(pageOffset)} style={{
+                      <button type="button" key={i} onClick={() => handlePageChange(pageOffset)} style={{
                         width: '32px', height: '32px', borderRadius: '8px',
                         background: active ? 'rgba(77,163,255,0.2)' : 'rgba(255,255,255,0.04)',
                         border: active ? '1px solid rgba(77,163,255,0.5)' : '1px solid rgba(255,255,255,0.07)',
@@ -838,7 +838,7 @@ export default function ConfiguratorPage() {
                   >
                     Ver Resumo Final →
                   </motion.button>
-                  <button
+                  <button type="button"
                     onClick={() => setStep(1)}
                     style={{ width: '100%', background: 'none', border: 'none', marginTop: '0.625rem', color: 'rgb(80,92,110)', fontSize: '0.7rem', cursor: 'pointer' }}
                   >

@@ -310,7 +310,7 @@ export default function InventoryPage() {
             {/* Status filter */}
             <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
               {['all','in_stock','low_stock','out_of_stock'].map(s => (
-                <button key={s} onClick={() => setStatusFilter(s)}
+                <button type="button" key={s} onClick={() => setStatusFilter(s)}
                   style={{ padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.6rem', fontWeight: 700, cursor: 'pointer', border: '1px solid transparent', background: statusFilter === s ? 'rgba(77,163,255,0.15)' : 'rgba(255,255,255,0.04)', color: statusFilter === s ? 'rgb(77,163,255)' : 'rgb(80,92,110)', borderColor: statusFilter === s ? 'rgba(77,163,255,0.3)' : 'transparent' }}>
                   {s === 'all' ? 'Todos' : STATUS_CFG[s]?.label ?? s}
                 </button>
@@ -330,7 +330,7 @@ export default function InventoryPage() {
             ) : filtered.length === 0 ? (
               <div style={{ padding: '2rem', textAlign: 'center', color: 'rgb(80,92,110)', fontSize: '0.75rem' }}>
                 Nenhum item encontrado.<br />
-                <button onClick={() => setPanelMode('add')} style={{ marginTop: '0.5rem', background: 'none', border: 'none', color: 'rgb(77,163,255)', cursor: 'pointer', fontSize: '0.72rem' }}>
+                <button type="button" onClick={() => setPanelMode('add')} style={{ marginTop: '0.5rem', background: 'none', border: 'none', color: 'rgb(77,163,255)', cursor: 'pointer', fontSize: '0.72rem' }}>
                   + Adicionar primeiro item
                 </button>
               </div>
@@ -394,7 +394,7 @@ export default function InventoryPage() {
                   <div className="yg-card" style={{ padding: '1.5rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                       <h2 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'rgb(220,232,248)', margin: 0 }}>🧠 Recomendações AI de Reorder</h2>
-                      <button onClick={() => setReorderRecs(null)} style={{ background: 'none', border: 'none', color: 'rgb(80,92,110)', cursor: 'pointer', fontSize: '0.72rem' }}>✕ Fechar</button>
+                      <button type="button" onClick={() => setReorderRecs(null)} style={{ background: 'none', border: 'none', color: 'rgb(80,92,110)', cursor: 'pointer', fontSize: '0.72rem' }}>✕ Fechar</button>
                     </div>
                     {reorderRecs.length === 0 ? (
                       <div style={{ color: 'rgb(80,92,110)', fontSize: '0.75rem' }}>Nenhuma recomendação disponível de momento.</div>
@@ -429,7 +429,7 @@ export default function InventoryPage() {
                 <div className="yg-card" style={{ padding: '1.5rem', maxWidth: '720px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
                     <h2 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'rgb(220,232,248)', margin: 0 }}>+ Novo Item de Inventário</h2>
-                    <button onClick={() => setPanelMode('list')} style={{ background: 'none', border: 'none', color: 'rgb(80,92,110)', cursor: 'pointer', fontSize: '0.72rem' }}>✕ Cancelar</button>
+                    <button type="button" onClick={() => setPanelMode('list')} style={{ background: 'none', border: 'none', color: 'rgb(80,92,110)', cursor: 'pointer', fontSize: '0.72rem' }}>✕ Cancelar</button>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
@@ -592,12 +592,12 @@ export default function InventoryPage() {
                 <div className="yg-card" style={{ padding: '1.5rem', maxWidth: '500px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                     <h2 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'rgb(220,232,248)', margin: 0 }}>Registar Movimento — {selectedItem.product_name}</h2>
-                    <button onClick={() => setPanelMode('detail')} style={{ background: 'none', border: 'none', color: 'rgb(80,92,110)', cursor: 'pointer' }}>✕</button>
+                    <button type="button" onClick={() => setPanelMode('detail')} style={{ background: 'none', border: 'none', color: 'rgb(80,92,110)', cursor: 'pointer' }}>✕</button>
                   </div>
 
                   <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.875rem', flexWrap: 'wrap' }}>
                     {['receipt','dispatch','adjustment','return','write_off'].map(t => (
-                      <button key={t} onClick={() => setMoveForm(f => ({ ...f, movement_type: t }))}
+                      <button type="button" key={t} onClick={() => setMoveForm(f => ({ ...f, movement_type: t }))}
                         style={{ padding: '0.35rem 0.625rem', borderRadius: '7px', fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer', border: '1px solid transparent', background: moveForm.movement_type === t ? 'rgba(77,163,255,0.15)' : 'rgba(255,255,255,0.04)', color: moveForm.movement_type === t ? 'rgb(77,163,255)' : 'rgb(80,92,110)', borderColor: moveForm.movement_type === t ? 'rgba(77,163,255,0.3)' : 'transparent' }}>
                         {MOVEMENT_ICONS[t]} {t.replace('_',' ')}
                       </button>
@@ -622,7 +622,7 @@ export default function InventoryPage() {
                       style={{ flex: 1, padding: '0.65rem', background: 'rgba(77,163,255,0.15)', border: '1px solid rgba(77,163,255,0.35)', borderRadius: '9px', color: 'rgb(77,163,255)', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
                       {actionLoading ? '⏳ A registar…' : '✓ Registar Movimento'}
                     </motion.button>
-                    <button onClick={() => setPanelMode('detail')} style={{ padding: '0.65rem 1rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '9px', color: 'rgb(80,92,110)', fontSize: '0.78rem', cursor: 'pointer' }}>
+                    <button type="button" onClick={() => setPanelMode('detail')} style={{ padding: '0.65rem 1rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '9px', color: 'rgb(80,92,110)', fontSize: '0.78rem', cursor: 'pointer' }}>
                       Cancelar
                     </button>
                   </div>
@@ -635,7 +635,7 @@ export default function InventoryPage() {
               <motion.div key="analytics" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={springGentle}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
                   <h2 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'rgb(220,232,248)', margin: 0 }}>📊 Analytics de Inventário</h2>
-                  <button onClick={() => setPanelMode('list')} style={{ background: 'none', border: 'none', color: 'rgb(80,92,110)', cursor: 'pointer', fontSize: '0.72rem' }}>✕ Fechar</button>
+                  <button type="button" onClick={() => setPanelMode('list')} style={{ background: 'none', border: 'none', color: 'rgb(80,92,110)', cursor: 'pointer', fontSize: '0.72rem' }}>✕ Fechar</button>
                 </div>
 
                 {!analytics ? (

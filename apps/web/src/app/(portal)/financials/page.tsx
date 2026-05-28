@@ -145,7 +145,7 @@ export default function FinancialsPage() {
                 { id: 'margins', label: `Fugas de Margem (${data.marginLeaks.length})` },
                 { id: 'clients', label: 'Top Clientes', adminOnly: true },
               ] as const).filter(t => !('adminOnly' in t) || !t.adminOnly || isAdmin).map(tab => (
-                <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)}
+                <button type="button" key={tab.id} type="button" onClick={() => setActiveTab(tab.id)}
                   style={{ flex: 1, padding: '0.4rem 0.5rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', border: 'none', background: activeTab === tab.id ? 'rgba(77,163,255,0.16)' : 'transparent', color: activeTab === tab.id ? 'rgb(77,163,255)' : 'rgb(100,112,130)', transition: 'all 150ms' }}>
                   {tab.label}
                 </button>

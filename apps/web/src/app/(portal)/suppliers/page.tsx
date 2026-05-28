@@ -210,7 +210,7 @@ function SupplierCard({ supplier, index }: { supplier: SupplierScore; index: num
       </div>
 
       {/* Expand toggle for breakdown */}
-      <button
+      <button type="button"
         type="button"
         onClick={() => setExpanded(e => !e)}
         style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '8px', padding: '0.4rem', cursor: 'pointer', fontSize: '0.65rem', color: 'rgb(100,112,130)', fontWeight: 600 }}
@@ -334,7 +334,7 @@ function RoutingIntelligencePanel({ suppliers }: { suppliers: SupplierScore[] })
         </div>
         <div style={{ display: 'flex', gap: '0.35rem' }}>
           {([['routing', '⚙️ Routing'], ['risk', '🌍 Risco'], ['ai', '🤖 AI Rec.']] as const).map(([t, label]) => (
-            <button key={t} onClick={() => { setTab(t); if (t === 'ai' && !aiRec) getAiRec(); }}
+            <button type="button" key={t} onClick={() => { setTab(t); if (t === 'ai' && !aiRec) getAiRec(); }}
               style={{
                 background: tab === t ? 'rgba(167,139,250,0.2)' : 'rgba(255,255,255,0.04)',
                 border: tab === t ? '1px solid rgba(167,139,250,0.4)' : '1px solid rgba(255,255,255,0.07)',
@@ -455,7 +455,7 @@ function RoutingIntelligencePanel({ suppliers }: { suppliers: SupplierScore[] })
                 <div style={{ fontSize: '0.78rem', color: 'rgb(185,198,218)', lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>{aiRec}</div>
               </div>
             ) : (
-              <button onClick={getAiRec} style={{ background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.3)', borderRadius: '10px', padding: '0.75rem 1.25rem', color: 'rgb(167,139,250)', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
+              <button type="button" onClick={getAiRec} style={{ background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.3)', borderRadius: '10px', padding: '0.75rem 1.25rem', color: 'rgb(167,139,250)', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
                 🤖 Gerar Recomendação AI
               </button>
             )}
@@ -587,7 +587,7 @@ export default function SuppliersPage() {
           </h2>
           <div style={{ display: 'flex', gap: '0.375rem', background: 'rgba(255,255,255,0.04)', padding: '3px', borderRadius: '9px', border: '1px solid rgba(255,255,255,0.06)' }}>
             {([['overall', 'Score Global'], ['quality', 'Qualidade'], ['delivery', 'Entrega']] as const).map(([key, label]) => (
-              <button key={key} type="button" onClick={() => setSortBy(key)}
+              <button type="button" key={key} type="button" onClick={() => setSortBy(key)}
                 style={{ padding: '0.25rem 0.625rem', borderRadius: '7px', fontSize: '0.68rem', fontWeight: 600, cursor: 'pointer', border: 'none', background: sortBy === key ? 'rgba(77,163,255,0.18)' : 'transparent', color: sortBy === key ? 'rgb(77,163,255)' : 'rgb(100,112,130)' }}>
                 {label}
               </button>

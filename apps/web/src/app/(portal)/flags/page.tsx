@@ -164,7 +164,7 @@ export default function FlagsPage() {
             {enabledCount} activas · {flags.length} total · {runningExps} experimentos a correr
           </p>
         </div>
-        <button onClick={() => setShowCreate(true)}
+        <button type="button" onClick={() => setShowCreate(true)}
           className="px-3 py-1.5 text-xs rounded-lg bg-violet-500/20 border border-violet-500/30 text-violet-300 hover:bg-violet-500/30 transition-colors">
           + Nova Flag
         </button>
@@ -177,7 +177,7 @@ export default function FlagsPage() {
             <div className="rounded-2xl border border-white/10 bg-white/3 p-16 text-center">
               <p className="text-3xl mb-3">🚩</p>
               <p className="text-sm text-white/50">Nenhuma feature flag criada</p>
-              <button onClick={() => setShowCreate(true)}
+              <button type="button" onClick={() => setShowCreate(true)}
                 className="mt-4 px-4 py-2 rounded-xl bg-violet-500/20 border border-violet-500/30 text-violet-300 text-xs hover:bg-violet-500/30 transition-colors">
                 Criar primeira flag
               </button>
@@ -215,7 +215,7 @@ export default function FlagsPage() {
                       <span className="text-xs text-white/30">{expCount} exp</span>
                     )}
                     {/* Toggle switch */}
-                    <button onClick={e => { e.stopPropagation(); toggleFlag(flag); }}
+                    <button type="button" onClick={e => { e.stopPropagation(); toggleFlag(flag); }}
                       disabled={toggling === flag.id}
                       className={`relative w-10 h-5 rounded-full transition-colors ${flag.enabled ? 'bg-emerald-500' : 'bg-white/10'}`}>
                       <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
@@ -248,7 +248,7 @@ export default function FlagsPage() {
                   <p className="text-sm font-semibold text-white/90">{selectedFlag.name}</p>
                   <p className="text-xs text-white/30 mt-0.5 font-mono">{selectedFlag.key}</p>
                 </div>
-                <button onClick={() => setSelectedFlag(null)} className="text-white/30 hover:text-white/60 text-lg">×</button>
+                <button type="button" onClick={() => setSelectedFlag(null)} className="text-white/30 hover:text-white/60 text-lg">×</button>
               </div>
 
               {selectedFlag.description && (
@@ -292,7 +292,7 @@ export default function FlagsPage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-xs font-medium text-white/50">Experimentos</p>
-                  <button onClick={() => setShowExpForm(true)}
+                  <button type="button" onClick={() => setShowExpForm(true)}
                     className="text-xs text-violet-400 hover:text-violet-300 transition-colors">
                     + Novo
                   </button>
@@ -323,7 +323,7 @@ export default function FlagsPage() {
                           <p className="text-xs text-emerald-400 font-medium">🏆 Vencedor: {exp.winner}</p>
                         )}
                         {exp.status === 'draft' && (
-                          <button onClick={() => startExperiment(exp.id)}
+                          <button type="button" onClick={() => startExperiment(exp.id)}
                             className="w-full py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs hover:bg-emerald-500/20 transition-colors">
                             ▶ Iniciar Experimento
                           </button>
@@ -351,11 +351,11 @@ export default function FlagsPage() {
                         ))}
                       </select>
                       <div className="flex gap-2">
-                        <button onClick={() => setShowExpForm(false)}
+                        <button type="button" onClick={() => setShowExpForm(false)}
                           className="flex-1 py-1.5 rounded-lg border border-white/10 text-white/40 text-xs hover:text-white/60 transition-colors">
                           Cancelar
                         </button>
-                        <button onClick={createExperiment} disabled={!expForm.name || creating}
+                        <button type="button" onClick={createExperiment} disabled={!expForm.name || creating}
                           className="flex-1 py-1.5 rounded-lg bg-violet-500/20 border border-violet-500/30 text-violet-300 text-xs hover:bg-violet-500/30 transition-colors disabled:opacity-40">
                           {creating ? 'A criar...' : 'Criar'}
                         </button>
@@ -407,11 +407,11 @@ export default function FlagsPage() {
               </div>
 
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setShowCreate(false)}
+                <button type="button" onClick={() => setShowCreate(false)}
                   className="flex-1 py-2 rounded-xl border border-white/10 text-white/50 text-sm hover:text-white/70 transition-colors">
                   Cancelar
                 </button>
-                <button onClick={createFlag} disabled={!flagForm.key || !flagForm.name || creating}
+                <button type="button" onClick={createFlag} disabled={!flagForm.key || !flagForm.name || creating}
                   className="flex-1 py-2 rounded-xl bg-violet-500/20 border border-violet-500/30 text-violet-300 text-sm font-medium hover:bg-violet-500/30 transition-colors disabled:opacity-40">
                   {creating ? 'A criar...' : 'Criar Flag'}
                 </button>

@@ -279,7 +279,7 @@ export default function QCPage() {
             {/* Status filters */}
             <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
               {['all','pending','in_progress','passed','failed','partial'].map(s => (
-                <button key={s} onClick={() => setStatusFilter(s)}
+                <button type="button" key={s} onClick={() => setStatusFilter(s)}
                   style={{ padding: '0.18rem 0.45rem', borderRadius: '5px', fontSize: '0.58rem', fontWeight: 700, cursor: 'pointer', border: '1px solid transparent', background: statusFilter === s ? 'rgba(77,163,255,0.15)' : 'rgba(255,255,255,0.04)', color: statusFilter === s ? 'rgb(77,163,255)' : 'rgb(80,92,110)', borderColor: statusFilter === s ? 'rgba(77,163,255,0.3)' : 'transparent' }}>
                   {s === 'all' ? 'Todos' : STATUS_CFG[s]?.label ?? s}
                 </button>
@@ -365,7 +365,7 @@ export default function QCPage() {
                 <div className="yg-card" style={{ padding: '1.5rem', maxWidth: '600px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
                     <h2 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'rgb(220,232,248)', margin: 0 }}>+ Nova Inspeção QC</h2>
-                    <button onClick={() => setPanelMode('list')} style={{ background: 'none', border: 'none', color: 'rgb(80,92,110)', cursor: 'pointer' }}>✕</button>
+                    <button type="button" onClick={() => setPanelMode('list')} style={{ background: 'none', border: 'none', color: 'rgb(80,92,110)', cursor: 'pointer' }}>✕</button>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
@@ -576,7 +576,7 @@ export default function QCPage() {
               <motion.div key="analytics" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={springGentle}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
                   <h2 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'rgb(220,232,248)', margin: 0 }}>📊 Analytics QC</h2>
-                  <button onClick={() => setPanelMode('list')} style={{ background: 'none', border: 'none', color: 'rgb(80,92,110)', cursor: 'pointer', fontSize: '0.72rem' }}>✕ Fechar</button>
+                  <button type="button" onClick={() => setPanelMode('list')} style={{ background: 'none', border: 'none', color: 'rgb(80,92,110)', cursor: 'pointer', fontSize: '0.72rem' }}>✕ Fechar</button>
                 </div>
 
                 {!analytics ? (

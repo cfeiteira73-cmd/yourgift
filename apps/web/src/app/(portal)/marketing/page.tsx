@@ -106,7 +106,7 @@ Tom: profissional e criativo. Responde em Português de Portugal.`,
       {/* Quick idea chips */}
       <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap', marginBottom: '0.875rem' }}>
         {IDEAS.map(idea => (
-          <button key={idea.title} type="button" onClick={() => generate(idea.prompt)}
+          <button type="button" key={idea.title} type="button" onClick={() => generate(idea.prompt)}
             style={{ padding: '0.22rem 0.6rem', borderRadius: '9999px', fontSize: '0.65rem', fontWeight: 500, cursor: 'pointer', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgb(120,130,150)', transition: 'all 150ms' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(77,163,255,0.4)'; (e.currentTarget as HTMLElement).style.color = 'rgb(77,163,255)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'; (e.currentTarget as HTMLElement).style.color = 'rgb(120,130,150)'; }}>

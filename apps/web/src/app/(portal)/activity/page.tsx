@@ -99,7 +99,7 @@ export default function ActivityPage() {
         </div>
         <div className="flex items-center gap-2">
           {(['all', 'error', 'order', 'quote', 'client'] as const).map(f => (
-            <button key={f} type="button"
+            <button type="button" key={f} type="button"
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 filter === f ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/60'

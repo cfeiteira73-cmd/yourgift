@@ -503,7 +503,7 @@ export default function ArtworkPage() {
             {/* Filter tabs */}
             <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap', marginBottom: '0.875rem' }}>
               {FILTER_TABS.slice(0, isAdmin ? 6 : 4).map(tab => (
-                <button
+                <button type="button"
                   key={tab.id}
                   onClick={() => handleFilterChange(tab.id)}
                   style={{

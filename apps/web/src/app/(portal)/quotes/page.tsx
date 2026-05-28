@@ -339,7 +339,7 @@ export default function QuotesPage() {
           style={{ display: 'flex', gap: '0.375rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}
         >
           {FILTERS.map((f) => (
-            <button
+            <button type="button"
               key={f.key}
               type="button"
               onClick={() => setFilter(f.key)}

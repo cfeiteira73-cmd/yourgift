@@ -117,7 +117,7 @@ export default function BillingPage() {
         <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.15 }}
           style={{ display:'flex', gap:'0.375rem', marginBottom:'1.25rem' }}>
           {TABS.map(tab => (
-            <button key={tab.key} type="button" onClick={() => setFilter(tab.key as typeof filter)}
+            <button type="button" key={tab.key} onClick={() => setFilter(tab.key as typeof filter)}
               style={{ padding:'0.4rem 0.875rem', borderRadius:'9999px', fontSize:'0.78rem', fontWeight:filter===tab.key ? 600 : 400, cursor:'pointer', border: filter===tab.key ? '1px solid rgba(77,163,255,0.35)' : '1px solid rgba(255,255,255,0.07)', background: filter===tab.key ? 'rgba(77,163,255,0.12)' : 'rgba(255,255,255,0.04)', color: filter===tab.key ? 'rgb(77,163,255)' : 'rgb(120,130,150)', transition:'all 150ms' }}>
               {tab.label} {tab.count > 0 && <span style={{ opacity:0.7 }}>({tab.count})</span>}
             </button>

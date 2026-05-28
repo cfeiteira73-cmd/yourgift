@@ -80,7 +80,7 @@ export default function PortalError({
 
         {/* Actions */}
         <div className="flex flex-col gap-2">
-          <button
+          <button type="button"
             type="button"
             onClick={reset}
             className="w-full py-2.5 rounded-xl bg-white/8 hover:bg-white/12 border border-white/10 text-white text-xs font-medium transition-colors"

@@ -258,7 +258,7 @@ export default function PaymentsPage() {
       {/* Tabs */}
       <div className="flex gap-1 border-b border-white/5 pb-0">
         {TABS.map(t => (
-          <button key={t} type="button" onClick={() => loadTab(t)}
+          <button type="button" key={t} type="button" onClick={() => loadTab(t)}
             className={`px-4 py-2 text-xs font-medium rounded-t-lg transition-colors ${
               tab === t ? 'text-white bg-white/8 border-b-2 border-blue-400' : 'text-white/40 hover:text-white/70'
             }`}>

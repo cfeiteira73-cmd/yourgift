@@ -183,7 +183,7 @@ export default function OrgPage() {
         </div>
         <div className="flex gap-2">
           {(['overview', 'members', 'roles', 'sso'] as const).map(v => (
-            <button key={v} onClick={() => setView(v)}
+            <button type="button" key={v} onClick={() => setView(v)}
               className={`px-3 py-1.5 text-xs rounded-lg border transition-colors capitalize ${
                 view === v ? 'bg-white/10 border-white/20 text-white' : 'border-white/5 text-white/40 hover:text-white/70'}`}>
               {v === 'sso' ? 'SSO' : v.charAt(0).toUpperCase() + v.slice(1)}
@@ -196,7 +196,7 @@ export default function OrgPage() {
       {view !== 'overview' && overview && overview.tenants.length > 0 && (
         <div className="flex gap-2 flex-wrap">
           {overview.tenants.map(t => (
-            <button key={t.id} onClick={() => setSelectedTenant(t)}
+            <button type="button" key={t.id} onClick={() => setSelectedTenant(t)}
               className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
                 selectedTenant?.id === t.id ? 'bg-white/10 border-white/20 text-white' : 'border-white/5 text-white/40 hover:text-white/60'}`}>
               {t.name}
@@ -285,7 +285,7 @@ export default function OrgPage() {
                 <p className="text-xs text-white/30 capitalize mt-0.5">{m.status}</p>
               </div>
               {m.status !== 'deactivated' && (
-                <button onClick={() => removeMember(m.id)}
+                <button type="button" onClick={() => removeMember(m.id)}
                   className="text-red-400/60 hover:text-red-400 text-xs px-2 py-1 rounded hover:bg-red-500/10 transition-colors">
                   Remove
                 </button>
@@ -299,7 +299,7 @@ export default function OrgPage() {
       {view === 'roles' && (
         <motion.div {...fadeUp} className="space-y-3">
           <div className="flex justify-end">
-            <button onClick={() => setShowRoleForm(true)}
+            <button type="button" onClick={() => setShowRoleForm(true)}
               className="px-3 py-1.5 text-xs rounded-lg bg-violet-500/20 border border-violet-500/30 text-violet-300 hover:bg-violet-500/30 transition-colors">
               + Criar Role
             </button>
@@ -326,7 +326,7 @@ export default function OrgPage() {
                       <p className="text-xs text-white/30 font-mono mt-0.5">{role.slug}</p>
                     </div>
                     {!role.is_system && (
-                      <button onClick={() => deleteRole(role.id)}
+                      <button type="button" onClick={() => deleteRole(role.id)}
                         className="text-red-400/50 hover:text-red-400 text-xs hover:bg-red-500/10 rounded px-1.5 py-0.5 transition-colors">
                         delete
                       </button>
@@ -374,8 +374,8 @@ export default function OrgPage() {
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white/80 placeholder:text-white/20 outline-none resize-none font-mono" />
                   </div>
                   <div className="flex gap-3">
-                    <button onClick={() => setShowRoleForm(false)} className="flex-1 py-2 rounded-xl border border-white/10 text-white/50 text-sm hover:text-white/70 transition-colors">Cancelar</button>
-                    <button onClick={createRole} disabled={!roleForm.name || !roleForm.slug || submitting}
+                    <button type="button" onClick={() => setShowRoleForm(false)} className="flex-1 py-2 rounded-xl border border-white/10 text-white/50 text-sm hover:text-white/70 transition-colors">Cancelar</button>
+                    <button type="button" onClick={createRole} disabled={!roleForm.name || !roleForm.slug || submitting}
                       className="flex-1 py-2 rounded-xl bg-violet-500/20 border border-violet-500/30 text-violet-300 text-sm font-medium hover:bg-violet-500/30 transition-colors disabled:opacity-40">
                       {submitting ? 'A criar...' : 'Criar Role'}
                     </button>
@@ -394,7 +394,7 @@ export default function OrgPage() {
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-white/90">SSO — {selectedTenant.name}</p>
               {sso && (
-                <button onClick={() => toggleSSO(!sso.enabled)}
+                <button type="button" onClick={() => toggleSSO(!sso.enabled)}
                   className={`relative w-10 h-5 rounded-full transition-colors ${sso.enabled ? 'bg-emerald-500' : 'bg-white/10'}`}>
                   <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${sso.enabled ? 'translate-x-5' : 'translate-x-0.5'}`} />
                 </button>
@@ -425,7 +425,7 @@ export default function OrgPage() {
                 placeholder="Client ID" className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white/80 placeholder:text-white/20 outline-none font-mono" />
               <input value={ssoForm.discovery_url} onChange={e => setSsoForm(p => ({ ...p, discovery_url: e.target.value }))}
                 placeholder="Discovery / Metadata URL" className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white/80 placeholder:text-white/20 outline-none" />
-              <button onClick={saveSSO} disabled={submitting}
+              <button type="button" onClick={saveSSO} disabled={submitting}
                 className="w-full py-2 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-300 text-sm font-medium hover:bg-blue-500/30 transition-colors disabled:opacity-40">
                 {submitting ? 'A guardar...' : 'Guardar Config SSO'}
               </button>

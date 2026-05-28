@@ -135,7 +135,7 @@ export default function AccountPage() {
               <code className="flex-1 text-white/50 text-[11px] font-mono bg-white/5 rounded-lg px-3 py-2 truncate">
                 {userId}
               </code>
-              <button
+              <button type="button"
                 type="button"
                 onClick={copyUserId}
                 className="px-3 py-2 rounded-lg border border-white/10 text-white/40 hover:text-white/70 text-[11px] transition-colors flex-shrink-0"
@@ -154,7 +154,7 @@ export default function AccountPage() {
                 <p className="text-white/70 text-xs font-medium">Palavra-passe</p>
                 <p className="text-white/30 text-[10px] mt-0.5">Enviar link de redefinição por email</p>
               </div>
-              <button
+              <button type="button"
                 type="button"
                 onClick={sendPasswordReset}
                 disabled={changingPwd}
@@ -227,7 +227,7 @@ export default function AccountPage() {
                 <p className="text-white/60 text-xs font-medium">Terminar todas as sessões</p>
                 <p className="text-white/25 text-[10px] mt-0.5">Encerra a sessão em todos os dispositivos</p>
               </div>
-              <button
+              <button type="button"
                 type="button"
                 onClick={async () => {
                   const supabase = createClient();

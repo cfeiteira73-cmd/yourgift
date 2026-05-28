@@ -230,7 +230,7 @@ export default function SalesIntelligencePage() {
         {/* View Mode Tabs */}
         <div style={{ display: 'flex', gap: '0.375rem', marginBottom: '1rem' }}>
           {(['health','actions'] as ViewMode[]).map(m => (
-            <button key={m} onClick={() => setViewMode(m)}
+            <button type="button" key={m} onClick={() => setViewMode(m)}
               style={{ padding: '0.4rem 0.875rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', border: '1px solid transparent', background: viewMode === m ? 'rgba(77,163,255,0.15)' : 'rgba(255,255,255,0.04)', color: viewMode === m ? 'rgb(77,163,255)' : 'rgb(80,92,110)', borderColor: viewMode === m ? 'rgba(77,163,255,0.3)' : 'transparent' }}>
               {m === 'health' ? `🏥 Saúde Clientes (${filteredHealth.length})` : `📋 Fila de Ações (${pendingActions.length})`}
             </button>
@@ -247,7 +247,7 @@ export default function SalesIntelligencePage() {
               <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.875rem', flexWrap: 'wrap', alignItems: 'center' }}>
                 <span style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)', fontWeight: 700 }}>CHURN:</span>
                 {['all','low','medium','high','critical'].map(c => (
-                  <button key={c} onClick={() => setChurnFilter(c)}
+                  <button type="button" key={c} onClick={() => setChurnFilter(c)}
                     style={{ padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.6rem', fontWeight: 700, cursor: 'pointer', border: '1px solid transparent', background: churnFilter === c ? 'rgba(77,163,255,0.15)' : 'rgba(255,255,255,0.04)', color: churnFilter === c ? 'rgb(77,163,255)' : 'rgb(80,92,110)', borderColor: churnFilter === c ? 'rgba(77,163,255,0.3)' : 'transparent' }}>
                     {c === 'all' ? 'Todos' : CHURN_CFG[c]?.label ?? c}
                   </button>
@@ -255,7 +255,7 @@ export default function SalesIntelligencePage() {
                 <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.08)', margin: '0 0.25rem' }} />
                 <span style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)', fontWeight: 700 }}>ALERTA:</span>
                 {['all','at_risk','win_back','upsell','vip_nurture'].map(a => (
-                  <button key={a} onClick={() => setAlertFilter(a)}
+                  <button type="button" key={a} onClick={() => setAlertFilter(a)}
                     style={{ padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.6rem', fontWeight: 700, cursor: 'pointer', border: '1px solid transparent', background: alertFilter === a ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.04)', color: alertFilter === a ? 'rgb(245,158,11)' : 'rgb(80,92,110)', borderColor: alertFilter === a ? 'rgba(245,158,11,0.3)' : 'transparent' }}>
                     {a === 'all' ? 'Todos' : `${ALERT_ICONS[a] ?? ''} ${a.replace('_',' ')}`}
                   </button>
@@ -287,7 +287,7 @@ export default function SalesIntelligencePage() {
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '300px', color: 'rgb(80,92,110)', gap: '0.75rem' }}>
                   <div style={{ fontSize: '2rem' }}>🎯</div>
                   <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'rgb(140,155,175)' }}>Nenhum cliente calculado ainda</div>
-                  <button onClick={computeAll} style={{ background: 'none', border: 'none', color: 'rgb(77,163,255)', cursor: 'pointer', fontSize: '0.75rem' }}>
+                  <button type="button" onClick={computeAll} style={{ background: 'none', border: 'none', color: 'rgb(77,163,255)', cursor: 'pointer', fontSize: '0.75rem' }}>
                     → Calcular scores agora
                   </button>
                 </div>
@@ -395,7 +395,7 @@ export default function SalesIntelligencePage() {
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '300px', color: 'rgb(80,92,110)', gap: '0.75rem' }}>
                   <div style={{ fontSize: '2rem' }}>📋</div>
                   <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'rgb(140,155,175)' }}>Sem ações pendentes</div>
-                  <button onClick={generateActions} style={{ background: 'none', border: 'none', color: 'rgb(77,163,255)', cursor: 'pointer', fontSize: '0.75rem' }}>
+                  <button type="button" onClick={generateActions} style={{ background: 'none', border: 'none', color: 'rgb(77,163,255)', cursor: 'pointer', fontSize: '0.75rem' }}>
                     → Gerar ações com AI
                   </button>
                 </div>
@@ -422,7 +422,7 @@ export default function SalesIntelligencePage() {
                           {/* AI Script (expandable) */}
                           {act.ai_script && (
                             <div>
-                              <button onClick={() => setExpandedAction(expandedAction === act.id ? null : act.id)}
+                              <button type="button" onClick={() => setExpandedAction(expandedAction === act.id ? null : act.id)}
                                 style={{ background: 'none', border: 'none', color: 'rgb(167,139,250)', fontSize: '0.62rem', cursor: 'pointer', padding: 0 }}>
                                 {expandedAction === act.id ? '▲ Ocultar script AI' : '▼ Ver script AI →'}
                               </button>

@@ -435,7 +435,7 @@ function AssetIntelligencePlatform() {
           {/* View toggle */}
           <div style={{ display: 'flex', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', overflow: 'hidden' }}>
             {(['grid', 'list'] as const).map((v) => (
-              <button
+              <button type="button"
                 key={v}
                 type="button"
                 onClick={() => setView(v)}
@@ -469,7 +469,7 @@ function AssetIntelligencePlatform() {
         style={{ display: 'flex', gap: '0.375rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}
       >
         {filterOpts.map((opt) => (
-          <button
+          <button type="button"
             key={opt.key}
             type="button"
             onClick={() => setFilter(opt.key)}

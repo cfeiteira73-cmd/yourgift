@@ -180,7 +180,7 @@ function CreateRFQPanel({ onCreated }: { onCreated: (rfq: RFQ) => void }) {
           <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.35rem' }}>Prioridade</div>
           <div style={{ display: 'flex', gap: '0.35rem' }}>
             {(['low','normal','high','urgent'] as const).map(p => (
-              <button key={p} onClick={() => set('priority', p)} style={{
+              <button type="button" key={p} onClick={() => set('priority', p)} style={{
                 flex: 1, background: form.priority === p ? `${PRIORITY_CFG[p].color}18` : 'rgba(255,255,255,0.04)',
                 border: form.priority === p ? `1px solid ${PRIORITY_CFG[p].color}40` : '1px solid rgba(255,255,255,0.07)',
                 borderRadius: '8px', padding: '0.4rem 0', color: form.priority === p ? PRIORITY_CFG[p].color : 'rgb(100,112,130)',
@@ -527,7 +527,7 @@ export default function ProcurementPage() {
             {/* Status filter */}
             <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap', marginBottom: '0.875rem' }}>
               {statusTabs.map(tab => (
-                <button key={tab.id} onClick={() => { setStatusFilter(tab.id); loadList(tab.id); }}
+                <button type="button" key={tab.id} onClick={() => { setStatusFilter(tab.id); loadList(tab.id); }}
                   style={{ background: statusFilter === tab.id ? 'rgba(77,163,255,0.18)' : 'rgba(255,255,255,0.04)', border: statusFilter === tab.id ? '1px solid rgba(77,163,255,0.4)' : '1px solid rgba(255,255,255,0.07)', borderRadius: '8px', padding: '0.3rem 0.6rem', color: statusFilter === tab.id ? 'rgb(77,163,255)' : 'rgb(100,112,130)', fontSize: '0.62rem', fontWeight: 600, cursor: 'pointer' }}>
                   {tab.label}
                 </button>
@@ -585,7 +585,7 @@ export default function ProcurementPage() {
                 <div className="yg-card" style={{ padding: '1.5rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
                     <h2 style={{ fontSize: '1rem', fontWeight: 800, color: 'rgb(220,232,248)' }}>🚀 Novo RFQ Autónomo</h2>
-                    <button onClick={() => setPanelMode('list')} style={{ background: 'none', border: 'none', color: 'rgb(80,92,110)', cursor: 'pointer', fontSize: '0.75rem' }}>✕ Fechar</button>
+                    <button type="button" onClick={() => setPanelMode('list')} style={{ background: 'none', border: 'none', color: 'rgb(80,92,110)', cursor: 'pointer', fontSize: '0.75rem' }}>✕ Fechar</button>
                   </div>
                   <CreateRFQPanel onCreated={(rfq) => { loadList(statusFilter); loadDetail(rfq); }} />
                 </div>

@@ -276,7 +276,7 @@ export default function OpsPage() {
       {/* Tabs */}
       <div className="flex gap-1">
         {(['incidents', 'sla', 'mttr'] as const).map(t => (
-          <button key={t} type="button" onClick={() => setTab(t)}
+          <button type="button" key={t} type="button" onClick={() => setTab(t)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               tab === t ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/60'
             }`}>

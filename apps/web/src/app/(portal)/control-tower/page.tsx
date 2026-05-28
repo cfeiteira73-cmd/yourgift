@@ -177,7 +177,7 @@ export default function ControlTowerPage() {
       {/* Tabs */}
       <div className="flex gap-1 border-b border-white/5">
         {(['risks', 'scorecards'] as const).map(t => (
-          <button key={t} type="button" onClick={() => setTab(t)}
+          <button type="button" key={t} type="button" onClick={() => setTab(t)}
             className={`px-4 py-2 text-xs font-medium rounded-t-lg transition-colors ${
               tab === t ? 'text-white bg-white/8 border-b-2 border-blue-400' : 'text-white/40 hover:text-white/70'
             }`}>
@@ -289,7 +289,7 @@ export default function ControlTowerPage() {
                         {mitigating === selected.id ? 'A gerar…' : '✨ Gerar Mitigação AI'}
                       </button>
                       {['monitoring', 'mitigating', 'resolved'].map(s => (
-                        <button key={s} type="button"
+                        <button type="button" key={s} type="button"
                           onClick={() => updateRiskStatus(selected.id, s)}
                           className={`px-3 py-1.5 rounded-lg border text-[10px] font-medium transition-colors ${
                             selected.status === s ? 'border-white/20 bg-white/10 text-white' : 'border-white/10 hover:bg-white/5 text-white/40'

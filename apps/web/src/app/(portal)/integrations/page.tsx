@@ -141,7 +141,7 @@ export default function IntegrationsPage() {
         <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.12 }}
           style={{ display:'flex', gap:'0.375rem', marginBottom:'1.25rem', flexWrap:'wrap' }}>
           {CATEGORIES.map(cat => (
-            <button key={cat} type="button" onClick={() => setCatFilter(cat)}
+            <button type="button" key={cat} type="button" onClick={() => setCatFilter(cat)}
               style={{ padding:'0.35rem 0.75rem', borderRadius:'9999px', fontSize:'0.72rem', fontWeight:catFilter===cat ? 600 : 400, cursor:'pointer', background: catFilter===cat ? 'rgba(77,163,255,0.14)' : 'rgba(255,255,255,0.04)', color: catFilter===cat ? 'rgb(77,163,255)' : 'rgb(120,130,150)', border: catFilter===cat ? '1px solid rgba(77,163,255,0.3)' : '1px solid rgba(255,255,255,0.07)', transition:'all 150ms' }}>
               {cat}
             </button>

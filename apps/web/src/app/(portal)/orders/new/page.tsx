@@ -193,7 +193,7 @@ function NewOrderForm() {
                 <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Variante / Cor</label>
                 <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
                   {product.variants?.map((v) => (
-                    <button key={v.id} type="button" onClick={() => setSelectedVariant(v.id)}
+                    <button type="button" key={v.id} type="button" onClick={() => setSelectedVariant(v.id)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                         selectedVariant === v.id ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'
                       } ${v.stock === 0 ? 'opacity-40' : ''}`}>

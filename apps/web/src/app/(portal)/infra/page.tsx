@@ -211,7 +211,7 @@ export default function InfraPage() {
         </div>
         <div className="flex gap-2">
           {(['health', 'iot', 'erp'] as const).map(t => (
-            <button key={t} onClick={() => setTab(t)}
+            <button type="button" key={t} onClick={() => setTab(t)}
               className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
                 tab === t ? 'bg-white/10 border-white/20 text-white' : 'border-white/5 text-white/40 hover:text-white/70'}`}>
               {t === 'health' ? '🛡 Saúde' : t === 'iot' ? '📡 IoT' : '🔌 ERP/EDI'}
@@ -244,7 +244,7 @@ export default function InfraPage() {
       {tab === 'health' && (
         <motion.div {...fadeUp} className="space-y-3">
           <div className="flex justify-end">
-            <button onClick={() => setShowAddProbe(true)}
+            <button type="button" onClick={() => setShowAddProbe(true)}
               className="px-3 py-1.5 text-xs rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/30 transition-colors">
               + Adicionar Probe
             </button>
@@ -283,7 +283,7 @@ export default function InfraPage() {
                         {probe.status}
                       </span>
                       {probe.status !== 'healthy' && (
-                        <button onClick={() => resetProbe(probe.id)}
+                        <button type="button" onClick={() => resetProbe(probe.id)}
                           className="text-xs text-white/30 hover:text-white/60 border border-white/10 rounded px-1.5 py-0.5 transition-colors">
                           reset
                         </button>
@@ -312,7 +312,7 @@ export default function InfraPage() {
       {tab === 'iot' && (
         <motion.div {...fadeUp} className="space-y-3">
           <div className="flex justify-end">
-            <button onClick={() => setShowRegister(true)}
+            <button type="button" onClick={() => setShowRegister(true)}
               className="px-3 py-1.5 text-xs rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30 transition-colors">
               + Registar Dispositivo
             </button>
@@ -372,7 +372,7 @@ export default function InfraPage() {
       {tab === 'erp' && (
         <motion.div {...fadeUp} className="space-y-3">
           <div className="flex justify-end">
-            <button onClick={() => setShowAddConnector(true)}
+            <button type="button" onClick={() => setShowAddConnector(true)}
               className="px-3 py-1.5 text-xs rounded-lg bg-violet-500/20 border border-violet-500/30 text-violet-300 hover:bg-violet-500/30 transition-colors">
               + Adicionar Conector
             </button>
@@ -403,11 +403,11 @@ export default function InfraPage() {
                       </div>
                     </div>
                     <div className="flex gap-2 shrink-0">
-                      <button onClick={() => testConnector(conn.id)} disabled={testing === conn.id}
+                      <button type="button" onClick={() => testConnector(conn.id)} disabled={testing === conn.id}
                         className="text-xs border border-white/10 rounded px-2 py-1 text-white/40 hover:text-white/60 transition-colors disabled:opacity-40">
                         {testing === conn.id ? '…' : 'Testar'}
                       </button>
-                      <button onClick={() => triggerSync(conn.id)} disabled={syncing === conn.id || !conn.enabled}
+                      <button type="button" onClick={() => triggerSync(conn.id)} disabled={syncing === conn.id || !conn.enabled}
                         className="text-xs border border-blue-500/30 rounded px-2 py-1 text-blue-300 hover:bg-blue-500/10 transition-colors disabled:opacity-40">
                         {syncing === conn.id ? 'Sync…' : 'Sync'}
                       </button>
@@ -443,8 +443,8 @@ export default function InfraPage() {
               <input value={regForm.location} onChange={e => setRegForm(p => ({ ...p, location: e.target.value }))}
                 placeholder="Localização" className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white/80 placeholder:text-white/20 outline-none" />
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setShowRegister(false)} className="flex-1 py-2 rounded-xl border border-white/10 text-white/50 text-sm">Cancelar</button>
-                <button onClick={registerDevice} disabled={!regForm.device_id || !regForm.label || creating}
+                <button type="button" onClick={() => setShowRegister(false)} className="flex-1 py-2 rounded-xl border border-white/10 text-white/50 text-sm">Cancelar</button>
+                <button type="button" onClick={registerDevice} disabled={!regForm.device_id || !regForm.label || creating}
                   className="flex-1 py-2 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-300 text-sm font-medium disabled:opacity-40">
                   {creating ? 'A registar…' : 'Registar'}
                 </button>
@@ -475,8 +475,8 @@ export default function InfraPage() {
               <input value={connForm.endpoint_url} onChange={e => setConnForm(p => ({ ...p, endpoint_url: e.target.value }))}
                 placeholder="Endpoint URL" className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white/80 placeholder:text-white/20 outline-none" />
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setShowAddConnector(false)} className="flex-1 py-2 rounded-xl border border-white/10 text-white/50 text-sm">Cancelar</button>
-                <button onClick={addConnector} disabled={!connForm.name || creating}
+                <button type="button" onClick={() => setShowAddConnector(false)} className="flex-1 py-2 rounded-xl border border-white/10 text-white/50 text-sm">Cancelar</button>
+                <button type="button" onClick={addConnector} disabled={!connForm.name || creating}
                   className="flex-1 py-2 rounded-xl bg-violet-500/20 border border-violet-500/30 text-violet-300 text-sm font-medium disabled:opacity-40">
                   {creating ? 'A criar…' : 'Criar'}
                 </button>
@@ -513,8 +513,8 @@ export default function InfraPage() {
                   className="w-full accent-emerald-400 cursor-pointer" />
               </div>
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setShowAddProbe(false)} className="flex-1 py-2 rounded-xl border border-white/10 text-white/50 text-sm">Cancelar</button>
-                <button onClick={addProbe} disabled={!probeForm.service_name || creating}
+                <button type="button" onClick={() => setShowAddProbe(false)} className="flex-1 py-2 rounded-xl border border-white/10 text-white/50 text-sm">Cancelar</button>
+                <button type="button" onClick={addProbe} disabled={!probeForm.service_name || creating}
                   className="flex-1 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-sm font-medium disabled:opacity-40">
                   {creating ? 'A criar…' : 'Criar Probe'}
                 </button>
