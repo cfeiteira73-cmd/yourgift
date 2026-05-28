@@ -8,6 +8,8 @@ import { createClient } from '@/lib/supabase/server';
 // Entries are write-once (append only) — never updated or deleted via API.
 //
 // GET  /api/audit?limit=50&since=ISO&actor=user_id&action=order_created
+// GET  /api/audit?mode=trail&limit=50&offset=0&result=error  (activity page)
+// GET  /api/audit?mode=stats                                 (activity page stats)
 // POST /api/audit  { action, entityType, entityId, metadata? }
 //
 // ─────────────────────────────────────────────────────────────────────────────
@@ -45,35 +47,98 @@ export async function GET(request: NextRequest) {
 
     const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
     const params  = request.nextUrl.searchParams;
-    const limit   = Math.min(parseInt(params.get('limit') ?? '50'), 200);
-    const since   = params.get('since') ?? new Date(Date.now() - 30 * 86400000).toISOString();
-    const action  = params.get('action');
+    const mode    = params.get('mode') ?? 'list';
+
+    // ── Mode: stats (for Activity Stream sidebar) ───────────────────────────
+    if (mode === 'stats') {
+      const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+      const weekAgo    = new Date(Date.now() - 7 * 86400000);
+
+      const [todayRes, weekRes, topRes] = await Promise.all([
+        supabase.from('audit_log').select('id', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString()),
+        supabase.from('audit_log').select('id', { count: 'exact', head: true }).gte('created_at', weekAgo.toISOString()),
+        supabase.from('audit_log').select('action').gte('created_at', weekAgo.toISOString()).limit(500),
+      ]);
+
+      if (topRes.error?.code === '42P01') {
+        return NextResponse.json({ today: 0, week: 0, top_actions: [], results: { success: 0, error: 0 } });
+      }
+
+      // Compute top actions from raw data
+      const actionCounts: Record<string, number> = {};
+      for (const row of topRes.data ?? []) {
+        actionCounts[row.action] = (actionCounts[row.action] ?? 0) + 1;
+      }
+      const top_actions = Object.entries(actionCounts)
+        .map(([action, count]) => ({ action, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
+
+      return NextResponse.json({
+        today: todayRes.count ?? 0,
+        week: weekRes.count ?? 0,
+        top_actions,
+        results: { success: weekRes.count ?? 0, error: 0 },
+        generatedAt: new Date().toISOString(),
+      });
+    }
+
+    // ── Mode: trail (for Activity Stream list, with offset pagination) ──────
+    if (mode === 'trail') {
+      const limit  = Math.min(parseInt(params.get('limit') ?? '50'), 200);
+      const offset = Math.max(parseInt(params.get('offset') ?? '0'), 0);
+      const resultFilter = params.get('result'); // 'error' filter (future: portal_error action)
+
+      let query = supabase
+        .from('audit_log')
+        .select('id, actor_id, actor_email, action, entity_type, entity_id, metadata, created_at', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (!isAdmin) query = query.eq('actor_id', user.id);
+      if (resultFilter === 'error') query = query.eq('action', 'portal_error');
+
+      const { data, error, count } = await query;
+      if (error) {
+        if (error.code === '42P01') return NextResponse.json({ trail: [], total: 0 });
+        throw error;
+      }
+
+      // Map actor_email → user_email; add synthetic result/duration_ms fields
+      const trail = (data ?? []).map(e => ({
+        ...e,
+        user_email: e.actor_email,
+        result: e.action === 'portal_error' ? 'error' : 'success',
+        duration_ms: null,
+      }));
+
+      return NextResponse.json({ trail, total: count ?? 0, generatedAt: new Date().toISOString() });
+    }
+
+    // ── Default mode: list (for Audit Trail page) ────────────────────────────
+    const limit       = Math.min(parseInt(params.get('limit') ?? '50'), 200);
+    const since       = params.get('since') ?? new Date(Date.now() - 30 * 86400000).toISOString();
+    const action      = params.get('action');
     const actorFilter = params.get('actor');
 
-    // Only admins can query arbitrary actors
     if (actorFilter && !isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Try to query audit_log table (graceful fallback if not yet created)
     let query = supabase
       .from('audit_log')
-      .select('id, actor_id, actor_email, action, entity_type, entity_id, metadata, created_at')
+      .select('id, actor_id, actor_email, action, entity_type, entity_id, metadata, ip, created_at')
       .gte('created_at', since)
       .order('created_at', { ascending: false })
       .limit(limit);
 
-    // Scope to current user for non-admins
     if (!isAdmin) query = query.eq('actor_id', user.id);
-
-    // Optional filters
     if (action) query = query.eq('action', action);
     if (actorFilter) query = query.eq('actor_id', actorFilter);
 
     const { data, error } = await query;
 
     if (error) {
-      // Table may not exist yet — return empty gracefully
       if (error.code === '42P01') {
         return NextResponse.json({ entries: [], total: 0, note: 'audit_log table not yet created' });
       }
