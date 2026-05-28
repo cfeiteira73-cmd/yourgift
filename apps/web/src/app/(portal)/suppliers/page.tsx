@@ -256,6 +256,216 @@ function SupplierCard({ supplier, index }: { supplier: SupplierScore; index: num
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+// ── S6: Routing Intelligence Panel ────────────────────────────────────────────
+
+interface RoutingRec { stage: string; supplier: string; available_slots: number; lead_time: number; }
+interface Bottleneck  { stage: string; utilisation: number; available_slots: number; }
+
+const GEOPOLITICAL_RISKS: Record<string, { level: 'low' | 'medium' | 'high'; note: string }> = {
+  'Midocean':       { level: 'low',    note: 'NL — UE estável, supply chain robusto' },
+  'PF Concept':     { level: 'low',    note: 'NL — UE estável, cadeia sustentável' },
+  'Xindao':         { level: 'medium', note: 'CN/NL — dependência parcial de manufatura asiática' },
+  'Maxema':         { level: 'low',    note: 'IT — UE, especialista premium estável' },
+  'Stanley/Stella': { level: 'low',    note: 'BE — UE, certificado Fair Wear' },
+};
+
+const RISK_COLORS = { low: 'rgb(99,230,190)', medium: 'rgb(245,158,11)', high: 'rgb(239,68,68)' };
+const RISK_LABELS = { low: '🟢 Baixo', medium: '🟡 Médio', high: '🔴 Alto' };
+
+function RoutingIntelligencePanel({ suppliers }: { suppliers: SupplierScore[] }) {
+  const [routing, setRouting] = useState<RoutingRec[]>([]);
+  const [bottlenecks, setBottlenecks] = useState<Bottleneck[]>([]);
+  const [aiRec, setAiRec] = useState<string>('');
+  const [loadingRouting, setLoadingRouting] = useState(true);
+  const [loadingAi, setLoadingAi] = useState(false);
+  const [tab, setTab] = useState<'routing' | 'risk' | 'ai'>('routing');
+
+  useEffect(() => {
+    async function fetchRouting() {
+      try {
+        const [routingRes, bottlenecksRes] = await Promise.all([
+          fetch('/api/manufacturing?mode=routing'),
+          fetch('/api/manufacturing?mode=bottlenecks'),
+        ]);
+        if (routingRes.ok) {
+          const d = await routingRes.json();
+          setRouting(d.recommendations ?? []);
+        }
+        if (bottlenecksRes.ok) {
+          const d = await bottlenecksRes.json();
+          setBottlenecks(d.bottlenecks ?? []);
+        }
+      } catch { /* non-fatal */ }
+      setLoadingRouting(false);
+    }
+    fetchRouting();
+  }, []);
+
+  async function getAiRec() {
+    setLoadingAi(true);
+    setTab('ai');
+    try {
+      const ctx = `Fornecedores: ${suppliers.map(s => `${s.supplier_name} (score: ${s.overall_score}, entrega: ${s.on_time_delivery_rate ?? '—'}%)`).join(', ')}. Gargalos: ${bottlenecks.map(b => `${b.stage} ${b.utilisation}%`).join(', ') || 'nenhum'}. Dá uma recomendação de sourcing para o próximo trimestre em português, 3-4 frases.`;
+      const res = await fetch('/api/copilot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: ctx, systemContext: 'És um especialista em procurement e gestão de fornecedores de merchandising corporativo.' }),
+      });
+      if (res.ok) {
+        const d = await res.json();
+        setAiRec(d.reply ?? d.message ?? 'Análise indisponível.');
+      }
+    } catch { /* non-fatal */ }
+    setLoadingAi(false);
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.6 }}
+      style={{ marginTop: '1.25rem', borderRadius: '16px', border: '1px solid rgba(167,139,250,0.2)', background: 'rgba(167,139,250,0.04)', overflow: 'hidden' }}
+    >
+      {/* Panel header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.25rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontSize: '1rem' }}>🧠</span>
+          <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'rgb(200,215,235)' }}>Supplier Intelligence Engine</span>
+        </div>
+        <div style={{ display: 'flex', gap: '0.35rem' }}>
+          {([['routing', '⚙️ Routing'], ['risk', '🌍 Risco'], ['ai', '🤖 AI Rec.']] as const).map(([t, label]) => (
+            <button key={t} onClick={() => { setTab(t); if (t === 'ai' && !aiRec) getAiRec(); }}
+              style={{
+                background: tab === t ? 'rgba(167,139,250,0.2)' : 'rgba(255,255,255,0.04)',
+                border: tab === t ? '1px solid rgba(167,139,250,0.4)' : '1px solid rgba(255,255,255,0.07)',
+                borderRadius: '8px', padding: '0.3rem 0.625rem',
+                color: tab === t ? 'rgb(167,139,250)' : 'rgb(100,112,130)',
+                fontSize: '0.65rem', fontWeight: 600, cursor: 'pointer',
+              }}>{label}</button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ padding: '1.25rem' }}>
+        {/* Routing tab */}
+        {tab === 'routing' && (
+          loadingRouting ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {[1, 2, 3].map(i => <div key={i} className="skeleton" style={{ height: '52px', borderRadius: '10px' }} />)}
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div>
+                <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.625rem' }}>
+                  Recomendações de Routing
+                </div>
+                {routing.length === 0 ? (
+                  <div style={{ fontSize: '0.72rem', color: 'rgb(80,92,110)', fontStyle: 'italic' }}>
+                    {suppliers.length > 0 ? `Routing: ${suppliers[0]?.supplier_name} recomendado para alta prioridade (score ${suppliers[0]?.overall_score})` : 'Dados indisponíveis.'}
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                    {routing.slice(0, 4).map((r, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '9px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div>
+                          <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgb(170,185,205)' }}>{r.stage}</div>
+                          <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)' }}>{r.supplier}</div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: '0.65rem', color: 'rgb(99,230,190)', fontWeight: 700 }}>{r.available_slots} slots</div>
+                          <div style={{ fontSize: '0.58rem', color: 'rgb(80,92,110)' }}>{r.lead_time}d</div>
+                        </div>
+                      </div>
+                    ))}
+                    {routing.length === 0 && suppliers.slice(0, 3).map((s, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '9px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div>
+                          <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgb(170,185,205)' }}>Prioridade {i + 1}</div>
+                          <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)' }}>{s.supplier_name}</div>
+                        </div>
+                        <span style={{ fontSize: '0.65rem', color: 'rgb(99,230,190)', fontWeight: 700 }}>Score {s.overall_score}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div>
+                <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.625rem' }}>
+                  Gargalos de Produção
+                </div>
+                {bottlenecks.length === 0 ? (
+                  <div style={{ padding: '0.75rem', background: 'rgba(99,230,190,0.06)', borderRadius: '10px', border: '1px solid rgba(99,230,190,0.15)' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'rgb(99,230,190)', fontWeight: 700 }}>✓ Sem gargalos críticos</div>
+                    <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)', marginTop: '0.2rem' }}>Capacidade de produção dentro dos limites normais.</div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                    {bottlenecks.map((b, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0.75rem', background: b.utilisation > 90 ? 'rgba(239,68,68,0.06)' : 'rgba(245,158,11,0.06)', borderRadius: '9px', border: `1px solid ${b.utilisation > 90 ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)'}` }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgb(170,185,205)' }}>{b.stage}</div>
+                          <div style={{ height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', marginTop: '0.25rem' }}>
+                            <div style={{ height: '100%', width: `${Math.min(b.utilisation, 100)}%`, background: b.utilisation > 90 ? 'rgb(239,68,68)' : 'rgb(245,158,11)', borderRadius: '9999px', transition: 'width 0.8s' }} />
+                          </div>
+                        </div>
+                        <span style={{ fontSize: '0.65rem', fontWeight: 800, color: b.utilisation > 90 ? 'rgb(239,68,68)' : 'rgb(245,158,11)', flexShrink: 0 }}>
+                          {b.utilisation}%
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        )}
+
+        {/* Risk tab */}
+        {tab === 'risk' && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '0.625rem' }}>
+            {suppliers.map(s => {
+              const risk = GEOPOLITICAL_RISKS[s.supplier_name] ?? { level: 'low' as const, note: 'Risco geopolítico não avaliado.' };
+              const col = RISK_COLORS[risk.level];
+              return (
+                <div key={s.supplier_name} style={{ padding: '0.875rem', background: `${col}08`, borderRadius: '12px', border: `1px solid ${col}25` }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgb(200,215,235)' }}>{s.supplier_name}</span>
+                    <span style={{ fontSize: '0.6rem', fontWeight: 700, color: col }}>{RISK_LABELS[risk.level]}</span>
+                  </div>
+                  <div style={{ fontSize: '0.65rem', color: 'rgb(100,112,130)', lineHeight: 1.4 }}>{risk.note}</div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* AI tab */}
+        {tab === 'ai' && (
+          <div>
+            {loadingAi ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1.5rem' }}>
+                <span style={{ fontSize: '1.25rem' }}>🧠</span>
+                <span style={{ fontSize: '0.78rem', color: 'rgb(167,139,250)', fontWeight: 600 }}>A gerar análise de procurement…</span>
+              </div>
+            ) : aiRec ? (
+              <div style={{ padding: '1rem', background: 'rgba(167,139,250,0.06)', borderRadius: '12px', border: '1px solid rgba(167,139,250,0.15)' }}>
+                <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(167,139,250)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  🤖 Recomendação AI — Sourcing Q{Math.ceil((new Date().getMonth() + 1) / 3)}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'rgb(185,198,218)', lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>{aiRec}</div>
+              </div>
+            ) : (
+              <button onClick={getAiRec} style={{ background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.3)', borderRadius: '10px', padding: '0.75rem 1.25rem', color: 'rgb(167,139,250)', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
+                🤖 Gerar Recomendação AI
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
 export default function SuppliersPage() {
   const router = useRouter();
   const [client, setClient] = useState<ClientProfile | null>(null);
@@ -394,6 +604,9 @@ export default function SuppliersPage() {
             ))}
           </div>
         )}
+
+        {/* S6: Intelligence Engine panel */}
+        {!loading && <RoutingIntelligencePanel suppliers={sorted} />}
 
         {/* Network health summary */}
         {!loading && suppliers.length > 0 && (
