@@ -36,6 +36,8 @@ const ICONS = {
   marketing:    ['M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z'],
   integrations: ['M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4'],
   settings:     ['M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z', 'M15 12a3 3 0 11-6 0 3 3 0 016 0z'],
+  cockpit:      ['M12 2a10 10 0 100 20A10 10 0 0012 2zm0 4a6 6 0 110 12A6 6 0 0112 6zm0 3a3 3 0 100 6 3 3 0 000-6z', 'M12 12l4-4'],
+  strategist:   ['M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18'],
   logout:       ['M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4', 'M16 17l5-5-5-5', 'M21 12H9'],
   search:       ['M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z'],
   plus:         ['M12 5v14M5 12h14'],
@@ -46,6 +48,7 @@ const ICONS = {
 
 const NAV_ITEMS = [
   { href: '/dashboard',    label: 'Dashboard',             icon: 'dashboard',    exact: true },
+  { href: '/cockpit',      label: 'Cockpit Executivo',     icon: 'cockpit' },
   { divider: 'Operações' },
   { href: '/orders',       label: 'Encomendas',            icon: 'orders',       badgeKey: 'orders' },
   { href: '/production',   label: 'Produção',              icon: 'production' },
@@ -58,6 +61,7 @@ const NAV_ITEMS = [
   { href: '/billing',      label: 'Faturação',             icon: 'billing' },
   { href: '/suppliers',    label: 'Fornecedores',          icon: 'suppliers' },
   { divider: 'Crescimento' },
+  { href: '/strategist',   label: 'Estratega AI',          icon: 'strategist' },
   { href: '/reports',      label: 'Relatórios & Analytics',icon: 'reports' },
   { href: '/marketing',    label: 'Marketing & Promoções', icon: 'marketing' },
   { href: '/integrations', label: 'Integrações',           icon: 'integrations' },
