@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
+import { parseBody } from '@/lib/schemas';
+import { z } from 'zod';
 
 // ── OMEGA PROTOCOL — S5: Manufacturing OS ────────────────────────────────────
 //
@@ -11,6 +14,22 @@ import { createClient } from '@/lib/supabase/server';
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
+
+function getAdminDb() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!key) return null;
+  return createAdminClient(url, key, { auth: { persistSession: false } });
+}
+
+const VALID_STAGES = ['pending', 'confirmed', 'producing', 'shipped', 'delivered', 'cancelled'] as const;
+type Stage = typeof VALID_STAGES[number];
+
+const UpdateStageSchema = z.object({
+  action: z.literal('update_stage'),
+  orderId: z.string().uuid(),
+  newStatus: z.enum(VALID_STAGES),
+});
 
 // Simulated capacity limits per production stage (units/week)
 const STAGE_CAPACITY: Record<string, number> = {
@@ -198,6 +217,66 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('[manufacturing] error:', error);
+    return NextResponse.json({ error: 'Manufacturing OS unavailable' }, { status: 500 });
+  }
+}
+
+// ── POST: admin stage transitions ──────────────────────────────────────────────
+
+export async function POST(req: NextRequest) {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!ADMIN_EMAILS.includes((user.email ?? '').toLowerCase())) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    let rawBody: unknown;
+    try { rawBody = await req.json(); } catch { return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 }); }
+
+    const parsed = parseBody(UpdateStageSchema, rawBody);
+    if (!parsed.ok) return parsed.response;
+    const { orderId, newStatus } = parsed.data;
+
+    const db = getAdminDb() ?? supabase;
+
+    // Fetch current order to validate transition
+    const { data: order, error: fetchErr } = await db
+      .from('orders')
+      .select('id, ref, status')
+      .eq('id', orderId)
+      .single();
+
+    if (fetchErr || !order) return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+
+    const prevStatus = (order as { id: string; ref: string; status: string }).status;
+
+    // Prevent nonsensical backwards jumps (allow same-stage for idempotency)
+    const stageIdx = (s: string) => VALID_STAGES.indexOf(s as Stage);
+    if (stageIdx(newStatus) < stageIdx(prevStatus) - 1) {
+      return NextResponse.json({ error: `Cannot move order from "${prevStatus}" back to "${newStatus}"` }, { status: 422 });
+    }
+
+    const { error: updateErr } = await db
+      .from('orders')
+      .update({ status: newStatus, updated_at: new Date().toISOString() })
+      .eq('id', orderId);
+
+    if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 });
+
+    // Audit log
+    await db.from('omega_final_audit_log').insert({
+      entity_type: 'order',
+      entity_id: orderId,
+      action: 'stage_updated',
+      performed_by: user.id,
+      metadata: { prevStatus, newStatus, ref: (order as { ref: string }).ref, source: 'production_kanban' },
+    });
+
+    return NextResponse.json({ ok: true, orderId, prevStatus, newStatus });
+  } catch (error) {
+    console.error('[manufacturing POST] error:', error);
     return NextResponse.json({ error: 'Manufacturing OS unavailable' }, { status: 500 });
   }
 }
