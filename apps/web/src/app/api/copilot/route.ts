@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { checkRateLimitFast } from '@/lib/rate-limit';
+import { rateLimitGuard } from '@/lib/rate-limit-redis';
+import { parseBody, CopilotSchema } from '@/lib/schemas';
+
+export const dynamic = 'force-dynamic';
 
 // ── AI Copilot — Phase 9: AI Operating Brain ───────────────────────────────────
 // Context-aware assistant that reads live DB state before responding
@@ -108,24 +112,26 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // Rate limit: 30 AI requests per user per 60 seconds
-    const { limited } = checkRateLimitFast(`copilot:${user.id}`, 30, 60);
-    if (limited) {
+    // Rate limit: 30 AI requests per user per 60 seconds (Redis cross-instance)
+    const rl = await rateLimitGuard(`copilot:${user.id}`, 30, 60);
+    if (rl.limited) {
       return NextResponse.json(
         { error: 'Demasiados pedidos. Aguarda um momento antes de continuar.' },
-        { status: 429, headers: { 'Retry-After': '60' } }
+        { status: 429, headers: rl.headers }
       );
     }
 
-    const body = await request.json();
-    const messages: ChatMessage[] = body.messages ?? [];
-    const skipContext: boolean = body.skipContext ?? false;
+    let rawBody: unknown;
+    try { rawBody = await request.json(); } catch { return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 }); }
 
-    if (!messages.length) return NextResponse.json({ error: 'No messages provided' }, { status: 400 });
+    const parsed = parseBody(CopilotSchema, rawBody);
+    if (!parsed.ok) return parsed.response;
+
+    const { messages: rawMessages, skipContext = false, stream: wantStream = false } = parsed.data;
 
     // Cap history to last 20 messages (token cost control); trim each to 3000 chars
-    const validMessages = messages
-      .filter(m => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
+    const validMessages = rawMessages
+      .filter(m => m.content.trim())
       .map(m => ({ role: m.role, content: m.content.trim().slice(0, 3000) }))
       .slice(-20);
 
@@ -140,19 +146,82 @@ export async function POST(request: NextRequest) {
     const ctx = skipContext ? {} : await buildContext(supabase, user.id);
     const systemPrompt = buildSystemPrompt(ctx);
 
+    const anthropicBody = JSON.stringify({
+      model: 'claude-3-haiku-20240307',
+      max_tokens: 768,
+      system: systemPrompt,
+      messages: validMessages,
+      ...(wantStream ? { stream: true } : {}),
+    });
+
+    const anthropicHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    };
+
+    // ── Streaming path ────────────────────────────────────────────────────────
+    if (wantStream) {
+      const upstream = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: anthropicHeaders,
+        body: anthropicBody,
+      });
+
+      if (!upstream.ok || !upstream.body) {
+        return NextResponse.json({ content: 'O assistente não está disponível neste momento.' });
+      }
+
+      // Stream SSE chunks from Anthropic → client
+      const { readable, writable } = new TransformStream();
+      const writer = writable.getWriter();
+      const encoder = new TextEncoder();
+
+      // Pipe upstream SSE to our ReadableStream, extracting text deltas
+      (async () => {
+        const reader = upstream.body!.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() ?? '';
+            for (const line of lines) {
+              if (!line.startsWith('data: ')) continue;
+              const data = line.slice(6).trim();
+              if (data === '[DONE]') continue;
+              try {
+                const evt = JSON.parse(data);
+                if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
+                  const chunk = `data: ${JSON.stringify({ text: evt.delta.text })}\n\n`;
+                  await writer.write(encoder.encode(chunk));
+                }
+              } catch { /* ignore malformed SSE lines */ }
+            }
+          }
+        } finally {
+          await writer.write(encoder.encode('data: [DONE]\n\n'));
+          await writer.close();
+        }
+      })();
+
+      return new Response(readable, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'X-Accel-Buffering': 'no',
+        },
+      });
+    }
+
+    // ── Non-streaming path (unchanged) ────────────────────────────────────────
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
-        max_tokens: 768,
-        system: systemPrompt,
-        messages: validMessages,
-      }),
+      headers: anthropicHeaders,
+      body: anthropicBody,
     });
 
     if (!res.ok) {

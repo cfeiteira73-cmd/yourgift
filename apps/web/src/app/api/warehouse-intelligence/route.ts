@@ -147,7 +147,7 @@ export async function GET(req: NextRequest) {
 
       type VelocityItem = { product_id: string; quantity: number; products?: { id: string; title: string; category?: string } | null };
       const recentMap: Record<string, { title: string; category: string; qty: number }> = {};
-      for (const item of (recent.data ?? []) as VelocityItem[]) {
+      for (const item of (recent.data ?? []) as unknown as VelocityItem[]) {
         const pid = item.product_id;
         if (!recentMap[pid]) recentMap[pid] = { title: item.products?.title ?? pid, category: item.products?.category ?? 'outro', qty: 0 };
         recentMap[pid].qty += item.quantity ?? 0;

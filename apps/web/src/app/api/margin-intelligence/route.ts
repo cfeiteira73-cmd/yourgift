@@ -76,7 +76,7 @@ async function detectMarginLeaks(db: ReturnType<typeof getAdminDb>) {
     severity: 'critical' | 'warning';
   }> = [];
 
-  for (const item of (items ?? []) as ItemWithDetails[]) {
+  for (const item of (items ?? []) as unknown as ItemWithDetails[]) {
     if (!item.products?.cost_price || !item.unit_price) continue;
     const costPrice = item.products.cost_price;
     const unitPrice = item.unit_price;
@@ -153,7 +153,7 @@ async function getProductProfitability(db: ReturnType<typeof getAdminDb>) {
     revenue: number; cost: number; units: number;
   }> = {};
 
-  for (const item of (items ?? []) as ProfItem[]) {
+  for (const item of (items ?? []) as unknown as ProfItem[]) {
     if (!item.products) continue;
     const cat = item.products.category ?? 'outro';
     const revenue = (item.quantity ?? 0) * (item.unit_price ?? 0);
@@ -394,8 +394,8 @@ export async function GET(req: NextRequest) {
       }
 
       const topCategory = Object.entries(catMap).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'outro';
-      const orders = clientOrders ?? [];
-      const lastOrderDate = orders.length > 0 ? orders.sort((a: ClientOrder, b: ClientOrder) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0].created_at : null;
+      const orders = (clientOrders ?? []) as unknown as ClientOrder[];
+      const lastOrderDate = orders.length > 0 ? orders.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0].created_at : null;
       const daysSince = lastOrderDate ? Math.round((Date.now() - new Date(lastOrderDate).getTime()) / 86400000) : 999;
 
       const marginPct = revenue > 0 ? ((revenue - cost) / revenue) * 100 : 0;

@@ -93,7 +93,7 @@ async function getClientRecommendations(
   const boughtProductIds = new Set<string>();
   const categoryProfile: Record<string, number> = {};
 
-  for (const item of (clientHistory ?? []) as HistoryItem[]) {
+  for (const item of (clientHistory ?? []) as unknown as HistoryItem[]) {
     if (item.products?.id) boughtProductIds.add(item.products.id);
     const cat = item.products?.category ?? 'outro';
     categoryProfile[cat] = (categoryProfile[cat] ?? 0) + (item.quantity ?? 1);
@@ -117,7 +117,7 @@ async function getClientRecommendations(
 
   // Score products by co-occurrence frequency
   const productScores: Record<string, { product: Product; score: number; reason: string }> = {};
-  for (const item of (similarClientOrders ?? []) as SimilarItem[]) {
+  for (const item of (similarClientOrders ?? []) as unknown as SimilarItem[]) {
     if (!item.products?.id || boughtProductIds.has(item.products.id)) continue;
     const pid = item.products.id;
     const catWeight = categoryProfile[item.products.category ?? ''] ?? 0;
@@ -190,7 +190,7 @@ export async function GET(req: NextRequest) {
         const { products, topCategory } = await getClientRecommendations(db, clientId);
         const clientName = (client as { name?: string; company?: string }).name
           ?? (client as { name?: string; company?: string }).company ?? 'Cliente';
-        const rationale = await generateRecommendationRationale(clientName, topCategory, products.slice(0, 3));
+        const rationale = await generateRecommendationRationale(clientName, topCategory, products.slice(0, 3) as unknown as Array<{ title: string; category: string }>);
 
         return NextResponse.json({ recommendations: products, rationale, topCategory, generatedAt: new Date().toISOString() });
       }
@@ -213,7 +213,7 @@ export async function GET(req: NextRequest) {
         .gte('orders.created_at', ninetyDaysAgo)
         .limit(50);
 
-      const buyerIds = [...new Set((buyers ?? []).map(b => (b.orders as { client_id: string } | null)?.client_id ?? '').filter(Boolean))];
+      const buyerIds = [...new Set((buyers ?? []).map(b => (b.orders as unknown as { client_id: string } | null)?.client_id ?? '').filter(Boolean))];
 
       if (!buyerIds.length) {
         return NextResponse.json({ alsoViewed: [], message: 'Dados insuficientes' });
@@ -230,7 +230,7 @@ export async function GET(req: NextRequest) {
 
       type CoItem = { products: Product | null; quantity: number };
       const coScores: Record<string, { product: Product; count: number }> = {};
-      for (const item of (coOrdered ?? []) as CoItem[]) {
+      for (const item of (coOrdered ?? []) as unknown as CoItem[]) {
         if (!item.products?.id) continue;
         const pid = item.products.id;
         if (!coScores[pid]) coScores[pid] = { product: item.products, count: 0 };
@@ -264,7 +264,7 @@ export async function GET(req: NextRequest) {
 
       type TrendItem = { product_id: string; quantity: number; products?: Product | null };
       const recentMap: Record<string, { product: Product; qty: number }> = {};
-      for (const item of (recent ?? []) as TrendItem[]) {
+      for (const item of (recent ?? []) as unknown as TrendItem[]) {
         const pid = item.product_id;
         if (!pid || !item.products) continue;
         if (!recentMap[pid]) recentMap[pid] = { product: item.products as Product, qty: 0 };

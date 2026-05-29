@@ -268,7 +268,7 @@ async function generateExecutiveBrief(data: {
 
 RECEITA:
 - Este mês: €${data.revenue.revenueThisMonth.toFixed(0)} (MoM: ${data.revenue.momGrowth?.toFixed(1) ?? 'N/D'}%)
-- Última semana: €${(data.revenue.revenueLast7d ?? 0).toFixed(0)} (vs semana anterior: ${data.revenue.velocityChange?.toFixed(1) ?? 'N/D'}%)
+- Última semana: ${data.revenue.ordersLast7d ?? 0} encomendas (vs semana anterior: ${data.revenue.velocityChange?.toFixed(1) ?? 'N/D'}%)
 - Valor médio por encomenda: €${data.revenue.avgOrderValue.toFixed(0)}
 - Encomendas este mês: ${data.revenue.ordersThisMonth}
 

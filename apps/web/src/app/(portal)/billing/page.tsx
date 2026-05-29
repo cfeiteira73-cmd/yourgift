@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { PortalLayout } from '@/components/portal/PortalLayout';
+import { SparklineCard } from '@/components/portal/RevenueSparkline';
 
 interface Order { id: string; ref: string; status: string; total_amount: number | null; created_at: string; }
 interface ClientProfile { id: string; name: string | null; company: string | null; tier: string | null; }
@@ -69,6 +70,22 @@ export default function BillingPage() {
     return { paid, pending, overdue, total: paid + pending + overdue };
   }, [orders]);
 
+  // Build 6-month revenue sparkline from orders
+  const sparklineData = useMemo(() => {
+    const now = new Date();
+    return Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+      const label = d.toLocaleDateString('pt-PT', { month: 'short' });
+      const value = orders
+        .filter(o => {
+          const od = new Date(o.created_at);
+          return od.getFullYear() === d.getFullYear() && od.getMonth() === d.getMonth() && !['cancelled','draft'].includes(o.status);
+        })
+        .reduce((s, o) => s + (o.total_amount ?? 0), 0);
+      return { label, value };
+    });
+  }, [orders]);
+
   const filtered = useMemo(() => {
     if (filter === 'paid') return orders.filter(o => ['delivered','shipped','payment_confirmed'].includes(o.status));
     if (filter === 'pending') return orders.filter(o => ['producing','in_production','confirmed','approved'].includes(o.status));
@@ -92,6 +109,20 @@ export default function BillingPage() {
           <h1 style={{ fontSize:'1.4rem', fontWeight:800, color:'rgb(245,247,251)', letterSpacing:'-0.03em', marginBottom:'0.2rem' }}>Faturação</h1>
           <p style={{ fontSize:'0.78rem', color:'rgb(80,92,110)' }}>Histórico de faturas e pagamentos</p>
         </motion.div>
+
+        {/* Revenue sparkline bar */}
+        {!loading && orders.length > 0 && (
+          <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.04 }}
+            style={{ marginBottom:'1rem' }}>
+            <SparklineCard
+              title="Receita — Últimos 6 meses"
+              value={fmtEur(stats.total)}
+              data={sparklineData}
+              color="rgb(99,230,190)"
+              width={180}
+            />
+          </motion.div>
+        )}
 
         {/* Summary cards */}
         <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.05 }}

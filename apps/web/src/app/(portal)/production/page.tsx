@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { PortalLayout } from '@/components/portal/PortalLayout';
 import { ManufacturingHeatmap, SLATimeline } from '@/components/portal/ManufacturingHeatmap';
+import { DragDropProductionBoard } from '@/components/portal/DragDropProductionBoard';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -442,12 +443,27 @@ export default function ProductionPage() {
               <div key={i} style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '12px', padding: '0.875rem', animation: 'pulse 1.5s ease-in-out infinite' }} />
             ))}
           </div>
+        ) : isAdmin ? (
+          /* Admin view: drag-drop enabled board */
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            style={{ flex: 1, minHeight: 0 }}
+          >
+            <DragDropProductionBoard
+              stages={visibleStages}
+              orders={orders}
+              isAdmin={isAdmin}
+              onOrderMoved={(orderId, newStatus) => {
+                setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+              }}
+            />
+          </motion.div>
         ) : (
+          /* Client view: read-only static board (original rendering) */
           <div style={{ display: 'grid', gridTemplateColumns: `repeat(${visibleStages.length}, 1fr)`, gap: '0.5rem', flex: 1, minHeight: 0, overflowX: visibleStages.length > 5 ? 'auto' : 'hidden' }}>
             {visibleStages.map((stage, si) => {
               const items = byStage[stage.key] ?? [];
               const criticalInStage = items.filter(o => getSlaStatus(o, slaMap) === 'critical').length;
-              const isBottleneckStage = stage.key === bottleneck && items.length > 0;
               return (
                 <motion.div key={stage.key}
                   initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
@@ -456,47 +472,20 @@ export default function ProductionPage() {
                     background: 'rgba(255,255,255,0.018)',
                     border: `1px solid ${criticalInStage > 0 ? 'rgba(239,68,68,0.18)' : 'rgba(255,255,255,0.05)'}`,
                     borderRadius: '12px', padding: '0.75rem 0.625rem',
-                    overflowY: 'auto', display: 'flex', flexDirection: 'column',
-                    minWidth: '180px',
+                    overflowY: 'auto', display: 'flex', flexDirection: 'column', minWidth: '180px',
                   }}>
-                  {/* Column header */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', marginBottom: '0.625rem', paddingBottom: '0.5rem', borderBottom: `1px solid ${stage.border}` }}>
                     <span style={{ fontSize: '0.85rem' }}>{stage.icon}</span>
                     <span style={{ fontSize: '0.7rem', fontWeight: 700, color: stage.color, flex: 1 }}>{stage.label}</span>
                     <span style={{ fontSize: '0.62rem', fontWeight: 700, background: stage.bg, border: `1px solid ${stage.border}`, color: stage.color, borderRadius: '9999px', padding: '0.1rem 0.4rem' }}>{items.length}</span>
-                    {isBottleneckStage && (
-                      <span style={{ fontSize: '0.55rem', color: 'rgb(245,158,11)', fontWeight: 700 }} title="Bottleneck">▲</span>
-                    )}
-                    {criticalInStage > 0 && (
-                      <span style={{ fontSize: '0.55rem', background: 'rgba(239,68,68,0.15)', color: 'rgb(239,68,68)', borderRadius: '9999px', padding: '0.1rem 0.3rem', fontWeight: 800 }}>
-                        {criticalInStage}⚠
-                      </span>
-                    )}
                   </div>
-
-                  {/* SLA legend for this stage */}
-                  {slaMap[stage.key] && (
-                    <div style={{ fontSize: '0.57rem', color: 'rgb(60,72,90)', marginBottom: '0.5rem', lineHeight: 1.5 }}>
-                      SLA: {fmtHours(slaMap[stage.key].expected_hours)} · Alerta: {fmtHours(slaMap[stage.key].warning_hours)} · Crítico: {fmtHours(slaMap[stage.key].critical_hours)}
-                    </div>
-                  )}
-
-                  {/* Cards */}
                   <div style={{ flex: 1, overflowY: 'auto' }}>
                     <AnimatePresence>
                       {items.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '1.25rem 0', color: 'rgb(50,62,80)', fontSize: '0.65rem' }}>
-                          Nenhuma encomenda
-                        </div>
+                        <div style={{ textAlign: 'center', padding: '1.25rem 0', color: 'rgb(50,62,80)', fontSize: '0.65rem' }}>Nenhuma encomenda</div>
                       ) : (
                         items.map(order => (
-                          <PipelineCard
-                            key={order.id}
-                            order={order}
-                            stage={stage}
-                            slaMap={slaMap}
-                            isAdmin={isAdmin}
-                          />
+                          <PipelineCard key={order.id} order={order} stage={stage} slaMap={slaMap} isAdmin={false} />
                         ))
                       )}
                     </AnimatePresence>

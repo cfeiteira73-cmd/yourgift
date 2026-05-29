@@ -9,6 +9,24 @@ import { usePathname, useRouter } from 'next/navigation';
 // Prevents double-chrome when a page renders its own PortalLayout inside the
 // group layout that already provides one. Inner instances just pass through.
 const PortalLayoutContext = createContext(false);
+
+// ── Viewport context — expose to all portal children ─────────────────────────
+export interface ViewportContextValue {
+  isMobile: boolean;
+  isTablet: boolean;
+  isDesktop: boolean;
+}
+
+export const ViewportContext = createContext<ViewportContextValue>({
+  isMobile: false,
+  isTablet: false,
+  isDesktop: true,
+});
+
+/** Use in any portal child component to react to viewport size. */
+export function useViewport(): ViewportContextValue {
+  return useContext(ViewportContext);
+}
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { GlobalSearch } from './GlobalSearch';
@@ -248,6 +266,36 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
   const [cmdOpen, setCmdOpen] = useState(false);
   const [authEmail, setAuthEmail] = useState<string>('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+
+  // Auto-detect viewport size using ResizeObserver + matchMedia
+  useEffect(() => {
+    const MOBILE_BP = 768;
+    const TABLET_BP = 1024;
+
+    function detect() {
+      const w = window.innerWidth;
+      setIsMobile(w < MOBILE_BP);
+      setIsTablet(w >= MOBILE_BP && w < TABLET_BP);
+    }
+
+    detect(); // initial
+
+    // Use ResizeObserver on document.body for accurate resize tracking
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(detect);
+      ro.observe(document.documentElement);
+    } else {
+      window.addEventListener('resize', detect, { passive: true });
+    }
+
+    return () => {
+      if (ro) ro.disconnect();
+      else window.removeEventListener('resize', detect);
+    };
+  }, []);
 
   // Auto-close mobile menu on route change (Apple sidebar dismiss pattern)
   useEffect(() => {
@@ -314,8 +362,15 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
   const company = companyName || 'YOURGIFT LDA';
   const usagePct = 78;
 
+  const viewportValue: ViewportContextValue = {
+    isMobile,
+    isTablet,
+    isDesktop: !isMobile && !isTablet,
+  };
+
   return (
     <PortalLayoutContext.Provider value={true}>
+    <ViewportContext.Provider value={viewportValue}>
     <div style={{ display: 'flex', minHeight: '100vh', background: 'rgb(7,17,31)' }}>
 
       {/* ════ COMMAND PALETTE (Cmd+K) ════ */}
@@ -689,6 +744,7 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
         {children}
       </main>
     </div>
+    </ViewportContext.Provider>
     </PortalLayoutContext.Provider>
   );
 }

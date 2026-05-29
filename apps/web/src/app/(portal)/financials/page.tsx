@@ -14,6 +14,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { PortalLayout } from '@/components/portal/PortalLayout';
 import { fadeUp, delayedFadeUp, tapScale, springSnappy } from '@/lib/motion';
+import { SparklineCard } from '@/components/portal/RevenueSparkline';
 
 const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 interface ClientProfile { id: string; name: string | null; company: string | null; tier: string | null; }
@@ -121,6 +122,29 @@ export default function FinancialsPage() {
           </div>
         ) : data ? (
           <>
+            {/* Revenue sparkline row */}
+            {data.revenueTimeline.length > 0 && (
+              <motion.div {...delayedFadeUp(0, 0.03)} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <SparklineCard
+                  title="Receita no período"
+                  value={fmtEur(s?.currentRevenue ?? 0)}
+                  trend={s?.revenueGrowth}
+                  subtitle="vs. período anterior"
+                  data={data.revenueTimeline.map(p => ({ label: p.label, value: p.revenue }))}
+                  color="rgb(99,230,190)"
+                  width={140}
+                />
+                <SparklineCard
+                  title="Margem bruta"
+                  value={`${s?.grossMarginPct?.toFixed(1) ?? 0}%`}
+                  subtitle={`Target: ${s?.targetMarginPct}%`}
+                  data={data.revenueTimeline.map(p => ({ label: p.label, value: p.revenue * (s?.grossMarginPct ?? 30) / 100 }))}
+                  color={marginColor}
+                  width={140}
+                />
+              </motion.div>
+            )}
+
             {/* KPI strip */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '0.5rem', marginBottom: '0.875rem' }}>
               {[

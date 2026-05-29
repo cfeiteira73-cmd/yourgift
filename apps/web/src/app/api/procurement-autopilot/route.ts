@@ -114,7 +114,7 @@ export async function GET(req: NextRequest) {
         const ref = (o as { ref: string }).ref;
         return !rfqTitles.has(ref);
       }).map(o => {
-        const items = (o as { order_items: OrderItem[] }).order_items ?? [];
+        const items = (o as unknown as { order_items: OrderItem[] }).order_items ?? [];
         const totalQty = items.reduce((s, i) => s + (i.quantity ?? 0), 0);
         const categories = [...new Set(items.map(i => i.products?.category ?? 'outro'))];
         return {

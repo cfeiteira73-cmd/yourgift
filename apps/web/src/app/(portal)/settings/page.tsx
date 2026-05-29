@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { PortalLayout } from '@/components/portal/PortalLayout';
+import { CompanyMembers } from '@/components/portal/CompanyMembers';
 
 interface ClientProfile { id: string; name: string | null; company: string | null; tier: string | null; budget_limit: number | null; }
 
@@ -206,6 +207,13 @@ export default function SettingsPage() {
                   </div>
                 ))}
               </div>
+            </motion.div>
+
+            {/* Company team */}
+            <SectionTitle>Equipa da Empresa</SectionTitle>
+            <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.22 }}
+              className="yg-card" style={{ padding:'1.25rem' }}>
+              <CompanyMembers />
             </motion.div>
 
             {/* Danger zone */}

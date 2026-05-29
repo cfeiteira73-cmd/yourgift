@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { PortalLayout } from '@/components/portal/PortalLayout';
 import { springSnappy, springGentle, fadeUp, tapScale } from '@/lib/motion';
+import { ArtworkAnnotationLayer } from '@/components/portal/ArtworkAnnotationLayer';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -632,20 +633,17 @@ export default function ArtworkPage() {
                         </a>
                       </div>
 
-                      {/* Image preview */}
+                      {/* Image preview with annotation layer */}
                       {isImage(selected.file_type, previewUrl ?? selected.file_url) && (
                         <div style={{
-                          background: 'rgba(255,255,255,0.03)', borderRadius: '10px', overflow: 'hidden',
+                          background: 'rgba(255,255,255,0.03)', borderRadius: '10px',
                           marginBottom: '0.875rem', border: '1px solid rgba(255,255,255,0.05)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          minHeight: '200px', maxHeight: '320px',
+                          padding: '0.75rem',
                         }}>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={previewUrl ?? selected.file_url}
-                            alt={selected.title}
-                            style={{ maxWidth: '100%', maxHeight: '320px', objectFit: 'contain', padding: '1rem' }}
-                            onError={e => { (e.target as HTMLImageElement).style.opacity = '0.1'; }}
+                          <ArtworkAnnotationLayer
+                            submissionId={selected.id}
+                            imageUrl={previewUrl ?? selected.file_url}
+                            readOnly={selected.status === 'approved' || selected.status === 'rejected'}
                           />
                         </div>
                       )}
