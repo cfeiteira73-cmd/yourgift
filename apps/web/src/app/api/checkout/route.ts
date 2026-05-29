@@ -27,7 +27,7 @@ export const dynamic = 'force-dynamic';
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CheckoutRequestSchema = z.object({
-  orderId: z.string().uuid(),
+  orderId: z.string().min(1), // orders.id is text, not uuid
 });
 
 function getStripe(): Stripe | null {
