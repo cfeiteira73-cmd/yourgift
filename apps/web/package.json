@@ -5,7 +5,9 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start",
-    "e2e": "playwright test --config=e2e/playwright.config.ts"
+    "e2e": "playwright test --config=e2e/playwright.config.ts",
+    "test:unit": "node --loader ts-node/esm src/lib/__tests__/validate.test.ts",
+    "test:types": "tsc --noEmit"
   },
   "dependencies": {
     "next": "^14.2.0",
