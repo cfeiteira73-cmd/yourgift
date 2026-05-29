@@ -19,6 +19,8 @@ const ADMIN_ROUTES = [
   '/payments', '/disputes', '/postmortems', '/forecasting', '/control-tower',
   '/client-success', '/security', '/ecosystem', '/command',
   '/approvals', '/support', '/audit',
+  // OMEGA WORLDCLASS routes
+  '/ops-center',
 ];
 
 // ── Client portal routes (simpler portal — future) ────────────────────────────
@@ -146,11 +148,31 @@ export async function middleware(request: NextRequest) {
     'Permissions-Policy',
     'camera=(), microphone=(), geolocation=(), interest-cohort=()',
   );
+  // Content Security Policy — enterprise-grade, Next.js compatible
+  // Note: unsafe-inline required for Next.js hydration scripts (no nonce infra).
+  // The connect-src, frame-src, and img-src restrictions still provide real attack surface reduction.
+  supabaseResponse.headers.set(
+    'Content-Security-Policy',
+    [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: blob: https://*.supabase.co https://cdn.midocean.com https://pf-concept.com https://*.pfconcept.com https://storage.googleapis.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.anthropic.com https://api.stripe.com https://api.exchangerate-api.com",
+      "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com",
+      "font-src 'self' data:",
+      "worker-src 'self' blob:",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self' https://checkout.stripe.com",
+      "upgrade-insecure-requests",
+    ].join('; '),
+  );
   // HSTS — force HTTPS (only on production HTTPS, not localhost)
   if (request.nextUrl.protocol === 'https:') {
     supabaseResponse.headers.set(
       'Strict-Transport-Security',
-      'max-age=31536000; includeSubDomains; preload',
+      'max-age=63072000; includeSubDomains; preload',
     );
   }
 
