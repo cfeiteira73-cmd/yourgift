@@ -83,6 +83,8 @@ const ICONS = {
   mobile:       ['M12 18h.01', 'M8 6h8a1 1 0 011 1v12a2 2 0 01-2 2H9a2 2 0 01-2-2V7a1 1 0 011-1z'],
   account:      ['M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2', 'M12 11a4 4 0 100-8 4 4 0 000 8z'],
   logout:       ['M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4', 'M16 17l5-5-5-5', 'M21 12H9'],
+  menu:         ['M3 12h18', 'M3 6h18', 'M3 18h18'],
+  close:        ['M18 6L6 18', 'M6 6l12 12'],
   search:       ['M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z'],
   plus:         ['M12 5v14M5 12h14'],
   chevronDown:  'M19 9l-7 7-7-7',
@@ -245,6 +247,12 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
   const [searchOpen, setSearchOpen] = useState(false);
   const [cmdOpen, setCmdOpen] = useState(false);
   const [authEmail, setAuthEmail] = useState<string>('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Auto-close mobile menu on route change (Apple sidebar dismiss pattern)
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   // Ctrl+K → CommandPalette | Ctrl+Shift+K → GlobalSearch
   useEffect(() => {
@@ -513,6 +521,72 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
         </div>
       </aside>
 
+      {/* ════ MOBILE NAV DRAWER (full screen) ════ */}
+      {mobileMenuOpen && (
+        <motion.div
+          className="flex md:hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+          }}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <motion.div
+            initial={{ x: -280 }}
+            animate={{ x: 0 }}
+            exit={{ x: -280 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 38 }}
+            onClick={e => e.stopPropagation()}
+            style={{
+              width: 240, height: '100%',
+              background: 'rgb(8,15,28)',
+              borderRight: '1px solid rgba(255,255,255,0.08)',
+              overflowY: 'auto', overflowX: 'hidden',
+              display: 'flex', flexDirection: 'column',
+            }}
+          >
+            {/* Drawer header */}
+            <div style={{ padding: '16px 16px 12px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '1rem', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.02em' }}>
+                your<span style={{ color: 'rgb(77,163,255)' }}>gift</span>
+              </span>
+              <button type="button" onClick={() => setMobileMenuOpen(false)} style={{ padding: 6, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer' }}>
+                <Icon d={ICONS.close} size={14} />
+              </button>
+            </div>
+            {/* Drawer nav */}
+            <nav style={{ flex: 1, padding: '8px 10px', overflowY: 'auto' }}>
+              {NAV_ITEMS.map((item, i) => {
+                if ('divider' in item) {
+                  return (
+                    <div key={i} style={{ fontSize: '0.55rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(60,72,90)', padding: '12px 8px 4px' }}>
+                      {item.divider}
+                    </div>
+                  );
+                }
+                return (
+                  <NavItem
+                    key={`mob-${item.href}-${item.label}`}
+                    href={item.href}
+                    label={item.label}
+                    iconKey={item.icon}
+                    exact={'exact' in item ? item.exact : undefined}
+                    badge={'badgeKey' in item && item.badgeKey ? badges[item.badgeKey] : undefined}
+                  />
+                );
+              })}
+            </nav>
+            {/* Drawer footer */}
+            <div style={{ padding: 12, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>{displayEmail}</div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
       {/* ════ MOBILE TOP BAR ════ */}
       <div className="flex md:hidden" style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, height: '52px',
@@ -520,9 +594,27 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
         borderBottom: '1px solid rgba(255,255,255,0.06)',
         alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem',
       }}>
-        <span style={{ fontSize: '1rem', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.02em' }}>
-          your<span style={{ color: 'rgb(77,163,255)' }}>gift</span>
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* Hamburger — opens full nav drawer */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(o => !o)}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 32, height: 32, borderRadius: 8, cursor: 'pointer',
+              background: mobileMenuOpen ? 'rgba(77,163,255,0.12)' : 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              color: mobileMenuOpen ? 'rgb(77,163,255)' : 'rgb(140,155,175)',
+            }}
+            aria-label="Abrir menu de navegação"
+            aria-expanded={mobileMenuOpen}
+          >
+            <Icon d={mobileMenuOpen ? ICONS.close : ICONS.menu} size={15} />
+          </button>
+          <span style={{ fontSize: '1rem', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.02em' }}>
+            your<span style={{ color: 'rgb(77,163,255)' }}>gift</span>
+          </span>
+        </div>
         <button
           type="button"
           onClick={() => setSearchOpen(true)}
@@ -535,7 +627,6 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
         >
           <Icon d={ICONS.search} size={14} />
           <span>Pesquisar</span>
-          <kbd style={{ fontSize: '0.58rem', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', padding: '0.1rem 0.3rem', fontFamily: 'monospace' }}>⌘K</kbd>
         </button>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <NotificationCenter />
