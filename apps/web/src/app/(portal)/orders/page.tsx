@@ -8,6 +8,7 @@ import { formatPrice } from '@yourgift/shared';
 import { createClient } from '@/lib/supabase/client';
 import { PortalLayout } from '@/components/portal/PortalLayout';
 import { StatusBadge } from '@/components/portal/StatusBadge';
+import { ReorderIntelligence } from '@/components/portal/ReorderIntelligence';
 
 // ── types ─────────────────────────────────────────────────────────────────
 
@@ -344,7 +345,9 @@ export default function OrdersPage() {
       tier={client?.tier ?? undefined}
     >
       <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }`}</style>
-      <div style={{ padding: '2rem 2rem 3rem', maxWidth: '900px' }}>
+      <div style={{ padding: '2rem 2rem 3rem', display: 'flex', gap: '1.5rem', alignItems: 'flex-start', maxWidth: '1280px' }}>
+        {/* ── Main orders column ───────────────────────────────────────────── */}
+        <div style={{ flex: 1, minWidth: 0 }}>
 
         {/* Header */}
         <motion.div
@@ -539,6 +542,28 @@ export default function OrdersPage() {
             </motion.div>
           </AnimatePresence>
         )}
+        </div>{/* end main orders column */}
+
+        {/* ── Reorder Intelligence sidebar ────────────────────────────── */}
+        <div style={{ width: '320px', flexShrink: 0, display: 'none', position: 'sticky', top: '1.5rem' }}
+          className="orders-intel-panel">
+          <div style={{
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px solid rgba(255,255,255,0.07)',
+            borderRadius: 16,
+            padding: '20px',
+          }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 14 }}>
+              ✦ Inteligência de Compra
+            </p>
+            <ReorderIntelligence />
+          </div>
+        </div>
+        <style>{`
+          @media (min-width: 1024px) {
+            .orders-intel-panel { display: block !important; }
+          }
+        `}</style>
       </div>
     </PortalLayout>
   );
