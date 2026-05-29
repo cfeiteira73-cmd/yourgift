@@ -116,7 +116,9 @@ export async function GET(request: NextRequest) {
     }
 
     if (mode === 'vat_matrix') {
-      return NextResponse.json({ vatRates: VAT_RATES, generatedAt: new Date().toISOString() });
+      return NextResponse.json({ vatRates: VAT_RATES, generatedAt: new Date().toISOString() }, {
+        headers: { 'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800' },
+      });
     }
 
     const rates = await getExchangeRates();
@@ -128,6 +130,10 @@ export async function GET(request: NextRequest) {
         source: rateCache && Date.now() - rateCache.cachedAt < 10000 ? 'live' : 'cache',
         cachedAt: rateCache ? new Date(rateCache.cachedAt).toISOString() : null,
         generatedAt: new Date().toISOString(),
+      }, {
+        headers: {
+          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+        },
       });
     }
 
