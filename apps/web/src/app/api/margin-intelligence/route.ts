@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 
+export const dynamic = 'force-dynamic';
+
 // ── OMEGA WORLDCLASS — Margin Intelligence API ────────────────────────────────
 //
 // X6 Executive Superintelligence: Profitability & margin leak detection.

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ClientSuccessCockpit } from '@/components/portal/ClientSuccessCockpit';
 
 interface ClientWithHealth {
   id: string;
@@ -208,6 +209,17 @@ export default function ClientSuccessPage() {
             <p className="text-white/40 text-[10px] mt-1">{label}</p>
           </div>
         ))}
+      </div>
+
+      {/* ── Margin Intelligence & Upsell Cockpit ── */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div className="rounded-2xl border border-white/6 bg-white/2 p-5">
+          <p className="text-white/40 text-[10px] font-semibold uppercase tracking-widest mb-4">
+            ✦ Inteligência de Oportunidades
+          </p>
+          <ClientSuccessCockpit />
+        </div>
+        <div className="hidden xl:block" />
       </div>
 
       {/* Health distribution bar */}
