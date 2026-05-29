@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { PortalLayout } from '@/components/portal/PortalLayout';
+import { ManufacturingHeatmap, SLATimeline } from '@/components/portal/ManufacturingHeatmap';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -396,6 +397,43 @@ export default function ProductionPage() {
             </span>
           )}
         </div>
+
+        {/* ── Manufacturing Heatmap ── */}
+        {isAdmin && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            style={{ marginBottom: '1rem' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Production Load Heatmap
+              </span>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>· calor = carga relativa</span>
+            </div>
+            <ManufacturingHeatmap
+              loading={loading}
+              stages={STAGES.map(stage => {
+                const stageOrders = byStage[stage.key] ?? [];
+                const capacity = stage.key === 'producing' ? 80 : stage.key === 'confirmed' ? 150 : 200;
+                return {
+                  key: stage.key,
+                  label: stage.label,
+                  count: stageOrders.length,
+                  capacity,
+                  criticalCount: stageOrders.filter(o => getSlaStatus(o, slaMap) === 'critical').length,
+                  warningCount: stageOrders.filter(o => getSlaStatus(o, slaMap) === 'warning').length,
+                  okCount: stageOrders.filter(o => getSlaStatus(o, slaMap) === 'ok').length,
+                  totalValue: stageOrders.reduce((s, o) => s + (o.total_amount ?? 0), 0),
+                  avgHours: stageOrders.length > 0
+                    ? stageOrders.reduce((s, o) => s + getSlaHours(o, slaMap), 0) / stageOrders.length
+                    : 0,
+                };
+              })}
+            />
+          </motion.div>
+        )}
 
         {/* ── Kanban board ── */}
         {loading ? (
