@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { parseAndValidate } from '@/lib/validate';
 
 // ── OMEGA WORLDCLASS — Live Operations Center API ─────────────────────────────
 //
@@ -74,10 +75,14 @@ export async function POST(request: Request) {
   }
 
   const db = adminSupabase() ?? supabase;
-  let body: { action?: string; id?: string };
-  try { body = await request.json(); } catch { body = {}; }
 
-  const { action, id } = body;
+  const parsed = await parseAndValidate(request, {
+    action: { type: 'string', required: true, enum: ['retry_webhook', 'resolve_anomaly', 'resolve_stuck'] },
+    id:     { type: 'string', required: false, uuid: true },
+  });
+  if (!parsed.ok) return parsed.response as Response;
+
+  const { action, id } = parsed.data as { action: string; id?: string };
 
   if (action === 'retry_webhook' && id) {
     const { error } = await db
