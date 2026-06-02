@@ -9,12 +9,12 @@ import {
   MakitoClient,
   MakitoCatalogSyncService,
   transformMakitoProduct,
+  MAKITO_BASE_URL,
 } from '@yourgift/makito';
 import type {
   MakitoOrderRequest,
   MakitoOrderResponse,
-  MakitoRFQRequest,
-  MakitoRFQResponse,
+  MakitoSalesOrder,
 } from '@yourgift/makito';
 import type { MakitoSyncResult } from '@yourgift/makito';
 
@@ -44,7 +44,7 @@ export class MakitoService implements OnModuleInit {
     this.client = new MakitoClient({
       clientId,
       clientSecret,
-      baseUrl,
+      baseUrl: baseUrl ?? MAKITO_BASE_URL,
       logger: (msg) => this.logger.debug(msg),
     });
 
@@ -211,47 +211,93 @@ export class MakitoService implements OnModuleInit {
 
     const response = await this.client.createOrder(order);
 
+    // Real API returns { documents: [{ documentNumber, link }] }
+    const documentNumber = response.documents?.[0]?.documentNumber;
+
     await this.prisma.order.update({
-      where: { ref: order.reference },
+      where: { ref: order.customerOrder },
       data: {
-        supplierOrderId: response.orderId,
+        supplierOrderId: documentNumber ?? null,
         supplier: 'makito',
-        status: this.mapMakitoStatus(response.status),
+        status: 'confirmed',
       },
     });
 
     this.events.emit('makito.order.submitted', {
-      ref: order.reference,
-      makitoOrderId: response.orderId,
-      status: response.status,
+      ref: order.customerOrder,
+      makitoDocumentNumber: documentNumber,
+      documents: response.documents,
     });
 
-    this.logger.log(`Makito order created: ${response.orderId} (${response.status})`);
+    this.logger.log(`Makito order created: document ${documentNumber} for ${order.customerOrder}`);
     return response;
   }
 
-  async cancelOrder(makitoOrderId: string, reason?: string) {
-    if (!this.client) throw new Error('Makito not configured');
-    return this.client.cancelOrder(makitoOrderId, reason);
+  async cancelOrder(documentNumber: string, reason?: string) {
+    // Makito API does not have a cancel endpoint.
+    // Cancellations must be requested via Makito account manager.
+    this.logger.warn(`Cancel requested for Makito order ${documentNumber}: ${reason ?? 'no reason'} — contact Makito account manager`);
+    this.events.emit('makito.order.cancel_requested', { documentNumber, reason });
+    return { requested: true, documentNumber, note: 'Contact Makito account manager to process cancellation' };
   }
 
-  async getOrderStatus(makitoOrderId: string): Promise<MakitoOrderResponse> {
+  async getOrderStatus(documentNumber: string): Promise<MakitoSalesOrder> {
     if (!this.client) throw new Error('Makito not configured');
-    return this.client.getOrder(makitoOrderId);
+    return this.client.getOrder(documentNumber);
   }
 
-  // ── RFQ (Phase 7) ─────────────────────────────────────────────────────────
-
-  async createRFQ(req: MakitoRFQRequest): Promise<MakitoRFQResponse> {
+  async getOrders(filters: { status?: string; from?: string; to?: string } = {}) {
     if (!this.client) throw new Error('Makito not configured');
-    return this.client.createRFQ(req);
+    return this.client.getOrders(filters);
+  }
+
+  async getMetadata() {
+    if (!this.client) throw new Error('Makito not configured');
+    const [regions, countries, colors] = await Promise.all([
+      this.client.getRegions(),
+      this.client.getCountries(),
+      this.client.getColors(),
+    ]);
+    return { regions, countries, colors };
+  }
+
+  // ── RFQ / Quote (Phase 7) ────────────────────────────────────────────────
+  // Makito does not have an RFQ endpoint — use price list + stock check instead
+
+  async getQuote(items: Array<{ variantRef: string; quantity: number }>) {
+    if (!this.client) throw new Error('Makito not configured');
+    const [priceMap, stockMap] = await Promise.all([
+      this.client.getPriceMap(),
+      this.client.getStockMap(),
+    ]);
+
+    return items.map(({ variantRef, quantity }) => {
+      const priceItem = priceMap.get(variantRef);
+      // Find best price for quantity from scales
+      const unitPrice = priceItem ?? 0;
+      const inStock = (stockMap.get(variantRef) ?? 0) >= quantity;
+      return {
+        variantRef,
+        quantity,
+        unitPrice,
+        totalPrice: typeof unitPrice === 'number' ? unitPrice * quantity : 0,
+        available: inStock,
+        stockQty: stockMap.get(variantRef) ?? 0,
+      };
+    });
   }
 
   // ── Shipment Tracking (Phase 10) ─────────────────────────────────────────
 
-  async getShipmentTracking(makitoOrderId: string) {
+  async getShipmentTracking(customerOrder: string) {
     if (!this.client) throw new Error('Makito not configured');
-    return this.client.getShipmentTracking(makitoOrderId);
+    const deliveries = await this.client.getDeliveries({ customerOrder });
+    return deliveries.deliveries ?? [];
+  }
+
+  async getDeliveries(filters: { from?: string; to?: string; customerOrder?: string } = {}) {
+    if (!this.client) throw new Error('Makito not configured');
+    return this.client.getDeliveries(filters);
   }
 
   // ── Stock ─────────────────────────────────────────────────────────────────
@@ -300,21 +346,22 @@ export class MakitoService implements OnModuleInit {
         return;
       }
 
+      // Makito order format: { customerOrder, items: [{variant, quantity}] }
       await this.submitOrder({
-        reference: order.ref,
+        customerOrder: order.ref,
+        items: order.items.map((item: any) => ({
+          variant: item.variant?.sku ?? item.variantId,
+          quantity: item.quantity,
+        })),
         deliveryAddress: {
-          company: (order as any).shippingAddress?.company ?? (order as any).shippingAddress?.name ?? '',
-          contact: (order as any).shippingAddress?.name ?? '',
-          street: (order as any).shippingAddress?.street ?? '',
-          city: (order as any).shippingAddress?.city ?? '',
-          postalCode: (order as any).shippingAddress?.postalCode ?? '',
+          company: (order as any).shippingAddress?.company ?? (order as any).shippingAddress?.name,
+          contact: (order as any).shippingAddress?.name,
+          street: (order as any).shippingAddress?.street,
+          city: (order as any).shippingAddress?.city,
+          postalCode: (order as any).shippingAddress?.postalCode,
           countryCode: (order as any).shippingAddress?.country ?? 'PT',
           phone: (order as any).shippingAddress?.phone,
         },
-        lines: order.items.map((item: any) => ({
-          sku: item.variant?.sku ?? item.variantId,
-          quantity: item.quantity,
-        })),
       });
     } catch (err) {
       this.logger.error(`Failed to dispatch order ${orderId} to Makito: ${err}`);

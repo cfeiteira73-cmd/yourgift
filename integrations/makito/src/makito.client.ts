@@ -1,32 +1,44 @@
-// ── Makito API Client ─────────────────────────────────────────────────────────
-// OAuth2 client_credentials flow with:
-//   • Automatic token refresh (300s before expiry)
-//   • Rate limit handling (429 → Retry-After)
+// ── Makito B2B API Client — Real API ─────────────────────────────────────────
+//
+// Base URL:  https://apis.makito.es
+// Auth:      POST /access/auth/login → { token } — JWT Bearer
+// Rate limit: Token bucket — 100 max capacity, 25 req/min replenishment
+//             429 when bucket empty
+//
+// Features:
+//   • JWT auth with automatic refresh (token stored in-memory)
+//   • Token bucket rate limit handling (429 → wait + retry)
 //   • Exponential backoff retry (3 attempts)
-//   • Circuit breaker (5 failures → open 60s)
+//   • Circuit breaker (5 consecutive failures → open 60s)
 //   • Request logging with duration
-//   • Error classification
+//   • Follow file download redirects (S3-style presigned URLs)
 
 import type {
-  MakitoTokenResponse,
-  MakitoCatalogResponse,
-  MakitoProduct,
-  MakitoStockResponse,
-  MakitoPriceItem,
+  MakitoLoginRequest,
+  MakitoLoginResponse,
+  MakitoCatalogFile,
+  MakitoStockFile,
+  MakitoPriceFile,
+  MakitoPrintPriceFile,
+  MakitoPrintConfigFile,
   MakitoOrderRequest,
   MakitoOrderResponse,
-  MakitoRFQRequest,
-  MakitoRFQResponse,
-  MakitoShipmentTracking,
-  MakitoArtworkValidationRequest,
-  MakitoArtworkValidationResponse,
+  MakitoSalesOrder,
+  MakitoSalesOrderListResponse,
+  MakitoDeliveriesResponse,
+  MakitoRegion,
+  MakitoCountry,
+  MakitoColor,
 } from './makito.types';
 
-const TIMEOUT_MS = 30_000;
+export const MAKITO_BASE_URL = 'https://apis.makito.es';
+const TIMEOUT_MS = 60_000; // catalog files can be large
 const MAX_RETRIES = 3;
 const CIRCUIT_BREAKER_THRESHOLD = 5;
 const CIRCUIT_BREAKER_COOLDOWN_MS = 60_000;
-const TOKEN_REFRESH_BUFFER_S = 300; // refresh 5 min before expiry
+// Token bucket: 100 capacity, 25/min refill → 1 token per 2.4s
+// On 429, wait 5s before retry (conservative)
+const RATE_LIMIT_WAIT_MS = 5_000;
 
 export type MakitoErrorType =
   | 'AUTH_FAILED'
@@ -51,13 +63,13 @@ export class MakitoApiError extends Error {
 }
 
 interface TokenState {
-  accessToken: string;
-  expiresAt: number; // epoch ms
+  jwt: string;
+  cachedAt: number; // epoch ms — refresh after 1h (JWTs typically valid for longer)
 }
 
 interface CircuitState {
   failures: number;
-  openedAt: number | null; // epoch ms or null if closed
+  openedAt: number | null;
 }
 
 function sleep(ms: number) {
@@ -71,6 +83,8 @@ export class MakitoClient {
   private token: TokenState | null = null;
   private circuit: CircuitState = { failures: 0, openedAt: null };
   private readonly log: (msg: string) => void;
+  // Track in-flight token refresh to prevent concurrent re-auth
+  private refreshPromise: Promise<string> | null = null;
 
   constructor(opts: {
     clientId: string;
@@ -82,7 +96,7 @@ export class MakitoClient {
     if (!opts.clientSecret) throw new Error('MakitoClient: clientSecret is required');
     this.clientId = opts.clientId;
     this.clientSecret = opts.clientSecret;
-    this.baseUrl = (opts.baseUrl ?? 'https://api.makito.es').replace(/\/$/, '');
+    this.baseUrl = (opts.baseUrl ?? MAKITO_BASE_URL).replace(/\/$/, '');
     this.log = opts.logger ?? ((msg) => console.log(`[Makito] ${msg}`));
   }
 
@@ -99,70 +113,84 @@ export class MakitoClient {
   }
 
   private recordSuccess() {
-    this.circuit.failures = 0;
-    this.circuit.openedAt = null;
+    this.circuit = { failures: 0, openedAt: null };
   }
 
   private recordFailure() {
     this.circuit.failures++;
     if (this.circuit.failures >= CIRCUIT_BREAKER_THRESHOLD && this.circuit.openedAt === null) {
       this.circuit.openedAt = Date.now();
-      this.log(`Circuit breaker: OPEN after ${this.circuit.failures} failures`);
+      this.log(`Circuit breaker OPEN after ${this.circuit.failures} failures — cooling down 60s`);
     }
   }
 
-  // ── Auth ───────────────────────────────────────────────────────────────────
+  // ── Authentication ─────────────────────────────────────────────────────────
 
+  /** Returns a valid JWT, refreshing if needed (max 1h cache) */
   async authenticate(): Promise<string> {
-    if (this.token && this.token.expiresAt - Date.now() > TOKEN_REFRESH_BUFFER_S * 1000) {
-      return this.token.accessToken;
+    const ONE_HOUR_MS = 3_600_000;
+    if (this.token && Date.now() - this.token.cachedAt < ONE_HOUR_MS) {
+      return this.token.jwt;
     }
-    return this.refreshToken();
+    // Prevent concurrent refresh
+    if (this.refreshPromise) return this.refreshPromise;
+    this.refreshPromise = this.refreshToken().finally(() => { this.refreshPromise = null; });
+    return this.refreshPromise;
   }
 
   async refreshToken(): Promise<string> {
-    this.log('Refreshing OAuth token...');
+    this.log('Authenticating with Makito API...');
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    const timeout = setTimeout(() => controller.abort(), 15_000);
 
     try {
-      const body = new URLSearchParams({
-        grant_type: 'client_credentials',
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
-        scope: 'catalog orders stock pricing',
-      });
+      const body: MakitoLoginRequest = {
+        clientId: this.clientId,
+        clientSecret: this.clientSecret,
+      };
 
-      const res = await fetch(`${this.baseUrl}/oauth/token`, {
+      const res = await fetch(`${this.baseUrl}/access/auth/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: body.toString(),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(body),
         signal: controller.signal,
       });
 
       if (!res.ok) {
         const text = await res.text();
-        throw new MakitoApiError('AUTH_FAILED', `OAuth failed ${res.status}: ${text}`, res.status, text);
+        throw new MakitoApiError(
+          'AUTH_FAILED',
+          `Makito auth failed ${res.status}: ${text}`,
+          res.status,
+          text,
+        );
       }
 
-      const data: MakitoTokenResponse = await res.json();
-      this.token = {
-        accessToken: data.access_token,
-        expiresAt: Date.now() + data.expires_in * 1000,
-      };
-      this.log(`Token refreshed — expires in ${data.expires_in}s`);
-      return this.token.accessToken;
+      const data: MakitoLoginResponse = await res.json();
+      if (!data.token) {
+        throw new MakitoApiError('AUTH_FAILED', 'Makito auth returned no token');
+      }
+
+      this.token = { jwt: data.token, cachedAt: Date.now() };
+      this.log('Authentication successful');
+      return this.token.jwt;
     } finally {
       clearTimeout(timeout);
     }
   }
 
+  // ── Health Check ───────────────────────────────────────────────────────────
+
   async healthCheck(): Promise<{ healthy: boolean; latencyMs: number; circuitOpen: boolean }> {
     const start = Date.now();
-    const circuitOpen = this.isCircuitOpen();
-    if (circuitOpen) return { healthy: false, latencyMs: 0, circuitOpen: true };
+    if (this.isCircuitOpen()) {
+      return { healthy: false, latencyMs: 0, circuitOpen: true };
+    }
     try {
-      await this.request<{ status: string }>('/api/v1/health');
+      await this.authenticate();
       return { healthy: true, latencyMs: Date.now() - start, circuitOpen: false };
     } catch {
       return { healthy: false, latencyMs: Date.now() - start, circuitOpen: false };
@@ -177,10 +205,10 @@ export class MakitoClient {
     attempt = 1,
   ): Promise<T> {
     if (this.isCircuitOpen()) {
-      throw new MakitoApiError('CIRCUIT_OPEN', 'Makito circuit breaker is OPEN — too many recent failures');
+      throw new MakitoApiError('CIRCUIT_OPEN', 'Makito circuit breaker is OPEN');
     }
 
-    const token = await this.authenticate();
+    const jwt = await this.authenticate();
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
     const start = Date.now();
@@ -190,31 +218,49 @@ export class MakitoClient {
       const res = await fetch(url, {
         ...options,
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${jwt}`,
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'X-Client-ID': this.clientId,
           ...options.headers,
         },
         signal: controller.signal,
+        redirect: 'manual', // handle file download redirects manually
       });
 
       const duration = Date.now() - start;
       this.log(`${options.method ?? 'GET'} ${path} → ${res.status} (${duration}ms)`);
 
-      // Rate limited
-      if (res.status === 429 && attempt <= MAX_RETRIES) {
-        const retryAfter = parseInt(res.headers.get('Retry-After') ?? '10', 10) * 1000;
-        this.log(`Rate limited — waiting ${retryAfter}ms (attempt ${attempt}/${MAX_RETRIES})`);
-        await sleep(retryAfter);
-        return this.request<T>(path, options, attempt + 1);
+      // File download redirect (catalog/stock/price files are served via presigned URLs)
+      if ([301, 302, 303, 307, 308].includes(res.status)) {
+        const location = res.headers.get('location');
+        if (location) {
+          this.log(`Following redirect → ${location.substring(0, 80)}...`);
+          const fileRes = await fetch(location, { signal: controller.signal });
+          if (!fileRes.ok) {
+            throw new MakitoApiError('SERVER_ERROR', `File download failed ${fileRes.status}`, fileRes.status);
+          }
+          this.recordSuccess();
+          return fileRes.json() as Promise<T>;
+        }
       }
 
-      // Token expired mid-flight
+      // Rate limited — token bucket exhausted
+      if (res.status === 429) {
+        if (attempt <= MAX_RETRIES) {
+          const retryAfter = parseInt(res.headers.get('Retry-After') ?? '5', 10) * 1000;
+          const wait = Math.max(retryAfter, RATE_LIMIT_WAIT_MS);
+          this.log(`Rate limited (token bucket empty) — waiting ${wait}ms (attempt ${attempt}/${MAX_RETRIES})`);
+          await sleep(wait);
+          return this.request<T>(path, options, attempt + 1);
+        }
+        throw new MakitoApiError('RATE_LIMITED', 'Makito rate limit exceeded after retries', 429);
+      }
+
+      // Auth expired mid-flight
       if (res.status === 401) {
         this.token = null;
         if (attempt <= 2) {
-          this.log('Token expired mid-flight — refreshing and retrying');
+          this.log('JWT expired — refreshing and retrying');
           return this.request<T>(path, options, attempt + 1);
         }
         throw new MakitoApiError('AUTH_FAILED', 'Makito auth failed after token refresh', 401);
@@ -230,13 +276,12 @@ export class MakitoClient {
       }
 
       if (res.status === 404) {
-        throw new MakitoApiError('NOT_FOUND', `Makito 404: ${path}`, 404);
+        throw new MakitoApiError('NOT_FOUND', `Not found: ${path}`, 404);
       }
 
       if (res.status >= 400) {
         const body = await res.text();
-        const type: MakitoErrorType = res.status === 422 ? 'VALIDATION' : 'UNKNOWN';
-        throw new MakitoApiError(type, `Makito ${res.status} on ${path}: ${body}`, res.status, body);
+        throw new MakitoApiError('VALIDATION', `Makito ${res.status}: ${body}`, res.status, body);
       }
 
       this.recordSuccess();
@@ -245,100 +290,144 @@ export class MakitoClient {
       if ((err as Error).name === 'AbortError') {
         this.recordFailure();
         if (attempt <= MAX_RETRIES) {
-          this.log(`Request timeout — retrying (attempt ${attempt}/${MAX_RETRIES})`);
+          this.log(`Timeout — retrying (attempt ${attempt}/${MAX_RETRIES})`);
           return this.request<T>(path, options, attempt + 1);
         }
-        throw new MakitoApiError('TIMEOUT', `Makito request timed out: ${path}`);
+        throw new MakitoApiError('TIMEOUT', `Request timed out: ${path}`);
       }
       if (err instanceof MakitoApiError) throw err;
       this.recordFailure();
-      throw new MakitoApiError('UNKNOWN', String(err));
+      throw new MakitoApiError('UNKNOWN', `Unexpected error: ${String(err)}`);
     } finally {
       clearTimeout(timeout);
     }
   }
 
-  // ── Catalogue ─────────────────────────────────────────────────────────────
+  // ── Catalog ───────────────────────────────────────────────────────────────
 
-  async getProducts(opts: { page?: number; pageSize?: number; since?: string } = {}): Promise<MakitoCatalogResponse> {
-    const params = new URLSearchParams();
-    if (opts.page) params.set('page', String(opts.page));
-    if (opts.pageSize) params.set('pageSize', String(opts.pageSize));
-    if (opts.since) params.set('since', opts.since);
-    return this.request<MakitoCatalogResponse>(`/api/v1/products?${params}`);
+  async getCatalog(lang: 'en' | 'es' | 'fr' = 'en'): Promise<MakitoCatalogFile> {
+    return this.request<MakitoCatalogFile>(`/catalog/files?format=JSON&lang=${lang}`);
   }
 
-  async getProduct(reference: string): Promise<MakitoProduct> {
-    return this.request<MakitoProduct>(`/api/v1/products/${reference}`);
+  async getCatalogAsset(prodRef: string, type: 'principal' | 'thumbnail', fileName: string): Promise<Buffer> {
+    const jwt = await this.authenticate();
+    const res = await fetch(`${this.baseUrl}/catalog/assets/${prodRef}/${type}/${fileName}`, {
+      headers: { 'Authorization': `Bearer ${jwt}` },
+    });
+    if (!res.ok) throw new MakitoApiError('NOT_FOUND', `Asset not found: ${prodRef}/${type}/${fileName}`, res.status);
+    return Buffer.from(await res.arrayBuffer());
   }
 
   // ── Stock ─────────────────────────────────────────────────────────────────
 
-  async getStock(): Promise<MakitoStockResponse> {
-    return this.request<MakitoStockResponse>('/api/v1/stock');
+  async getStock(opts: { plant?: string; storageLocation?: string } = {}): Promise<MakitoStockFile> {
+    const params = new URLSearchParams({ format: 'JSON' });
+    if (opts.plant) params.set('plant', opts.plant);
+    if (opts.storageLocation) params.set('storageLocation', opts.storageLocation);
+    return this.request<MakitoStockFile>(`/stock/files?${params}`);
   }
 
   async getStockMap(): Promise<Map<string, number>> {
-    const { items } = await this.getStock();
-    return new Map(items.map((s) => [s.sku, s.available]));
+    const file = await this.getStock();
+    return new Map((file.stocks ?? []).map((s) => [s.material, s.quantity]));
+  }
+
+  async getStockByMaterial(material: string): Promise<number> {
+    const file = await this.request<MakitoStockFile>(`/stock/stocks/${material}?format=JSON`);
+    return file.stocks?.[0]?.quantity ?? 0;
   }
 
   // ── Pricing ───────────────────────────────────────────────────────────────
 
-  async getPriceList(currency = 'EUR'): Promise<MakitoPriceItem[]> {
-    return this.request<MakitoPriceItem[]>(`/api/v1/prices?currency=${currency}`);
+  async getPriceList(): Promise<MakitoPriceFile> {
+    return this.request<MakitoPriceFile>('/price-list/files?format=JSON');
   }
 
-  async getPriceMap(currency = 'EUR'): Promise<Map<string, number>> {
-    const prices = await this.getPriceList(currency);
-    return new Map(prices.map((p) => [p.sku, p.basePrice]));
+  /** Returns map: material → lowest unit price (first scale = min qty price) */
+  async getPriceMap(): Promise<Map<string, number>> {
+    const file = await this.getPriceList();
+    const map = new Map<string, number>();
+    for (const item of file.priceList ?? []) {
+      // Use scale with qty=1 if present, else first scale
+      const baseScale = item.scales.find((s) => Number(s.quantity) <= 1) ?? item.scales[0];
+      if (baseScale) {
+        map.set(item.material, Number(baseScale.amount));
+      }
+    }
+    return map;
+  }
+
+  async getPrintPriceList(): Promise<MakitoPrintPriceFile> {
+    return this.request<MakitoPrintPriceFile>('/print-price-list/files?format=JSON');
+  }
+
+  // ── Print Configuration ───────────────────────────────────────────────────
+
+  async getPrintConfig(lang: 'en' | 'es' | 'fr' = 'en'): Promise<MakitoPrintConfigFile> {
+    return this.request<MakitoPrintConfigFile>(`/print-config/files?format=JSON&lang=${lang}`);
   }
 
   // ── Orders ────────────────────────────────────────────────────────────────
 
   async createOrder(order: MakitoOrderRequest): Promise<MakitoOrderResponse> {
-    return this.request<MakitoOrderResponse>('/api/v1/orders', {
+    return this.request<MakitoOrderResponse>('/orders', {
       method: 'POST',
       body: JSON.stringify(order),
     });
   }
 
-  async getOrder(orderId: string): Promise<MakitoOrderResponse> {
-    return this.request<MakitoOrderResponse>(`/api/v1/orders/${orderId}`);
+  async getOrders(filters: {
+    status?: string;
+    from?: string;
+    to?: string;
+    customerOrder?: string;
+  } = {}): Promise<MakitoSalesOrderListResponse> {
+    const params = new URLSearchParams();
+    if (filters.status) params.set('status', filters.status);
+    if (filters.from) params.set('from', filters.from);
+    if (filters.to) params.set('to', filters.to);
+    if (filters.customerOrder) params.set('customerOrder', filters.customerOrder);
+    const qs = params.toString() ? `?${params}` : '';
+    return this.request<MakitoSalesOrderListResponse>(`/orders/sales-order${qs}`);
   }
 
-  async cancelOrder(orderId: string, reason?: string): Promise<{ cancelled: boolean }> {
-    return this.request<{ cancelled: boolean }>(`/api/v1/orders/${orderId}/cancel`, {
-      method: 'POST',
-      body: JSON.stringify({ reason }),
-    });
+  async getOrder(documentNumber: string): Promise<MakitoSalesOrder> {
+    return this.request<MakitoSalesOrder>(`/orders/sales-order/${documentNumber}`);
   }
 
-  // ── RFQ ───────────────────────────────────────────────────────────────────
-
-  async createRFQ(req: MakitoRFQRequest): Promise<MakitoRFQResponse> {
-    return this.request<MakitoRFQResponse>('/api/v1/rfq', {
-      method: 'POST',
-      body: JSON.stringify(req),
-    });
+  async getDeliveries(filters: { from?: string; to?: string; customerOrder?: string } = {}): Promise<MakitoDeliveriesResponse> {
+    const params = new URLSearchParams();
+    if (filters.from) params.set('from', filters.from);
+    if (filters.to) params.set('to', filters.to);
+    if (filters.customerOrder) params.set('customerOrder', filters.customerOrder);
+    const qs = params.toString() ? `?${params}` : '';
+    return this.request<MakitoDeliveriesResponse>(`/orders/deliveries${qs}`);
   }
 
-  // ── Shipment ──────────────────────────────────────────────────────────────
-
-  async getShipmentTracking(orderId: string): Promise<MakitoShipmentTracking> {
-    return this.request<MakitoShipmentTracking>(`/api/v1/orders/${orderId}/tracking`);
+  async getOrderByCustomerRef(customerOrder: string): Promise<MakitoSalesOrder | null> {
+    const result = await this.getOrders({ customerOrder });
+    const orders = result.orders ?? [];
+    return orders.length > 0 ? orders[0] : null;
   }
 
-  // ── Artwork ───────────────────────────────────────────────────────────────
+  // ── Metadata ──────────────────────────────────────────────────────────────
 
-  async validateArtwork(req: MakitoArtworkValidationRequest): Promise<MakitoArtworkValidationResponse> {
-    return this.request<MakitoArtworkValidationResponse>('/api/v1/artwork/validate', {
-      method: 'POST',
-      body: JSON.stringify(req),
-    });
+  async getRegions(): Promise<MakitoRegion[]> {
+    const res = await this.request<{ regions?: MakitoRegion[] } | MakitoRegion[]>('/orders/regions');
+    return Array.isArray(res) ? res : (res as any).regions ?? [];
   }
 
-  // ── Circuit Breaker Status ────────────────────────────────────────────────
+  async getCountries(): Promise<MakitoCountry[]> {
+    const res = await this.request<{ countries?: MakitoCountry[] } | MakitoCountry[]>('/orders/countries');
+    return Array.isArray(res) ? res : (res as any).countries ?? [];
+  }
+
+  async getColors(): Promise<MakitoColor[]> {
+    const res = await this.request<{ colors?: MakitoColor[] } | MakitoColor[]>('/orders/colors');
+    return Array.isArray(res) ? res : (res as any).colors ?? [];
+  }
+
+  // ── Circuit State ─────────────────────────────────────────────────────────
 
   getCircuitState() {
     return {
