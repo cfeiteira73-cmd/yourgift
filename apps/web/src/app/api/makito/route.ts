@@ -17,12 +17,13 @@ export const dynamic = 'force-dynamic';
 // GET  ?mode=scorecard          — supplier intelligence scorecard
 // GET  ?mode=kpis&days=30       — executive KPIs
 // GET  ?mode=products&q=        — search Makito products in DB
-// GET  ?mode=order&id=          — order status + tracking
+// GET  ?mode=order&id=          — order status (by Makito document number)
+// GET  ?mode=deliveries&ref=    — delivery tracking by customerOrder ref
 // POST { action:'sync_full' }   — trigger full catalog sync
 // POST { action:'sync_stock' }  — trigger stock-only sync
-// POST { action:'rfq', ... }    — create RFQ
-// POST { action:'price', ... }  — calculate pricing
-// POST { action:'artwork_check', ... } — validate artwork
+// POST { action:'quote', items } — price + stock check (no RFQ endpoint in API)
+// POST { action:'price', ... }  — calculate pricing with margin
+// POST { action:'artwork_check', ... } — validate artwork specs
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -54,11 +55,10 @@ async function callMakitoAPI(path: string, opts: RequestInit = {}) {
   return res.json();
 }
 
-const RFQSchema = z.object({
-  action: z.literal('rfq'),
-  products: z.array(z.object({ sku: z.string(), quantity: z.number().int().positive() })),
-  deliveryCountry: z.string().length(2),
-  requestedDate: z.string().optional(),
+// Makito has no RFQ endpoint — quote = price list + stock check
+const QuoteSchema = z.object({
+  action: z.literal('quote'),
+  items: z.array(z.object({ variantRef: z.string(), quantity: z.number().int().positive() })),
 });
 
 const PriceSchema = z.object({
@@ -202,10 +202,29 @@ export async function GET(req: NextRequest) {
 
     // ── Order status ──────────────────────────────────────────────────────────
     if (mode === 'order') {
-      const id = searchParams.get('id');
+      const id = searchParams.get('id'); // Makito document number
       if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
-      const status = await callMakitoAPI(`/production/${id}`);
+      const status = await callMakitoAPI(`/orders/${id}`);
       return NextResponse.json(status);
+    }
+
+    // ── Deliveries ────────────────────────────────────────────────────────────
+    if (mode === 'deliveries') {
+      const ref = searchParams.get('ref');
+      const from = searchParams.get('from');
+      const to = searchParams.get('to');
+      const params = new URLSearchParams();
+      if (ref) params.set('customerOrder', ref);
+      if (from) params.set('from', from);
+      if (to) params.set('to', to);
+      const deliveries = await callMakitoAPI(`/deliveries?${params}`);
+      return NextResponse.json(deliveries);
+    }
+
+    // ── Metadata ──────────────────────────────────────────────────────────────
+    if (mode === 'metadata') {
+      const meta = await callMakitoAPI('/metadata');
+      return NextResponse.json(meta);
     }
 
     return NextResponse.json({ error: 'Unknown mode' }, { status: 400 });
@@ -253,13 +272,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(result);
     }
 
-    // ── RFQ ───────────────────────────────────────────────────────────────────
-    if (action === 'rfq') {
-      const parsed = parseBody(RFQSchema, rawBody);
+    // ── Quote (price + stock check — Makito has no RFQ endpoint) ─────────────
+    if (action === 'quote') {
+      const parsed = parseBody(QuoteSchema, rawBody);
       if (!parsed.ok) return parsed.response;
-      const result = await callMakitoAPI('/rfq', {
+      const result = await callMakitoAPI('/quote', {
         method: 'POST',
-        body: JSON.stringify(parsed.data),
+        body: JSON.stringify({ items: parsed.data.items }),
       });
       return NextResponse.json(result);
     }

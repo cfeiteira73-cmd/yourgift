@@ -2,6 +2,38 @@
 // Base URL: https://apis.makito.es
 // Auth: POST /access/auth/login → { token }
 
+// ── Shared utility types used by pricing, artwork, normalizer ────────────────
+
+/** Price break: min quantity → unit price (used by pricing engine) */
+export interface MakitoPriceBreak {
+  minQty: number;
+  price: number;
+}
+
+/** Print technique (used by artwork validator and normalizer) */
+export interface MakitoPrintTechnique {
+  code: string;
+  name: string;
+  maxColors?: number;
+  minQty?: number;
+  setupCost?: number;
+  unitCost?: number;
+  dpiRequired?: number;
+  colorMode?: string;
+  maxWidth?: number;
+  maxHeight?: number;
+}
+
+/** Print area (used by artwork validator) */
+export interface MakitoPrintArea {
+  id: string;
+  name: string;
+  positionCode: string;
+  maxWidth: number;   // mm
+  maxHeight: number;  // mm
+  techniques: MakitoPrintTechnique[];
+}
+
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 export interface MakitoLoginRequest {

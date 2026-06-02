@@ -1,30 +1,29 @@
 // ── Makito REST Controller ────────────────────────────────────────────────────
+// Real Makito API: POST /orders {customerOrder, items:[{variant,quantity}]}
+// No RFQ endpoint — use quote (price list + stock check)
 
-import { Controller, Get, Post, Body, Param, Query, UseGuards, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Logger } from '@nestjs/common';
 import { MakitoService } from './makito.service';
 import { MakitoInventoryService } from './makito-inventory.service';
 import { MakitoTrackingService } from './makito-tracking.service';
 import { MakitoAnalyticsService } from './makito-analytics.service';
-import { MakitoArtworkValidator } from '@yourgift/makito';
-import { MakitoPricingEngine } from '@yourgift/makito';
-import type { MakitoOrderRequest, MakitoRFQRequest } from '@yourgift/makito';
-import type { ArtworkSpec } from '@yourgift/makito';
+import { MakitoArtworkValidator, MakitoPricingEngine } from '@yourgift/makito';
+import type { MakitoOrderRequest, ArtworkSpec } from '@yourgift/makito';
 
 // ── DTOs ──────────────────────────────────────────────────────────────────────
 
+/** Real Makito order format */
 class SubmitOrderDto implements MakitoOrderRequest {
-  reference!: string;
-  deliveryAddress!: MakitoOrderRequest['deliveryAddress'];
-  lines!: MakitoOrderRequest['lines'];
-  requestedDeliveryDate?: string;
+  customerOrder!: string;
+  items!: MakitoOrderRequest['items'];
+  deliveryAddress?: MakitoOrderRequest['deliveryAddress'];
+  requestedDate?: string;
   notes?: string;
 }
 
-class CreateRFQDto implements MakitoRFQRequest {
-  products!: Array<{ sku: string; quantity: number }>;
-  deliveryCountry!: string;
-  requestedDate?: string;
-  includeDecoration?: boolean;
+/** Quote request — price list + stock check (Makito has no RFQ endpoint) */
+class GetQuoteDto {
+  items!: Array<{ variantRef: string; quantity: number }>;
 }
 
 class ValidateArtworkDto {
@@ -39,7 +38,7 @@ class CalculatePriceDto {
   sku!: string;
   quantity!: number;
   basePrice!: number;
-  priceBreaks?: Array<{ minQty: number; unitPrice: number; setupCost: number }>;
+  priceBreaks?: Array<{ minQty: number; price: number }>;
   decorationCost?: number;
   setupCost?: number;
   targetMarginPct?: number;
@@ -135,7 +134,6 @@ export class MakitoController {
 
   @Post('artwork/validate')
   async validateArtwork(@Body() dto: ValidateArtworkDto) {
-    // Build a minimal print area and technique for validation
     const printArea = {
       id: dto.printAreaId,
       name: 'Print Area',
@@ -144,10 +142,7 @@ export class MakitoController {
       maxHeight: dto.maxHeight,
       techniques: [],
     };
-    const technique = {
-      code: dto.techniqueCode,
-      name: dto.techniqueCode,
-    };
+    const technique = { code: dto.techniqueCode, name: dto.techniqueCode };
     return this.artworkValidator.validate(dto.artwork, printArea, technique);
   }
 
@@ -156,11 +151,11 @@ export class MakitoController {
     return this.artworkValidator.quickValidate(artwork);
   }
 
-  // ── RFQ ───────────────────────────────────────────────────────────────────
+  // ── Quote (replaces RFQ — Makito has no dedicated RFQ endpoint) ───────────
 
-  @Post('rfq')
-  async createRFQ(@Body() dto: CreateRFQDto) {
-    return this.makito.createRFQ(dto);
+  @Post('quote')
+  async getQuote(@Body() dto: GetQuoteDto) {
+    return this.makito.getQuote(dto.items);
   }
 
   // ── Orders ────────────────────────────────────────────────────────────────
@@ -170,24 +165,42 @@ export class MakitoController {
     return this.makito.submitOrder(dto);
   }
 
-  @Get('orders/:makitoOrderId')
-  async getOrder(@Param('makitoOrderId') id: string) {
+  @Get('orders')
+  async listOrders(
+    @Query('status') status?: string,
+    @Query('from') from?: string,
+    @Query('to') to?: string,
+  ) {
+    return this.makito.getOrders({ status, from, to });
+  }
+
+  @Get('orders/:documentNumber')
+  async getOrder(@Param('documentNumber') id: string) {
     return this.makito.getOrderStatus(id);
   }
 
-  @Post('orders/:makitoOrderId/cancel')
+  @Post('orders/:documentNumber/cancel')
   async cancelOrder(
-    @Param('makitoOrderId') id: string,
+    @Param('documentNumber') id: string,
     @Body('reason') reason?: string,
   ) {
     return this.makito.cancelOrder(id, reason);
   }
 
-  // ── Tracking ─────────────────────────────────────────────────────────────
+  // ── Deliveries & Tracking ─────────────────────────────────────────────────
 
-  @Get('orders/:orderId/tracking')
-  async getTracking(@Param('orderId') orderId: string) {
-    return this.makito.getShipmentTracking(orderId);
+  @Get('deliveries')
+  async getDeliveries(
+    @Query('customerOrder') customerOrder?: string,
+    @Query('from') from?: string,
+    @Query('to') to?: string,
+  ) {
+    return this.makito.getDeliveries({ customerOrder, from, to });
+  }
+
+  @Get('orders/:customerOrder/tracking')
+  async getTracking(@Param('customerOrder') ref: string) {
+    return this.makito.getShipmentTracking(ref);
   }
 
   @Get('production/:orderId')
@@ -203,6 +216,13 @@ export class MakitoController {
   @Post('production/poll')
   async pollTracking() {
     return this.tracking.pollActiveOrders();
+  }
+
+  // ── Metadata ─────────────────────────────────────────────────────────────
+
+  @Get('metadata')
+  async metadata() {
+    return this.makito.getMetadata();
   }
 
   // ── Analytics ─────────────────────────────────────────────────────────────
