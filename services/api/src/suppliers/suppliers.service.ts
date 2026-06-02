@@ -4,6 +4,7 @@ import { EventBusService } from '../events/event-bus.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { MidoceanClient, MidoceanSyncService, transformProduct } from '@yourgift/midocean';
 import { PFConceptClient, PFSyncService } from '@yourgift/pf-concept';
+// Makito is managed via MakitoModule — included here for stats aggregation
 import type { TransformedPFProduct } from '@yourgift/pf-concept';
 type SyncableProduct = ReturnType<typeof transformProduct>;
 
@@ -179,7 +180,7 @@ export class SuppliersService {
 
   /** Get product/variant counts per supplier */
   async getStats() {
-    const suppliers = ['midocean', 'pf_concept', 'stricker'];
+    const suppliers = ['midocean', 'pf_concept', 'stricker', 'makito'];
     const results = await Promise.all(
       suppliers.map(async (s) => {
         const [products, variants, lastSync] = await Promise.all([
@@ -211,6 +212,9 @@ export class SuppliersService {
       await this.dispatchToMidocean(order);
     } else if (supplier === 'pf_concept') {
       await this.dispatchToPfConcept(order);
+    } else if (supplier === 'makito') {
+      // Makito orders routed via MakitoService (event-driven via makito.service.ts)
+      this.logger.log(`Makito order routing delegated to MakitoService for ${order.ref}`);
     }
 
     await this.prisma.order.update({

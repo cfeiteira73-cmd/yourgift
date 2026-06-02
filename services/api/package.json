@@ -39,6 +39,7 @@
     "@sentry/nestjs": "^10.53.1",
     "@sentry/node": "^10.53.1",
     "@sentry/profiling-node": "^10.53.1",
+    "@yourgift/makito": "workspace:*",
     "@yourgift/midocean": "workspace:*",
     "@yourgift/pf-concept": "workspace:*",
     "@yourgift/shared": "workspace:*",

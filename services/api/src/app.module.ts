@@ -122,6 +122,7 @@ import { SupplierRoutingModule } from './supplier-routing/supplier-routing.modul
 import { SupplierIntelligenceModule } from './supplier-intelligence/supplier-intelligence.module';
 import { FilePipelineModule } from './file-pipeline/file-pipeline.module';
 import { ProductionSimulationModule } from './production-simulation/production-simulation.module';
+import { MakitoModule } from './makito/makito.module';
 import { APP_GUARD } from '@nestjs/core';
 import { TenantGuard } from './common/guards/tenant.guard';
 import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard';
@@ -152,6 +153,7 @@ import { TenantThrottlerGuard } from './common/throttler/tenant-throttler.guard'
     PricingModule,
     PaymentsModule,
     SuppliersModule,
+    MakitoModule,
     ArtworkModule,
     QuotesModule,
     ApprovalsModule,
