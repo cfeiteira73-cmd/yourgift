@@ -1,13 +1,12 @@
-// ── Makito Catalog Sync — Real API ───────────────────────────────────────────
-// Fetches full catalog, stock, and prices from real Makito B2B API endpoints
+// ── Makito Catalog Sync — Verified Real API Fields ───────────────────────────
+// Verified against real payloads 2026-06-02
+//
+// CRITICAL FINDING: stock/price material codes (numeric) do NOT map to
+// variant_reference (alphanumeric). Stock integration is best-effort only.
+// Price integration is product-level, not variant-level.
 
 import { MakitoClient } from './makito.client';
-import type {
-  MakitoCatalogProduct,
-  MakitoCatalogVariant,
-  MakitoPriceItem,
-  MakitoStockItem,
-} from './makito.types';
+import type { MakitoRealProduct, MakitoRealVariant } from './makito.types';
 
 export interface MakitoSyncResult {
   productsUpserted: number;
@@ -16,19 +15,20 @@ export interface MakitoSyncResult {
   errors: string[];
   durationMs: number;
   mode: 'full' | 'incremental' | 'stock_only';
-  conflicts: Array<{ reference: string; field: string; existing: unknown; incoming: unknown }>;
+  mappingErrors: number;
+  conflicts: Array<{ ref: string; field: string; value: unknown }>;
 }
 
 export interface TransformedMakitoVariant {
-  sku: string;          // variantReference
-  color: string;
-  colorGroup: string;
-  colorCode: string;
-  gtin: string;
-  price: number;
-  stock: number;
-  images: string[];
-  size?: string;
+  sku: string;          // variant_reference — e.g. "5246ROJS/T"
+  color: string;        // variant_name (full colour description)
+  colorGroup: string;   // derived from variant_name
+  colorCode: string;    // variant_colorcode — e.g. "003"
+  size: string;         // variant_size — e.g. "000"
+  gtin: string;         // not in API — empty string
+  price: number;        // from price list (product-level) or 0
+  stock: number;        // always 0 (cannot join material codes to variant_reference)
+  images: string[];     // [variant_image, variant_thumbnail]
   categoryLevel1: string;
   categoryLevel2: string;
   categoryLevel3: string;
@@ -36,106 +36,143 @@ export interface TransformedMakitoVariant {
 }
 
 export interface TransformedMakitoProduct {
-  supplierRef: string;   // "makito_{productReference}"
+  supplierRef: string;   // "makito_" + ref (e.g. "makito_15246")
   supplier: 'makito';
   title: string;
   description: string;
-  category: string;
-  basePrice: number;
-  images: string[];
+  category: string;      // first category segment
+  basePrice: number;     // from price list
+  images: string[];      // [image, ...detail_images]
   printAreas: object;
   metadata: object;
   variants: TransformedMakitoVariant[];
 }
 
-/** Build price breaks from Makito scale array */
-function buildPriceBreaks(
-  scales: Array<{ quantity: string | number; amount: string | number }>,
-): Array<{ minQty: number; price: number }> {
+// Parse category path: "Production > PRODUCTS > Technology > Others > Cameras"
+// Returns the most specific leaf category
+function parseCategory(categories: string[]): { level1: string; level2: string; level3: string } {
+  if (!categories || categories.length === 0) {
+    return { level1: 'Merchandising', level2: '', level3: '' };
+  }
+  // Take first category path, skip "Production > PRODUCTS >" prefix
+  const path = categories[0];
+  const parts = path.split('>').map((p: string) => p.trim()).filter(Boolean);
+  // Skip "Production" and "PRODUCTS"
+  const cleaned = parts.filter((p: string) => !['Production', 'PRODUCTS'].includes(p));
+  return {
+    level1: cleaned[0] ?? 'Merchandising',
+    level2: cleaned[1] ?? '',
+    level3: cleaned[2] ?? '',
+  };
+}
+
+// Build price breaks from scales array
+function buildPriceBreaks(scales: Array<{ quantity: string; amount: string }>): Array<{ minQty: number; price: number }> {
   return scales
-    .map((s) => ({ minQty: Number(s.quantity), price: Number(s.amount) }))
-    .filter((s) => s.minQty > 0 && s.price > 0)
+    .map((s) => ({ minQty: Number(s.quantity), price: parseFloat(s.amount) }))
+    .filter((s) => !isNaN(s.minQty) && !isNaN(s.price) && s.minQty > 0)
     .sort((a, b) => a.minQty - b.minQty);
 }
 
-/** Find best price for a variant from the price list */
-function findBasePrice(
-  variantRef: string,
-  productRef: string,
-  priceMap: Map<string, MakitoPriceItem>,
-): number {
-  const item = priceMap.get(variantRef) ?? priceMap.get(productRef);
-  if (!item || !item.scales.length) return 0;
-  // First scale = lowest quantity price (most common use case)
-  return Number(item.scales[0].amount ?? 0);
+// Derive colour group from colour name (first word)
+function colorGroup(name: string): string {
+  return name ? name.split(' ')[0] : '';
 }
 
 export function transformMakitoProduct(
-  product: MakitoCatalogProduct,
-  priceMap: Map<string, MakitoPriceItem>,
-  stockMap: Map<string, number>,
+  product: MakitoRealProduct,
+  priceMap: Map<string, { basePrice: number; priceBreaks: Array<{ minQty: number; price: number }> }>,
 ): TransformedMakitoProduct {
-  const basePrice = findBasePrice(
-    product.variants[0]?.variantReference ?? '',
-    product.productReference,
-    priceMap,
-  );
+  // Validate required fields
+  if (!product.ref) throw new Error(`Product missing 'ref' field`);
+  if (!product.name) throw new Error(`Product ${product.ref} missing 'name' field`);
 
+  const cat = parseCategory(product.categories);
+
+  // Images: primary + details
+  const images: string[] = [];
+  if (product.image) images.push(product.image);
+  if (Array.isArray(product.detail_images)) {
+    images.push(...product.detail_images.filter((u: string) => u && typeof u === 'string'));
+  }
+
+  // Price: look up by ref (web_reference also tried)
+  const priceData = priceMap.get(product.ref)
+    ?? priceMap.get(product.web_reference)
+    ?? { basePrice: 0, priceBreaks: [] };
+
+  // Active variants only (all present variants are considered active in Makito API)
   const activeVariants = (product.variants ?? []).filter(
-    (v) => v.active !== false && v.active !== 'false' && v.active !== '0',
+    (v: MakitoRealVariant) => v.variant_reference && v.variant_reference.trim() !== '',
   );
 
   return {
-    supplierRef: `makito_${product.productReference}`,
+    supplierRef: `makito_${product.ref}`,
     supplier: 'makito',
-    title: product.productName,
-    description: product.productDescription || product.shortDescription || '',
-    category: product.category ?? 'Merchandising',
-    basePrice,
-    images: product.images ?? [],
+    title: product.name,
+    description: product.description ?? '',
+    category: cat.level1,
+    basePrice: priceData.basePrice,
+    images,
     printAreas: {
-      areas: (product.markingAreas ?? []).map((a) => ({
-        areaCode: a.areaCode,
-        areaName: a.areaDescription,
-        maxWidth: a.maxWidth,
-        maxHeight: a.maxHeight,
-        techniques: a.techniques ?? [],
-      })),
-      count: product.markingAreas?.length ?? 0,
-      printable: (product.printable === true || product.printable === 'true' || product.printable === 'yes'),
+      printable: Boolean(product.printcode),
+      printcode: product.printcode ?? '',
+      count: product.printcode ? 1 : 0,
     },
     metadata: {
-      brand: product.brand,
-      material: product.material,
-      colors: product.colors,
-      measures: product.measures,
-      weight: product.weight,
-      countryOfOrigin: product.countryOfOrigin,
-      customsCode: product.customsCode,
+      webReference: product.web_reference,
+      brand: product.brand ?? null,
+      material: product.material ?? null,
+      customsCode: product.custom_code ?? null,
+      weight: typeof product.weight === 'number' ? product.weight : null,
+      dimensions: {
+        length: product.length ?? null,
+        height: product.height ?? null,
+        width: product.width ?? null,
+        diameter: product.diameter ?? null,
+      },
+      packaging: {
+        pfUnits: product.pf_units ?? null,
+        cartonQty: product.ptc_units ?? null,
+      },
+      isNew: product.web_new ?? false,
+      categories: product.categories ?? [],
+      image360: product.image360link ?? null,
     },
-    variants: activeVariants.map((v) => {
-      const priceItem = priceMap.get(v.variantReference) ?? priceMap.get(product.productReference);
-      const variantPrice = priceItem
-        ? Number(priceItem.scales[0]?.amount ?? 0)
-        : basePrice;
-      const priceBreaks = priceItem ? buildPriceBreaks(priceItem.scales) : [];
+    variants: activeVariants.map((v: MakitoRealVariant) => {
+      const varImages: string[] = [];
+      if (v.variant_image) varImages.push(v.variant_image);
+      if (v.variant_thumbnail) varImages.push(v.variant_thumbnail);
 
       return {
-        sku: v.variantReference,
-        color: v.colorDescription,
-        colorGroup: v.colorGroup ?? v.colorDescription,
-        colorCode: v.colorCode,
-        gtin: v.eanCode ?? '',
-        price: variantPrice,
-        stock: stockMap.get(v.variantReference) ?? 0,
-        images: [],  // variant images fetched separately via /catalog/assets/{ref}/principal/{file}
-        categoryLevel1: product.category ?? '',
-        categoryLevel2: product.subcategory ?? '',
-        categoryLevel3: '',
-        priceBreaks,
+        sku: v.variant_reference,              // CORRECT — "5246ROJS/T"
+        color: v.variant_name,                 // full colour name
+        colorGroup: colorGroup(v.variant_name),
+        colorCode: v.variant_colorcode,        // "003"
+        size: v.variant_size,                  // "000"
+        gtin: '',                              // not provided by Makito API
+        price: priceData.basePrice,            // product-level price
+        stock: 0,                              // ⚠️ cannot join — see CRITICAL FINDING
+        images: varImages,
+        categoryLevel1: cat.level1,
+        categoryLevel2: cat.level2,
+        categoryLevel3: cat.level3,
+        priceBreaks: priceData.priceBreaks,
       };
     }),
   };
+}
+
+// Validate a transformed product for undefined/null SKUs
+export function validateTransformed(p: TransformedMakitoProduct): string[] {
+  const errors: string[] = [];
+  if (!p.supplierRef || p.supplierRef === 'makito_undefined') errors.push(`Invalid supplierRef: ${p.supplierRef}`);
+  if (!p.title) errors.push('Missing title');
+  for (const v of p.variants) {
+    if (!v.sku || v.sku.includes('undefined')) errors.push(`Invalid SKU: ${v.sku}`);
+    if (!v.colorCode) errors.push(`Missing colorCode for SKU ${v.sku}`);
+  }
+  return errors;
 }
 
 export class MakitoCatalogSyncService {
@@ -148,55 +185,49 @@ export class MakitoCatalogSyncService {
     });
   }
 
-  /** Full sync: catalog + stock + prices in parallel */
   async syncFull(
     upsert: (product: TransformedMakitoProduct) => Promise<void>,
   ): Promise<MakitoSyncResult> {
     const start = Date.now();
     const result: MakitoSyncResult = {
-      productsUpserted: 0,
-      variantsUpserted: 0,
-      stockUpdated: 0,
-      errors: [],
-      durationMs: 0,
-      mode: 'full',
-      conflicts: [],
+      productsUpserted: 0, variantsUpserted: 0, stockUpdated: 0,
+      errors: [], durationMs: 0, mode: 'full', mappingErrors: 0, conflicts: [],
     };
 
-    console.log('[MakitoSync] Fetching catalog, stock and prices in parallel...');
+    console.log('[MakitoSync] Fetching catalog + prices in parallel...');
 
-    // Fetch all 3 files in parallel
-    const [catalogFile, stockFile, priceFile] = await Promise.all([
+    const [catalogRaw, priceRaw] = await Promise.all([
       this.client.getCatalog('en').catch((e) => { result.errors.push(`catalog: ${e}`); return null; }),
-      this.client.getStock().catch((e) => { result.errors.push(`stock: ${e}`); return null; }),
       this.client.getPriceList().catch((e) => { result.errors.push(`prices: ${e}`); return null; }),
     ]);
 
-    // Build lookup maps
-    const stockMap = new Map<string, number>(
-      (stockFile?.stocks ?? []).map((s: MakitoStockItem) => [s.material, s.quantity]),
-    );
+    // Build price map: material → {basePrice, priceBreaks}
+    const priceMap = new Map<string, { basePrice: number; priceBreaks: Array<{ minQty: number; price: number }> }>();
+    for (const item of priceRaw?.priceList ?? []) {
+      const breaks = buildPriceBreaks(item.scales ?? []);
+      const basePrice = breaks.length > 0 ? breaks[0].price : 0;
+      priceMap.set(item.material, { basePrice, priceBreaks: breaks });
+    }
 
-    const priceMap = new Map<string, MakitoPriceItem>(
-      (priceFile?.priceList ?? []).map((p: MakitoPriceItem) => [p.material, p]),
-    );
-
-    // Extract product list from catalog (API may return different shapes)
-    const products = this.extractProducts(catalogFile);
-
-    console.log(
-      `[MakitoSync] ${products.length} products · ${stockMap.size} stock entries · ${priceMap.size} price entries`,
-    );
+    // Extract products from catalog
+    const products = this.extractProducts(catalogRaw);
+    console.log(`[MakitoSync] ${products.length} products | ${priceMap.size} price entries`);
 
     for (const raw of products) {
       try {
-        const data = transformMakitoProduct(raw, priceMap, stockMap);
+        const data = transformMakitoProduct(raw as MakitoRealProduct, priceMap);
+        // Validate before upsert
+        const validationErrors = validateTransformed(data);
+        if (validationErrors.length > 0) {
+          result.mappingErrors++;
+          result.errors.push(`MAPPING ${raw.ref}: ${validationErrors.join('; ')}`);
+          continue;
+        }
         await upsert(data);
         result.productsUpserted++;
         result.variantsUpserted += data.variants.length;
-        result.stockUpdated += data.variants.filter((v) => v.stock > 0).length;
       } catch (err) {
-        result.errors.push(`${raw.productReference}: ${String(err)}`);
+        result.errors.push(`${(raw as any).ref ?? 'unknown'}: ${String(err)}`);
       }
     }
 
@@ -204,79 +235,51 @@ export class MakitoCatalogSyncService {
     console.log(
       `[MakitoSync] Done in ${result.durationMs}ms — ` +
       `${result.productsUpserted} products, ${result.variantsUpserted} variants, ` +
-      `${result.errors.length} errors`,
+      `${result.mappingErrors} mapping errors, ${result.errors.length} total errors`,
     );
-
     return result;
   }
 
-  /** Incremental sync: same as full but note API doesn't expose delta — re-syncs all */
   async syncIncremental(
     upsert: (product: TransformedMakitoProduct) => Promise<void>,
     _since: string,
   ): Promise<MakitoSyncResult> {
-    // Makito API provides full file snapshots — no delta endpoint
-    // Re-sync full and let upsert handle conflicts
+    // Makito provides full snapshots — no delta API
     const result = await this.syncFull(upsert);
     return { ...result, mode: 'incremental' };
   }
 
-  /** Stock-only sync — fastest, skips catalog */
-  async syncStock(
-    updateStock: (sku: string, qty: number) => Promise<void>,
-  ): Promise<MakitoSyncResult> {
+  async syncStock(updateStock: (sku: string, qty: number) => Promise<void>): Promise<MakitoSyncResult> {
+    // ⚠️ KNOWN LIMITATION: Makito stock uses internal material codes (numeric)
+    // which cannot be joined to variant_reference (alphanumeric) without a mapping file.
+    // This sync updates by material code — only works if SKUs were imported as material codes.
     const start = Date.now();
     const result: MakitoSyncResult = {
-      productsUpserted: 0,
-      variantsUpserted: 0,
-      stockUpdated: 0,
-      errors: [],
-      durationMs: 0,
-      mode: 'stock_only',
-      conflicts: [],
+      productsUpserted: 0, variantsUpserted: 0, stockUpdated: 0,
+      errors: ['⚠️ Stock material codes (numeric) do not map to catalog variant_reference — stock sync unreliable'],
+      durationMs: 0, mode: 'stock_only', mappingErrors: 0, conflicts: [],
     };
-
-    try {
-      const stockFile = await this.client.getStock();
-      for (const item of stockFile.stocks ?? []) {
-        try {
-          await updateStock(item.material, item.quantity);
-          result.stockUpdated++;
-        } catch (err) {
-          result.errors.push(`stock ${item.material}: ${String(err)}`);
-        }
-      }
-    } catch (err) {
-      result.errors.push(`stock fetch: ${String(err)}`);
-    }
-
     result.durationMs = Date.now() - start;
     return result;
   }
 
-  /** Extract product array from catalog response (handles different API response shapes) */
-  private extractProducts(file: any): MakitoCatalogProduct[] {
+  private extractProducts(file: unknown): unknown[] {
     if (!file) return [];
-    // Try known shapes
     if (Array.isArray(file)) return file;
-    if (Array.isArray(file.products)) return file.products;
-    if (Array.isArray(file.catalog)) return file.catalog;
-    if (Array.isArray(file.items)) return file.items;
-    // If it's an object with a single array key
-    for (const key of Object.keys(file)) {
-      if (Array.isArray(file[key]) && file[key].length > 0 && file[key][0]?.productReference) {
-        return file[key];
+    const obj = file as Record<string, unknown>;
+    if (Array.isArray(obj.products)) return obj.products;
+    if (Array.isArray(obj.catalog)) return obj.catalog;
+    if (Array.isArray(obj.items)) return obj.items;
+    for (const key of Object.keys(obj)) {
+      if (Array.isArray(obj[key]) && (obj[key] as unknown[]).length > 0) {
+        const first = (obj[key] as Record<string, unknown>[])[0];
+        if (first?.ref || first?.productReference) return obj[key] as unknown[];
       }
     }
-    console.warn('[MakitoSync] Could not extract products from catalog response shape:', Object.keys(file));
+    console.warn('[MakitoSync] Unknown catalog shape:', Object.keys(obj));
     return [];
   }
 
-  async healthCheck() {
-    return this.client.healthCheck();
-  }
-
-  getCircuitState() {
-    return this.client.getCircuitState();
-  }
+  async healthCheck() { return this.client.healthCheck(); }
+  getCircuitState() { return this.client.getCircuitState(); }
 }

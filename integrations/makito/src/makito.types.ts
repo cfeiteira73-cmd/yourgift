@@ -1,16 +1,14 @@
-// ── Makito B2B API Types — Real API v1 ───────────────────────────────────────
+// ── Makito B2B API Types — Verified Against Real API Payloads ─────────────────
+// Verified: 2026-06-02 | Source: GET /catalog/files, /stock/files, /price-list/files
 // Base URL: https://apis.makito.es
-// Auth: POST /access/auth/login → { token }
 
-// ── Shared utility types used by pricing, artwork, normalizer ────────────────
+// ── Shared ────────────────────────────────────────────────────────────────────
 
-/** Price break: min quantity → unit price (used by pricing engine) */
 export interface MakitoPriceBreak {
   minQty: number;
   price: number;
 }
 
-/** Print technique (used by artwork validator and normalizer) */
 export interface MakitoPrintTechnique {
   code: string;
   name: string;
@@ -24,17 +22,17 @@ export interface MakitoPrintTechnique {
   maxHeight?: number;
 }
 
-/** Print area (used by artwork validator) */
 export interface MakitoPrintArea {
   id: string;
   name: string;
   positionCode: string;
-  maxWidth: number;   // mm
-  maxHeight: number;  // mm
+  maxWidth: number;
+  maxHeight: number;
   techniques: MakitoPrintTechnique[];
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
+// POST /access/auth/login
 
 export interface MakitoLoginRequest {
   clientId: string;
@@ -46,83 +44,91 @@ export interface MakitoLoginResponse {
 }
 
 // ── Catalog ───────────────────────────────────────────────────────────────────
-// GET /catalog/files?format=JSON&lang={es|en|fr}
+// GET /catalog/files?format=JSON&lang=en
+// VERIFIED REAL PAYLOAD — do NOT change field names
 
-export interface MakitoCatalogVariant {
-  variantReference: string;   // e.g. "15246N"
-  colorCode: string;
-  colorDescription: string;
-  colorGroup?: string;
-  eanCode?: string;
-  active?: boolean | string;
-  netWeight?: number;
-  grossWeight?: number;
+export interface MakitoRealVariant {
+  variant_reference: string;   // e.g. "5246ROJS/T" — THIS IS THE SKU
+  variant_name: string;        // e.g. "Camara Deportiva Komir Rojo"
+  variant_colorcode: string;   // e.g. "003"
+  variant_size: string;        // e.g. "000"
+  variant_image: string;       // full URL to principal image
+  variant_thumbnail: string;   // full URL to thumbnail
 }
 
-export interface MakitoMarkingArea {
-  areaCode: string;
-  areaDescription: string;
-  techniques?: string[];
-  maxWidth?: number;
-  maxHeight?: number;
-  positionCode?: string;
-}
-
-export interface MakitoCatalogProduct {
-  productReference: string;   // master code e.g. "15246"
-  productName: string;
-  productDescription?: string;
-  shortDescription?: string;
-  category?: string;
-  subcategory?: string;
-  brand?: string;
-  material?: string;
-  colors?: string;
-  measures?: string;
-  weight?: number;
-  countryOfOrigin?: string;
-  customsCode?: string;
-  printable?: boolean | string;
-  markingAreas?: MakitoMarkingArea[];
-  variants: MakitoCatalogVariant[];
-  images?: string[];
-  [key: string]: unknown; // API may return additional fields
-}
-
-export interface MakitoCatalogFile {
-  generatedAt?: string;
-  products?: MakitoCatalogProduct[];
-  [key: string]: unknown; // top-level key may vary
+export interface MakitoRealProduct {
+  ref: string;                 // e.g. "15246" — MASTER PRODUCT CODE
+  web_reference: string;       // e.g. "5246"
+  name: string;                // e.g. "Komir"
+  description: string;         // HTML string
+  observations?: string;
+  print_observations?: string;
+  printcode?: string;          // e.g. "K(4)"
+  length?: number | null;
+  height?: number | null;
+  width?: number | null;
+  diameter?: number | null;
+  weight?: number | false | null;
+  material?: string | null;
+  // Packaging fields (pf_, pi1_, pi2_, ptc_)
+  pf_type?: string | null;
+  pf_units?: number | null;
+  pf_length?: number | null;
+  pf_height?: number | null;
+  pf_width?: number | null;
+  pf_weight?: number | null;
+  ptc_type?: string | null;
+  ptc_units?: number | null;
+  ptc_length?: number | null;
+  ptc_height?: number | null;
+  ptc_width?: number | null;
+  ptc_weight?: number | null;
+  pallet_units?: number | null;
+  sizes?: string[] | null;
+  brand?: string | null;
+  web_new?: boolean;
+  custom_code?: string | null;  // customs/HS code
+  batteries?: string[];
+  categories: string[];          // e.g. ["Production > PRODUCTS > Technology > ..."]
+  image360link?: string | null;
+  image: string;                 // primary image URL
+  thumbnail_image: string;       // thumbnail URL
+  detail_images: string[];       // array of detail image URLs
+  variants: MakitoRealVariant[];
 }
 
 // ── Stock ─────────────────────────────────────────────────────────────────────
 // GET /stock/files?format=JSON
+// VERIFIED: material code is NUMERIC (e.g. "11011006000"), NOT variant_reference
+// ⚠️ CRITICAL: material codes do NOT directly map to variant_reference
+// They are internal SAP codes. Cross-reference not available via API.
 
 export interface MakitoStockItem {
-  material: string;         // variant reference / SKU
+  material: string;       // internal numeric code e.g. "11011006000"
   quantity: number;
-  availableDate?: string;   // ISO-8601 for incoming stock
-  plant?: string;
-  storageLocation?: string;
+  availableDate?: string; // ISO-8601 for incoming stock (future availability)
 }
 
 export interface MakitoStockFile {
-  generatedAt?: string;
+  generatedAt: string;
   stocks: MakitoStockItem[];
 }
 
 // ── Price List ────────────────────────────────────────────────────────────────
 // GET /price-list/files?format=JSON
+// VERIFIED: material is NUMERIC product code (e.g. "11011"), NOT variant_reference
+// Prices are in EUR, amounts as strings (e.g. "3850.00")
+// ⚠️ CRITICAL: material codes here are product-level, not variant-level
 
 export interface MakitoPriceScale {
-  quantity: string | number;
-  amount: string | number;  // unit price at this quantity
+  quantity: string;   // e.g. "1", "500", "2000"
+  amount: string;     // e.g. "3850.00" — ALWAYS A STRING
 }
 
 export interface MakitoPriceItem {
-  material: string;         // product or variant reference
-  currency: string;         // e.g. "EUR"
-  baseQuantity?: string | number;
+  material: string;       // internal numeric product code
+  currency: string;       // "EUR"
+  baseQuantity: string;   // e.g. "1000"
   scales: MakitoPriceScale[];
 }
 
@@ -131,81 +137,25 @@ export interface MakitoPriceFile {
   priceList: MakitoPriceItem[];
 }
 
-// ── Print Price List ──────────────────────────────────────────────────────────
-// GET /print-price-list/files?format=JSON
-
-export interface MakitoPrintPriceItem {
-  technique: string;
-  area?: string;
-  setupCost?: string | number;
-  unitPrice?: string | number;
-  minQuantity?: string | number;
-  colors?: string | number;
-  [key: string]: unknown;
-}
-
-export interface MakitoPrintPriceFile {
-  generatedAt?: string;
-  printPrices: MakitoPrintPriceItem[];
-}
-
-// ── Print Config ──────────────────────────────────────────────────────────────
-// GET /print-config/files?format=JSON&lang={es|en|fr}
-
-export interface MakitoTechnique {
-  techniqueCode: string;
-  techniqueName: string;
-  maxColors?: number;
-  minQuantity?: number;
-  dpiRequired?: number;
-  colorMode?: string;
-  maxWidth?: number;
-  maxHeight?: number;
-  setupCost?: number;
-  unitCost?: number;
-}
-
-export interface MakitoPrintPosition {
-  areaCode: string;
-  areaName?: string;
-  positionCode?: string;
-  maxWidth?: number;   // mm
-  maxHeight?: number;  // mm
-  techniques: MakitoTechnique[];
-}
-
-export interface MakitoPrintConfigProduct {
-  productReference: string;
-  printPositions: MakitoPrintPosition[];
-}
-
-export interface MakitoPrintConfigFile {
-  generatedAt?: string;
-  printConfig?: MakitoPrintConfigProduct[];
-  [key: string]: unknown;
-}
-
 // ── Orders ────────────────────────────────────────────────────────────────────
 // POST /orders
 
 export interface MakitoPrintingJob {
-  area: string;        // area code
-  technique: string;   // technique code
-  colors?: string;     // e.g. "PMS 286 C, PMS 032 C"
+  area: string;
+  technique: string;
+  colors?: string;
   artworkUrl?: string;
-  artworkRef?: string;
 }
 
 export interface MakitoOrderItem {
-  variant: string;     // variantReference e.g. "15246N"
+  variant: string;      // variant_reference e.g. "5246ROJS/T"
   quantity: number;
   printingJobs?: MakitoPrintingJob[];
 }
 
 export interface MakitoOrderRequest {
-  customerOrder: string;   // your reference — idempotency key
+  customerOrder: string;
   items: MakitoOrderItem[];
-  // Delivery address and other fields may be required — check with Makito
   deliveryAddress?: {
     company?: string;
     contact?: string;
@@ -222,30 +172,20 @@ export interface MakitoOrderRequest {
 
 export interface MakitoOrderDocument {
   documentNumber: string;
-  link: string;           // e.g. "https://apis.makito.es/orders/sales-order/12923148"
+  link: string;
 }
 
 export interface MakitoOrderResponse {
   documents: MakitoOrderDocument[];
 }
 
-// ── Order Status ──────────────────────────────────────────────────────────────
-// GET /orders/sales-order or /orders/sales-order/{id}
-
-export interface MakitoSalesOrderItem {
-  variant: string;
-  quantity: number;
-  status?: string;
-  deliveredQuantity?: number;
-}
-
 export interface MakitoSalesOrder {
-  id: string;              // documentNumber
+  id: string;
   customerOrder: string;
   status?: string;
   createdAt?: string;
   estimatedDeliveryDate?: string;
-  items?: MakitoSalesOrderItem[];
+  items?: Array<{ variant: string; quantity: number; status?: string }>;
   [key: string]: unknown;
 }
 
@@ -254,18 +194,13 @@ export interface MakitoSalesOrderListResponse {
   [key: string]: unknown;
 }
 
-// ── Deliveries ────────────────────────────────────────────────────────────────
-// GET /orders/deliveries
-
 export interface MakitoDelivery {
   documentNumber: string;
   customerOrder?: string;
-  deliveredAt?: string;
   trackingNumber?: string;
   carrier?: string;
   trackingUrl?: string;
   status?: string;
-  items?: Array<{ variant: string; quantity: number }>;
   [key: string]: unknown;
 }
 
@@ -285,12 +220,10 @@ export interface MakitoRegion {
 export interface MakitoCountry {
   countryCode: string;
   countryName: string;
-  isoCode?: string;
 }
 
 export interface MakitoColor {
   colorCode: string;
   colorName: string;
-  pantoneRef?: string;
-  hexCode?: string;
+  [key: string]: unknown;
 }

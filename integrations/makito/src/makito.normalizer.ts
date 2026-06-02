@@ -1,67 +1,37 @@
-// ── Phase 4 — Product Normalizer ──────────────────────────────────────────────
-// Maps Makito products into YourGift universal product schema
+// ── Phase 4 — Product Normalizer — UPDATED TO REAL API FIELDS ────────────────
+// Real Makito API fields as verified 2026-06-02
 
-import type { MakitoProduct, MakitoVariant, MakitoPrintTechnique } from './makito.types';
+import type { MakitoRealProduct, MakitoRealVariant, MakitoPrintTechnique } from './makito.types';
 
 export interface YourGiftProduct {
-  // Identity
   supplierRef: string;
   supplier: 'makito';
   externalId: string;
-
-  // Content
   title: string;
-  titlePt?: string;
   description: string;
-  descriptionPt?: string;
-  shortDescription?: string;
-
-  // Taxonomy
   category: string;
   subcategory?: string;
   tags: string[];
   brand?: string;
-
-  // Physical
   material?: string;
-  dimensions?: { l: number; w: number; h: number; unit: 'mm' };
-  weight?: number; // grams
-
-  // Images
+  dimensions?: { l: number | null; w: number | null; h: number | null; unit: 'mm' };
+  weight?: number;
   primaryImage?: string;
   images: string[];
   technicalSheets: string[];
-
-  // Print
   printAreas: NormalizedPrintArea[];
   isPrintable: boolean;
   printTechniques: string[];
-
-  // Commerce
   basePrice: number;
   currency: 'EUR';
   minQuantity: number;
-
-  // Sustainability
   isEcoFriendly: boolean;
   certifications: string[];
-  recycledContent?: number;
-
-  // Logistics
   customsCode?: string;
-  countryOfOrigin?: string;
-  packagingQty?: number;
-
-  // Metadata
   isNew: boolean;
   isBestSeller: boolean;
   isSustainable: boolean;
-  updatedAt: string;
-
-  // Variants
   variants: NormalizedVariant[];
-
-  // AI/Search
   searchKeywords: string[];
   aiMetadata: AiProductMetadata;
 }
@@ -87,12 +57,12 @@ export interface NormalizedTechnique {
 }
 
 export interface NormalizedVariant {
-  sku: string;
+  sku: string;         // variant_reference
   gtin?: string;
-  color: string;
+  color: string;       // variant_name
   colorHex?: string;
-  colorFamily: string;
-  size?: string;
+  colorFamily: string; // first word of variant_name
+  size?: string;       // variant_size
   price: number;
   priceBreaks: Array<{ minQty: number; price: number }>;
   stock: number;
@@ -107,7 +77,12 @@ export interface AiProductMetadata {
   industries: string[];
   priceSegment: 'economy' | 'mid' | 'premium';
   popularityScore: number;
-  searchVector?: string;
+}
+
+function parseCategories(categories: string[]): { level1: string; level2: string } {
+  if (!categories || !categories.length) return { level1: 'Merchandising', level2: '' };
+  const parts = categories[0].split('>').map(p => p.trim()).filter(p => !['Production', 'PRODUCTS'].includes(p));
+  return { level1: parts[0] ?? 'Merchandising', level2: parts[1] ?? '' };
 }
 
 function classifyPriceSegment(price: number): 'economy' | 'mid' | 'premium' {
@@ -116,135 +91,91 @@ function classifyPriceSegment(price: number): 'economy' | 'mid' | 'premium' {
   return 'premium';
 }
 
-function inferUseCases(product: MakitoProduct): string[] {
-  const cat = (product.category + ' ' + (product.subcategory ?? '')).toLowerCase();
-  const name = product.name.toLowerCase();
+function inferUseCases(product: MakitoRealProduct): string[] {
+  const cat = (product.categories ?? []).join(' ').toLowerCase();
+  const name = (product.name ?? '').toLowerCase();
   const useCases: string[] = [];
-  if (cat.includes('bag') || cat.includes('mochila')) useCases.push('corporate_gifts', 'events');
-  if (cat.includes('drink') || cat.includes('bottle') || cat.includes('garrafa')) useCases.push('sports', 'wellness');
-  if (cat.includes('tech') || cat.includes('usb') || cat.includes('charger')) useCases.push('tech_promo', 'corporate');
-  if (cat.includes('pen') || cat.includes('caneta') || cat.includes('escrita')) useCases.push('office', 'events');
-  if (cat.includes('textile') || cat.includes('têxtil') || cat.includes('shirt')) useCases.push('apparel', 'teamwear');
-  if (cat.includes('sustainable') || product.isSustainable) useCases.push('eco_events', 'csr');
+  if (cat.includes('bag') || cat.includes('backpack')) useCases.push('corporate_gifts', 'events');
+  if (cat.includes('drink') || cat.includes('bottle')) useCases.push('sports', 'wellness');
+  if (cat.includes('tech') || cat.includes('usb') || cat.includes('camera')) useCases.push('tech_promo', 'corporate');
+  if (cat.includes('writing') || cat.includes('pen')) useCases.push('office', 'events');
+  if (cat.includes('textile') || cat.includes('shirt') || cat.includes('apparel')) useCases.push('apparel', 'teamwear');
   if (useCases.length === 0) useCases.push('corporate_gifts', 'general');
   return [...new Set(useCases)];
 }
 
-function buildSearchKeywords(product: MakitoProduct): string[] {
+function buildSearchKeywords(product: MakitoRealProduct): string[] {
   const keywords = new Set<string>();
   keywords.add(product.name.toLowerCase());
-  keywords.add(product.category.toLowerCase());
-  if (product.subcategory) keywords.add(product.subcategory.toLowerCase());
+  (product.categories ?? []).forEach(c =>
+    c.split('>').forEach(p => keywords.add(p.trim().toLowerCase()))
+  );
   if (product.brand) keywords.add(product.brand.toLowerCase());
   if (product.material) keywords.add(product.material.toLowerCase());
-  if (product.tags) product.tags.forEach((t) => keywords.add(t.toLowerCase()));
   keywords.add('makito');
   keywords.add('merchandising');
   keywords.add('brindes');
-  return [...keywords];
-}
-
-function normalizeTechnique(t: MakitoPrintTechnique): NormalizedTechnique {
-  return {
-    code: t.code,
-    label: t.name,
-    maxColors: t.maxColors,
-    minQty: t.minQty,
-    setupCost: t.setupCost,
-    unitCost: t.unitCost,
-    dpiMin: t.dpiRequired,
-    colorMode: t.colorMode,
-  };
+  keywords.add(product.ref);
+  keywords.add(product.web_reference);
+  return [...keywords].filter(Boolean);
 }
 
 export function normalizeMakitoProduct(
-  product: MakitoProduct,
+  product: MakitoRealProduct,
   priceMap: Map<string, number>,
-  stockMap: Map<string, number>,
+  _stockMap: Map<string, number>, // stock cannot be joined — see MakitoMappingReport.md
 ): YourGiftProduct {
-  const firstSku = product.variants[0]?.sku ?? '';
-  const basePrice = priceMap.get(firstSku) ?? product.variants[0]?.price ?? 0;
+  const basePrice = priceMap.get(product.ref) ?? priceMap.get(product.web_reference) ?? 0;
+  const { level1, level2 } = parseCategories(product.categories);
 
-  const images = product.media
-    .filter((m) => m.type === 'image')
-    .sort((a, b) => (a.sortOrder ?? 99) - (b.sortOrder ?? 99))
-    .map((m) => m.url);
-
-  const technicalSheets = product.media
-    .filter((m) => m.type === 'technical_sheet' || m.type === 'document')
-    .map((m) => m.url);
-
-  const techniques = new Set<string>();
-  product.printAreas.forEach((pa) => pa.techniques.forEach((t) => techniques.add(t.code)));
+  const images: string[] = [];
+  if (product.image) images.push(product.image);
+  if (Array.isArray(product.detail_images)) images.push(...product.detail_images.filter(Boolean));
 
   return {
-    supplierRef: `makito_${product.reference}`,
+    supplierRef: `makito_${product.ref}`,
     supplier: 'makito',
-    externalId: product.reference,
-
+    externalId: product.ref,
     title: product.name,
-    description: product.longDescription || product.shortDescription || '',
-    shortDescription: product.shortDescription,
-
-    category: product.category,
-    subcategory: product.subcategory,
-    tags: product.tags ?? [],
-    brand: product.brand,
-
-    material: product.material,
-    dimensions: product.dimensions
-      ? { ...product.dimensions, unit: 'mm' }
-      : undefined,
-    weight: product.weight,
-
-    primaryImage: images[0],
-    images,
-    technicalSheets,
-
-    printAreas: product.printAreas.map((pa) => ({
-      id: pa.id,
-      name: pa.name,
-      maxWidth: pa.maxWidth,
-      maxHeight: pa.maxHeight,
+    description: product.description ?? '',
+    category: level1,
+    subcategory: level2 || undefined,
+    tags: [],
+    brand: product.brand ?? undefined,
+    material: product.material ?? undefined,
+    dimensions: {
+      l: product.length ?? null,
+      w: product.width ?? null,
+      h: product.height ?? null,
       unit: 'mm',
-      techniques: pa.techniques.map(normalizeTechnique),
-    })),
-    isPrintable: product.printAreas.length > 0,
-    printTechniques: [...techniques],
-
+    },
+    weight: typeof product.weight === 'number' ? product.weight : undefined,
+    primaryImage: product.image || undefined,
+    images,
+    technicalSheets: [],
+    printAreas: [], // print config fetched separately via /print-config/files
+    isPrintable: Boolean(product.printcode),
+    printTechniques: product.printcode ? [product.printcode] : [],
     basePrice,
     currency: 'EUR',
     minQuantity: 1,
-
-    isEcoFriendly: product.sustainability.isRecycled || product.sustainability.isOrganic || false,
-    certifications: product.sustainability.certifications ?? [],
-    recycledContent: product.sustainability.recycledContent,
-
-    customsCode: product.customsCode,
-    countryOfOrigin: product.countryOfOrigin,
-    packagingQty: product.packaging.cartonQty,
-
-    isNew: product.isNew ?? false,
-    isBestSeller: product.isBestSeller ?? false,
-    isSustainable: product.isSustainable ?? false,
-    updatedAt: product.updatedAt,
-
-    variants: product.variants
-      .filter((v) => v.status === 'active' || v.status === 'new')
-      .map((v) => ({
-        sku: v.sku,
-        gtin: v.ean,
-        color: v.colorName,
-        colorHex: v.colorHex,
-        colorFamily: v.colorFamily ?? v.colorName,
-        size: v.size,
-        price: priceMap.get(v.sku) ?? v.price ?? basePrice,
-        priceBreaks: v.priceBreaks ?? [],
-        stock: stockMap.get(v.sku) ?? v.stock ?? 0,
-        isAvailable: (stockMap.get(v.sku) ?? v.stock ?? 0) > 0,
-        images: v.media.filter((m) => m.type === 'image').map((m) => m.url),
-      })),
-
+    isEcoFriendly: false,
+    certifications: [],
+    customsCode: product.custom_code ?? undefined,
+    isNew: product.web_new ?? false,
+    isBestSeller: false,
+    isSustainable: false,
+    variants: product.variants.map((v: MakitoRealVariant) => ({
+      sku: v.variant_reference,
+      color: v.variant_name,
+      colorFamily: v.variant_name.split(' ')[0] ?? v.variant_name,
+      size: v.variant_size || undefined,
+      price: basePrice,
+      priceBreaks: [],
+      stock: 0, // cannot join numeric material codes to variant_reference
+      isAvailable: false, // unknown without stock join
+      images: [v.variant_image, v.variant_thumbnail].filter(Boolean) as string[],
+    })),
     searchKeywords: buildSearchKeywords(product),
     aiMetadata: {
       useCases: inferUseCases(product),
@@ -252,7 +183,7 @@ export function normalizeMakitoProduct(
       eventTypes: ['conferences', 'trade_shows', 'corporate_events'],
       industries: ['general'],
       priceSegment: classifyPriceSegment(basePrice),
-      popularityScore: product.isBestSeller ? 0.9 : product.isNew ? 0.7 : 0.5,
+      popularityScore: product.web_new ? 0.7 : 0.5,
     },
   };
 }
