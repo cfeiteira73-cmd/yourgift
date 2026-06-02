@@ -210,9 +210,9 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-// ── Named export for internal use: fire webhooks for an event ─────────────────
+// ── Internal helper: fire webhooks for an event ───────────────────────────────
 
-export async function fireWebhooks(
+async function fireWebhooks(
   supabase: Awaited<ReturnType<typeof createClient>>,
   event: WebhookEvent,
   data: Record<string, unknown>,
