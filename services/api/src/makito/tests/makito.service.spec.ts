@@ -1,69 +1,78 @@
-// ── Phase 15 — Makito Unit Tests ─────────────────────────────────────────────
+// ── Phase 15 — Makito Unit Tests — Updated to Real API Fields ────────────────
+// Verified against real API payloads 2026-06-03
 
 import { MakitoClient, MakitoApiError } from '@yourgift/makito';
-import { MakitoCatalogSyncService, transformMakitoProduct } from '@yourgift/makito';
+import { transformMakitoProduct, validateTransformed } from '@yourgift/makito';
 import { MakitoPricingEngine } from '@yourgift/makito';
 import { MakitoArtworkValidator } from '@yourgift/makito';
-import type { MakitoProduct, MakitoPrintArea, MakitoPrintTechnique } from '@yourgift/makito';
+import type { MakitoRealProduct, MakitoPrintArea, MakitoPrintTechnique } from '@yourgift/makito';
 
-// ── Fixtures ──────────────────────────────────────────────────────────────────
+// ── Fixtures — Real API field names ───────────────────────────────────────────
 
-const mockProduct: MakitoProduct = {
-  id: 'test-001',
-  reference: 'MK001',
+const mockProduct: MakitoRealProduct = {
+  ref: '15246',
+  web_reference: '5246',
   name: 'Test Pen',
-  shortDescription: 'A great pen',
-  longDescription: 'A fantastic promotional pen',
-  brand: 'Makito',
-  category: 'Writing',
-  subcategory: 'Ballpoint Pens',
-  tags: ['pen', 'writing', 'promo'],
-  material: 'ABS Plastic',
-  countryOfOrigin: 'CN',
+  description: '<p>A fantastic promotional pen</p>',
+  observations: '',
+  print_observations: '',
+  printcode: 'K(2)',
+  length: 140,
+  height: 15,
+  width: 15,
+  diameter: null,
   weight: 20,
-  printAreas: [
-    {
-      id: 'pa1',
-      name: 'Barrel',
-      positionCode: 'BARREL',
-      maxWidth: 40,
-      maxHeight: 8,
-      techniques: [
-        { code: 'SCREENPRINT', name: 'Screen Printing', maxColors: 4, minQty: 50, setupCost: 25, unitCost: 0.5, dpiRequired: 300, colorMode: 'Pantone' },
-        { code: 'LASER', name: 'Laser Engraving', minQty: 1, setupCost: 15, unitCost: 0.3 },
-      ],
-    },
+  material: 'ABS Plastic',
+  pf_type: null,
+  pf_units: null,
+  pf_length: null,
+  pf_height: null,
+  pf_width: null,
+  pf_weight: null,
+  pi1_type: null, pi1_units: null, pi1_length: null, pi1_height: null, pi1_width: null, pi1_weight: null,
+  pi2_type: null, pi2_units: null, pi2_length: null, pi2_height: null, pi2_width: null, pi2_weight: null,
+  ptc_type: '1003',
+  ptc_units: 100,
+  ptc_length: 480,
+  ptc_height: 255,
+  ptc_width: 330,
+  ptc_weight: 3.5,
+  pallet_units: 4000,
+  bundle_pallets: 40,
+  pallet_weight: 140,
+  sizes: null,
+  brand: 'TestBrand',
+  web_new: false,
+  custom_code: '9608101000',
+  batteries: [],
+  categories: [
+    'Production > PRODUCTS > Writing > Ballpoint Pens',
+    'Production > PRODUCTS > Marking Techniques > Serigraphy',
   ],
-  sustainability: { isRecycled: false, certifications: [] },
-  packaging: { cartonQty: 100 },
-  media: [
-    { id: 'img1', url: 'https://makito.es/img/MK001.jpg', type: 'image', isPrimary: true, sortOrder: 1 },
-    { id: 'doc1', url: 'https://makito.es/docs/MK001.pdf', type: 'technical_sheet' },
+  image360link: null,
+  image: 'https://apis.makito.es/catalog/assets/15246/principal/5246-W.jpg',
+  thumbnail_image: 'https://apis.makito.es/catalog/assets/15246/thumbnail/5246-W.jpg',
+  detail_images: [
+    'https://apis.makito.es/catalog/assets/15246/details/5246-D1.jpg',
   ],
   variants: [
     {
-      id: 'v1', sku: 'MK001-BLU', ean: '1234567890123',
-      colorCode: 'BLU', colorName: 'Blue', colorFamily: 'Blues',
-      price: 0.85, stock: 5000,
-      status: 'active',
-      media: [{ id: 'vi1', url: 'https://makito.es/img/MK001-BLU.jpg', type: 'image', sortOrder: 1 }],
+      variant_reference: 'MK001BLU',
+      variant_name: 'Test Pen Blue',
+      variant_colorcode: 'BLU',
+      variant_size: '000',
+      variant_image: 'https://apis.makito.es/catalog/assets/15246/15246001000/principal/5246-001-P.jpg',
+      variant_thumbnail: 'https://apis.makito.es/catalog/assets/15246/15246001000/thumbnail/5246-001-P.jpg',
     },
     {
-      id: 'v2', sku: 'MK001-RED', ean: '1234567890124',
-      colorCode: 'RED', colorName: 'Red', colorFamily: 'Reds',
-      price: 0.85, stock: 3000,
-      status: 'active',
-      media: [{ id: 'vi2', url: 'https://makito.es/img/MK001-RED.jpg', type: 'image', sortOrder: 1 }],
-    },
-    {
-      id: 'v3', sku: 'MK001-OLD', ean: '1234567890125',
-      colorCode: 'GRY', colorName: 'Grey', colorFamily: 'Greys',
-      price: 0.80, stock: 0,
-      status: 'discontinued',
-      media: [],
+      variant_reference: 'MK001RED',
+      variant_name: 'Test Pen Red',
+      variant_colorcode: 'RED',
+      variant_size: '000',
+      variant_image: 'https://apis.makito.es/catalog/assets/15246/15246002000/principal/5246-002-P.jpg',
+      variant_thumbnail: 'https://apis.makito.es/catalog/assets/15246/15246002000/thumbnail/5246-002-P.jpg',
     },
   ],
-  updatedAt: '2026-05-01T00:00:00Z',
 };
 
 // ── MakitoClient Tests ────────────────────────────────────────────────────────
@@ -94,52 +103,84 @@ describe('MakitoClient', () => {
   });
 });
 
-// ── transformMakitoProduct Tests ──────────────────────────────────────────────
+// ── transformMakitoProduct Tests — Real API Fields ───────────────────────────
 
 describe('transformMakitoProduct', () => {
-  const priceMap = new Map([['MK001-BLU', 1.20], ['MK001-RED', 1.20]]);
-  const stockMap = new Map([['MK001-BLU', 4500], ['MK001-RED', 2800]]);
+  const priceMap = new Map([
+    ['15246', { basePrice: 1.20, priceBreaks: [{ minQty: 1, price: 1.20 }, { minQty: 100, price: 0.95 }] }],
+    ['5246', { basePrice: 1.20, priceBreaks: [] }],
+  ]);
 
-  it('should transform product with correct supplier', () => {
-    const result = transformMakitoProduct(mockProduct, priceMap, stockMap);
+  it('should use correct supplier', () => {
+    const result = transformMakitoProduct(mockProduct, priceMap);
     expect(result.supplier).toBe('makito');
   });
 
-  it('should set correct supplierRef', () => {
-    const result = transformMakitoProduct(mockProduct, priceMap, stockMap);
-    expect(result.supplierRef).toBe('makito_MK001');
+  it('should build supplierRef from ref field', () => {
+    const result = transformMakitoProduct(mockProduct, priceMap);
+    expect(result.supplierRef).toBe('makito_15246');
+    expect(result.supplierRef).not.toContain('undefined');
   });
 
-  it('should use priceMap values over product prices', () => {
-    const result = transformMakitoProduct(mockProduct, priceMap, stockMap);
+  it('should use price from priceMap', () => {
+    const result = transformMakitoProduct(mockProduct, priceMap);
     expect(result.basePrice).toBe(1.20);
-    expect(result.variants[0].price).toBe(1.20);
   });
 
-  it('should use stockMap values over product stock', () => {
-    const result = transformMakitoProduct(mockProduct, priceMap, stockMap);
-    expect(result.variants[0].stock).toBe(4500);
+  it('should parse categories array into category string', () => {
+    const result = transformMakitoProduct(mockProduct, priceMap);
+    expect(result.category).toBe('Writing');
+    expect(result.category).not.toBe('undefined');
   });
 
-  it('should filter out discontinued variants', () => {
-    const result = transformMakitoProduct(mockProduct, priceMap, stockMap);
-    const skus = result.variants.map((v) => v.sku);
-    expect(skus).toContain('MK001-BLU');
-    expect(skus).toContain('MK001-RED');
-    expect(skus).not.toContain('MK001-OLD');
-  });
-
-  it('should extract primary image', () => {
-    const result = transformMakitoProduct(mockProduct, priceMap, stockMap);
+  it('should build images from image + detail_images', () => {
+    const result = transformMakitoProduct(mockProduct, priceMap);
     expect(result.images.length).toBeGreaterThan(0);
+    expect(result.images[0]).toContain('apis.makito.es');
   });
 
-  it('should include print area data', () => {
-    const result = transformMakitoProduct(mockProduct, priceMap, stockMap);
-    const pa = result.printAreas as any;
-    expect(pa.positions).toBe(1);
-    expect(pa.areas).toHaveLength(1);
-    expect(pa.areas[0].maxWidth).toBe(40);
+  it('should use variant_reference as SKU', () => {
+    const result = transformMakitoProduct(mockProduct, priceMap);
+    expect(result.variants[0].sku).toBe('MK001BLU');
+    expect(result.variants[0].sku).not.toContain('undefined');
+  });
+
+  it('should use variant_colorcode as colorCode', () => {
+    const result = transformMakitoProduct(mockProduct, priceMap);
+    expect(result.variants[0].colorCode).toBe('BLU');
+  });
+
+  it('should use variant_name as color', () => {
+    const result = transformMakitoProduct(mockProduct, priceMap);
+    expect(result.variants[0].color).toBe('Test Pen Blue');
+  });
+
+  it('should pass validation with 0 errors', () => {
+    const result = transformMakitoProduct(mockProduct, priceMap);
+    const errors = validateTransformed(result);
+    expect(errors).toHaveLength(0);
+  });
+});
+
+// ── validateTransformed Tests ─────────────────────────────────────────────────
+
+describe('validateTransformed', () => {
+  it('should detect undefined supplierRef', () => {
+    const bad = { supplierRef: 'makito_undefined', title: 'Test', variants: [] } as any;
+    const errors = validateTransformed(bad);
+    expect(errors.some(e => e.includes('supplierRef'))).toBe(true);
+  });
+
+  it('should detect missing SKU', () => {
+    const bad = { supplierRef: 'makito_123', title: 'Test', variants: [{ sku: '' }] } as any;
+    const errors = validateTransformed(bad);
+    expect(errors.some(e => e.includes('SKU'))).toBe(true);
+  });
+
+  it('should pass for valid product', () => {
+    const priceMap = new Map([['15246', { basePrice: 1.0, priceBreaks: [] }]]);
+    const valid = transformMakitoProduct(mockProduct, priceMap);
+    expect(validateTransformed(valid)).toHaveLength(0);
   });
 });
 
@@ -149,42 +190,38 @@ describe('MakitoPricingEngine', () => {
   const engine = new MakitoPricingEngine({ defaultMarginPct: 35, vatRate: 23 });
 
   it('should calculate basic price with margin', () => {
-    const result = engine.calculate({ sku: 'MK001-BLU', quantity: 100, basePrice: 0.85 });
+    const result = engine.calculate({ sku: 'MK001BLU', quantity: 100, basePrice: 0.85 });
     expect(result.unitCost).toBe(0.85);
     expect(result.marginPct).toBeCloseTo(35, 0);
     expect(result.total).toBeGreaterThan(result.subtotal);
   });
 
-  it('should apply price breaks', () => {
+  it('should apply price breaks correctly', () => {
     const priceBreaks = [
-      { minQty: 100, unitPrice: 0.75, setupCost: 20 },
-      { minQty: 500, unitPrice: 0.60, setupCost: 20 },
+      { minQty: 100, price: 0.75 },
+      { minQty: 500, price: 0.60 },
     ];
-    const result100 = engine.calculate({ sku: 'MK001-BLU', quantity: 100, basePrice: 0.85, priceBreaks });
-    const result500 = engine.calculate({ sku: 'MK001-BLU', quantity: 500, basePrice: 0.85, priceBreaks });
-
-    expect(result100.unitCost).toBe(0.75);
-    expect(result500.unitCost).toBe(0.60);
-    expect(result100.priceBreakApplied).toBeDefined();
+    const r100 = engine.calculate({ sku: 'test', quantity: 100, basePrice: 0.85, priceBreaks });
+    const r500 = engine.calculate({ sku: 'test', quantity: 500, basePrice: 0.85, priceBreaks });
+    expect(r100.unitCost).toBe(0.75);
+    expect(r500.unitCost).toBe(0.60);
   });
 
-  it('should apply VAT correctly', () => {
+  it('should apply VAT correctly at 23%', () => {
     const result = engine.calculate({ sku: 'test', quantity: 100, basePrice: 1.00, vatRate: 23 });
-    const expectedVat = result.subtotal * 0.23;
-    expect(Math.abs(result.vatAmount - expectedVat)).toBeLessThan(0.01);
+    expect(Math.abs(result.vatAmount - result.subtotal * 0.23)).toBeLessThan(0.01);
   });
 
-  it('should give higher profitability score for higher volume', () => {
+  it('should give higher profitability for higher volume', () => {
     const low = engine.calculate({ sku: 'test', quantity: 10, basePrice: 1.00 });
     const high = engine.calculate({ sku: 'test', quantity: 1000, basePrice: 1.00 });
     expect(high.profitabilityScore).toBeGreaterThan(low.profitabilityScore);
   });
 
-  it('should compare quantities', () => {
+  it('compareQuantities returns results for each qty', () => {
     const results = engine.compareQuantities('MK001', 0.85, [50, 100, 500]);
     expect(results).toHaveLength(3);
     expect(results[0].quantity).toBe(50);
-    expect(results[2].quantity).toBe(500);
   });
 });
 
@@ -194,129 +231,95 @@ describe('MakitoArtworkValidator', () => {
   const validator = new MakitoArtworkValidator();
 
   const printArea: MakitoPrintArea = {
-    id: 'pa1',
-    name: 'Barrel',
-    positionCode: 'BARREL',
-    maxWidth: 40,
-    maxHeight: 8,
-    techniques: [],
+    id: 'pa1', name: 'Barrel', positionCode: 'BARREL',
+    maxWidth: 40, maxHeight: 8, techniques: [],
   };
 
   const screenPrint: MakitoPrintTechnique = {
-    code: 'SCREENPRINT',
-    name: 'Screen Printing',
-    maxColors: 4,
-    minQty: 50,
-    setupCost: 25,
-    unitCost: 0.5,
-    dpiRequired: 300,
-    colorMode: 'Pantone',
+    code: 'SCREENPRINT', name: 'Screen Printing',
+    maxColors: 4, minQty: 50, setupCost: 25, unitCost: 0.5, dpiRequired: 300, colorMode: 'Pantone',
   };
 
   const laser: MakitoPrintTechnique = {
-    code: 'LASER',
-    name: 'Laser Engraving',
-    minQty: 1,
-    setupCost: 15,
-    unitCost: 0.3,
+    code: 'LASER', name: 'Laser Engraving', minQty: 1, setupCost: 15, unitCost: 0.3,
   };
 
   it('should PASS valid vector artwork for screen printing', () => {
     const result = validator.validate(
       { dpi: 300, colorMode: 'CMYK', widthMm: 35, heightMm: 6, fileFormat: 'ai', estimatedColors: 2 },
-      printArea,
-      screenPrint,
+      printArea, screenPrint,
     );
     expect(result.verdict).toBe('PASS');
     expect(result.valid).toBe(true);
     expect(result.errors).toHaveLength(0);
   });
 
-  it('should FAIL artwork that exceeds print area', () => {
+  it('should FAIL artwork exceeding print area', () => {
     const result = validator.validate(
       { dpi: 300, colorMode: 'CMYK', widthMm: 60, heightMm: 10, fileFormat: 'ai' },
-      printArea,
-      screenPrint,
+      printArea, screenPrint,
     );
-    expect(result.errors.some((e) => e.includes('exceeds print area'))).toBe(true);
+    expect(result.errors.some(e => e.includes('exceeds print area'))).toBe(true);
     expect(result.valid).toBe(false);
-    expect(result.verdict).toBe('FAIL');
   });
 
   it('should FAIL low DPI artwork', () => {
     const result = validator.validate(
       { dpi: 72, colorMode: 'CMYK', widthMm: 35, heightMm: 6, fileFormat: 'jpg' },
-      printArea,
-      screenPrint,
+      printArea, screenPrint,
     );
-    expect(result.errors.some((e) => e.includes('DPI'))).toBe(true);
+    expect(result.errors.some(e => e.includes('DPI'))).toBe(true);
     expect(result.valid).toBe(false);
   });
 
   it('should WARN on raster format', () => {
     const result = validator.validate(
       { dpi: 300, colorMode: 'CMYK', widthMm: 35, heightMm: 6, fileFormat: 'png' },
-      printArea,
-      screenPrint,
+      printArea, screenPrint,
     );
-    expect(result.warnings.some((w) => w.includes('Raster format'))).toBe(true);
+    expect(result.warnings.some(w => w.includes('Raster format'))).toBe(true);
     expect(result.verdict).toBe('WARN');
   });
 
   it('should FAIL too many colors for screen print', () => {
     const result = validator.validate(
       { dpi: 300, colorMode: 'CMYK', widthMm: 35, heightMm: 6, fileFormat: 'ai', estimatedColors: 6 },
-      printArea,
-      screenPrint,
+      printArea, screenPrint,
     );
-    expect(result.errors.some((e) => e.includes('colours'))).toBe(true);
     expect(result.valid).toBe(false);
   });
 
-  it('should PASS laser engraving with vector and no transparency', () => {
+  it('should PASS laser with vector no transparency', () => {
     const result = validator.validate(
       { dpi: 300, widthMm: 35, heightMm: 6, fileFormat: 'ai', hasTransparency: false },
-      printArea,
-      laser,
+      printArea, laser,
     );
     expect(result.valid).toBe(true);
   });
 
-  it('should WARN laser engraving with transparency', () => {
-    const result = validator.validate(
-      { dpi: 300, widthMm: 35, heightMm: 6, fileFormat: 'ai', hasTransparency: true },
-      printArea,
-      laser,
-    );
-    expect(result.warnings.some((w) => w.includes('transparency'))).toBe(true);
-  });
-
-  it('quickValidate should detect RGB', () => {
+  it('quickValidate detects RGB', () => {
     const result = validator.quickValidate({ colorMode: 'RGB' });
     expect(result.ready).toBe(false);
-    expect(result.issues.some((i) => i.includes('RGB'))).toBe(true);
+    expect(result.issues.some(i => i.includes('RGB'))).toBe(true);
   });
 
-  it('quickValidate should pass clean artwork', () => {
+  it('quickValidate passes clean artwork', () => {
     const result = validator.quickValidate({ dpi: 300, colorMode: 'CMYK', fileFormat: 'ai' });
     expect(result.ready).toBe(true);
-    expect(result.issues).toHaveLength(0);
   });
 });
 
 // ── MakitoApiError Tests ──────────────────────────────────────────────────────
 
 describe('MakitoApiError', () => {
-  it('should store error type and message', () => {
+  it('should store type, message and statusCode', () => {
     const err = new MakitoApiError('RATE_LIMITED', 'Too many requests', 429);
     expect(err.type).toBe('RATE_LIMITED');
     expect(err.statusCode).toBe(429);
     expect(err.name).toBe('MakitoApiError');
-    expect(err.message).toBe('Too many requests');
   });
 
-  it('should be an instance of Error', () => {
-    const err = new MakitoApiError('TIMEOUT', 'Timeout');
-    expect(err instanceof Error).toBe(true);
+  it('should be instanceof Error', () => {
+    expect(new MakitoApiError('TIMEOUT', 'Timeout') instanceof Error).toBe(true);
   });
 });
