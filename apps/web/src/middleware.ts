@@ -157,7 +157,7 @@ export async function middleware(request: NextRequest) {
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.supabase.co https://cdn.midocean.com https://cdn1.midocean.com https://images.unsplash.com https://pf-concept.com https://*.pfconcept.com https://storage.googleapis.com https://apis.makito.es",
+      "img-src 'self' data: blob: https://*.supabase.co https://cdn.midocean.com https://cdn1.midocean.com https://images.unsplash.com https://ui-avatars.com https://pf-concept.com https://*.pfconcept.com https://storage.googleapis.com https://apis.makito.es https://etools.boxpromotions.com",
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.anthropic.com https://api.stripe.com https://api.exchangerate-api.com",
       "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com",
       "font-src 'self' data:",
