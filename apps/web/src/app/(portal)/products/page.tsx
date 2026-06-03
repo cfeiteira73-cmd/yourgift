@@ -48,6 +48,14 @@ export default async function ProductsPage({
       companyName={(client as { company?: string } | null)?.company ?? undefined}
       tier={(client as { tier?: string } | null)?.tier ?? undefined}
     >
+      {/* CSS hover effects — cannot use event handlers in RSC */}
+      <style>{`
+        .product-card-link:hover {
+          border-color: rgba(77,163,255,0.25) !important;
+          background: rgba(77,163,255,0.05) !important;
+        }
+      `}</style>
+
       <div style={{ padding: '2rem 2rem 3rem' }}>
 
         {/* Header */}
@@ -127,6 +135,7 @@ export default async function ProductsPage({
                   <Link
                     key={product.id}
                     href={`/products/${product.id}`}
+                    className="product-card-link"
                     style={{
                       display: 'block',
                       background: 'rgba(255,255,255,0.03)',
@@ -134,15 +143,7 @@ export default async function ProductsPage({
                       borderRadius: '14px',
                       overflow: 'hidden',
                       textDecoration: 'none',
-                      transition: 'border-color 150ms ease, background 150ms ease, transform 150ms ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.borderColor = 'rgba(77,163,255,0.25)';
-                      (e.currentTarget as HTMLElement).style.background = 'rgba(77,163,255,0.04)';
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.06)';
-                      (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)';
+                      transition: 'border-color 150ms ease, background 150ms ease',
                     }}
                   >
                     {/* Image */}
