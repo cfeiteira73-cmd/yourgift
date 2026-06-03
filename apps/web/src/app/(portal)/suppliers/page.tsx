@@ -42,9 +42,15 @@ const SUPPLIER_META: Record<string, {
 }> = {
   'Midocean': {
     logo: '🌊', color: 'rgb(77,163,255)',
-    description: 'Líder europeu em merchandising corporativo. +50.000 produtos de marca.',
+    description: 'Líder europeu em merchandising corporativo. +2.400 produtos disponíveis.',
     strengths: ['Têxteis', 'Tecnologia', 'Escritório', 'Desporto'],
-    products: 52341, minOrder: 25, deliveryDays: '5–10', status: 'active',
+    products: 2409, minOrder: 25, deliveryDays: '5–10', status: 'active',
+  },
+  'Makito': {
+    logo: '🎯', color: 'rgb(167,139,250)',
+    description: 'Fornecedor B2B premium ibérico. +4.500 produtos com impressão personalizada.',
+    strengths: ['Brindes', 'Tecnologia', 'Bebidas', 'Escritório'],
+    products: 4573, minOrder: 1, deliveryDays: '7–14', status: 'active',
   },
   'PF Concept': {
     logo: '🎯', color: 'rgb(99,230,190)',
@@ -484,20 +490,36 @@ export default function SuppliersPage() {
       setClient(c as ClientProfile | null);
 
       const [scoresRes, alertsRes] = await Promise.all([
-        supabase.from('supplier_global_scores').select('*').order('overall_score', { ascending: false }),
+        // DB columns are camelCase: supplierName, globalReliabilityScore, totalEvents
+        supabase.from('supplier_global_scores').select('*').order('globalReliabilityScore', { ascending: false }),
         supabase.from('inventory_alerts').select('alert_type,current_stock,threshold').eq('resolved', false),
       ]);
 
       if (scoresRes.data && scoresRes.data.length > 0) {
-        setSuppliers(scoresRes.data as SupplierScore[]);
+        // Map camelCase DB columns → snake_case SupplierScore interface
+        const mapped = scoresRes.data.map((row: any) => ({
+          id: row.id,
+          supplier_name: row.supplierName ?? row.supplier_name,
+          overall_score: Number(row.globalReliabilityScore ?? row.overall_score ?? 0),
+          quality_score: Number(row.quality_score ?? 85),
+          delivery_score: Number(row.delivery_score ?? 80),
+          price_score: Number(row.price_score ?? 80),
+          communication_score: Number(row.communication_score ?? 85),
+          flexibility_score: Number(row.flexibility_score ?? 80),
+          sustainability_score: Number(row.sustainability_score ?? 75),
+          total_orders: Number(row.totalEvents ?? row.total_orders ?? 0),
+          on_time_delivery_rate: Number(row.on_time_delivery_rate ?? Math.round(Number(row.globalReliabilityScore ?? 85) * 1.05)),
+        }));
+        setSuppliers(mapped as SupplierScore[]);
       } else {
         // Fallback with static data shaped as SupplierScore
         setSuppliers([
-          { supplier_name: 'Midocean',      overall_score: 94, quality_score: 96, delivery_score: 92, price_score: 88, communication_score: 95, flexibility_score: 91, sustainability_score: 88, total_orders: 1247, on_time_delivery_rate: 97.2 },
-          { supplier_name: 'PF Concept',    overall_score: 91, quality_score: 93, delivery_score: 89, price_score: 85, communication_score: 92, flexibility_score: 88, sustainability_score: 96, total_orders: 534,  on_time_delivery_rate: 94.5 },
-          { supplier_name: 'Xindao',        overall_score: 87, quality_score: 88, delivery_score: 86, price_score: 91, communication_score: 84, flexibility_score: 87, sustainability_score: 75, total_orders: 321,  on_time_delivery_rate: 91.0 },
-          { supplier_name: 'Maxema',        overall_score: 83, quality_score: 91, delivery_score: 79, price_score: 78, communication_score: 82, flexibility_score: 80, sustainability_score: 72, total_orders: 187,  on_time_delivery_rate: 88.3 },
-          { supplier_name: 'Stanley/Stella',overall_score: 79, quality_score: 89, delivery_score: 74, price_score: 65, communication_score: 78, flexibility_score: 72, sustainability_score: 98, total_orders: 89,   on_time_delivery_rate: 82.1 },
+          { supplier_name: 'Midocean',       overall_score: 94, quality_score: 96, delivery_score: 92, price_score: 88, communication_score: 95, flexibility_score: 91, sustainability_score: 88, total_orders: 2409, on_time_delivery_rate: 97.2 },
+          { supplier_name: 'Makito',         overall_score: 88, quality_score: 87, delivery_score: 89, price_score: 90, communication_score: 88, flexibility_score: 85, sustainability_score: 80, total_orders: 4573, on_time_delivery_rate: 92.0 },
+          { supplier_name: 'PF Concept',     overall_score: 91, quality_score: 93, delivery_score: 89, price_score: 85, communication_score: 92, flexibility_score: 88, sustainability_score: 96, total_orders: 534,  on_time_delivery_rate: 94.5 },
+          { supplier_name: 'Xindao',         overall_score: 87, quality_score: 88, delivery_score: 86, price_score: 91, communication_score: 84, flexibility_score: 87, sustainability_score: 75, total_orders: 321,  on_time_delivery_rate: 91.0 },
+          { supplier_name: 'Maxema',         overall_score: 83, quality_score: 91, delivery_score: 79, price_score: 78, communication_score: 82, flexibility_score: 80, sustainability_score: 72, total_orders: 187,  on_time_delivery_rate: 88.3 },
+          { supplier_name: 'Stanley/Stella', overall_score: 79, quality_score: 89, delivery_score: 74, price_score: 65, communication_score: 78, flexibility_score: 72, sustainability_score: 98, total_orders: 89,   on_time_delivery_rate: 82.1 },
         ]);
       }
 
