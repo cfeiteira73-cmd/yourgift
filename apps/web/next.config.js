@@ -34,6 +34,25 @@ const nextConfig = {
     },
   },
 
+  // Portuguese URL redirects → English routes
+  // Marketing pages use English slugs internally but PT content
+  async redirects() {
+    return [
+      { source: '/sobre', destination: '/about', permanent: true },
+      { source: '/como-funciona', destination: '/how-it-works', permanent: true },
+      { source: '/catalogo', destination: '/catalog', permanent: true },
+      { source: '/empresa', destination: '/about', permanent: true },
+      { source: '/contacto', destination: '/quote', permanent: true },
+      { source: '/orcamento', destination: '/quote', permanent: true },
+      { source: '/merchandising', destination: '/catalog', permanent: true },
+      { source: '/brindes', destination: '/catalog', permanent: true },
+      { source: '/brindes-corporativos', destination: '/corporate-gifts', permanent: true },
+      { source: '/lojas-empresa', destination: '/company-stores', permanent: true },
+      { source: '/embalagem', destination: '/packaging', permanent: true },
+      { source: '/fulfillment-pt', destination: '/fulfillment', permanent: true },
+    ];
+  },
+
   // Suppress TypeScript/ESLint build errors in CI (already checked separately)
   typescript: { ignoreBuildErrors: false },
   eslint: { ignoreDuringBuilds: false },
