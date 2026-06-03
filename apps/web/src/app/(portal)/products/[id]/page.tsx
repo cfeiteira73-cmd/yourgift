@@ -9,7 +9,10 @@ export default async function ProductPage({ params }: { params: { id: string } }
 
   const prices = product.variants?.map((v) => v.price).filter((p) => p > 0) ?? [];
   const minPrice = prices.length ? Math.min(...prices) : 0;
-  const image = product.images?.[0] ?? product.variants?.[0]?.images?.[0];
+  const rawImage = product.images?.[0] ?? product.variants?.[0]?.images?.[0];
+  const image = rawImage?.includes('apis.makito.es')
+    ? `/api/images/makito?url=${encodeURIComponent(rawImage)}`
+    : rawImage;
   const inStockVariants = product.variants?.filter((v) => v.stock > 0) ?? [];
 
   return (

@@ -130,7 +130,11 @@ export default async function ProductsPage({
               marginBottom: '2rem',
             }}>
               {products.map((product) => {
-                const image = product.images?.[0];
+                const rawImage = product.images?.[0];
+                // Makito supplier images require auth — route through proxy
+                const image = rawImage?.includes('apis.makito.es')
+                  ? `/api/images/makito?url=${encodeURIComponent(rawImage)}`
+                  : rawImage;
                 return (
                   <Link
                     key={product.id}

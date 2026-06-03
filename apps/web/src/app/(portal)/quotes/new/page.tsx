@@ -410,7 +410,7 @@ export default function NewQuotePage() {
                       <div style={{ width: '44px', height: '44px', borderRadius: '8px', overflow: 'hidden', background: 'rgba(255,255,255,0.05)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {item.product.images?.[0] ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={item.product.images[0]} alt="" referrerPolicy="no-referrer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <img src={item.product.images[0]?.includes("apis.makito.es") ? `/api/images/makito?url=${encodeURIComponent(item.product.images[0])}` : item.product.images[0]} alt="" referrerPolicy="no-referrer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
                           <span style={{ fontSize: '1.1rem' }}>🎁</span>
                         )}

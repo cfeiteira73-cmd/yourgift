@@ -18,9 +18,15 @@ interface Product {
   supplier: string | null;
 }
 
-// Midocean CDN images are real — use first image in array
+// Get product image URL — routes Makito images through auth proxy
 function productImage(p: Product): string | null {
-  return p.images && p.images.length > 0 ? p.images[0] : null;
+  const url = p.images && p.images.length > 0 ? p.images[0] : null;
+  if (!url) return null;
+  // Makito supplier images require auth — use server-side proxy
+  if (url.includes('apis.makito.es')) {
+    return `/api/images/makito?url=${encodeURIComponent(url)}`;
+  }
+  return url;
 }
 
 const CATEGORY_ICONS: Record<string, string> = {
