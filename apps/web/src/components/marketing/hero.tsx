@@ -52,7 +52,7 @@ const PRODUCT_GRID = [
     label: "Tech",
   },
   {
-    img: "https://images.unsplash.com/photo-1616345840969-851d7e671c74?w=400&h=400&fit=crop",
+    img: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400&h=400&fit=crop",
     label: "Tumblers",
   },
   {

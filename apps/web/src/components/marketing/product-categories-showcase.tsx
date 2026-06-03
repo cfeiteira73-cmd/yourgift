@@ -38,7 +38,7 @@ const CATEGORIES: Category[] = [
     id: "drinkware",
     name: "Drinkware",
     productCount: "2.100 produtos",
-    image: "https://images.unsplash.com/photo-1616345840969-851d7e671c74?w=800&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=800&h=500&fit=crop",
     span: "normal",
   },
   {
@@ -52,7 +52,7 @@ const CATEGORIES: Category[] = [
     id: "desk-accessories",
     name: "Desk & Office",
     productCount: "1.600 produtos",
-    image: "https://images.unsplash.com/photo-1597673030470-87f51615740f?w=800&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&h=500&fit=crop",
     span: "normal",
   },
   {

@@ -9,11 +9,11 @@ const PRODUCT_STRIP = [
   "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=200&h=200&fit=crop",
   "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=200&h=200&fit=crop",
   "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=200&h=200&fit=crop",
-  "https://images.unsplash.com/photo-1616345840969-851d7e671c74?w=200&h=200&fit=crop",
+  "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=200&h=200&fit=crop",
   "https://images.unsplash.com/photo-1591543620767-582b2e76369e?w=200&h=200&fit=crop",
   "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=200&h=200&fit=crop",
   "https://images.unsplash.com/photo-1544816155-12df9643f363?w=200&h=200&fit=crop",
-  "https://images.unsplash.com/photo-1597673030470-87f51615740f?w=200&h=200&fit=crop",
+  "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop",
 ];
 
 const GUARANTEES = [
