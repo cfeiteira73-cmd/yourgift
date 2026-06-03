@@ -91,14 +91,32 @@ export class MidoceanClient {
     return new Map(stock.map((s) => [s.sku, s.qty]));
   }
 
-  /** Price list — generated async on first call, ready in ~24h */
+  /** Price list — generated async on first call, ready in ~24h
+   * API response format (verified 2026-06-03):
+   * {currency:"EUR", date:"2026-06-03", price:[{sku, variant_id, price:"3,51", valid_until}]}
+   * Note: price uses comma as decimal separator (European format)
+   */
   async getPriceList(currency = 'EUR'): Promise<MidoceanPriceItem[]> {
     const raw = await this.request<any>(`/pricelist/2.0?currency=${currency}`);
     if (raw?.PRICELIST_RESPONSE) {
       console.warn('[Midocean] Pricelist status:', raw.PRICELIST_RESPONSE.STATUS_TEXT);
       return [];
     }
-    return Array.isArray(raw) ? raw : [];
+    // New format: {currency, date, price: [{sku, variant_id, price:"3,51", valid_until}]}
+    // Legacy format: array of {sku, net_price, gross_price, currency}
+    const items = raw?.price ?? (Array.isArray(raw) ? raw : []);
+    return items.map((item: any) => {
+      // Parse price: "3,51" or "3.51" → number
+      const parsedPrice = typeof item.price === 'string'
+        ? parseFloat(item.price.replace(',', '.'))
+        : (item.net_price ?? item.price ?? 0);
+      return {
+        sku: item.sku ?? item.variant_id,
+        net_price: parsedPrice,
+        gross_price: item.gross_price ?? parsedPrice,
+        currency: raw?.currency ?? item.currency ?? currency,
+      };
+    });
   }
 
   /** Place a production order with full branding spec */

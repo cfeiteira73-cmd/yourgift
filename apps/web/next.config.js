@@ -15,11 +15,16 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'cdn.yourgift.pt' },
       { protocol: 'https', hostname: 'www.midocean.com' },
-      { protocol: 'https', hostname: 'cdn1.midocean.com' },
-      { protocol: 'https', hostname: '**.supabase.co' }, // Supabase storage
+      { protocol: 'https', hostname: 'cdn1.midocean.com' },   // MidOcean CDN ✅ (public)
+      { protocol: 'https', hostname: '**.supabase.co' },       // Supabase storage (artwork, cached images)
+      { protocol: 'https', hostname: '**.supabase.in' },       // Supabase storage alt region
+      // Makito supplier images are served via /api/images/makito proxy (requires Bearer token)
+      // Direct access to apis.makito.es/catalog/assets/ returns 401 — use proxy instead
     ],
     // Modern formats for better performance
     formats: ['image/avif', 'image/webp'],
+    // Allow unoptimized for supplier CDN images (avoids proxy overhead for public CDNs)
+    unoptimized: false,
   },
 
   experimental: {
