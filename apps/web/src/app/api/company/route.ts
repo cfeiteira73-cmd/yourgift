@@ -219,14 +219,36 @@ export async function POST(req: NextRequest) {
         metadata: { email, role, token_prefix: token.slice(0, 8) },
       });
 
-      // In production: send invite email via Resend
-      // TODO: integrate Resend email send here
+      // Send invite email via Resend
+      const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.yourgift.pt'}/join?token=${token}`;
+      const resendKey = process.env.RESEND_API_KEY;
+      if (resendKey) {
+        try {
+          await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              from: 'YourGift <noreply@yourgift.pt>',
+              to: [email],
+              subject: `Convite para a empresa ${client.company ?? 'YourGift'}`,
+              html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+                <h2>Convite para a equipa</h2>
+                <p>Foi convidado para juntar-se à empresa <strong>${client.company ?? 'YourGift'}</strong> na plataforma YourGift como <strong>${role}</strong>.</p>
+                <p><a href="${inviteUrl}" style="background:#4da3ff;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin:16px 0">Aceitar convite</a></p>
+                <p style="color:#666;font-size:12px">Este convite expira em 7 dias. Se não esperava este convite, pode ignorar este email.</p>
+              </div>`,
+            }),
+          });
+        } catch (emailErr) {
+          console.warn('[company invite] Email failed (non-blocking):', emailErr);
+        }
+      }
 
       return NextResponse.json({
         ok: true,
         inviteToken: token,
         expiresAt,
-        inviteUrl: `${process.env.NEXT_PUBLIC_APP_URL ?? ''}/join?token=${token}`,
+        inviteUrl,
       });
     }
 
