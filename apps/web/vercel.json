@@ -1,0 +1,16 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "cd ../.. && pnpm --filter @yourgift/shared run build && pnpm --filter web run build",
+  "outputDirectory": ".next",
+  "installCommand": "cd ../.. && pnpm install --no-frozen-lockfile",
+  "crons": [
+    {
+      "path": "/api/cron/sync-prices",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/sync-makito",
+      "schedule": "0 3 * * 0"
+    }
+  ]
+}
