@@ -319,6 +319,24 @@ async function handleCheckoutCompleted(
       currency: session.currency,
       order_id: orderId,
     });
+
+    // Send payment confirmation email to customer
+    try {
+      const clientEmail = session.customer_email ?? session.customer_details?.email;
+      if (clientEmail) {
+        const { data: order } = await db.from('orders').select('ref, total_amount').eq('id', orderId).single();
+        const { sendEmail, paymentConfirmationEmail } = await import('@/lib/email');
+        const emailContent = paymentConfirmationEmail({
+          clientName: session.customer_details?.name ?? 'Cliente',
+          orderRef: (order as Record<string, unknown>)?.ref as string ?? orderId,
+          amount: ((order as Record<string, unknown>)?.total_amount as number ?? (session.amount_total ?? 0) / 100),
+          stripeSessionId: session.id,
+        });
+        await sendEmail({ to: clientEmail, ...emailContent });
+      }
+    } catch (emailErr) {
+      console.warn('[stripe-webhook] Payment email failed (non-blocking):', emailErr);
+    }
   }
 }
 

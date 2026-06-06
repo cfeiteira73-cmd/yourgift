@@ -218,9 +218,10 @@ export class MakitoCatalogSyncService {
         const data = transformMakitoProduct(raw as MakitoRealProduct, priceMap);
         // Validate before upsert
         const validationErrors = validateTransformed(data);
+        const rawProduct = raw as MakitoRealProduct;
         if (validationErrors.length > 0) {
           result.mappingErrors++;
-          result.errors.push(`MAPPING ${raw.ref}: ${validationErrors.join('; ')}`);
+          result.errors.push(`MAPPING ${rawProduct.ref}: ${validationErrors.join('; ')}`);
           continue;
         }
         await upsert(data);

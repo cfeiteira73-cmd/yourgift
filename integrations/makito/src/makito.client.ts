@@ -14,13 +14,9 @@
 //   • Follow file download redirects (S3-style presigned URLs)
 
 import type {
-  MakitoLoginRequest,
   MakitoLoginResponse,
-  MakitoCatalogFile,
   MakitoStockFile,
   MakitoPriceFile,
-  MakitoPrintPriceFile,
-  MakitoPrintConfigFile,
   MakitoOrderRequest,
   MakitoOrderResponse,
   MakitoSalesOrder,
@@ -144,7 +140,7 @@ export class MakitoClient {
     const timeout = setTimeout(() => controller.abort(), 15_000);
 
     try {
-      const body: MakitoLoginRequest = {
+      const body = {
         clientId: this.clientId,
         clientSecret: this.clientSecret,
       };
@@ -169,7 +165,7 @@ export class MakitoClient {
         );
       }
 
-      const data: MakitoLoginResponse = await res.json();
+      const data = await res.json() as MakitoLoginResponse;
       if (!data.token) {
         throw new MakitoApiError('AUTH_FAILED', 'Makito auth returned no token');
       }
@@ -305,8 +301,8 @@ export class MakitoClient {
 
   // ── Catalog ───────────────────────────────────────────────────────────────
 
-  async getCatalog(lang: 'en' | 'es' | 'fr' = 'en'): Promise<MakitoCatalogFile> {
-    return this.request<MakitoCatalogFile>(`/catalog/files?format=JSON&lang=${lang}`);
+  async getCatalog(lang: 'en' | 'es' | 'fr' = 'en'): Promise<unknown> {
+    return this.request<unknown>(`/catalog/files?format=JSON&lang=${lang}`);
   }
 
   async getCatalogAsset(prodRef: string, type: 'principal' | 'thumbnail', fileName: string): Promise<Buffer> {
@@ -357,14 +353,14 @@ export class MakitoClient {
     return map;
   }
 
-  async getPrintPriceList(): Promise<MakitoPrintPriceFile> {
-    return this.request<MakitoPrintPriceFile>('/print-price-list/files?format=JSON');
+  async getPrintPriceList(): Promise<unknown> {
+    return this.request<unknown>('/print-price-list/files?format=JSON');
   }
 
   // ── Print Configuration ───────────────────────────────────────────────────
 
-  async getPrintConfig(lang: 'en' | 'es' | 'fr' = 'en'): Promise<MakitoPrintConfigFile> {
-    return this.request<MakitoPrintConfigFile>(`/print-config/files?format=JSON&lang=${lang}`);
+  async getPrintConfig(lang: 'en' | 'es' | 'fr' = 'en'): Promise<unknown> {
+    return this.request<unknown>(`/print-config/files?format=JSON&lang=${lang}`);
   }
 
   // ── Orders ────────────────────────────────────────────────────────────────

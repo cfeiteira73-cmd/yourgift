@@ -54,7 +54,7 @@ export class MakitoPricingEngine {
     const sorted = [...priceBreaks].sort((a, b) => b.minQty - a.minQty);
     const applicable = sorted.find((pb) => quantity >= pb.minQty);
     return applicable
-      ? { price: applicable.unitPrice, breakApplied: applicable }
+      ? { price: applicable.price, breakApplied: applicable }
       : { price: basePrice };
   }
 
