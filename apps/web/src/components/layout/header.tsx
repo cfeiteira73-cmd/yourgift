@@ -54,22 +54,22 @@ export function Header() {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b",
         isScrolled
-          ? "bg-[rgb(7,17,31)]/90 backdrop-blur-xl border-b border-white/[0.06] shadow-heavy"
-          : "bg-transparent"
+          ? "border-[#3a3a3a]/30"
+          : "border-transparent"
       )}
+      style={{ backdropFilter: 'blur(16px)', backgroundColor: 'rgba(13,13,13,0.88)' }}
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between h-16 md:h-18">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-[#4DA3FF] to-[#63E6BE] flex items-center justify-center shadow-glow-blue">
-              <Sparkles className="h-4 w-4 text-white" />
-            </div>
-            <span className="font-semibold text-lg text-white tracking-tight">
-              yourgift
-              <span className="text-[#4DA3FF]">.pt</span>
+            <span
+              className="text-xl tracking-[0.2em] text-[#c5a059] uppercase"
+              style={{ fontFamily: 'var(--font-playfair), serif', fontWeight: 700 }}
+            >
+              yourgift.pt
             </span>
           </Link>
 
@@ -85,10 +85,11 @@ export function Header() {
                 >
                   <button
                     className={cn(
-                      "flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
-                      "text-white/70 hover:text-white hover:bg-white/[0.06]",
-                      openDropdown === item.href && "text-white bg-white/[0.06]"
+                      "flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-all duration-200",
+                      "text-[#a5a5a5] hover:text-[#c5a059]",
+                      openDropdown === item.href && "text-[#c5a059]"
                     )}
+                    style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}
                   >
                     {item.label}
                     <ChevronDown
@@ -106,25 +107,26 @@ export function Header() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 8 }}
                         transition={{ duration: 0.18, ease: "easeOut" }}
-                        className="absolute top-full left-0 mt-2 w-72 rounded-2xl border border-white/[0.08] bg-[#0B1526]/95 backdrop-blur-xl shadow-heavy p-2"
+                        className="absolute top-full left-0 mt-2 w-72 border border-[#3a3a3a]/50 p-2"
+                  style={{ backgroundColor: 'rgba(13,13,13,0.97)', backdropFilter: 'blur(16px)' }}
                       >
                         {item.children.map((child) => (
                           <Link
                             key={child.href}
                             href={child.href}
-                            className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/[0.06] transition-colors group"
+                            className="flex items-start gap-3 p-3 hover:bg-[#c5a059]/5 transition-colors group"
                           >
-                            <div className="mt-0.5 p-1.5 rounded-lg bg-[#4DA3FF]/10 text-[#4DA3FF] group-hover:bg-[#4DA3FF]/18 transition-colors">
+                            <div className="mt-0.5 p-1.5 text-[#c5a059]">
                               {solutionIcons[child.href] || (
                                 <Package className="h-4 w-4" />
                               )}
                             </div>
                             <div>
-                              <div className="text-sm font-medium text-white/90 group-hover:text-white transition-colors">
+                              <div className="text-sm font-medium text-[#f2f0f0] group-hover:text-[#c5a059] transition-colors" style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}>
                                 {child.label}
                               </div>
                               {child.description && (
-                                <div className="text-xs text-white/48 mt-0.5 leading-relaxed">
+                                <div className="text-xs text-[#a5a5a5] mt-0.5 leading-relaxed">
                                   {child.description}
                                 </div>
                               )}
@@ -140,10 +142,11 @@ export function Header() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
-                    "text-white/70 hover:text-white hover:bg-white/[0.06]",
-                    pathname === item.href && "text-white bg-white/[0.08]"
+                    "px-4 py-2 text-sm font-medium transition-all duration-200",
+                    "text-[#a5a5a5] hover:text-[#c5a059]",
+                    pathname === item.href && "text-[#c5a059]"
                   )}
+                  style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}
                 >
                   {item.label}
                 </Link>
@@ -159,18 +162,16 @@ export function Header() {
 
             <Link
               href="/auth/login"
-              className="hidden md:block text-sm text-white/70 hover:text-white px-4 py-2 rounded-xl transition-all hover:bg-white/[0.06]"
+              className="hidden md:block text-sm text-[#a5a5a5] hover:text-[#c5a059] px-4 py-2 transition-all"
+              style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}
             >
               Entrar
             </Link>
 
             <Link
               href="/rfq"
-              className={cn(
-                "flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all duration-200",
-                "bg-white text-[#07111F] hover:bg-white/90 shadow-soft",
-                "hover:shadow-glow-blue hover:scale-[1.02]"
-              )}
+              className="hidden md:flex items-center gap-2 text-[10px] font-semibold px-5 py-2.5 text-[#131313] transition-all hover:scale-[1.02]"
+              style={{ background: 'linear-gradient(135deg, #c5a059 0%, #e9c176 100%)', fontFamily: 'var(--font-montserrat), sans-serif' }}
             >
               Pedir proposta
               <ArrowRight className="h-3.5 w-3.5" />
@@ -179,7 +180,7 @@ export function Header() {
             {/* Mobile toggle */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="lg:hidden p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/[0.06] transition-all"
+              className="lg:hidden p-2 text-[#a5a5a5] hover:text-[#c5a059] transition-all"
               aria-label="Menu"
             >
               {mobileOpen ? (
@@ -200,14 +201,16 @@ export function Header() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="lg:hidden border-t border-white/[0.06] bg-[#07111F]/98 backdrop-blur-xl overflow-hidden"
+            className="lg:hidden border-t border-[#3a3a3a]/30 overflow-hidden"
+            style={{ backgroundColor: 'rgba(13,13,13,0.98)', backdropFilter: 'blur(16px)' }}
           >
             <div className="px-6 py-6 space-y-1 max-h-[80vh] overflow-y-auto">
               {mainNav.map((item) => (
                 <div key={item.href}>
                   <Link
                     href={item.href}
-                    className="flex items-center justify-between py-3 px-4 rounded-xl text-white/80 hover:text-white hover:bg-white/[0.06] transition-all"
+                    className="flex items-center justify-between py-3 px-4 text-[#a5a5a5] hover:text-[#c5a059] transition-all"
+                    style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}
                   >
                     <span className="font-medium">{item.label}</span>
                   </Link>
@@ -217,7 +220,8 @@ export function Header() {
                         <Link
                           key={child.href}
                           href={child.href}
-                          className="flex items-center gap-2 py-2.5 px-4 rounded-xl text-white/60 hover:text-white hover:bg-white/[0.06] transition-all text-sm"
+                          className="flex items-center gap-2 py-2.5 px-4 text-[#a5a5a5]/60 hover:text-[#c5a059] transition-all text-sm"
+                          style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}
                         >
                           {child.label}
                         </Link>
@@ -227,17 +231,19 @@ export function Header() {
                 </div>
               ))}
 
-              <div className="pt-4 border-t border-white/[0.06] space-y-2">
+              <div className="pt-4 border-t border-[#3a3a3a]/30 space-y-2">
                 <Link
                   href="/rfq"
-                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-white text-[#07111F] font-semibold text-sm"
+                  className="flex items-center justify-center gap-2 w-full py-3 text-[#131313] text-sm"
+                  style={{ background: 'linear-gradient(135deg, #c5a059 0%, #e9c176 100%)', fontFamily: 'var(--font-montserrat), sans-serif', fontWeight: 700 }}
                 >
                   Pedir proposta
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
-                  href="/login"
-                  className="flex items-center justify-center w-full py-3 rounded-xl border border-white/[0.12] text-white/80 text-sm hover:bg-white/[0.06] transition-all"
+                  href="/auth/login"
+                  className="flex items-center justify-center w-full py-3 border border-[#c5a059]/30 text-[#a5a5a5] text-sm hover:text-[#c5a059] transition-all"
+                  style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}
                 >
                   Entrar
                 </Link>
