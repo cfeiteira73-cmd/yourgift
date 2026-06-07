@@ -482,7 +482,7 @@ export default function ProductionPage() {
                   <div style={{ flex: 1, overflowY: 'auto' }}>
                     <AnimatePresence>
                       {items.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '1.25rem 0', color: 'rgb(50,62,80)', fontSize: '0.65rem' }}>Nenhuma encomenda</div>
+                        <div style={{ textAlign: 'center', padding: '1.25rem 0', color: 'rgba(240,236,228,0.18)', fontSize: '0.65rem' }}>Nenhuma encomenda</div>
                       ) : (
                         items.map(order => (
                           <PipelineCard key={order.id} order={order} stage={stage} slaMap={slaMap} isAdmin={false} />

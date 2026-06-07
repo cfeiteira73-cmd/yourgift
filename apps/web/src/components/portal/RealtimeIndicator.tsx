@@ -56,7 +56,7 @@ export function RealtimeIndicator() {
             ? 'rgb(245,158,11)'
             : 'rgba(240,236,228,0.24)',
           boxShadow: isConnected
-            ? '0 0 6px rgba(99,230,190,0.7)'
+            ? '0 0 6px rgba(184,151,94,0.55)'
             : isReconnecting
             ? '0 0 6px rgba(245,158,11,0.6)'
             : 'none',

@@ -183,7 +183,7 @@ export default function ExecutivePage() {
               {generating ? '⏳ A gerar…' : '🧠 Gerar Brief AI'}
             </motion.button>
             <motion.button whileTap={tapScale} onClick={getForecast} disabled={forecasting}
-              style={{ padding: '0.4rem 0.875rem', background: 'rgba(184,151,94,0.10)', border: '1px solid rgba(99,230,190,0.25)', borderRadius: '8px', color: '#b8975e', fontSize: '0.68rem', fontWeight: 700, cursor: 'pointer' }}>
+              style={{ padding: '0.4rem 0.875rem', background: 'rgba(184,151,94,0.10)', border: '1px solid rgba(184,151,94,0.22)', borderRadius: '8px', color: '#b8975e', fontSize: '0.68rem', fontWeight: 700, cursor: 'pointer' }}>
               {forecasting ? '⏳ A prever…' : '🔮 Forecast'}
             </motion.button>
           </div>
@@ -199,7 +199,7 @@ export default function ExecutivePage() {
             {/* ── AI Brief ── */}
             <AnimatePresence>
               {snapshot?.ai_brief && (
-                <motion.div {...fadeUp} style={{ padding: '1.25rem', background: 'linear-gradient(135deg, rgba(167,139,250,0.08) 0%, rgba(77,163,255,0.06) 100%)', borderRadius: '16px', border: '1px solid rgba(167,139,250,0.2)' }}>
+                <motion.div {...fadeUp} style={{ padding: '1.25rem', background: 'linear-gradient(135deg, rgba(167,139,250,0.08) 0%, rgba(154,124,74,0.08) 100%)', borderRadius: '16px', border: '1px solid rgba(167,139,250,0.2)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.625rem' }}>
                     <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgb(167,139,250)', boxShadow: '0 0 6px rgba(167,139,250,0.6)' }} />
                     <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(167,139,250)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Briefing Executivo AI</span>
@@ -306,7 +306,7 @@ export default function ExecutivePage() {
                       <div style={{ fontSize: '0.68rem', color: 'rgba(240,236,228,0.24)' }}>Nenhuma oportunidade identificada.</div>
                     ) : (
                       snapshot.ai_opportunities.map((o, i) => (
-                        <div key={i} style={{ marginBottom: '0.625rem', padding: '0.625rem', background: 'rgba(99,230,190,0.05)', borderRadius: '8px', border: '1px solid rgba(184,151,94,0.12)' }}>
+                        <div key={i} style={{ marginBottom: '0.625rem', padding: '0.625rem', background: 'rgba(184,151,94,0.06)', borderRadius: '8px', border: '1px solid rgba(184,151,94,0.12)' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
                             <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgb(200,215,235)' }}>{o.title}</span>
                             <span style={{ fontSize: '0.58rem', color: '#b8975e', fontWeight: 700 }}>{o.potential}</span>
@@ -324,7 +324,7 @@ export default function ExecutivePage() {
                       <div style={{ fontSize: '0.68rem', color: 'rgba(240,236,228,0.24)' }}>Sem ações recomendadas.</div>
                     ) : (
                       snapshot.ai_actions.map((a, i) => (
-                        <div key={i} style={{ marginBottom: '0.5rem', padding: '0.5rem 0.625rem', background: 'rgba(77,163,255,0.05)', borderRadius: '8px', border: '1px solid rgba(154,124,74,0.10)' }}>
+                        <div key={i} style={{ marginBottom: '0.5rem', padding: '0.5rem 0.625rem', background: 'rgba(154,124,74,0.06)', borderRadius: '8px', border: '1px solid rgba(154,124,74,0.10)' }}>
                           <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgb(190,205,225)', marginBottom: '0.15rem' }}>{a.action}</div>
                           <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)' }}>
                             <span>👤 {a.owner}</span>

@@ -291,19 +291,19 @@ export default function QuoteDetailPage() {
             padding: '1rem 1.25rem',
             borderRadius: '12px',
             background: `rgba(${
-              quote.status === 'approved' ? '99,230,190' :
+              quote.status === 'approved' ? '184,151,94' :
               quote.status === 'rejected' ? '239,68,68' :
-              quote.status === 'submitted' ? '77,163,255' :
+              quote.status === 'submitted' ? '154,124,74' :
               quote.status === 'pricing' ? '245,158,11' :
-              quote.status === 'converted' ? '116,231,255' :
+              quote.status === 'converted' ? '154,124,74' :
               '107,114,128'
             },0.08)`,
             border: `1px solid rgba(${
-              quote.status === 'approved' ? '99,230,190' :
+              quote.status === 'approved' ? '184,151,94' :
               quote.status === 'rejected' ? '239,68,68' :
-              quote.status === 'submitted' ? '77,163,255' :
+              quote.status === 'submitted' ? '154,124,74' :
               quote.status === 'pricing' ? '245,158,11' :
-              quote.status === 'converted' ? '116,231,255' :
+              quote.status === 'converted' ? '154,124,74' :
               '107,114,128'
             },0.2)`,
             display: 'flex',
@@ -573,7 +573,7 @@ export default function QuoteDetailPage() {
                     fontSize: '0.875rem',
                     fontWeight: 700,
                     cursor: actionLoading ? 'not-allowed' : 'pointer',
-                    background: actionLoading ? 'rgba(99,230,190,0.4)' : '#b8975e',
+                    background: actionLoading ? 'rgba(184,151,94,0.35)' : '#b8975e',
                     color: '#090907',
                     border: 'none',
                     display: 'flex',

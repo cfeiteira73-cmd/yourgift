@@ -41,11 +41,11 @@ const TOAST_ICONS: Record<ToastType, string> = {
 };
 
 const TOAST_COLORS: Record<ToastType, { border: string; bg: string; text: string }> = {
-  success:  { border: 'rgba(99,230,190,0.3)',  bg: 'rgba(184,151,94,0.08)',  text: '#b8975e' },
+  success:  { border: 'rgba(184,151,94,0.28)',  bg: 'rgba(184,151,94,0.08)',  text: '#b8975e' },
   info:     { border: 'rgba(154,124,74,0.28)',  bg: 'rgba(154,124,74,0.08)',  text: '#d4b47a' },
   warning:  { border: 'rgba(245,158,11,0.3)',  bg: 'rgba(245,158,11,0.08)',  text: 'rgb(245,158,11)' },
   error:    { border: 'rgba(239,68,68,0.3)',   bg: 'rgba(239,68,68,0.08)',   text: 'rgb(239,68,68)' },
-  realtime: { border: 'rgba(116,231,255,0.3)', bg: 'rgba(116,231,255,0.08)', text: '#b8975e' },
+  realtime: { border: 'rgba(154,124,74,0.28)', bg: 'rgba(154,124,74,0.08)', text: '#b8975e' },
 };
 
 let toastIdCounter = 0;

@@ -270,7 +270,7 @@ export default function QCPage() {
                   Analytics
                 </motion.button>
                 <motion.button whileTap={tapScale} onClick={() => { setPanelMode('create'); setSelected(null); }}
-                  style={{ padding: '0.35rem 0.5rem', background: 'rgba(184,151,94,0.10)', border: '1px solid rgba(99,230,190,0.25)', borderRadius: '7px', color: '#b8975e', fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer' }}>
+                  style={{ padding: '0.35rem 0.5rem', background: 'rgba(184,151,94,0.10)', border: '1px solid rgba(184,151,94,0.22)', borderRadius: '7px', color: '#b8975e', fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer' }}>
                   + Nova
                 </motion.button>
               </div>
@@ -393,7 +393,7 @@ export default function QCPage() {
                   </div>
 
                   <motion.button whileTap={tapScale} onClick={submitCreate} disabled={actionLoading || !createForm.reference_id || !createForm.product_name}
-                    style={{ marginTop: '1rem', width: '100%', padding: '0.7rem', background: 'rgba(154,124,74,0.14)', border: '1px solid rgba(77,163,255,0.35)', borderRadius: '10px', color: '#d4b47a', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
+                    style={{ marginTop: '1rem', width: '100%', padding: '0.7rem', background: 'rgba(154,124,74,0.14)', border: '1px solid rgba(154,124,74,0.35)', borderRadius: '10px', color: '#d4b47a', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
                     {actionLoading ? '⏳ A criar…' : '+ Iniciar Inspeção'}
                   </motion.button>
                 </div>
@@ -563,7 +563,7 @@ export default function QCPage() {
                       placeholder="Notas do inspetor (opcional)"
                       style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem 0.625rem', color: 'rgb(200,215,235)', fontSize: '0.72rem', resize: 'vertical', lineHeight: 1.5, marginBottom: '0.625rem' }} />
                     <motion.button whileTap={tapScale} onClick={submitClose} disabled={actionLoading}
-                      style={{ width: '100%', padding: '0.65rem', background: 'rgba(184,151,94,0.14)', border: '1px solid rgba(99,230,190,0.3)', borderRadius: '9px', color: '#b8975e', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
+                      style={{ width: '100%', padding: '0.65rem', background: 'rgba(184,151,94,0.14)', border: '1px solid rgba(184,151,94,0.28)', borderRadius: '9px', color: '#b8975e', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
                       {actionLoading ? '⏳ A concluir…' : '✓ Fechar & Calcular Score AI'}
                     </motion.button>
                   </div>

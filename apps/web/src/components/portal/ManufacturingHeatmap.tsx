@@ -102,7 +102,7 @@ export function ManufacturingHeatmap({ stages, loading }: ManufacturingHeatmapPr
             ? `rgba(239,68,68,${0.04 + intensity * 0.1})`
             : hasWarning
             ? `rgba(245,158,11,${0.04 + intensity * 0.08})`
-            : `rgba(77,163,255,${0.03 + intensity * 0.07})`;
+            : `rgba(154,124,74,${0.03 + intensity * 0.07})`;
 
           return (
             <motion.div

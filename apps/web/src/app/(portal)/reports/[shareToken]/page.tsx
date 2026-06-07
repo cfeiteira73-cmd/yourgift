@@ -133,7 +133,7 @@ export default async function ROIReportPage({ params }: Props) {
         </div>
 
         {/* ROI Hero number */}
-        <div style={{ background: 'linear-gradient(135deg, rgba(99,230,190,0.06), rgba(77,163,255,0.04))', border: '1px solid rgba(184,151,94,0.14)', borderRadius: '20px', padding: '2.5rem', textAlign: 'center', marginBottom: '2rem' }}>
+        <div style={{ background: 'linear-gradient(135deg, rgba(184,151,94,0.08), rgba(154,124,74,0.04))', border: '1px solid rgba(184,151,94,0.14)', borderRadius: '20px', padding: '2.5rem', textAlign: 'center', marginBottom: '2rem' }}>
           <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#b8975e', marginBottom: '0.75rem' }}>Retorno sobre investimento</p>
           <p style={{ fontSize: '5rem', fontWeight: 900, letterSpacing: '-0.05em', color: '#b8975e', lineHeight: 1, marginBottom: '0.5rem' }}>
             {report.roiPct > 0 ? `${fmt(report.roiPct)}%` : '—'}
@@ -195,7 +195,7 @@ export default async function ROIReportPage({ params }: Props) {
         </div>
 
         {/* Market benchmarks */}
-        <div style={{ background: 'rgba(77,163,255,0.04)', border: '1px solid rgba(154,124,74,0.12)', borderRadius: '16px', padding: '1.75rem 2rem', marginBottom: '2rem' }}>
+        <div style={{ background: 'rgba(154,124,74,0.04)', border: '1px solid rgba(154,124,74,0.12)', borderRadius: '16px', padding: '1.75rem 2rem', marginBottom: '2rem' }}>
           <p style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#d4b47a', marginBottom: '1.25rem' }}>Benchmark vs. mercado</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
             {[

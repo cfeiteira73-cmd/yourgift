@@ -192,7 +192,7 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
                     onClick={() => setActiveTab(tab.id)}
                     style={{
                       flex: 1, padding: '0.4rem 0.5rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', border: 'none',
-                      background: activeTab === tab.id ? 'rgba(77,163,255,0.16)' : 'transparent',
+                      background: activeTab === tab.id ? 'rgba(154,124,74,0.14)' : 'transparent',
                       color: activeTab === tab.id ? '#d4b47a' : 'rgba(240,236,228,0.42)',
                       transition: 'all 150ms',
                     }}
@@ -294,7 +294,7 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
                               <div className="prog-track">
                                 <motion.div
                                   className="prog-fill"
-                                  style={{ background: `rgba(99,230,190,${0.7 - i * 0.1})` }}
+                                  style={{ background: `rgba(184,151,94,${0.7 - i * 0.1})` }}
                                   initial={{ width: 0 }}
                                   animate={{ width: `${Math.min((w.adjustedPredicted / Math.max(...forecast.forecast.map(f => f.adjustedPredicted), 1)) * 100, 100)}%` }}
                                   transition={{ duration: 0.7, delay: 0.2 + i * 0.1, ease: [0.16, 1, 0.3, 1] }}

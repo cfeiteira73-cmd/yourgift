@@ -80,7 +80,7 @@ function UploadZone({ onUpload }: { onUpload: (files: FileList) => void }) {
         borderRadius: '18px',
         padding: '2.5rem 2rem',
         textAlign: 'center',
-        background: dragging ? 'rgba(77,163,255,0.06)' : 'rgba(255,255,255,0.02)',
+        background: dragging ? 'rgba(154,124,74,0.08)' : 'rgba(255,255,255,0.02)',
         cursor: 'pointer',
         transition: 'all 200ms ease',
         marginBottom: '1.5rem',
@@ -145,9 +145,9 @@ function AssetCard({ asset, onDelete, selected, onSelect }: {
       onClick={() => onSelect(asset.id)}
       style={{
         background: selected
-          ? 'linear-gradient(145deg, rgba(154,124,74,0.10) 0%, rgba(77,163,255,0.04) 100%)'
+          ? 'linear-gradient(145deg, rgba(154,124,74,0.10) 0%, rgba(154,124,74,0.04) 100%)'
           : 'linear-gradient(145deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.02) 100%)',
-        border: `1px solid ${selected ? 'rgba(77,163,255,0.35)' : 'rgba(240,236,228,0.06)'}`,
+        border: `1px solid ${selected ? 'rgba(154,124,74,0.35)' : 'rgba(240,236,228,0.06)'}`,
         borderRadius: '14px',
         overflow: 'hidden',
         cursor: 'pointer',
@@ -227,7 +227,7 @@ function UploadProgress({ jobs }: { jobs: UploadJob[] }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       style={{
-        background: 'rgba(77,163,255,0.06)', border: '1px solid rgba(154,124,74,0.14)',
+        background: 'rgba(154,124,74,0.08)', border: '1px solid rgba(154,124,74,0.14)',
         borderRadius: '14px', padding: '1rem 1.25rem', marginBottom: '1.25rem',
       }}
     >
@@ -475,7 +475,7 @@ function AssetIntelligencePlatform() {
             onClick={() => setFilter(opt.key)}
             style={{
               padding: '0.4rem 0.875rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600,
-              border: `1px solid ${filter === opt.key ? 'rgba(77,163,255,0.35)' : 'rgba(240,236,228,0.06)'}`,
+              border: `1px solid ${filter === opt.key ? 'rgba(154,124,74,0.35)' : 'rgba(240,236,228,0.06)'}`,
               background: filter === opt.key ? 'rgba(154,124,74,0.12)' : 'rgba(240,236,228,0.04)',
               color: filter === opt.key ? '#d4b47a' : 'rgba(240,236,228,0.42)',
               cursor: 'pointer', transition: 'all 150ms',
@@ -548,7 +548,7 @@ function AssetIntelligencePlatform() {
                 style={{
                   display: 'flex', alignItems: 'center', gap: '1rem',
                   padding: '0.875rem 1.25rem',
-                  background: selected.has(asset.id) ? 'rgba(77,163,255,0.06)' : 'rgba(255,255,255,0.02)',
+                  background: selected.has(asset.id) ? 'rgba(154,124,74,0.08)' : 'rgba(255,255,255,0.02)',
                   borderBottom: i < filtered.length - 1 ? '1px solid rgba(240,236,228,0.04)' : 'none',
                   cursor: 'pointer', transition: 'background 150ms',
                 }}

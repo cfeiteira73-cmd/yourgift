@@ -305,7 +305,7 @@ export default function SalesIntelligencePage() {
                           onClick={() => setSelected(isSelected ? null : h)}
                           style={{
                             padding: '1rem', borderRadius: '12px',
-                            background: isSelected ? 'rgba(77,163,255,0.06)' : 'rgba(240,236,228,0.04)',
+                            background: isSelected ? 'rgba(154,124,74,0.08)' : 'rgba(240,236,228,0.04)',
                             border: `1px solid ${isSelected ? 'rgba(154,124,74,0.22)' : 'rgba(240,236,228,0.06)'}`,
                             cursor: 'pointer', transition: 'all 120ms',
                           }}
@@ -442,7 +442,7 @@ export default function SalesIntelligencePage() {
                           )}
                         </div>
                         <motion.button whileTap={tapScale} onClick={() => completeAction(act.id)}
-                          style={{ padding: '0.35rem 0.625rem', background: 'rgba(184,151,94,0.12)', border: '1px solid rgba(99,230,190,0.25)', borderRadius: '7px', color: '#b8975e', fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                          style={{ padding: '0.35rem 0.625rem', background: 'rgba(184,151,94,0.12)', border: '1px solid rgba(184,151,94,0.22)', borderRadius: '7px', color: '#b8975e', fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
                           ✓ Feito
                         </motion.button>
                       </div>

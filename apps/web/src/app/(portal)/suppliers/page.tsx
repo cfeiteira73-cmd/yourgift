@@ -164,7 +164,7 @@ function SupplierCard({ supplier, index }: { supplier: SupplierScore; index: num
         <span style={{ fontSize: '0.58rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '9999px',
           color: meta.status === 'active' ? '#b8975e' : 'rgb(245,158,11)',
           background: meta.status === 'active' ? 'rgba(184,151,94,0.10)' : 'rgba(245,158,11,0.1)',
-          border: `1px solid ${meta.status === 'active' ? 'rgba(99,230,190,0.25)' : 'rgba(245,158,11,0.25)'}`,
+          border: `1px solid ${meta.status === 'active' ? 'rgba(184,151,94,0.22)' : 'rgba(245,158,11,0.25)'}`,
         }}>
           {meta.status === 'active' ? '● Ativo' : '◌ Em breve'}
         </span>
@@ -400,7 +400,7 @@ function RoutingIntelligencePanel({ suppliers }: { suppliers: SupplierScore[] })
                   Gargalos de Produção
                 </div>
                 {bottlenecks.length === 0 ? (
-                  <div style={{ padding: '0.75rem', background: 'rgba(99,230,190,0.06)', borderRadius: '10px', border: '1px solid rgba(184,151,94,0.14)' }}>
+                  <div style={{ padding: '0.75rem', background: 'rgba(184,151,94,0.08)', borderRadius: '10px', border: '1px solid rgba(184,151,94,0.14)' }}>
                     <div style={{ fontSize: '0.75rem', color: '#b8975e', fontWeight: 700 }}>✓ Sem gargalos críticos</div>
                     <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.2rem' }}>Capacidade de produção dentro dos limites normais.</div>
                   </div>
@@ -610,7 +610,7 @@ export default function SuppliersPage() {
           <div style={{ display: 'flex', gap: '0.375rem', background: 'rgba(240,236,228,0.04)', padding: '3px', borderRadius: '9px', border: '1px solid rgba(240,236,228,0.06)' }}>
             {([['overall', 'Score Global'], ['quality', 'Qualidade'], ['delivery', 'Entrega']] as const).map(([key, label]) => (
               <button type="button" key={key}  onClick={() => setSortBy(key)}
-                style={{ padding: '0.25rem 0.625rem', borderRadius: '7px', fontSize: '0.68rem', fontWeight: 600, cursor: 'pointer', border: 'none', background: sortBy === key ? 'rgba(77,163,255,0.18)' : 'transparent', color: sortBy === key ? '#d4b47a' : 'rgba(240,236,228,0.42)' }}>
+                style={{ padding: '0.25rem 0.625rem', borderRadius: '7px', fontSize: '0.68rem', fontWeight: 600, cursor: 'pointer', border: 'none', background: sortBy === key ? 'rgba(154,124,74,0.16)' : 'transparent', color: sortBy === key ? '#d4b47a' : 'rgba(240,236,228,0.42)' }}>
                 {label}
               </button>
             ))}

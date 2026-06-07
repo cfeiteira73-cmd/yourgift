@@ -72,7 +72,7 @@ function DroppableColumn({
     <div
       ref={setNodeRef}
       style={{
-        background: isOver ? 'rgba(77,163,255,0.06)' : 'rgba(255,255,255,0.018)',
+        background: isOver ? 'rgba(154,124,74,0.08)' : 'rgba(255,255,255,0.018)',
         border: `1px solid ${isOver ? 'rgba(154,124,74,0.28)' : stage.border}`,
         borderRadius: '12px',
         padding: '0.75rem 0.625rem',
@@ -98,7 +98,7 @@ function DroppableColumn({
           {children}
           {items.length === 0 && (
             <div style={{
-              textAlign: 'center', padding: '1.5rem 0', color: 'rgb(50,62,80)',
+              textAlign: 'center', padding: '1.5rem 0', color: 'rgba(240,236,228,0.18)',
               fontSize: '0.65rem', border: '1px dashed rgba(240,236,228,0.06)', borderRadius: '8px',
             }}>
               Arrasta aqui

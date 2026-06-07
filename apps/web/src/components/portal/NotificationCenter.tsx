@@ -195,7 +195,7 @@ export function NotificationCenter() {
                   type="button" onClick={markAllRead}
                   style={{
                     background: 'none', border: 'none', cursor: 'pointer',
-                    color: 'rgba(77,163,255,0.8)', fontSize: 10, fontWeight: 500,
+                    color: 'rgba(184,151,94,0.65)', fontSize: 10, fontWeight: 500,
                   }}
                 >
                   Marcar todas lidas
@@ -221,7 +221,7 @@ export function NotificationCenter() {
                   style={{
                     padding: '10px 16px',
                     borderBottom: '1px solid rgba(240,236,228,0.04)',
-                    background: n.read_at ? 'transparent' : 'rgba(77,163,255,0.04)',
+                    background: n.read_at ? 'transparent' : 'rgba(154,124,74,0.04)',
                     cursor: 'pointer',
                   }}
                   onClick={() => { if (!n.read_at) markRead(n.id); }}
@@ -267,7 +267,7 @@ export function NotificationCenter() {
                           onClick={e => { e.stopPropagation(); setOpen(false); }}
                           style={{
                             display: 'inline-block', marginTop: 4,
-                            color: 'rgba(77,163,255,0.8)', fontSize: 10, fontWeight: 500,
+                            color: 'rgba(184,151,94,0.65)', fontSize: 10, fontWeight: 500,
                             textDecoration: 'none',
                           }}
                         >

@@ -210,7 +210,7 @@ export function AICopilot() {
               padding: '0.875rem 1.125rem',
               borderBottom: '1px solid rgba(240,236,228,0.06)',
               display: 'flex', alignItems: 'center', gap: '0.625rem',
-              background: 'rgba(77,163,255,0.04)',
+              background: 'rgba(154,124,74,0.04)',
             }}>
               <div style={{
                 width: '34px', height: '34px', borderRadius: '10px',

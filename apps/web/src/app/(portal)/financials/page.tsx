@@ -106,7 +106,7 @@ export default function FinancialsPage() {
             {(['30d', '90d', '12m'] as const).map(p => (
               <motion.button key={p} type="button" whileTap={tapScale}
                 onClick={() => { setPeriod(p); load(p); }}
-                style={{ padding: '0.3rem 0.625rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', background: period === p ? 'rgba(77,163,255,0.16)' : 'rgba(240,236,228,0.04)', color: period === p ? '#d4b47a' : 'rgba(240,236,228,0.42)', border: period === p ? '1px solid rgba(154,124,74,0.28)' : '1px solid rgba(240,236,228,0.06)', transition: 'all 150ms' }}>
+                style={{ padding: '0.3rem 0.625rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', background: period === p ? 'rgba(154,124,74,0.14)' : 'rgba(240,236,228,0.04)', color: period === p ? '#d4b47a' : 'rgba(240,236,228,0.42)', border: period === p ? '1px solid rgba(154,124,74,0.28)' : '1px solid rgba(240,236,228,0.06)', transition: 'all 150ms' }}>
                 {p}
               </motion.button>
             ))}
@@ -170,7 +170,7 @@ export default function FinancialsPage() {
                 { id: 'clients', label: 'Top Clientes', adminOnly: true },
               ] as const).filter(t => !('adminOnly' in t) || !t.adminOnly || isAdmin).map(tab => (
                 <button type="button" key={tab.id}  onClick={() => setActiveTab(tab.id)}
-                  style={{ flex: 1, padding: '0.4rem 0.5rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', border: 'none', background: activeTab === tab.id ? 'rgba(77,163,255,0.16)' : 'transparent', color: activeTab === tab.id ? '#d4b47a' : 'rgba(240,236,228,0.42)', transition: 'all 150ms' }}>
+                  style={{ flex: 1, padding: '0.4rem 0.5rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', border: 'none', background: activeTab === tab.id ? 'rgba(154,124,74,0.14)' : 'transparent', color: activeTab === tab.id ? '#d4b47a' : 'rgba(240,236,228,0.42)', transition: 'all 150ms' }}>
                   {tab.label}
                 </button>
               ))}
@@ -255,7 +255,7 @@ export default function FinancialsPage() {
                                 </div>
                               </div>
                               <div className="prog-track">
-                                <motion.div className="prog-fill" style={{ background: `rgba(99,230,190,${0.9 - i * 0.08})` }}
+                                <motion.div className="prog-fill" style={{ background: `rgba(184,151,94,${0.9 - i * 0.08})` }}
                                   initial={{ width: 0 }} animate={{ width: `${(c.revenue / maxClientRev) * 100}%` }}
                                   transition={{ duration: 0.6, delay: 0.15 + i * 0.07, ease: [0.16, 1, 0.3, 1] }} />
                               </div>

@@ -48,7 +48,7 @@ type SubmissionStatus = 'draft' | 'submitted' | 'in_review' | 'revision_requeste
 const STATUS_CONFIG: Record<SubmissionStatus, { label: string; color: string; bg: string; emoji: string }> = {
   draft:              { label: 'Rascunho',            color: 'rgba(240,236,228,0.24)',    bg: 'rgba(80,92,110,0.15)',    emoji: '📝' },
   submitted:          { label: 'Submetido',            color: '#d4b47a',   bg: 'rgba(154,124,74,0.12)',   emoji: '📤' },
-  in_review:          { label: 'Em Revisão',           color: '#b8975e',  bg: 'rgba(116,231,255,0.12)',  emoji: '🔍' },
+  in_review:          { label: 'Em Revisão',           color: '#b8975e',  bg: 'rgba(154,124,74,0.12)',  emoji: '🔍' },
   revision_requested: { label: 'Revisão Pedida',       color: 'rgb(245,158,11)',   bg: 'rgba(245,158,11,0.12)',   emoji: '🔄' },
   approved:           { label: 'Aprovado',             color: '#b8975e',   bg: 'rgba(184,151,94,0.12)',   emoji: '✅' },
   rejected:           { label: 'Rejeitado',            color: 'rgb(239,68,68)',    bg: 'rgba(239,68,68,0.12)',    emoji: '❌' },
@@ -745,7 +745,7 @@ export default function ArtworkPage() {
                             />
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
                               {[
-                                { action: 'approve' as const,  label: '✅ Aprovar',         bg: 'rgba(184,151,94,0.14)',  border: 'rgba(99,230,190,0.35)',  color: '#b8975e' },
+                                { action: 'approve' as const,  label: '✅ Aprovar',         bg: 'rgba(184,151,94,0.14)',  border: 'rgba(184,151,94,0.32)',  color: '#b8975e' },
                                 { action: 'revision' as const, label: '🔄 Pedir Revisão',   bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.35)', color: 'rgb(245,158,11)' },
                                 { action: 'reject' as const,   label: '❌ Rejeitar',         bg: 'rgba(239,68,68,0.12)',  border: 'rgba(239,68,68,0.35)',  color: 'rgb(239,68,68)' },
                               ].map(btn => (

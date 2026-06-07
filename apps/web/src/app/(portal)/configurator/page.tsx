@@ -111,7 +111,7 @@ function ProductCard({ product, selected, onSelect }: { product: Product; select
         borderRadius: '16px',
         border: selected ? '1.5px solid #d4b47a' : '1px solid rgba(240,236,228,0.06)',
         background: selected
-          ? 'linear-gradient(135deg,rgba(154,124,74,0.12) 0%,rgba(116,231,255,0.06) 100%)'
+          ? 'linear-gradient(135deg,rgba(154,124,74,0.12) 0%,rgba(154,124,74,0.08) 100%)'
           : 'linear-gradient(135deg,rgba(240,236,228,0.04) 0%,rgba(255,255,255,0.01) 100%)',
         cursor: 'pointer',
         overflow: 'hidden',
@@ -760,7 +760,7 @@ export default function ConfiguratorPage() {
               <div style={{ position: 'sticky', top: '1.5rem' }}>
                 <div className="yg-card" style={{ padding: '1.5rem', borderColor: 'rgba(154,124,74,0.14)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
-                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#b8975e', boxShadow: '0 0 6px rgba(99,230,190,0.7)' }} />
+                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#b8975e', boxShadow: '0 0 6px rgba(184,151,94,0.55)' }} />
                     <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#b8975e', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                       Pricing em Tempo Real
                     </span>
@@ -819,7 +819,7 @@ export default function ConfiguratorPage() {
                   </div>
 
                   {/* Delivery estimate */}
-                  <div style={{ padding: '0.75rem', background: 'rgba(99,230,190,0.06)', borderRadius: '10px', border: '1px solid rgba(184,151,94,0.14)', marginBottom: '1.25rem' }}>
+                  <div style={{ padding: '0.75rem', background: 'rgba(184,151,94,0.08)', borderRadius: '10px', border: '1px solid rgba(184,151,94,0.14)', marginBottom: '1.25rem' }}>
                     <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>🚚 Entrega estimada</div>
                     <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#b8975e' }}>{deliveryDate}</div>
                     <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.1rem' }}>{deliveryDays} dias úteis após aprovação de arte</div>
@@ -901,7 +901,7 @@ export default function ConfiguratorPage() {
                 </div>
 
                 {brandingNotes && (
-                  <div style={{ marginBottom: '1.25rem', padding: '0.75rem', background: 'rgba(77,163,255,0.05)', borderRadius: '10px', border: '1px solid rgba(154,124,74,0.12)' }}>
+                  <div style={{ marginBottom: '1.25rem', padding: '0.75rem', background: 'rgba(154,124,74,0.06)', borderRadius: '10px', border: '1px solid rgba(154,124,74,0.12)' }}>
                     <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.3rem' }}>Notas de Arte</div>
                     <div style={{ fontSize: '0.75rem', color: 'rgb(170,185,205)', lineHeight: 1.5 }}>{brandingNotes}</div>
                   </div>
@@ -969,7 +969,7 @@ export default function ConfiguratorPage() {
                     <motion.div
                       whileTap={tapScale}
                       style={{
-                        background: 'rgba(116,231,255,0.08)', border: '1px solid rgba(184,151,94,0.18)',
+                        background: 'rgba(154,124,74,0.08)', border: '1px solid rgba(184,151,94,0.18)',
                         borderRadius: '12px', padding: '0.75rem',
                         color: '#b8975e', fontSize: '0.78rem', fontWeight: 600,
                         cursor: 'pointer', textAlign: 'center',

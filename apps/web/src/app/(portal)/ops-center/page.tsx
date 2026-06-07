@@ -527,7 +527,7 @@ function WebhooksTab({
                 disabled={actioning === w.id}
                 style={{
                   padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600,
-                  background: 'rgba(154,124,74,0.14)', color: '#4da3ff',
+                  background: 'rgba(154,124,74,0.14)', color: '#d4b47a',
                   border: '1px solid rgba(154,124,74,0.18)', cursor: actioning === w.id ? 'not-allowed' : 'pointer',
                 }}
               >

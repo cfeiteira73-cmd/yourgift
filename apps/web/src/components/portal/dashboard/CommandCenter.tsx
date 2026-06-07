@@ -213,8 +213,8 @@ const STATUS_CFG: Record<string, { label: string; color: string; bg: string }> =
   confirmed:          { label: 'Confirmado',   color: '#d4b47a',  bg: 'rgba(154,124,74,0.12)'  },
   payment_confirmed:  { label: 'Pago',         color: '#d4b47a',  bg: 'rgba(154,124,74,0.12)'  },
   approved:           { label: 'Aprovada',     color: '#b8975e',  bg: 'rgba(184,151,94,0.12)'  },
-  producing:          { label: 'Em produção',  color: '#b8975e', bg: 'rgba(116,231,255,0.12)' },
-  in_production:      { label: 'Em produção',  color: '#b8975e', bg: 'rgba(116,231,255,0.12)' },
+  producing:          { label: 'Em produção',  color: '#b8975e', bg: 'rgba(154,124,74,0.12)' },
+  in_production:      { label: 'Em produção',  color: '#b8975e', bg: 'rgba(154,124,74,0.12)' },
   shipped:            { label: 'Em trânsito',  color: '#d4b47a',  bg: 'rgba(154,124,74,0.12)'  },
   delivered:          { label: 'Entregue',     color: '#b8975e',  bg: 'rgba(184,151,94,0.12)'  },
   cancelled:          { label: 'Cancelado',    color: 'rgb(239,68,68)',   bg: 'rgba(239,68,68,0.12)'   },
@@ -407,7 +407,7 @@ export function CommandCenter({
               borderRadius: '10px', padding: '0.45rem 2.5rem 0.45rem 2.125rem',
               fontSize: '0.75rem', color: 'rgba(240,236,228,0.72)', outline: 'none',
             }}
-              onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(77,163,255,0.35)')}
+              onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(154,124,74,0.35)')}
               onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(240,236,228,0.06)')}
             />
             <kbd style={{

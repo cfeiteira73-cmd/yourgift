@@ -52,7 +52,7 @@ export default async function ProductsPage({
       <style>{`
         .product-card-link:hover {
           border-color: rgba(154,124,74,0.22) !important;
-          background: rgba(77,163,255,0.05) !important;
+          background: rgba(154,124,74,0.06) !important;
         }
       `}</style>
 

@@ -57,7 +57,7 @@ type PanelMode = 'list' | 'detail' | 'create' | 'negotiate' | 'memory' | 'analyt
 const STATUS_CFG: Record<RFQStatus, { label: string; color: string; bg: string; emoji: string }> = {
   draft:               { label: 'Rascunho',          color: 'rgba(240,236,228,0.24)',    bg: 'rgba(80,92,110,0.12)',    emoji: '📝' },
   sent:                { label: 'Enviado',            color: '#d4b47a',   bg: 'rgba(154,124,74,0.12)',   emoji: '📤' },
-  responses_received:  { label: 'Respostas',         color: '#b8975e',  bg: 'rgba(116,231,255,0.12)',  emoji: '📬' },
+  responses_received:  { label: 'Respostas',         color: '#b8975e',  bg: 'rgba(154,124,74,0.12)',  emoji: '📬' },
   negotiating:         { label: 'Em Negociação',     color: 'rgb(245,158,11)',   bg: 'rgba(245,158,11,0.12)',   emoji: '🤝' },
   awarded:             { label: 'Adjudicado',        color: '#b8975e',   bg: 'rgba(184,151,94,0.12)',   emoji: '✅' },
   cancelled:           { label: 'Cancelado',         color: 'rgb(239,68,68)',    bg: 'rgba(239,68,68,0.12)',    emoji: '❌' },
@@ -310,7 +310,7 @@ function AddBidPanel({ rfqId, rfqQty, onAdded }: { rfqId: string; rfqQty: number
         </div>
       </div>
       <motion.button whileTap={tapScale} onClick={submit} disabled={loading || !form.supplier_name || !form.unit_price} style={{
-        background: form.supplier_name && form.unit_price ? 'rgba(77,163,255,0.18)' : 'rgba(240,236,228,0.04)',
+        background: form.supplier_name && form.unit_price ? 'rgba(154,124,74,0.16)' : 'rgba(240,236,228,0.04)',
         border: form.supplier_name && form.unit_price ? '1px solid rgba(154,124,74,0.35)' : '1px solid rgba(240,236,228,0.06)',
         borderRadius: '8px', padding: '0.5rem 1rem', color: form.supplier_name && form.unit_price ? '#d4b47a' : 'rgba(240,236,228,0.24)',
         fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
@@ -320,7 +320,7 @@ function AddBidPanel({ rfqId, rfqQty, onAdded }: { rfqId: string; rfqQty: number
 
       {result && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-          style={{ marginTop: '0.75rem', padding: '0.625rem 0.75rem', background: 'rgba(99,230,190,0.06)', borderRadius: '10px', border: '1px solid rgba(184,151,94,0.14)' }}>
+          style={{ marginTop: '0.75rem', padding: '0.625rem 0.75rem', background: 'rgba(184,151,94,0.08)', borderRadius: '10px', border: '1px solid rgba(184,151,94,0.14)' }}>
           <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#b8975e', marginBottom: '0.2rem' }}>✓ Proposta registada — Score AI: {result.score}/100</div>
           {result.insight && <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.42)', lineHeight: 1.5 }}>{result.insight}</div>}
         </motion.div>
@@ -505,7 +505,7 @@ export default function ProcurementPage() {
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             {isAdmin && (
               <>
-                <motion.button whileTap={tapScale} onClick={loadAnalytics} style={{ background: 'rgba(184,151,94,0.10)', border: '1px solid rgba(99,230,190,0.25)', borderRadius: '10px', padding: '0.5rem 0.875rem', color: '#b8975e', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}>
+                <motion.button whileTap={tapScale} onClick={loadAnalytics} style={{ background: 'rgba(184,151,94,0.10)', border: '1px solid rgba(184,151,94,0.22)', borderRadius: '10px', padding: '0.5rem 0.875rem', color: '#b8975e', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}>
                   📊 Analytics
                 </motion.button>
                 <motion.button whileTap={tapScale} onClick={loadMemory} style={{ background: 'rgba(167,139,250,0.1)', border: '1px solid rgba(167,139,250,0.25)', borderRadius: '10px', padding: '0.5rem 0.875rem', color: 'rgb(167,139,250)', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}>
@@ -513,7 +513,7 @@ export default function ProcurementPage() {
                 </motion.button>
               </>
             )}
-            <motion.button whileTap={tapScale} onClick={() => setPanelMode('create')} style={{ background: 'linear-gradient(135deg,rgba(154,124,74,0.18),rgba(184,151,94,0.10))', border: '1px solid rgba(77,163,255,0.35)', borderRadius: '10px', padding: '0.5rem 1rem', color: '#d4b47a', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
+            <motion.button whileTap={tapScale} onClick={() => setPanelMode('create')} style={{ background: 'linear-gradient(135deg,rgba(154,124,74,0.18),rgba(184,151,94,0.10))', border: '1px solid rgba(154,124,74,0.35)', borderRadius: '10px', padding: '0.5rem 1rem', color: '#d4b47a', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
               + Novo RFQ
             </motion.button>
           </div>
@@ -528,7 +528,7 @@ export default function ProcurementPage() {
             <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap', marginBottom: '0.875rem' }}>
               {statusTabs.map(tab => (
                 <button type="button" key={tab.id} onClick={() => { setStatusFilter(tab.id); loadList(tab.id); }}
-                  style={{ background: statusFilter === tab.id ? 'rgba(77,163,255,0.18)' : 'rgba(240,236,228,0.04)', border: statusFilter === tab.id ? '1px solid rgba(154,124,74,0.35)' : '1px solid rgba(240,236,228,0.06)', borderRadius: '8px', padding: '0.3rem 0.6rem', color: statusFilter === tab.id ? '#d4b47a' : 'rgba(240,236,228,0.42)', fontSize: '0.62rem', fontWeight: 600, cursor: 'pointer' }}>
+                  style={{ background: statusFilter === tab.id ? 'rgba(154,124,74,0.16)' : 'rgba(240,236,228,0.04)', border: statusFilter === tab.id ? '1px solid rgba(154,124,74,0.35)' : '1px solid rgba(240,236,228,0.06)', borderRadius: '8px', padding: '0.3rem 0.6rem', color: statusFilter === tab.id ? '#d4b47a' : 'rgba(240,236,228,0.42)', fontSize: '0.62rem', fontWeight: 600, cursor: 'pointer' }}>
                   {tab.label}
                 </button>
               ))}
@@ -694,7 +694,7 @@ export default function ProcurementPage() {
 
                   {/* Winner / savings */}
                   {selectedRFQ.winner_supplier && (
-                    <div style={{ padding: '0.75rem', background: 'rgba(99,230,190,0.07)', borderRadius: '10px', border: '1px solid rgba(184,151,94,0.18)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ padding: '0.75rem', background: 'rgba(184,151,94,0.08)', borderRadius: '10px', border: '1px solid rgba(184,151,94,0.18)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
                         <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.1rem' }}>Adjudicado a</div>
                         <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#b8975e' }}>🏆 {selectedRFQ.winner_supplier}</div>
@@ -754,7 +754,7 @@ export default function ProcurementPage() {
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         {rfqResponses.map((r, i) => (
-                          <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', padding: '0.75rem', background: r.status === 'accepted' ? 'rgba(99,230,190,0.06)' : 'rgba(240,236,228,0.04)', borderRadius: '10px', border: r.status === 'accepted' ? '1px solid rgba(184,151,94,0.18)' : '1px solid rgba(240,236,228,0.06)' }}>
+                          <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', padding: '0.75rem', background: r.status === 'accepted' ? 'rgba(184,151,94,0.08)' : 'rgba(240,236,228,0.04)', borderRadius: '10px', border: r.status === 'accepted' ? '1px solid rgba(184,151,94,0.18)' : '1px solid rgba(240,236,228,0.06)' }}>
                             {r.ai_score != null && <ScoreRing score={r.ai_score} />}
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
@@ -771,7 +771,7 @@ export default function ProcurementPage() {
                             </div>
                             {isAdmin && selectedRFQ.status !== 'awarded' && (
                               <motion.button whileTap={tapScale} onClick={() => awardToSupplier(r)} disabled={awardLoading}
-                                style={{ background: 'rgba(184,151,94,0.12)', border: '1px solid rgba(99,230,190,0.3)', borderRadius: '8px', padding: '0.4rem 0.75rem', color: '#b8975e', fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                                style={{ background: 'rgba(184,151,94,0.12)', border: '1px solid rgba(184,151,94,0.28)', borderRadius: '8px', padding: '0.4rem 0.75rem', color: '#b8975e', fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
                                 {awardLoading ? '…' : '🏆 Adjudicar'}
                               </motion.button>
                             )}

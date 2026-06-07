@@ -42,7 +42,7 @@ interface ConfirmDialogProps {
 const CONFIRM_STYLES = {
   danger:  { bg: 'rgba(239,68,68,0.15)',   text: '#ef4444', border: 'rgba(239,68,68,0.3)',  hover: 'rgba(239,68,68,0.25)'  },
   warning: { bg: 'rgba(245,158,11,0.15)',  text: '#f59e0b', border: 'rgba(245,158,11,0.3)', hover: 'rgba(245,158,11,0.25)' },
-  primary: { bg: 'rgba(154,124,74,0.14)',  text: '#4da3ff', border: 'rgba(154,124,74,0.28)', hover: 'rgba(154,124,74,0.22)' },
+  primary: { bg: 'rgba(154,124,74,0.14)',  text: '#d4b47a', border: 'rgba(154,124,74,0.28)', hover: 'rgba(154,124,74,0.22)' },
 };
 
 export function ConfirmDialog({

@@ -242,8 +242,8 @@ export default function RunbooksPage() {
                 className="yg-card"
                 style={{
                   padding: '1rem 1.125rem', cursor: 'pointer',
-                  borderColor: selectedRunbook?.id === rb.id ? 'rgba(77,163,255,0.35)' : 'rgba(240,236,228,0.06)',
-                  background: selectedRunbook?.id === rb.id ? 'linear-gradient(180deg,rgba(77,163,255,0.06) 0%,rgba(255,255,255,0.02) 100%)' : undefined,
+                  borderColor: selectedRunbook?.id === rb.id ? 'rgba(154,124,74,0.35)' : 'rgba(240,236,228,0.06)',
+                  background: selectedRunbook?.id === rb.id ? 'linear-gradient(180deg,rgba(154,124,74,0.08) 0%,rgba(255,255,255,0.02) 100%)' : undefined,
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.375rem' }}>
@@ -360,7 +360,7 @@ export default function RunbooksPage() {
                 </div>
 
                 {/* Escalation */}
-                <div style={{ padding: '0.5rem 0.75rem', background: 'rgba(77,163,255,0.07)', border: '1px solid rgba(154,124,74,0.14)', borderRadius: '8px' }}>
+                <div style={{ padding: '0.5rem 0.75rem', background: 'rgba(154,124,74,0.08)', border: '1px solid rgba(154,124,74,0.14)', borderRadius: '8px' }}>
                   <div style={{ fontSize: '0.58rem', fontWeight: 700, color: '#d4b47a', marginBottom: '0.2rem' }}>ESCALAÇÃO</div>
                   <div style={{ fontSize: '0.68rem', color: 'rgb(160,175,195)' }}>{selectedRunbook.escalation}</div>
                 </div>
@@ -369,7 +369,7 @@ export default function RunbooksPage() {
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'rgba(184,151,94,0.10)', border: '1px solid rgba(99,230,190,0.25)', borderRadius: '10px', textAlign: 'center' }}
+                    style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'rgba(184,151,94,0.10)', border: '1px solid rgba(184,151,94,0.22)', borderRadius: '10px', textAlign: 'center' }}
                   >
                     <div style={{ fontSize: '1.25rem', marginBottom: '0.2rem' }}>✅</div>
                     <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#b8975e' }}>Runbook completo!</div>

@@ -81,7 +81,7 @@ export function OrderTimeline({ steps, currentStatus }: OrderTimelineProps) {
                     flex: 1,
                     minHeight: '24px',
                     background: isCompleted
-                      ? 'linear-gradient(to bottom, #b8975e, rgba(99,230,190,0.3))'
+                      ? 'linear-gradient(to bottom, #b8975e, rgba(184,151,94,0.28))'
                       : 'rgba(240,236,228,0.06)',
                     margin: '4px 0',
                   }}

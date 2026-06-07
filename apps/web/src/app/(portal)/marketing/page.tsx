@@ -89,7 +89,7 @@ Tom: profissional e criativo. Responde em Português de Portugal.`,
   }
 
   return (
-    <div style={{ background: 'linear-gradient(135deg, rgba(77,163,255,0.06) 0%, rgba(99,230,190,0.04) 100%)', border: '1px solid rgba(77,163,255,0.18)', borderRadius: '16px', padding: '1.375rem', marginBottom: '1.5rem' }}>
+    <div style={{ background: 'linear-gradient(135deg, rgba(154,124,74,0.08) 0%, rgba(184,151,94,0.04) 100%)', border: '1px solid rgba(154,124,74,0.16)', borderRadius: '16px', padding: '1.375rem', marginBottom: '1.5rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
         <span style={{ fontSize: '1.125rem' }}>✦</span>
         <div>

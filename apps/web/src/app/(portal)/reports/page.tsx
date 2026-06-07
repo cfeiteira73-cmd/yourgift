@@ -296,7 +296,7 @@ function AdminReports({ allOrders, allQuotes, allClients }: {
         <div style={{ display: 'flex', gap: '0.375rem', background: 'rgba(240,236,228,0.04)', padding: '4px', borderRadius: '10px', border: '1px solid rgba(240,236,228,0.06)' }}>
           {(['3m', '6m', '12m'] as const).map((p) => (
             <motion.button key={p} type="button" onClick={() => setPeriod(p)} whileTap={{ scale: 0.95 }}
-              style={{ padding: '0.3rem 0.75rem', borderRadius: '7px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', transition: 'all 150ms ease', background: period === p ? 'rgba(77,163,255,0.18)' : 'transparent', color: period === p ? '#d4b47a' : 'rgba(240,236,228,0.42)', border: 'none' }}>
+              style={{ padding: '0.3rem 0.75rem', borderRadius: '7px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', transition: 'all 150ms ease', background: period === p ? 'rgba(154,124,74,0.16)' : 'transparent', color: period === p ? '#d4b47a' : 'rgba(240,236,228,0.42)', border: 'none' }}>
               {p === '3m' ? '3 meses' : p === '6m' ? '6 meses' : '12 meses'}
             </motion.button>
           ))}
@@ -334,7 +334,7 @@ function AdminReports({ allOrders, allQuotes, allClients }: {
       <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '1rem', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '10px', padding: '4px', width: 'fit-content' }}>
         {TABS.map(tab => (
           <motion.button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} whileTap={{ scale: 0.96 }}
-            style={{ padding: '0.375rem 1rem', borderRadius: '7px', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', border: 'none', transition: 'all 150ms', background: activeTab === tab.id ? 'rgba(77,163,255,0.18)' : 'transparent', color: activeTab === tab.id ? '#d4b47a' : 'rgba(240,236,228,0.42)' }}>
+            style={{ padding: '0.375rem 1rem', borderRadius: '7px', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', border: 'none', transition: 'all 150ms', background: activeTab === tab.id ? 'rgba(154,124,74,0.16)' : 'transparent', color: activeTab === tab.id ? '#d4b47a' : 'rgba(240,236,228,0.42)' }}>
             {tab.label}
           </motion.button>
         ))}
@@ -602,7 +602,7 @@ function ClientReports({ client, orders, quotes }: {
         <div style={{ display: 'flex', gap: '0.375rem', background: 'rgba(240,236,228,0.04)', padding: '4px', borderRadius: '10px', border: '1px solid rgba(240,236,228,0.06)' }}>
           {(['3m', '6m', '12m'] as const).map((p) => (
             <motion.button key={p} type="button" onClick={() => setPeriod(p)} whileTap={{ scale: 0.95 }}
-              style={{ padding: '0.3rem 0.75rem', borderRadius: '7px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', transition: 'all 150ms ease', background: period === p ? 'rgba(77,163,255,0.18)' : 'transparent', color: period === p ? '#d4b47a' : 'rgba(240,236,228,0.42)', border: 'none' }}>
+              style={{ padding: '0.3rem 0.75rem', borderRadius: '7px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', transition: 'all 150ms ease', background: period === p ? 'rgba(154,124,74,0.16)' : 'transparent', color: period === p ? '#d4b47a' : 'rgba(240,236,228,0.42)', border: 'none' }}>
               {p === '3m' ? '3 meses' : p === '6m' ? '6 meses' : '12 meses'}
             </motion.button>
           ))}

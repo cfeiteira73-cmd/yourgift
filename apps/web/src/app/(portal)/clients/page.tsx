@@ -36,8 +36,8 @@ interface Stats { orders: number; quotes: number; totalSpend: number; }
 // ── Tier config ───────────────────────────────────────────────────────────────
 
 const TIER_CFG: Record<string, { label: string; color: string; bg: string; border: string }> = {
-  premium:    { label: 'Premium',    color: '#b8975e',  bg: 'rgba(184,151,94,0.10)',  border: 'rgba(99,230,190,0.25)'  },
-  enterprise: { label: 'Enterprise', color: '#b8975e', bg: 'rgba(184,151,94,0.10)', border: 'rgba(116,231,255,0.25)' },
+  premium:    { label: 'Premium',    color: '#b8975e',  bg: 'rgba(184,151,94,0.10)',  border: 'rgba(184,151,94,0.22)'  },
+  enterprise: { label: 'Enterprise', color: '#b8975e', bg: 'rgba(184,151,94,0.10)', border: 'rgba(154,124,74,0.22)' },
   standard:   { label: 'Standard',   color: 'rgba(240,236,228,0.42)', bg: 'rgba(120,130,150,0.1)', border: 'rgba(120,130,150,0.2)'  },
   trial:      { label: 'Trial',       color: 'rgb(245,158,11)', bg: 'rgba(245,158,11,0.1)',  border: 'rgba(245,158,11,0.2)'   },
 };
@@ -121,7 +121,7 @@ function ClientRow({ client, index, onSelect }: {
         {timeAgo(client.created_at)}
       </td>
       <td style={{ padding: '0.75rem 1rem' }}>
-        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: (client.activeOrders ?? 0) > 0 ? '#b8975e' : 'rgb(50,62,80)', boxShadow: (client.activeOrders ?? 0) > 0 ? '0 0 6px rgba(99,230,190,0.5)' : 'none' }} />
+        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: (client.activeOrders ?? 0) > 0 ? '#b8975e' : 'rgba(240,236,228,0.18)', boxShadow: (client.activeOrders ?? 0) > 0 ? '0 0 6px rgba(184,151,94,0.45)' : 'none' }} />
       </td>
     </motion.tr>
   );
@@ -197,7 +197,7 @@ function ClientDrawer({ client, onClose }: { client: ClientWithStats; onClose: (
           ✉ Contactar cliente
         </a>
         <a href="/orders"
-          style={{ display: 'block', textAlign: 'center', padding: '0.6rem', background: 'rgba(99,230,190,0.06)', border: '1px solid rgba(184,151,94,0.18)', borderRadius: '9px', fontSize: '0.75rem', fontWeight: 600, color: '#b8975e', textDecoration: 'none' }}>
+          style={{ display: 'block', textAlign: 'center', padding: '0.6rem', background: 'rgba(184,151,94,0.08)', border: '1px solid rgba(184,151,94,0.18)', borderRadius: '9px', fontSize: '0.75rem', fontWeight: 600, color: '#b8975e', textDecoration: 'none' }}>
           📦 Ver encomendas
         </a>
       </div>
@@ -383,7 +383,7 @@ export default function ClientsPage() {
             </svg>
             <input type="text" placeholder="Pesquisar por nome ou empresa..." value={search} onChange={e => setSearch(e.target.value)}
               style={{ width: '100%', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '11px', padding: '0.6rem 1rem 0.6rem 2.5rem', fontSize: '0.82rem', color: 'rgba(240,236,228,0.72)', outline: 'none', boxSizing: 'border-box' }}
-              onFocus={e => (e.currentTarget.style.borderColor = 'rgba(77,163,255,0.35)')}
+              onFocus={e => (e.currentTarget.style.borderColor = 'rgba(154,124,74,0.35)')}
               onBlur={e => (e.currentTarget.style.borderColor = 'rgba(240,236,228,0.06)')}
             />
           </div>

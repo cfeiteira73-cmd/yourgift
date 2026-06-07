@@ -409,7 +409,7 @@ export default function CockpitPage() {
                 onClick={() => handlePeriodChange(p)}
                 style={{
                   padding: '0.3rem 0.625rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer',
-                  background: period === p ? 'rgba(77,163,255,0.16)' : 'rgba(240,236,228,0.04)',
+                  background: period === p ? 'rgba(154,124,74,0.14)' : 'rgba(240,236,228,0.04)',
                   color: period === p ? '#d4b47a' : 'rgba(240,236,228,0.42)',
                   border: period === p ? '1px solid rgba(154,124,74,0.28)' : '1px solid rgba(240,236,228,0.06)',
                   transition: 'all 150ms',

@@ -313,7 +313,7 @@ export function ReorderIntelligence() {
             ? 'rgba(239,68,68,0.06)'
             : pattern.daysUntilReorder <= 7
             ? 'rgba(245,158,11,0.06)'
-            : 'rgba(77,163,255,0.05)',
+            : 'rgba(154,124,74,0.06)',
           border: `1px solid ${pattern.isOverdue ? 'rgba(239,68,68,0.2)' : pattern.daysUntilReorder <= 7 ? 'rgba(245,158,11,0.2)' : 'rgba(154,124,74,0.14)'}`,
           borderRadius: 14,
         }}
@@ -403,7 +403,7 @@ export function ReorderIntelligence() {
           transition={{ ...springGentle, delay: 0.12 }}
           style={{
             padding: '14px 16px',
-            background: 'rgba(99,230,190,0.05)',
+            background: 'rgba(184,151,94,0.06)',
             border: '1px solid rgba(184,151,94,0.12)',
             borderRadius: 12,
             display: 'flex', gap: 10, alignItems: 'flex-start',

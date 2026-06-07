@@ -149,7 +149,7 @@ export default function BillingPage() {
           style={{ display:'flex', gap:'0.375rem', marginBottom:'1.25rem' }}>
           {TABS.map(tab => (
             <button type="button" key={tab.key} onClick={() => setFilter(tab.key as typeof filter)}
-              style={{ padding:'0.4rem 0.875rem', borderRadius:'9999px', fontSize:'0.78rem', fontWeight:filter===tab.key ? 600 : 400, cursor:'pointer', border: filter===tab.key ? '1px solid rgba(77,163,255,0.35)' : '1px solid rgba(240,236,228,0.06)', background: filter===tab.key ? 'rgba(154,124,74,0.12)' : 'rgba(240,236,228,0.04)', color: filter===tab.key ? '#d4b47a' : 'rgba(240,236,228,0.42)', transition:'all 150ms' }}>
+              style={{ padding:'0.4rem 0.875rem', borderRadius:'9999px', fontSize:'0.78rem', fontWeight:filter===tab.key ? 600 : 400, cursor:'pointer', border: filter===tab.key ? '1px solid rgba(154,124,74,0.35)' : '1px solid rgba(240,236,228,0.06)', background: filter===tab.key ? 'rgba(154,124,74,0.12)' : 'rgba(240,236,228,0.04)', color: filter===tab.key ? '#d4b47a' : 'rgba(240,236,228,0.42)', transition:'all 150ms' }}>
               {tab.label} {tab.count > 0 && <span style={{ opacity:0.7 }}>({tab.count})</span>}
             </button>
           ))}

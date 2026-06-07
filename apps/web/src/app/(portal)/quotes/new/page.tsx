@@ -569,7 +569,7 @@ export default function NewQuotePage() {
                     padding: '2rem',
                     textAlign: 'center',
                     cursor: 'pointer',
-                    background: dragOver ? 'rgba(77,163,255,0.06)' : 'rgba(255,255,255,0.02)',
+                    background: dragOver ? 'rgba(154,124,74,0.08)' : 'rgba(255,255,255,0.02)',
                     transition: 'all 150ms ease',
                   }}
                 >
@@ -605,7 +605,7 @@ export default function NewQuotePage() {
                     {artworkFiles.map((file, idx) => (
                       <div
                         key={idx}
-                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', background: 'rgba(99,230,190,0.06)', border: '1px solid rgba(184,151,94,0.14)', borderRadius: '8px' }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', background: 'rgba(184,151,94,0.08)', border: '1px solid rgba(184,151,94,0.14)', borderRadius: '8px' }}
                       >
                         <svg style={{ color: '#b8975e', flexShrink: 0 }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
                         <span style={{ flex: 1, fontSize: '0.8rem', color: '#b8975e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -685,7 +685,7 @@ export default function NewQuotePage() {
 
               {/* Estimate */}
               {low > 0 && (
-                <div style={{ marginTop: '1.25rem', padding: '0.875rem 1rem', background: 'rgba(99,230,190,0.06)', border: '1px solid rgba(184,151,94,0.14)', borderRadius: '10px' }}>
+                <div style={{ marginTop: '1.25rem', padding: '0.875rem 1rem', background: 'rgba(184,151,94,0.08)', border: '1px solid rgba(184,151,94,0.14)', borderRadius: '10px' }}>
                   <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#b8975e', marginBottom: '0.25rem' }}>
                     Estimativa de preço
                   </p>
@@ -772,7 +772,7 @@ export default function NewQuotePage() {
                   fontSize: '0.875rem',
                   fontWeight: 700,
                   cursor: !termsAccepted || submitting ? 'not-allowed' : 'pointer',
-                  background: !termsAccepted || submitting ? 'rgba(99,230,190,0.3)' : '#b8975e',
+                  background: !termsAccepted || submitting ? 'rgba(184,151,94,0.28)' : '#b8975e',
                   color: '#090907',
                   border: 'none',
                   opacity: !termsAccepted || submitting ? 0.6 : 1,

@@ -54,7 +54,7 @@ const STATUS_CFG: Record<string, { label: string; color: string; bg: string; dot
   in_stock:      { label: 'Em Stock',    color: '#b8975e',   bg: 'rgba(184,151,94,0.10)',   dot: '#63e6be' },
   low_stock:     { label: 'Stock Baixo', color: 'rgb(245,158,11)',   bg: 'rgba(245,158,11,0.1)',   dot: '#f59e0b' },
   out_of_stock:  { label: 'Esgotado',   color: 'rgb(239,68,68)',    bg: 'rgba(239,68,68,0.1)',    dot: '#ef4444' },
-  reserved:      { label: 'Reservado',  color: '#d4b47a',   bg: 'rgba(154,124,74,0.10)',   dot: '#4da3ff' },
+  reserved:      { label: 'Reservado',  color: '#d4b47a',   bg: 'rgba(154,124,74,0.10)',   dot: '#d4b47a' },
   quarantine:    { label: 'Quarentena', color: 'rgb(167,139,250)',  bg: 'rgba(167,139,250,0.1)',  dot: '#a78bfa' },
 };
 
@@ -280,7 +280,7 @@ export default function InventoryPage() {
                   Analytics
                 </motion.button>
                 <motion.button whileTap={tapScale} onClick={() => { setPanelMode('add'); setSelectedItem(null); setAddError(''); }}
-                  style={{ padding: '0.35rem 0.625rem', background: 'rgba(184,151,94,0.10)', border: '1px solid rgba(99,230,190,0.25)', borderRadius: '8px', color: '#b8975e', fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer' }}>
+                  style={{ padding: '0.35rem 0.625rem', background: 'rgba(184,151,94,0.10)', border: '1px solid rgba(184,151,94,0.22)', borderRadius: '8px', color: '#b8975e', fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer' }}>
                   + Novo
                 </motion.button>
               </div>
@@ -467,7 +467,7 @@ export default function InventoryPage() {
                   )}
 
                   <motion.button whileTap={tapScale} onClick={submitAdd} disabled={actionLoading}
-                    style={{ marginTop: '1rem', width: '100%', padding: '0.7rem', background: 'rgba(184,151,94,0.14)', border: '1px solid rgba(99,230,190,0.3)', borderRadius: '10px', color: '#b8975e', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
+                    style={{ marginTop: '1rem', width: '100%', padding: '0.7rem', background: 'rgba(184,151,94,0.14)', border: '1px solid rgba(184,151,94,0.28)', borderRadius: '10px', color: '#b8975e', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
                     {actionLoading ? '⏳ A criar…' : '✓ Criar Item'}
                   </motion.button>
                 </div>
@@ -619,7 +619,7 @@ export default function InventoryPage() {
 
                   <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
                     <motion.button whileTap={tapScale} onClick={submitMove} disabled={actionLoading || !moveForm.quantity}
-                      style={{ flex: 1, padding: '0.65rem', background: 'rgba(154,124,74,0.14)', border: '1px solid rgba(77,163,255,0.35)', borderRadius: '9px', color: '#d4b47a', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
+                      style={{ flex: 1, padding: '0.65rem', background: 'rgba(154,124,74,0.14)', border: '1px solid rgba(154,124,74,0.35)', borderRadius: '9px', color: '#d4b47a', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
                       {actionLoading ? '⏳ A registar…' : '✓ Registar Movimento'}
                     </motion.button>
                     <button type="button" onClick={() => setPanelMode('detail')} style={{ padding: '0.65rem 1rem', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '9px', color: 'rgba(240,236,228,0.24)', fontSize: '0.78rem', cursor: 'pointer' }}>
