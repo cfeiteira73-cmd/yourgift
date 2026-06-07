@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import './home-v2.css';
+import { HeroVideo } from '@/components/marketing/HeroVideo';
 
 export const metadata: Metadata = {
   title: 'Corporate Gifts, Branded Merch & Company Stores — 20.000+ Produtos | yourgift.pt',
@@ -18,12 +19,12 @@ export default function HomePage() {
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section className="yg-hero">
-        <div className="yg-hero-bg">
-          <img
-            src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=1920&q=95&fit=crop&crop=center"
-            alt="Premium gifts"
-          />
-        </div>
+        {/* Cinematic video hero — replaces static image */}
+        <HeroVideo
+          src="/videos/hero.mp4"
+          poster="/images/hero-fallback.jpg"
+          ariaLabel="YourGift — Cinematic Master Brand Film"
+        />
         <div className="yg-hero-content">
           <div className="yg-hero-eyebrow">Plataforma B2B Premium · Portugal</div>
           <h1 className="yg-hero-h1">
