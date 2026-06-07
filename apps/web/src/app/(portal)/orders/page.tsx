@@ -88,14 +88,14 @@ function SkeletonCard({ index }: { index: number }) {
       <div
         style={{
           width: '64px', height: '64px', borderRadius: '12px',
-          background: 'rgba(255,255,255,0.05)', flexShrink: 0,
+          background: 'rgba(240,236,228,0.06)', flexShrink: 0,
           animation: 'pulse 1.5s ease-in-out infinite',
         }}
       />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <div style={{ width: '120px', height: '14px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', animation: 'pulse 1.5s ease-in-out infinite' }} />
-        <div style={{ width: '200px', height: '12px', borderRadius: '6px', background: 'rgba(255,255,255,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />
-        <div style={{ width: '80px', height: '12px', borderRadius: '6px', background: 'rgba(255,255,255,0.03)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+        <div style={{ width: '120px', height: '14px', borderRadius: '6px', background: 'rgba(240,236,228,0.06)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+        <div style={{ width: '200px', height: '12px', borderRadius: '6px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+        <div style={{ width: '80px', height: '12px', borderRadius: '6px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />
       </div>
     </motion.div>
   );
@@ -109,9 +109,9 @@ function SummaryBar({ orders, filtered }: { orders: Order[]; filtered: Order[] }
   const deliveredCount = orders.filter((o) => o.status === 'delivered').length;
 
   const stats = [
-    { label: 'Total', value: String(orders.length), sub: 'encomendas', icon: '📦', color: 'rgb(77,163,255)' },
+    { label: 'Total', value: String(orders.length), sub: 'encomendas', icon: '📦', color: '#d4b47a' },
     { label: 'Ativas', value: String(activeCount), sub: 'em curso', icon: '⚡', color: 'rgb(245,158,11)' },
-    { label: 'Entregues', value: String(deliveredCount), sub: 'concluídas', icon: '✅', color: 'rgb(99,230,190)' },
+    { label: 'Entregues', value: String(deliveredCount), sub: 'concluídas', icon: '✅', color: '#b8975e' },
     { label: 'Valor total', value: totalValue > 0 ? formatPrice(totalValue) : '—', sub: 'acumulado', icon: '💶', color: 'rgb(167,139,250)' },
   ];
 
@@ -141,9 +141,9 @@ function SummaryBar({ orders, filtered }: { orders: Order[]; filtered: Order[] }
           }}
         >
           <div style={{ position: 'absolute', top: '-8px', right: '-8px', fontSize: '1.75rem', opacity: 0.12 }}>{s.icon}</div>
-          <span style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgb(120,130,150)' }}>{s.label}</span>
+          <span style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)' }}>{s.label}</span>
           <span style={{ fontSize: '1.25rem', fontWeight: 800, color: s.color, letterSpacing: '-0.03em', lineHeight: 1 }}>{s.value}</span>
-          <span style={{ fontSize: '0.7rem', color: 'rgb(80,92,110)' }}>{s.sub}</span>
+          <span style={{ fontSize: '0.7rem', color: 'rgba(240,236,228,0.24)' }}>{s.sub}</span>
         </div>
       ))}
     </motion.div>
@@ -178,10 +178,10 @@ function OrderCard({ order }: { order: Order }) {
         <div style={{
           position: 'absolute', left: 0, top: '20%', bottom: '20%',
           width: '2px', borderRadius: '2px',
-          background: order.status === 'delivered' ? 'rgb(99,230,190)'
-            : order.status === 'shipped' ? 'rgb(77,163,255)'
+          background: order.status === 'delivered' ? '#b8975e'
+            : order.status === 'shipped' ? '#d4b47a'
             : order.status === 'producing' || order.status === 'in_production' ? 'rgb(245,158,11)'
-            : 'rgba(255,255,255,0.1)',
+            : 'rgba(240,236,228,0.10)',
         }} />
 
         {/* Thumbnails */}
@@ -190,7 +190,7 @@ function OrderCard({ order }: { order: Order }) {
             <div
               style={{
                 width: '56px', height: '56px', borderRadius: '10px',
-                background: 'rgba(255,255,255,0.05)',
+                background: 'rgba(240,236,228,0.06)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem',
               }}
             >
@@ -206,7 +206,7 @@ function OrderCard({ order }: { order: Order }) {
                 referrerPolicy="no-referrer"
                 style={{
                   width: '56px', height: '56px', borderRadius: '10px',
-                  objectFit: 'cover', background: 'rgba(255,255,255,0.04)',
+                  objectFit: 'cover', background: 'rgba(240,236,228,0.04)',
                 }}
               />
             ))
@@ -215,9 +215,9 @@ function OrderCard({ order }: { order: Order }) {
             <div
               style={{
                 width: '56px', height: '56px', borderRadius: '10px',
-                background: 'rgba(255,255,255,0.05)',
+                background: 'rgba(240,236,228,0.06)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '0.8rem', fontWeight: 700, color: 'rgb(120,130,150)',
+                fontSize: '0.8rem', fontWeight: 700, color: 'rgba(240,236,228,0.42)',
               }}
             >
               +{extraImages}
@@ -236,14 +236,14 @@ function OrderCard({ order }: { order: Order }) {
             <span
               style={{
                 fontFamily: 'monospace', fontSize: '0.85rem',
-                fontWeight: 700, color: 'rgb(245,247,251)',
+                fontWeight: 700, color: '#f0ece4',
               }}
             >
               {order.ref}
             </span>
             <StatusBadge status={order.status} size="sm" />
           </div>
-          <p style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)' }}>
+          <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)' }}>
             {new Date(order.created_at).toLocaleDateString('pt-PT', {
               day: 'numeric', month: 'long', year: 'numeric',
             })}
@@ -259,11 +259,11 @@ function OrderCard({ order }: { order: Order }) {
             display: 'flex', alignItems: 'center', gap: '0.75rem',
           }}
         >
-          <p style={{ fontSize: '1rem', fontWeight: 700, color: 'rgb(99,230,190)' }}>
+          <p style={{ fontSize: '1rem', fontWeight: 700, color: '#b8975e' }}>
             {order.total_amount ? formatPrice(order.total_amount) : 'Sob consulta'}
           </p>
           <svg
-            style={{ color: 'rgb(120,130,150)' }}
+            style={{ color: 'rgba(240,236,228,0.42)' }}
             width="16" height="16" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" strokeWidth="2"
             strokeLinecap="round" strokeLinejoin="round"
@@ -360,10 +360,10 @@ export default function OrdersPage() {
           }}
         >
           <div>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
               Encomendas
             </h1>
-            <p style={{ fontSize: '0.8rem', color: 'rgb(80,92,110)' }}>
+            <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.24)' }}>
               Acompanha o estado de todas as tuas encomendas
             </p>
           </div>
@@ -371,7 +371,7 @@ export default function OrdersPage() {
             <Link
               href="/quotes/new"
               style={{
-                background: 'linear-gradient(135deg, rgb(77,163,255), rgb(116,100,255))',
+                background: 'linear-gradient(135deg, #d4b47a, rgb(116,100,255))',
                 color: '#fff',
                 padding: '0.5rem 1.125rem',
                 borderRadius: '10px',
@@ -381,7 +381,7 @@ export default function OrdersPage() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.375rem',
-                boxShadow: '0 4px 16px rgba(77,163,255,0.25)',
+                boxShadow: '0 4px 16px rgba(154,124,74,0.22)',
               }}
             >
               + Pedir Orçamento
@@ -402,7 +402,7 @@ export default function OrdersPage() {
           style={{ position: 'relative', marginBottom: '1.25rem' }}
         >
           <svg
-            style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'rgb(120,130,150)', pointerEvents: 'none' }}
+            style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(240,236,228,0.42)', pointerEvents: 'none' }}
             width="16" height="16" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" strokeWidth="2"
             strokeLinecap="round" strokeLinejoin="round"
@@ -417,17 +417,17 @@ export default function OrdersPage() {
             onChange={(e) => setSearch(e.target.value)}
             style={{
               width: '100%',
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
+              background: 'rgba(240,236,228,0.04)',
+              border: '1px solid rgba(240,236,228,0.06)',
               borderRadius: '10px',
               padding: '0.625rem 1rem 0.625rem 2.5rem',
               fontSize: '0.875rem',
-              color: 'rgb(245,247,251)',
+              color: '#f0ece4',
               outline: 'none',
               transition: 'border-color 150ms ease',
             }}
-            onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(77,163,255,0.4)')}
-            onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)')}
+            onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(154,124,74,0.35)')}
+            onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(240,236,228,0.06)')}
           />
         </motion.div>
 
@@ -454,9 +454,9 @@ export default function OrdersPage() {
                   fontWeight: isActive ? 600 : 400,
                   cursor: 'pointer',
                   transition: 'all 150ms ease',
-                  background: isActive ? 'rgba(77,163,255,0.15)' : 'rgba(255,255,255,0.04)',
-                  color: isActive ? 'rgb(77,163,255)' : 'rgb(120,130,150)',
-                  border: isActive ? '1px solid rgba(77,163,255,0.3)' : '1px solid rgba(255,255,255,0.06)',
+                  background: isActive ? 'rgba(154,124,74,0.14)' : 'rgba(240,236,228,0.04)',
+                  color: isActive ? '#d4b47a' : 'rgba(240,236,228,0.42)',
+                  border: isActive ? '1px solid rgba(154,124,74,0.28)' : '1px solid rgba(240,236,228,0.06)',
                 }}
               >
                 {tab.label}
@@ -493,10 +493,10 @@ export default function OrdersPage() {
             style={{ padding: '4rem 2rem', textAlign: 'center' }}
           >
             <p style={{ fontSize: '3rem', marginBottom: '1rem' }}>📦</p>
-            <p style={{ fontSize: '1.125rem', fontWeight: 600, color: 'rgb(245,247,251)', marginBottom: '0.5rem' }}>
+            <p style={{ fontSize: '1.125rem', fontWeight: 600, color: '#f0ece4', marginBottom: '0.5rem' }}>
               {search || activeFilter !== 'all' ? 'Nenhuma encomenda encontrada' : 'Ainda não tens encomendas'}
             </p>
-            <p style={{ fontSize: '0.875rem', color: 'rgb(120,130,150)', marginBottom: '1.5rem' }}>
+            <p style={{ fontSize: '0.875rem', color: 'rgba(240,236,228,0.42)', marginBottom: '1.5rem' }}>
               {search || activeFilter !== 'all'
                 ? 'Tenta mudar os filtros ou a pesquisa.'
                 : 'Começa por pedir um orçamento ou explorar o catálogo.'}
@@ -506,8 +506,8 @@ export default function OrdersPage() {
                 href="/quotes/new"
                 style={{
                   display: 'inline-block',
-                  background: 'rgb(77,163,255)',
-                  color: 'rgb(7,17,31)',
+                  background: '#d4b47a',
+                  color: '#090907',
                   padding: '0.625rem 1.25rem',
                   borderRadius: '10px',
                   fontSize: '0.875rem',
@@ -535,7 +535,7 @@ export default function OrdersPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: filtered.length * 0.06 + 0.1 }}
-                style={{ textAlign: 'center', fontSize: '0.75rem', color: 'rgb(80,92,110)', marginTop: '0.5rem' }}
+                style={{ textAlign: 'center', fontSize: '0.75rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.5rem' }}
               >
                 {filtered.length} encomenda{filtered.length !== 1 ? 's' : ''}
               </motion.p>
@@ -549,11 +549,11 @@ export default function OrdersPage() {
           className="orders-intel-panel">
           <div style={{
             background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.07)',
+            border: '1px solid rgba(240,236,228,0.06)',
             borderRadius: 16,
             padding: '20px',
           }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 14 }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(240,236,228,0.35)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 14 }}>
               ✦ Inteligência de Compra
             </p>
             <ReorderIntelligence />

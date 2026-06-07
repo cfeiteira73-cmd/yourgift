@@ -532,7 +532,7 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
           }}>
             <div style={{
               width: '30px', height: '30px', flexShrink: 0,
-              background: 'linear-gradient(135deg, #d4b47a, rgb(116,231,255))',
+              background: 'linear-gradient(135deg, #d4b47a, #b8975e)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '0.7rem', fontWeight: 800, color: '#090907',
               boxShadow: '0 0 8px rgba(154,124,74,0.22)',
@@ -607,7 +607,7 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
               <span style={{ fontSize: '1rem', fontWeight: 900, color: '#f0ece4', letterSpacing: '-0.02em' }}>
                 your<span style={{ color: '#d4b47a' }}>gift</span>
               </span>
-              <button type="button" onClick={() => setMobileMenuOpen(false)} style={{ padding: 6, borderRadius: 8, background: 'rgba(240,236,228,0.06)', border: '1px solid rgba(240,236,228,0.06)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer' }}>
+              <button type="button" onClick={() => setMobileMenuOpen(false)} style={{ padding: 6, borderRadius: 8, background: 'rgba(240,236,228,0.06)', border: '1px solid rgba(240,236,228,0.06)', color: 'rgba(240,236,228,0.45)', cursor: 'pointer' }}>
                 <Icon d={ICONS.close} size={14} />
               </button>
             </div>
@@ -635,7 +635,7 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
             </nav>
             {/* Drawer footer */}
             <div style={{ padding: 12, borderTop: '1px solid rgba(240,236,228,0.06)' }}>
-              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>{displayEmail}</div>
+              <div style={{ fontSize: 12, color: 'rgba(240,236,228,0.28)', textAlign: 'center' }}>{displayEmail}</div>
             </div>
           </motion.div>
         </motion.div>
@@ -728,7 +728,7 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
                 <div style={{
                   position: 'absolute', top: '4px', right: '8px',
                   width: '14px', height: '14px', borderRadius: '50%',
-                  background: '#d4b47a', border: '2px solid rgb(8,15,28)',
+                  background: '#d4b47a', border: '2px solid #0f0f0c',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: '0.45rem', fontWeight: 800, color: '#090907',
                 }}>{badge > 9 ? '9+' : badge}</div>

@@ -73,7 +73,7 @@ function DroppableColumn({
       ref={setNodeRef}
       style={{
         background: isOver ? 'rgba(77,163,255,0.06)' : 'rgba(255,255,255,0.018)',
-        border: `1px solid ${isOver ? 'rgba(77,163,255,0.3)' : stage.border}`,
+        border: `1px solid ${isOver ? 'rgba(154,124,74,0.28)' : stage.border}`,
         borderRadius: '12px',
         padding: '0.75rem 0.625rem',
         display: 'flex',
@@ -99,7 +99,7 @@ function DroppableColumn({
           {items.length === 0 && (
             <div style={{
               textAlign: 'center', padding: '1.5rem 0', color: 'rgb(50,62,80)',
-              fontSize: '0.65rem', border: '1px dashed rgba(255,255,255,0.06)', borderRadius: '8px',
+              fontSize: '0.65rem', border: '1px dashed rgba(240,236,228,0.06)', borderRadius: '8px',
             }}>
               Arrasta aqui
             </div>
@@ -141,8 +141,8 @@ function OrderKanbanCard({ order, isDragging }: { order: OrderCard; isDragging?:
 
   return (
     <div style={{
-      background: isDragging ? 'rgba(77,163,255,0.12)' : 'rgba(255,255,255,0.04)',
-      border: `1px solid ${isDragging ? 'rgba(77,163,255,0.4)' : 'rgba(255,255,255,0.08)'}`,
+      background: isDragging ? 'rgba(154,124,74,0.12)' : 'rgba(240,236,228,0.04)',
+      border: `1px solid ${isDragging ? 'rgba(154,124,74,0.35)' : 'rgba(240,236,228,0.06)'}`,
       borderRadius: '9px',
       padding: '0.625rem 0.75rem',
       cursor: 'grab',
@@ -150,7 +150,7 @@ function OrderKanbanCard({ order, isDragging }: { order: OrderCard; isDragging?:
       transition: 'background 150ms, border-color 150ms',
       userSelect: 'none',
     }}>
-      <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgb(77,163,255)', marginBottom: '0.2rem', fontFamily: 'monospace' }}>
+      <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#d4b47a', marginBottom: '0.2rem', fontFamily: 'monospace' }}>
         {order.ref}
       </div>
       {(client?.company || client?.name) && (
@@ -160,11 +160,11 @@ function OrderKanbanCard({ order, isDragging }: { order: OrderCard; isDragging?:
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.3rem' }}>
         {order.total_amount && (
-          <span style={{ fontSize: '0.65rem', color: 'rgb(99,230,190)', fontWeight: 700 }}>
+          <span style={{ fontSize: '0.65rem', color: '#b8975e', fontWeight: 700 }}>
             €{order.total_amount.toLocaleString('pt-PT', { maximumFractionDigits: 0 })}
           </span>
         )}
-        <span style={{ fontSize: '0.6rem', color: days > 10 ? 'rgb(239,68,68)' : 'rgb(80,92,110)' }}>
+        <span style={{ fontSize: '0.6rem', color: days > 10 ? 'rgb(239,68,68)' : 'rgba(240,236,228,0.24)' }}>
           {days}d
         </span>
       </div>

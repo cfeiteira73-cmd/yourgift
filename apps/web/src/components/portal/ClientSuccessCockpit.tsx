@@ -41,14 +41,14 @@ const fmtCompact = new Intl.NumberFormat('pt-PT', { style: 'currency', currency:
 
 const TIER_COLOR: Record<string, string> = {
   enterprise: 'rgb(167,139,250)',
-  premium: 'rgb(77,163,255)',
-  standard: 'rgba(255,255,255,0.5)',
+  premium: '#d4b47a',
+  standard: 'rgba(240,236,228,0.45)',
 };
 
 const TYPE_LABEL: Record<UpsellOpportunity['type'], { label: string; icon: string; color: string }> = {
   dormant:            { label: 'Dormido', icon: '💤', color: 'rgb(245,158,11)' },
-  category_expansion: { label: 'Cross-sell', icon: '↗', color: 'rgb(77,163,255)' },
-  volume_growth:      { label: 'Volume', icon: '📈', color: 'rgb(99,230,190)' },
+  category_expansion: { label: 'Cross-sell', icon: '↗', color: '#d4b47a' },
+  volume_growth:      { label: 'Volume', icon: '📈', color: '#b8975e' },
 };
 
 type Tab = 'upsells' | 'leaks';
@@ -107,8 +107,8 @@ export function ClientSuccessCockpit() {
         style={{
           flex: 1, padding: '7px 12px', borderRadius: 8, cursor: 'pointer', border: 'none',
           fontSize: 12, fontWeight: 600,
-          background: active ? 'rgba(77,163,255,0.15)' : 'transparent',
-          color: active ? 'rgb(77,163,255)' : 'rgba(255,255,255,0.4)',
+          background: active ? 'rgba(154,124,74,0.14)' : 'transparent',
+          color: active ? '#d4b47a' : 'rgba(240,236,228,0.35)',
           transition: 'all 160ms ease',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
         }}
@@ -117,8 +117,8 @@ export function ClientSuccessCockpit() {
         {badge !== undefined && badge > 0 && (
           <span style={{
             fontSize: 10, fontWeight: 700, padding: '1px 5px', borderRadius: 9999,
-            background: active ? 'rgba(77,163,255,0.3)' : 'rgba(255,255,255,0.1)',
-            color: active ? 'rgb(77,163,255)' : 'rgba(255,255,255,0.4)',
+            background: active ? 'rgba(154,124,74,0.28)' : 'rgba(240,236,228,0.10)',
+            color: active ? '#d4b47a' : 'rgba(240,236,228,0.35)',
           }}>
             {badge}
           </span>
@@ -142,13 +142,13 @@ export function ClientSuccessCockpit() {
   if (error) {
     return (
       <div style={{ padding: 20, textAlign: 'center' }}>
-        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 8 }}>{error}</p>
+        <p style={{ fontSize: 12, color: 'rgba(240,236,228,0.35)', marginBottom: 8 }}>{error}</p>
         <button
           onClick={() => tab === 'upsells' ? loadUpsells() : loadLeaks()}
           style={{
             fontSize: 11, padding: '5px 12px', borderRadius: 7, cursor: 'pointer',
-            background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)',
-            border: '1px solid rgba(255,255,255,0.1)',
+            background: 'rgba(240,236,228,0.06)', color: 'rgba(240,236,228,0.45)',
+            border: '1px solid rgba(240,236,228,0.10)',
           }}
         >
           Tentar novamente
@@ -162,7 +162,7 @@ export function ClientSuccessCockpit() {
       {/* Tab switcher */}
       <div style={{
         display: 'flex', gap: 4, padding: '4px',
-        background: 'rgba(255,255,255,0.04)', borderRadius: 10,
+        background: 'rgba(240,236,228,0.04)', borderRadius: 10,
         marginBottom: 14,
       }}>
         <TabBtn id="upsells" label="Upsells" badge={upsells.length} />
@@ -173,7 +173,7 @@ export function ClientSuccessCockpit() {
       {tab === 'upsells' && (
         <div>
           {upsells.length === 0 ? (
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: 20 }}>
+            <p style={{ fontSize: 12, color: 'rgba(240,236,228,0.28)', textAlign: 'center', padding: 20 }}>
               Nenhuma oportunidade de upsell detectada.
             </p>
           ) : (
@@ -190,14 +190,14 @@ export function ClientSuccessCockpit() {
                     style={{
                       padding: '11px 14px',
                       background: 'rgba(255,255,255,0.02)',
-                      border: '1px solid rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(240,236,228,0.06)',
                       borderRadius: 10,
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 5 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                         <span style={{ fontSize: 13 }}>{typeCfg.icon}</span>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: 'rgb(245,247,251)' }}>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: '#f0ece4' }}>
                           {opp.clientName}
                         </span>
                         <span style={{
@@ -216,7 +216,7 @@ export function ClientSuccessCockpit() {
                         {typeCfg.label}
                       </span>
                     </div>
-                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 5 }}>
+                    <p style={{ fontSize: 11, color: 'rgba(240,236,228,0.35)', marginBottom: 5 }}>
                       {opp.signal}
                     </p>
                     <div style={{ display: 'flex', gap: 12, fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
@@ -252,7 +252,7 @@ export function ClientSuccessCockpit() {
                   <p style={{ fontSize: 12, fontWeight: 700, color: leakSummary.criticalCount > 0 ? 'rgb(239,68,68)' : 'rgb(245,158,11)' }}>
                     {leakSummary.criticalCount > 0 ? `⚠ ${leakSummary.criticalCount} vazamentos críticos` : `◐ ${leakSummary.totalLeaks} vazamentos detectados`}
                   </p>
-                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                  <p style={{ fontSize: 11, color: 'rgba(240,236,228,0.35)', marginTop: 2 }}>
                     Perda de margem estimada (30d)
                   </p>
                 </div>
@@ -264,7 +264,7 @@ export function ClientSuccessCockpit() {
           )}
 
           {leaks.length === 0 ? (
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: 20 }}>
+            <p style={{ fontSize: 12, color: 'rgba(240,236,228,0.28)', textAlign: 'center', padding: 20 }}>
               Sem vazamentos de margem detectados. ✓
             </p>
           ) : (
@@ -283,7 +283,7 @@ export function ClientSuccessCockpit() {
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-                    <p style={{ fontSize: 12, fontWeight: 600, color: 'rgb(245,247,251)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '60%' }}>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: '#f0ece4', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '60%' }}>
                       {leak.productTitle}
                     </p>
                     <span style={{
@@ -298,7 +298,7 @@ export function ClientSuccessCockpit() {
                     <span>Target: {leak.targetMarginPct}%</span>
                     <span>Gap: <strong style={{ color: leak.severity === 'critical' ? 'rgb(239,68,68)' : 'rgb(245,158,11)' }}>-{leak.marginGapPct}pp</strong></span>
                   </div>
-                  <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 3 }}>
+                  <p style={{ fontSize: 10, color: 'rgba(240,236,228,0.22)', marginTop: 3 }}>
                     {leak.orderRef} · {leak.category}
                   </p>
                 </motion.div>

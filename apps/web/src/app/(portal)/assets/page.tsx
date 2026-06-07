@@ -28,14 +28,14 @@ interface Asset {
 // ── File type config ──────────────────────────────────────────────────────────
 
 function fileConfig(type: string): { icon: string; color: string; label: string } {
-  if (type.includes('svg')) return { icon: '✦', color: 'rgb(99,230,190)', label: 'SVG' };
+  if (type.includes('svg')) return { icon: '✦', color: '#b8975e', label: 'SVG' };
   if (type.includes('pdf')) return { icon: '📄', color: 'rgb(239,68,68)', label: 'PDF' };
-  if (type.includes('png')) return { icon: '🖼️', color: 'rgb(77,163,255)', label: 'PNG' };
+  if (type.includes('png')) return { icon: '🖼️', color: '#d4b47a', label: 'PNG' };
   if (type.includes('jpg') || type.includes('jpeg')) return { icon: '📷', color: 'rgb(245,158,11)', label: 'JPG' };
   if (type.includes('ai') || type.includes('illustrator')) return { icon: '🎨', color: 'rgb(245,158,11)', label: 'AI' };
-  if (type.includes('psd') || type.includes('photoshop')) return { icon: '🎨', color: 'rgb(77,163,255)', label: 'PSD' };
-  if (type.includes('zip')) return { icon: '📦', color: 'rgb(120,130,150)', label: 'ZIP' };
-  return { icon: '📁', color: 'rgb(120,130,150)', label: type.split('/')[1]?.toUpperCase() ?? 'FILE' };
+  if (type.includes('psd') || type.includes('photoshop')) return { icon: '🎨', color: '#d4b47a', label: 'PSD' };
+  if (type.includes('zip')) return { icon: '📦', color: 'rgba(240,236,228,0.42)', label: 'ZIP' };
+  return { icon: '📁', color: 'rgba(240,236,228,0.42)', label: type.split('/')[1]?.toUpperCase() ?? 'FILE' };
 }
 
 function formatBytes(bytes: number): string {
@@ -76,7 +76,7 @@ function UploadZone({ onUpload }: { onUpload: (files: FileList) => void }) {
       onDragLeave={() => setDragging(false)}
       onDrop={handleDrop}
       style={{
-        border: `2px dashed ${dragging ? 'rgba(77,163,255,0.6)' : 'rgba(255,255,255,0.1)'}`,
+        border: `2px dashed ${dragging ? 'rgba(154,124,74,0.5)' : 'rgba(240,236,228,0.10)'}`,
         borderRadius: '18px',
         padding: '2.5rem 2rem',
         textAlign: 'center',
@@ -84,18 +84,18 @@ function UploadZone({ onUpload }: { onUpload: (files: FileList) => void }) {
         cursor: 'pointer',
         transition: 'all 200ms ease',
         marginBottom: '1.5rem',
-        boxShadow: dragging ? '0 0 30px rgba(77,163,255,0.1)' : 'none',
+        boxShadow: dragging ? '0 0 30px rgba(154,124,74,0.10)' : 'none',
       }}
       onMouseEnter={(e) => {
         if (!dragging) {
-          (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)';
+          (e.currentTarget as HTMLElement).style.background = 'rgba(240,236,228,0.04)';
           (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.16)';
         }
       }}
       onMouseLeave={(e) => {
         if (!dragging) {
           (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.02)';
-          (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)';
+          (e.currentTarget as HTMLElement).style.borderColor = 'rgba(240,236,228,0.10)';
         }
       }}
     >
@@ -113,10 +113,10 @@ function UploadZone({ onUpload }: { onUpload: (files: FileList) => void }) {
       >
         {dragging ? '📥' : '☁️'}
       </motion.div>
-      <p style={{ fontSize: '0.95rem', fontWeight: 600, color: 'rgb(200,210,225)', marginBottom: '0.375rem' }}>
+      <p style={{ fontSize: '0.95rem', fontWeight: 600, color: 'rgba(240,236,228,0.72)', marginBottom: '0.375rem' }}>
         {dragging ? 'Solta os ficheiros aqui' : 'Arrasta ficheiros ou clica para fazer upload'}
       </p>
-      <p style={{ fontSize: '0.78rem', color: 'rgb(80,92,110)' }}>
+      <p style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.24)' }}>
         PNG · JPG · SVG · PDF · AI · PSD · EPS · ZIP — até 50 MB por ficheiro
       </p>
     </motion.div>
@@ -145,9 +145,9 @@ function AssetCard({ asset, onDelete, selected, onSelect }: {
       onClick={() => onSelect(asset.id)}
       style={{
         background: selected
-          ? 'linear-gradient(145deg, rgba(77,163,255,0.1) 0%, rgba(77,163,255,0.04) 100%)'
+          ? 'linear-gradient(145deg, rgba(154,124,74,0.10) 0%, rgba(77,163,255,0.04) 100%)'
           : 'linear-gradient(145deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.02) 100%)',
-        border: `1px solid ${selected ? 'rgba(77,163,255,0.35)' : 'rgba(255,255,255,0.07)'}`,
+        border: `1px solid ${selected ? 'rgba(77,163,255,0.35)' : 'rgba(240,236,228,0.06)'}`,
         borderRadius: '14px',
         overflow: 'hidden',
         cursor: 'pointer',
@@ -188,9 +188,9 @@ function AssetCard({ asset, onDelete, selected, onSelect }: {
           <div style={{
             position: 'absolute', top: '8px', right: '8px',
             width: '20px', height: '20px', borderRadius: '50%',
-            background: 'rgb(77,163,255)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: '#d4b47a', display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgb(7,17,31)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#090907" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <polyline points="20 6 9 17 4 12" />
             </svg>
           </div>
@@ -199,14 +199,14 @@ function AssetCard({ asset, onDelete, selected, onSelect }: {
 
       {/* Info */}
       <div style={{ padding: '0.75rem' }}>
-        <p style={{ fontSize: '0.78rem', fontWeight: 600, color: 'rgb(200,210,225)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '0.2rem' }}>
+        <p style={{ fontSize: '0.78rem', fontWeight: 600, color: 'rgba(240,236,228,0.72)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '0.2rem' }}>
           {asset.name}
         </p>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: '0.68rem', color: 'rgb(70,82,100)' }}>
+          <span style={{ fontSize: '0.68rem', color: 'rgba(240,236,228,0.24)' }}>
             {formatBytes(asset.size)}
           </span>
-          <span style={{ fontSize: '0.68rem', color: 'rgb(70,82,100)' }}>
+          <span style={{ fontSize: '0.68rem', color: 'rgba(240,236,228,0.24)' }}>
             {timeAgo(asset.createdAt)}
           </span>
         </div>
@@ -227,25 +227,25 @@ function UploadProgress({ jobs }: { jobs: UploadJob[] }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       style={{
-        background: 'rgba(77,163,255,0.06)', border: '1px solid rgba(77,163,255,0.15)',
+        background: 'rgba(77,163,255,0.06)', border: '1px solid rgba(154,124,74,0.14)',
         borderRadius: '14px', padding: '1rem 1.25rem', marginBottom: '1.25rem',
       }}
     >
-      <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgb(77,163,255)', marginBottom: '0.75rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+      <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#d4b47a', marginBottom: '0.75rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
         A fazer upload…
       </p>
       {jobs.map((job) => (
         <div key={job.id} style={{ marginBottom: '0.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
             <span style={{ fontSize: '0.78rem', color: 'rgb(170,180,198)' }}>{job.name}</span>
-            <span style={{ fontSize: '0.72rem', color: job.error ? 'rgb(239,68,68)' : 'rgb(77,163,255)' }}>
+            <span style={{ fontSize: '0.72rem', color: job.error ? 'rgb(239,68,68)' : '#d4b47a' }}>
               {job.error ? 'Erro' : `${job.progress}%`}
             </span>
           </div>
-          <div style={{ height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '99px', overflow: 'hidden' }}>
+          <div style={{ height: '3px', background: 'rgba(240,236,228,0.06)', borderRadius: '99px', overflow: 'hidden' }}>
             <motion.div
               animate={{ width: `${job.progress}%` }}
-              style={{ height: '100%', background: job.error ? 'rgb(239,68,68)' : 'rgb(77,163,255)', borderRadius: '99px' }}
+              style={{ height: '100%', background: job.error ? 'rgb(239,68,68)' : '#d4b47a', borderRadius: '99px' }}
             />
           </div>
         </div>
@@ -406,10 +406,10 @@ function AssetIntelligencePlatform() {
         style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}
       >
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '0.3rem' }}>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '0.3rem' }}>
             Ficheiros & Artes
           </h1>
-          <p style={{ fontSize: '0.875rem', color: 'rgb(100,112,130)' }}>
+          <p style={{ fontSize: '0.875rem', color: 'rgba(240,236,228,0.42)' }}>
             {assets.length} ficheiro{assets.length !== 1 ? 's' : ''} · Brand Asset Intelligence Platform
           </p>
         </div>
@@ -433,7 +433,7 @@ function AssetIntelligencePlatform() {
           )}
 
           {/* View toggle */}
-          <div style={{ display: 'flex', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '10px', overflow: 'hidden' }}>
             {(['grid', 'list'] as const).map((v) => (
               <button type="button"
                 key={v}
@@ -441,8 +441,8 @@ function AssetIntelligencePlatform() {
                 onClick={() => setView(v)}
                 style={{
                   padding: '0.5rem 0.75rem', border: 'none', cursor: 'pointer',
-                  background: view === v ? 'rgba(77,163,255,0.15)' : 'transparent',
-                  color: view === v ? 'rgb(77,163,255)' : 'rgb(100,112,130)',
+                  background: view === v ? 'rgba(154,124,74,0.14)' : 'transparent',
+                  color: view === v ? '#d4b47a' : 'rgba(240,236,228,0.42)',
                   fontSize: '0.9rem', transition: 'all 150ms',
                 }}
               >
@@ -475,9 +475,9 @@ function AssetIntelligencePlatform() {
             onClick={() => setFilter(opt.key)}
             style={{
               padding: '0.4rem 0.875rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600,
-              border: `1px solid ${filter === opt.key ? 'rgba(77,163,255,0.35)' : 'rgba(255,255,255,0.07)'}`,
-              background: filter === opt.key ? 'rgba(77,163,255,0.12)' : 'rgba(255,255,255,0.03)',
-              color: filter === opt.key ? 'rgb(77,163,255)' : 'rgb(100,112,130)',
+              border: `1px solid ${filter === opt.key ? 'rgba(77,163,255,0.35)' : 'rgba(240,236,228,0.06)'}`,
+              background: filter === opt.key ? 'rgba(154,124,74,0.12)' : 'rgba(240,236,228,0.04)',
+              color: filter === opt.key ? '#d4b47a' : 'rgba(240,236,228,0.42)',
               cursor: 'pointer', transition: 'all 150ms',
             }}
           >
@@ -494,7 +494,7 @@ function AssetIntelligencePlatform() {
               key={i}
               animate={{ opacity: [0.3, 0.6, 0.3] }}
               transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }}
-              style={{ height: '180px', borderRadius: '14px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.05)' }}
+              style={{ height: '180px', borderRadius: '14px', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)' }}
             />
           ))}
         </div>
@@ -504,15 +504,15 @@ function AssetIntelligencePlatform() {
           animate={{ opacity: 1, y: 0 }}
           style={{
             textAlign: 'center', padding: '4rem 2rem',
-            background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)',
+            background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(240,236,228,0.06)',
             borderRadius: '18px',
           }}
         >
           <div style={{ fontSize: '3.5rem', marginBottom: '1rem', opacity: 0.5 }}>🎨</div>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'rgb(200,210,225)', marginBottom: '0.5rem' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'rgba(240,236,228,0.72)', marginBottom: '0.5rem' }}>
             {filter === 'all' ? 'Ainda não tens ficheiros' : `Sem ficheiros do tipo "${filterOpts.find(f => f.key === filter)?.label}"`}
           </h3>
-          <p style={{ fontSize: '0.875rem', color: 'rgb(80,92,110)', marginBottom: '1.5rem', maxWidth: '340px', margin: '0 auto 1.5rem' }}>
+          <p style={{ fontSize: '0.875rem', color: 'rgba(240,236,228,0.24)', marginBottom: '1.5rem', maxWidth: '340px', margin: '0 auto 1.5rem' }}>
             Faz upload dos teus logos, artes finais e ficheiros de marca para teres tudo num só lugar.
           </p>
         </motion.div>
@@ -535,7 +535,7 @@ function AssetIntelligencePlatform() {
         </motion.div>
       ) : (
         // List view
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0', borderRadius: '14px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0', borderRadius: '14px', overflow: 'hidden', border: '1px solid rgba(240,236,228,0.06)' }}>
           {filtered.map((asset, i) => {
             const fc = fileConfig(asset.type);
             return (
@@ -549,7 +549,7 @@ function AssetIntelligencePlatform() {
                   display: 'flex', alignItems: 'center', gap: '1rem',
                   padding: '0.875rem 1.25rem',
                   background: selected.has(asset.id) ? 'rgba(77,163,255,0.06)' : 'rgba(255,255,255,0.02)',
-                  borderBottom: i < filtered.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                  borderBottom: i < filtered.length - 1 ? '1px solid rgba(240,236,228,0.04)' : 'none',
                   cursor: 'pointer', transition: 'background 150ms',
                 }}
                 onMouseEnter={(e) => { if (!selected.has(asset.id)) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.035)'; }}
@@ -559,13 +559,13 @@ function AssetIntelligencePlatform() {
                   {fc.icon}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'rgb(200,210,225)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{asset.name}</p>
-                  <p style={{ fontSize: '0.72rem', color: 'rgb(70,82,100)' }}>{fc.label} · {formatBytes(asset.size)}</p>
+                  <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'rgba(240,236,228,0.72)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{asset.name}</p>
+                  <p style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.24)' }}>{fc.label} · {formatBytes(asset.size)}</p>
                 </div>
-                <span style={{ fontSize: '0.72rem', color: 'rgb(70,82,100)', flexShrink: 0 }}>{timeAgo(asset.createdAt)}</span>
+                <span style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.24)', flexShrink: 0 }}>{timeAgo(asset.createdAt)}</span>
                 {selected.has(asset.id) && (
-                  <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgb(77,163,255)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="rgb(7,17,31)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>
+                  <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: '#d4b47a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#090907" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>
                   </div>
                 )}
               </motion.div>

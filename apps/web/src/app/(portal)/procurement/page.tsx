@@ -55,18 +55,18 @@ type PanelMode = 'list' | 'detail' | 'create' | 'negotiate' | 'memory' | 'analyt
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const STATUS_CFG: Record<RFQStatus, { label: string; color: string; bg: string; emoji: string }> = {
-  draft:               { label: 'Rascunho',          color: 'rgb(80,92,110)',    bg: 'rgba(80,92,110,0.12)',    emoji: '📝' },
-  sent:                { label: 'Enviado',            color: 'rgb(77,163,255)',   bg: 'rgba(77,163,255,0.12)',   emoji: '📤' },
-  responses_received:  { label: 'Respostas',         color: 'rgb(116,231,255)',  bg: 'rgba(116,231,255,0.12)',  emoji: '📬' },
+  draft:               { label: 'Rascunho',          color: 'rgba(240,236,228,0.24)',    bg: 'rgba(80,92,110,0.12)',    emoji: '📝' },
+  sent:                { label: 'Enviado',            color: '#d4b47a',   bg: 'rgba(154,124,74,0.12)',   emoji: '📤' },
+  responses_received:  { label: 'Respostas',         color: '#b8975e',  bg: 'rgba(116,231,255,0.12)',  emoji: '📬' },
   negotiating:         { label: 'Em Negociação',     color: 'rgb(245,158,11)',   bg: 'rgba(245,158,11,0.12)',   emoji: '🤝' },
-  awarded:             { label: 'Adjudicado',        color: 'rgb(99,230,190)',   bg: 'rgba(99,230,190,0.12)',   emoji: '✅' },
+  awarded:             { label: 'Adjudicado',        color: '#b8975e',   bg: 'rgba(184,151,94,0.12)',   emoji: '✅' },
   cancelled:           { label: 'Cancelado',         color: 'rgb(239,68,68)',    bg: 'rgba(239,68,68,0.12)',    emoji: '❌' },
   completed:           { label: 'Concluído',         color: 'rgb(167,139,250)',  bg: 'rgba(167,139,250,0.12)', emoji: '🏆' },
 };
 
 const PRIORITY_CFG = {
-  low:    { label: 'Baixa',  color: 'rgb(80,92,110)' },
-  normal: { label: 'Normal', color: 'rgb(77,163,255)' },
+  low:    { label: 'Baixa',  color: 'rgba(240,236,228,0.24)' },
+  normal: { label: 'Normal', color: '#d4b47a' },
   high:   { label: 'Alta',   color: 'rgb(245,158,11)' },
   urgent: { label: 'Urgente',color: 'rgb(239,68,68)' },
 };
@@ -94,11 +94,11 @@ function StatusBadge({ status }: { status: RFQStatus }) {
 }
 
 function ScoreRing({ score }: { score: number }) {
-  const color = score >= 80 ? 'rgb(99,230,190)' : score >= 60 ? 'rgb(77,163,255)' : score >= 40 ? 'rgb(245,158,11)' : 'rgb(239,68,68)';
+  const color = score >= 80 ? '#b8975e' : score >= 60 ? '#d4b47a' : score >= 40 ? 'rgb(245,158,11)' : 'rgb(239,68,68)';
   return (
     <div style={{ width: '40px', height: '40px', position: 'relative', flexShrink: 0 }}>
       <svg viewBox="0 0 36 36" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
-        <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3" />
+        <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(240,236,228,0.06)" strokeWidth="3" />
         <motion.circle
           cx="18" cy="18" r="15" fill="none" stroke={color} strokeWidth="3"
           strokeLinecap="round"
@@ -163,13 +163,13 @@ function CreateRFQPanel({ onCreated }: { onCreated: (rfq: RFQ) => void }) {
           { label: 'Prazo', key: 'deadline', type: 'date' },
         ].map(f => (
           <div key={f.key}>
-            <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.35rem' }}>{f.label}</div>
+            <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.35rem' }}>{f.label}</div>
             <input
               type={f.type ?? 'text'}
               value={String(form[f.key as keyof typeof form])}
               onChange={e => set(f.key, e.target.value)}
               placeholder={f.placeholder}
-              style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '9px', padding: '0.6rem 0.75rem', color: 'rgb(200,215,235)', fontSize: '0.78rem' }}
+              style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '9px', padding: '0.6rem 0.75rem', color: 'rgb(200,215,235)', fontSize: '0.78rem' }}
             />
           </div>
         ))}
@@ -177,31 +177,31 @@ function CreateRFQPanel({ onCreated }: { onCreated: (rfq: RFQ) => void }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
         <div>
-          <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.35rem' }}>Prioridade</div>
+          <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.35rem' }}>Prioridade</div>
           <div style={{ display: 'flex', gap: '0.35rem' }}>
             {(['low','normal','high','urgent'] as const).map(p => (
               <button type="button" key={p} onClick={() => set('priority', p)} style={{
-                flex: 1, background: form.priority === p ? `${PRIORITY_CFG[p].color}18` : 'rgba(255,255,255,0.04)',
-                border: form.priority === p ? `1px solid ${PRIORITY_CFG[p].color}40` : '1px solid rgba(255,255,255,0.07)',
-                borderRadius: '8px', padding: '0.4rem 0', color: form.priority === p ? PRIORITY_CFG[p].color : 'rgb(100,112,130)',
+                flex: 1, background: form.priority === p ? `${PRIORITY_CFG[p].color}18` : 'rgba(240,236,228,0.04)',
+                border: form.priority === p ? `1px solid ${PRIORITY_CFG[p].color}40` : '1px solid rgba(240,236,228,0.06)',
+                borderRadius: '8px', padding: '0.4rem 0', color: form.priority === p ? PRIORITY_CFG[p].color : 'rgba(240,236,228,0.42)',
                 fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer',
               }}>{PRIORITY_CFG[p].label}</button>
             ))}
           </div>
         </div>
         <div>
-          <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.35rem' }}>País Entrega</div>
-          <select value={form.delivery_country} onChange={e => set('delivery_country', e.target.value)} style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '9px', padding: '0.6rem 0.75rem', color: 'rgb(200,215,235)', fontSize: '0.78rem' }}>
+          <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.35rem' }}>País Entrega</div>
+          <select value={form.delivery_country} onChange={e => set('delivery_country', e.target.value)} style={{ width: '100%', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '9px', padding: '0.6rem 0.75rem', color: 'rgb(200,215,235)', fontSize: '0.78rem' }}>
             {['PT','ES','FR','DE','GB','NL','IT'].map(c => <option key={c} value={c} style={{ background: 'rgb(14,22,36)' }}>{c}</option>)}
           </select>
         </div>
       </div>
 
       <div>
-        <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.35rem' }}>Requisitos / Especificações</div>
+        <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.35rem' }}>Requisitos / Especificações</div>
         <textarea value={form.requirements} onChange={e => set('requirements', e.target.value)} rows={3}
           placeholder="Descreve requisitos técnicos, certificações, embalagem, etc."
-          style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '9px', padding: '0.6rem 0.75rem', color: 'rgb(200,215,235)', fontSize: '0.75rem', resize: 'vertical', lineHeight: 1.5 }}
+          style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '9px', padding: '0.6rem 0.75rem', color: 'rgb(200,215,235)', fontSize: '0.75rem', resize: 'vertical', lineHeight: 1.5 }}
         />
       </div>
 
@@ -216,20 +216,20 @@ function CreateRFQPanel({ onCreated }: { onCreated: (rfq: RFQ) => void }) {
             </div>
           )}
           {aiRecs.risk_score != null && (
-            <div style={{ fontSize: '0.68rem', color: Number(aiRecs.risk_score) < 40 ? 'rgb(99,230,190)' : 'rgb(245,158,11)' }}>
+            <div style={{ fontSize: '0.68rem', color: Number(aiRecs.risk_score) < 40 ? '#b8975e' : 'rgb(245,158,11)' }}>
               Risco: {String(aiRecs.risk_score)}/100
             </div>
           )}
           {(aiRecs.negotiation_tips as string[] | undefined)?.map((t, i) => (
-            <div key={i} style={{ fontSize: '0.65rem', color: 'rgb(140,155,175)', marginTop: '0.2rem' }}>💡 {t}</div>
+            <div key={i} style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.42)', marginTop: '0.2rem' }}>💡 {t}</div>
           ))}
         </motion.div>
       )}
 
       <motion.button whileTap={tapScale} onClick={submit} disabled={loading} style={{
-        background: loading ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg,rgb(77,163,255),rgb(116,231,255))',
+        background: loading ? 'rgba(240,236,228,0.06)' : 'linear-gradient(135deg,#d4b47a,#b8975e)',
         border: 'none', borderRadius: '12px', padding: '0.875rem',
-        color: loading ? 'rgb(80,92,110)' : '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: loading ? 'wait' : 'pointer',
+        color: loading ? 'rgba(240,236,228,0.24)' : '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: loading ? 'wait' : 'pointer',
       }}>
         {loading ? '🧠 A gerar RFQ com AI…' : '🚀 Criar RFQ Autónomo'}
       </motion.button>
@@ -270,49 +270,49 @@ function AddBidPanel({ rfqId, rfqQty, onAdded }: { rfqId: string; rfqQty: number
   }
 
   return (
-    <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.07)' }}>
-      <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem' }}>+ Registar Proposta de Fornecedor</div>
+    <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(240,236,228,0.06)' }}>
+      <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem' }}>+ Registar Proposta de Fornecedor</div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem', marginBottom: '0.5rem' }}>
         <div>
-          <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>Fornecedor *</div>
-          <select value={form.supplier_name} onChange={e => set('supplier_name', e.target.value)} style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.72rem' }}>
+          <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>Fornecedor *</div>
+          <select value={form.supplier_name} onChange={e => set('supplier_name', e.target.value)} style={{ width: '100%', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.72rem' }}>
             <option value="" style={{ background: 'rgb(14,22,36)' }}>Selecciona…</option>
             {KNOWN_SUPPLIERS.map(s => <option key={s} value={s} style={{ background: 'rgb(14,22,36)' }}>{s}</option>)}
           </select>
         </div>
         <div>
-          <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>€/un *</div>
+          <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>€/un *</div>
           <input type="number" step="0.01" value={form.unit_price} onChange={e => set('unit_price', e.target.value)} placeholder="0.00"
-            style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.72rem' }} />
+            style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.72rem' }} />
         </div>
         <div>
-          <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>Lead time (dias)</div>
+          <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>Lead time (dias)</div>
           <input type="number" value={form.lead_time_days} onChange={e => set('lead_time_days', e.target.value)} placeholder="14"
-            style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.72rem' }} />
+            style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.72rem' }} />
         </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 2fr', gap: '0.5rem', marginBottom: '0.75rem' }}>
         <div>
-          <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>MOQ</div>
+          <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>MOQ</div>
           <input type="number" value={form.moq} onChange={e => set('moq', e.target.value)} placeholder={String(rfqQty)}
-            style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.72rem' }} />
+            style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.72rem' }} />
         </div>
         <div>
-          <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>Termos</div>
-          <select value={form.payment_terms} onChange={e => set('payment_terms', e.target.value)} style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.72rem' }}>
+          <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>Termos</div>
+          <select value={form.payment_terms} onChange={e => set('payment_terms', e.target.value)} style={{ width: '100%', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.72rem' }}>
             {['Net30','Net60','50/50','30% advance','Full advance'].map(t => <option key={t} value={t} style={{ background: 'rgb(14,22,36)' }}>{t}</option>)}
           </select>
         </div>
         <div>
-          <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>Notas</div>
+          <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>Notas</div>
           <input value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="Observações…"
-            style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.72rem' }} />
+            style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.72rem' }} />
         </div>
       </div>
       <motion.button whileTap={tapScale} onClick={submit} disabled={loading || !form.supplier_name || !form.unit_price} style={{
-        background: form.supplier_name && form.unit_price ? 'rgba(77,163,255,0.18)' : 'rgba(255,255,255,0.04)',
-        border: form.supplier_name && form.unit_price ? '1px solid rgba(77,163,255,0.4)' : '1px solid rgba(255,255,255,0.07)',
-        borderRadius: '8px', padding: '0.5rem 1rem', color: form.supplier_name && form.unit_price ? 'rgb(77,163,255)' : 'rgb(80,92,110)',
+        background: form.supplier_name && form.unit_price ? 'rgba(77,163,255,0.18)' : 'rgba(240,236,228,0.04)',
+        border: form.supplier_name && form.unit_price ? '1px solid rgba(154,124,74,0.35)' : '1px solid rgba(240,236,228,0.06)',
+        borderRadius: '8px', padding: '0.5rem 1rem', color: form.supplier_name && form.unit_price ? '#d4b47a' : 'rgba(240,236,228,0.24)',
         fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
       }}>
         {loading ? '🧠 A avaliar com AI…' : '+ Registar & Avaliar'}
@@ -320,9 +320,9 @@ function AddBidPanel({ rfqId, rfqQty, onAdded }: { rfqId: string; rfqQty: number
 
       {result && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-          style={{ marginTop: '0.75rem', padding: '0.625rem 0.75rem', background: 'rgba(99,230,190,0.06)', borderRadius: '10px', border: '1px solid rgba(99,230,190,0.15)' }}>
-          <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgb(99,230,190)', marginBottom: '0.2rem' }}>✓ Proposta registada — Score AI: {result.score}/100</div>
-          {result.insight && <div style={{ fontSize: '0.65rem', color: 'rgb(140,155,175)', lineHeight: 1.5 }}>{result.insight}</div>}
+          style={{ marginTop: '0.75rem', padding: '0.625rem 0.75rem', background: 'rgba(99,230,190,0.06)', borderRadius: '10px', border: '1px solid rgba(184,151,94,0.14)' }}>
+          <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#b8975e', marginBottom: '0.2rem' }}>✓ Proposta registada — Score AI: {result.score}/100</div>
+          {result.insight && <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.42)', lineHeight: 1.5 }}>{result.insight}</div>}
         </motion.div>
       )}
     </div>
@@ -495,17 +495,17 @@ export default function ProcurementPage() {
         {/* Header */}
         <motion.div {...fadeUp(0)} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.75rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
               Procurement AI {isAdmin && <span style={{ fontSize: '0.68rem', color: 'rgb(245,158,11)', marginLeft: '0.5rem', fontWeight: 700 }}>ADMIN</span>}
             </h1>
-            <p style={{ fontSize: '0.78rem', color: 'rgb(80,92,110)' }}>
+            <p style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.24)' }}>
               Motor autónomo de RFQ, negociação AI e optimização de sourcing.
             </p>
           </div>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             {isAdmin && (
               <>
-                <motion.button whileTap={tapScale} onClick={loadAnalytics} style={{ background: 'rgba(99,230,190,0.1)', border: '1px solid rgba(99,230,190,0.25)', borderRadius: '10px', padding: '0.5rem 0.875rem', color: 'rgb(99,230,190)', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}>
+                <motion.button whileTap={tapScale} onClick={loadAnalytics} style={{ background: 'rgba(184,151,94,0.10)', border: '1px solid rgba(99,230,190,0.25)', borderRadius: '10px', padding: '0.5rem 0.875rem', color: '#b8975e', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}>
                   📊 Analytics
                 </motion.button>
                 <motion.button whileTap={tapScale} onClick={loadMemory} style={{ background: 'rgba(167,139,250,0.1)', border: '1px solid rgba(167,139,250,0.25)', borderRadius: '10px', padding: '0.5rem 0.875rem', color: 'rgb(167,139,250)', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}>
@@ -513,7 +513,7 @@ export default function ProcurementPage() {
                 </motion.button>
               </>
             )}
-            <motion.button whileTap={tapScale} onClick={() => setPanelMode('create')} style={{ background: 'linear-gradient(135deg,rgba(77,163,255,0.2),rgba(116,231,255,0.1))', border: '1px solid rgba(77,163,255,0.35)', borderRadius: '10px', padding: '0.5rem 1rem', color: 'rgb(77,163,255)', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
+            <motion.button whileTap={tapScale} onClick={() => setPanelMode('create')} style={{ background: 'linear-gradient(135deg,rgba(154,124,74,0.18),rgba(184,151,94,0.10))', border: '1px solid rgba(77,163,255,0.35)', borderRadius: '10px', padding: '0.5rem 1rem', color: '#d4b47a', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
               + Novo RFQ
             </motion.button>
           </div>
@@ -528,7 +528,7 @@ export default function ProcurementPage() {
             <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap', marginBottom: '0.875rem' }}>
               {statusTabs.map(tab => (
                 <button type="button" key={tab.id} onClick={() => { setStatusFilter(tab.id); loadList(tab.id); }}
-                  style={{ background: statusFilter === tab.id ? 'rgba(77,163,255,0.18)' : 'rgba(255,255,255,0.04)', border: statusFilter === tab.id ? '1px solid rgba(77,163,255,0.4)' : '1px solid rgba(255,255,255,0.07)', borderRadius: '8px', padding: '0.3rem 0.6rem', color: statusFilter === tab.id ? 'rgb(77,163,255)' : 'rgb(100,112,130)', fontSize: '0.62rem', fontWeight: 600, cursor: 'pointer' }}>
+                  style={{ background: statusFilter === tab.id ? 'rgba(77,163,255,0.18)' : 'rgba(240,236,228,0.04)', border: statusFilter === tab.id ? '1px solid rgba(154,124,74,0.35)' : '1px solid rgba(240,236,228,0.06)', borderRadius: '8px', padding: '0.3rem 0.6rem', color: statusFilter === tab.id ? '#d4b47a' : 'rgba(240,236,228,0.42)', fontSize: '0.62rem', fontWeight: 600, cursor: 'pointer' }}>
                   {tab.label}
                 </button>
               ))}
@@ -538,7 +538,7 @@ export default function ProcurementPage() {
               {listLoading ? Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="skeleton skeleton-card" style={{ borderRadius: '12px' }} />
               )) : rfqs.length === 0 ? (
-                <div style={{ padding: '2.5rem', textAlign: 'center', color: 'rgb(80,92,110)', fontSize: '0.75rem', border: '1px dashed rgba(255,255,255,0.07)', borderRadius: '12px' }}>
+                <div style={{ padding: '2.5rem', textAlign: 'center', color: 'rgba(240,236,228,0.24)', fontSize: '0.75rem', border: '1px dashed rgba(240,236,228,0.06)', borderRadius: '12px' }}>
                   Nenhum RFQ encontrado.<br />Clica em "+ Novo RFQ" para começar.
                 </div>
               ) : (
@@ -551,23 +551,23 @@ export default function ProcurementPage() {
                       transition={{ ...springSnappy, delay: i * 0.04 }}
                       whileTap={tapScale}
                       onClick={() => loadDetail(rfq)}
-                      style={{ padding: '0.875rem 1rem', borderRadius: '12px', border: selectedRFQ?.id === rfq.id ? '1.5px solid rgba(77,163,255,0.5)' : '1px solid rgba(255,255,255,0.06)', background: selectedRFQ?.id === rfq.id ? 'rgba(77,163,255,0.08)' : 'rgba(255,255,255,0.03)', cursor: 'pointer' }}
+                      style={{ padding: '0.875rem 1rem', borderRadius: '12px', border: selectedRFQ?.id === rfq.id ? '1.5px solid rgba(154,124,74,0.45)' : '1px solid rgba(240,236,228,0.06)', background: selectedRFQ?.id === rfq.id ? 'rgba(154,124,74,0.08)' : 'rgba(240,236,228,0.04)', cursor: 'pointer' }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.3rem' }}>
                         <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgb(200,215,235)', flex: 1, paddingRight: '0.5rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{rfq.title}</div>
                         <StatusBadge status={rfq.status} />
                       </div>
-                      <div style={{ fontSize: '0.65rem', color: 'rgb(100,112,130)', marginBottom: '0.25rem' }}>
+                      <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.42)', marginBottom: '0.25rem' }}>
                         {rfq.product_name} · {rfq.quantity.toLocaleString('pt-PT')} un
                         {rfq.target_unit_price ? ` · Target €${rfq.target_unit_price}/un` : ''}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
                           <span style={{ fontSize: '0.58rem', fontWeight: 700, color: PRIORITY_CFG[rfq.priority].color }}>● {PRIORITY_CFG[rfq.priority].label}</span>
-                          {rfq.responded_count > 0 && <span style={{ fontSize: '0.58rem', color: 'rgb(116,231,255)', fontWeight: 600 }}>{rfq.responded_count} propostas</span>}
-                          {rfq.savings_amount && rfq.savings_amount > 0 && <span style={{ fontSize: '0.58rem', color: 'rgb(99,230,190)', fontWeight: 700 }}>-{fmtEur(rfq.savings_amount)}</span>}
+                          {rfq.responded_count > 0 && <span style={{ fontSize: '0.58rem', color: '#b8975e', fontWeight: 600 }}>{rfq.responded_count} propostas</span>}
+                          {rfq.savings_amount && rfq.savings_amount > 0 && <span style={{ fontSize: '0.58rem', color: '#b8975e', fontWeight: 700 }}>-{fmtEur(rfq.savings_amount)}</span>}
                         </div>
-                        <span style={{ fontSize: '0.55rem', color: 'rgb(60,72,90)' }}>{fmtAgo(rfq.updated_at)}</span>
+                        <span style={{ fontSize: '0.55rem', color: 'rgba(240,236,228,0.24)' }}>{fmtAgo(rfq.updated_at)}</span>
                       </div>
                     </motion.div>
                   ))}
@@ -585,7 +585,7 @@ export default function ProcurementPage() {
                 <div className="yg-card" style={{ padding: '1.5rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
                     <h2 style={{ fontSize: '1rem', fontWeight: 800, color: 'rgb(220,232,248)' }}>🚀 Novo RFQ Autónomo</h2>
-                    <button type="button" onClick={() => setPanelMode('list')} style={{ background: 'none', border: 'none', color: 'rgb(80,92,110)', cursor: 'pointer', fontSize: '0.75rem' }}>✕ Fechar</button>
+                    <button type="button" onClick={() => setPanelMode('list')} style={{ background: 'none', border: 'none', color: 'rgba(240,236,228,0.24)', cursor: 'pointer', fontSize: '0.75rem' }}>✕ Fechar</button>
                   </div>
                   <CreateRFQPanel onCreated={(rfq) => { loadList(statusFilter); loadDetail(rfq); }} />
                 </div>
@@ -599,23 +599,23 @@ export default function ProcurementPage() {
                   <h2 style={{ fontSize: '1rem', fontWeight: 800, color: 'rgb(220,232,248)', marginBottom: '1.25rem' }}>📊 Procurement Analytics</h2>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.75rem', marginBottom: '1.25rem' }}>
                     {[
-                      { label: 'Total RFQs', value: String(analytics.total_rfqs ?? 0), color: 'rgb(77,163,255)' },
-                      { label: 'Poupança Total', value: fmtEur(Number(analytics.total_savings ?? 0)), color: 'rgb(99,230,190)' },
-                      { label: 'Propostas Recebidas', value: String(analytics.response_count ?? 0), color: 'rgb(116,231,255)' },
+                      { label: 'Total RFQs', value: String(analytics.total_rfqs ?? 0), color: '#d4b47a' },
+                      { label: 'Poupança Total', value: fmtEur(Number(analytics.total_savings ?? 0)), color: '#b8975e' },
+                      { label: 'Propostas Recebidas', value: String(analytics.response_count ?? 0), color: '#b8975e' },
                     ].map(m => (
-                      <div key={m.label} style={{ padding: '0.875rem', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <div key={m.label} style={{ padding: '0.875rem', background: 'rgba(240,236,228,0.04)', borderRadius: '10px', border: '1px solid rgba(240,236,228,0.06)' }}>
                         <div style={{ fontSize: '1.25rem', fontWeight: 800, color: m.color, letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>{m.value}</div>
-                        <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)' }}>{m.label}</div>
+                        <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)' }}>{m.label}</div>
                       </div>
                     ))}
                   </div>
                   {!!(analytics.supplier_wins) && Object.keys(analytics.supplier_wins as object).length > 0 && (
                     <div>
-                      <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.625rem' }}>Top Fornecedores Adjudicados</div>
+                      <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.625rem' }}>Top Fornecedores Adjudicados</div>
                       {Object.entries(analytics.supplier_wins as Record<string, number>).sort((a,b) => b[1]-a[1]).map(([name, wins]) => (
-                        <div key={name} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div key={name} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
                           <span style={{ fontSize: '0.75rem', color: 'rgb(170,185,205)', fontWeight: 600 }}>{name}</span>
-                          <span style={{ fontSize: '0.72rem', color: 'rgb(99,230,190)', fontWeight: 700 }}>{wins} contratos</span>
+                          <span style={{ fontSize: '0.72rem', color: '#b8975e', fontWeight: 700 }}>{wins} contratos</span>
                         </div>
                       ))}
                     </div>
@@ -630,18 +630,18 @@ export default function ProcurementPage() {
                 <div className="yg-card" style={{ padding: '1.5rem' }}>
                   <h2 style={{ fontSize: '1rem', fontWeight: 800, color: 'rgb(220,232,248)', marginBottom: '1.25rem' }}>🧠 Procurement Memory Graph</h2>
                   {memory.length === 0 ? (
-                    <div style={{ padding: '2rem', textAlign: 'center', color: 'rgb(80,92,110)', fontSize: '0.75rem' }}>
+                    <div style={{ padding: '2rem', textAlign: 'center', color: 'rgba(240,236,228,0.24)', fontSize: '0.75rem' }}>
                       A memória será construída automaticamente à medida que adjudicas RFQs.
                     </div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
                       {memory.map((m) => (
-                        <div key={String(m.supplier_name)} style={{ padding: '0.875rem 1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div key={String(m.supplier_name)} style={{ padding: '0.875rem 1rem', background: 'rgba(240,236,228,0.04)', borderRadius: '12px', border: '1px solid rgba(240,236,228,0.06)' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                             <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'rgb(200,215,235)' }}>{String(m.supplier_name)}</span>
-                            <span style={{ fontSize: '0.65rem', color: 'rgb(99,230,190)', fontWeight: 700 }}>{Number(m.total_awarded ?? 0)}/{Number(m.total_rfqs ?? 0)} adjudicações</span>
+                            <span style={{ fontSize: '0.65rem', color: '#b8975e', fontWeight: 700 }}>{Number(m.total_awarded ?? 0)}/{Number(m.total_rfqs ?? 0)} adjudicações</span>
                           </div>
-                          <div style={{ display: 'flex', gap: '0.75rem', fontSize: '0.62rem', color: 'rgb(80,92,110)' }}>
+                          <div style={{ display: 'flex', gap: '0.75rem', fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)' }}>
                             {m.best_price_achieved != null && <span>Melhor preço: {fmtEur(Number(m.best_price_achieved))}/un</span>}
                             {m.avg_lead_time != null && <span>Lead time médio: {String(m.avg_lead_time)}d</span>}
                             {m.negotiation_win_rate != null && <span>Win rate: {Number(m.negotiation_win_rate).toFixed(0)}%</span>}
@@ -670,8 +670,8 @@ export default function ProcurementPage() {
                     </div>
                     {selectedRFQ.ai_risk_score != null && (
                       <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '0.58rem', color: 'rgb(80,92,110)', marginBottom: '0.15rem' }}>Risco AI</div>
-                        <div style={{ fontSize: '0.88rem', fontWeight: 800, color: selectedRFQ.ai_risk_score < 40 ? 'rgb(99,230,190)' : selectedRFQ.ai_risk_score < 70 ? 'rgb(245,158,11)' : 'rgb(239,68,68)' }}>
+                        <div style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.15rem' }}>Risco AI</div>
+                        <div style={{ fontSize: '0.88rem', fontWeight: 800, color: selectedRFQ.ai_risk_score < 40 ? '#b8975e' : selectedRFQ.ai_risk_score < 70 ? 'rgb(245,158,11)' : 'rgb(239,68,68)' }}>
                           {selectedRFQ.ai_risk_score}/100
                         </div>
                       </div>
@@ -686,7 +686,7 @@ export default function ProcurementPage() {
                       { label: 'Prazo', value: fmtDate(selectedRFQ.deadline) },
                     ].map(m => (
                       <div key={m.label}>
-                        <div style={{ fontSize: '0.58rem', color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.15rem' }}>{m.label}</div>
+                        <div style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.15rem' }}>{m.label}</div>
                         <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'rgb(170,185,205)' }}>{m.value}</div>
                       </div>
                     ))}
@@ -694,16 +694,16 @@ export default function ProcurementPage() {
 
                   {/* Winner / savings */}
                   {selectedRFQ.winner_supplier && (
-                    <div style={{ padding: '0.75rem', background: 'rgba(99,230,190,0.07)', borderRadius: '10px', border: '1px solid rgba(99,230,190,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ padding: '0.75rem', background: 'rgba(99,230,190,0.07)', borderRadius: '10px', border: '1px solid rgba(184,151,94,0.18)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
-                        <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)', marginBottom: '0.1rem' }}>Adjudicado a</div>
-                        <div style={{ fontSize: '0.88rem', fontWeight: 800, color: 'rgb(99,230,190)' }}>🏆 {selectedRFQ.winner_supplier}</div>
+                        <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.1rem' }}>Adjudicado a</div>
+                        <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#b8975e' }}>🏆 {selectedRFQ.winner_supplier}</div>
                       </div>
                       <div style={{ textAlign: 'right' }}>
                         {selectedRFQ.savings_amount && selectedRFQ.savings_amount > 0 && (
                           <>
-                            <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>Poupança</div>
-                            <div style={{ fontSize: '0.88rem', fontWeight: 800, color: 'rgb(99,230,190)' }}>
+                            <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)' }}>Poupança</div>
+                            <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#b8975e' }}>
                               {fmtEur(selectedRFQ.savings_amount)} ({selectedRFQ.savings_pct?.toFixed(1)}%)
                             </div>
                           </>
@@ -726,7 +726,7 @@ export default function ProcurementPage() {
 
                   {actionSuccess && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                      style={{ marginTop: '0.75rem', padding: '0.625rem', background: 'rgba(99,230,190,0.08)', borderRadius: '8px', color: 'rgb(99,230,190)', fontSize: '0.72rem', fontWeight: 600, textAlign: 'center' }}>
+                      style={{ marginTop: '0.75rem', padding: '0.625rem', background: 'rgba(184,151,94,0.08)', borderRadius: '8px', color: '#b8975e', fontSize: '0.72rem', fontWeight: 600, textAlign: 'center' }}>
                       ✅ {actionSuccess}
                     </motion.div>
                   )}
@@ -738,7 +738,7 @@ export default function ProcurementPage() {
                 ) : (
                   <div className="yg-card" style={{ padding: '1.25rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.875rem' }}>
-                      <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                      <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                         Propostas ({rfqResponses.length})
                       </div>
                       {isAdmin && rfqResponses.length >= 2 && (
@@ -750,28 +750,28 @@ export default function ProcurementPage() {
                     </div>
 
                     {rfqResponses.length === 0 ? (
-                      <div style={{ padding: '1rem', textAlign: 'center', color: 'rgb(80,92,110)', fontSize: '0.72rem' }}>Sem propostas ainda.</div>
+                      <div style={{ padding: '1rem', textAlign: 'center', color: 'rgba(240,236,228,0.24)', fontSize: '0.72rem' }}>Sem propostas ainda.</div>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         {rfqResponses.map((r, i) => (
-                          <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', padding: '0.75rem', background: r.status === 'accepted' ? 'rgba(99,230,190,0.06)' : 'rgba(255,255,255,0.03)', borderRadius: '10px', border: r.status === 'accepted' ? '1px solid rgba(99,230,190,0.2)' : '1px solid rgba(255,255,255,0.06)' }}>
+                          <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', padding: '0.75rem', background: r.status === 'accepted' ? 'rgba(99,230,190,0.06)' : 'rgba(240,236,228,0.04)', borderRadius: '10px', border: r.status === 'accepted' ? '1px solid rgba(184,151,94,0.18)' : '1px solid rgba(240,236,228,0.06)' }}>
                             {r.ai_score != null && <ScoreRing score={r.ai_score} />}
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
-                                {r.rank && <span style={{ fontSize: '0.58rem', fontWeight: 800, color: r.rank === 1 ? 'rgb(245,158,11)' : 'rgb(80,92,110)' }}>#{r.rank}</span>}
+                                {r.rank && <span style={{ fontSize: '0.58rem', fontWeight: 800, color: r.rank === 1 ? 'rgb(245,158,11)' : 'rgba(240,236,228,0.24)' }}>#{r.rank}</span>}
                                 <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(200,215,235)' }}>{r.supplier_name}</span>
-                                {r.status === 'accepted' && <span style={{ fontSize: '0.58rem', color: 'rgb(99,230,190)', fontWeight: 700 }}>● ACEITE</span>}
+                                {r.status === 'accepted' && <span style={{ fontSize: '0.58rem', color: '#b8975e', fontWeight: 700 }}>● ACEITE</span>}
                               </div>
-                              <div style={{ fontSize: '0.65rem', color: 'rgb(100,112,130)' }}>
+                              <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.42)' }}>
                                 {fmtEur(r.unit_price)}/un · {r.lead_time_days ?? '?'}d · MOQ {r.moq ?? '?'} · {r.payment_terms ?? 'Net30'}
                               </div>
                               {r.ai_analysis?.ai_insight && (
-                                <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginTop: '0.15rem', fontStyle: 'italic', lineHeight: 1.4 }}>{r.ai_analysis.ai_insight}</div>
+                                <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.15rem', fontStyle: 'italic', lineHeight: 1.4 }}>{r.ai_analysis.ai_insight}</div>
                               )}
                             </div>
                             {isAdmin && selectedRFQ.status !== 'awarded' && (
                               <motion.button whileTap={tapScale} onClick={() => awardToSupplier(r)} disabled={awardLoading}
-                                style={{ background: 'rgba(99,230,190,0.12)', border: '1px solid rgba(99,230,190,0.3)', borderRadius: '8px', padding: '0.4rem 0.75rem', color: 'rgb(99,230,190)', fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                                style={{ background: 'rgba(184,151,94,0.12)', border: '1px solid rgba(99,230,190,0.3)', borderRadius: '8px', padding: '0.4rem 0.75rem', color: '#b8975e', fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
                                 {awardLoading ? '…' : '🏆 Adjudicar'}
                               </motion.button>
                             )}
@@ -807,10 +807,10 @@ export default function ProcurementPage() {
                     {negotiations.length > 0 && (
                       <div style={{ marginBottom: '0.875rem' }}>
                         {negotiations.slice(-3).map(n => (
-                          <div key={n.id} style={{ padding: '0.625rem 0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)', marginBottom: '0.35rem' }}>
+                          <div key={n.id} style={{ padding: '0.625rem 0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(240,236,228,0.06)', marginBottom: '0.35rem' }}>
                             <div style={{ fontSize: '0.65rem', color: 'rgb(245,158,11)', fontWeight: 700 }}>Ronda {n.round} — {n.supplier_name}</div>
-                            {n.supplier_offer && <div style={{ fontSize: '0.62rem', color: 'rgb(140,155,175)' }}>Oferta: {fmtEur(n.supplier_offer)}/un</div>}
-                            {n.ai_strategy && <div style={{ fontSize: '0.6rem', color: 'rgb(100,112,130)', marginTop: '0.15rem', lineHeight: 1.4 }}>{n.ai_strategy.slice(0, 120)}…</div>}
+                            {n.supplier_offer && <div style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.42)' }}>Oferta: {fmtEur(n.supplier_offer)}/un</div>}
+                            {n.ai_strategy && <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.42)', marginTop: '0.15rem', lineHeight: 1.4 }}>{n.ai_strategy.slice(0, 120)}…</div>}
                           </div>
                         ))}
                       </div>
@@ -818,22 +818,22 @@ export default function ProcurementPage() {
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.625rem' }}>
                       <div>
-                        <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>Fornecedor</div>
-                        <select value={negSupplier} onChange={e => setNegSupplier(e.target.value)} style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.72rem' }}>
+                        <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>Fornecedor</div>
+                        <select value={negSupplier} onChange={e => setNegSupplier(e.target.value)} style={{ width: '100%', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.72rem' }}>
                           <option value="" style={{ background: 'rgb(14,22,36)' }}>Selecciona…</option>
                           {rfqResponses.map(r => <option key={r.id} value={r.supplier_name} style={{ background: 'rgb(14,22,36)' }}>{r.supplier_name} ({fmtEur(r.unit_price)}/un)</option>)}
                         </select>
                       </div>
                       <div>
-                        <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>Target €/un</div>
+                        <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>Target €/un</div>
                         <input type="number" step="0.01" value={negTargetPrice} onChange={e => setNegTargetPrice(e.target.value)}
                           placeholder={selectedRFQ.target_unit_price ? String(selectedRFQ.target_unit_price) : '0.00'}
-                          style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.72rem' }} />
+                          style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.72rem' }} />
                       </div>
                     </div>
 
                     <motion.button whileTap={tapScale} onClick={startNegotiation} disabled={negLoading || !negSupplier}
-                      style={{ width: '100%', background: negSupplier ? 'rgba(245,158,11,0.14)' : 'rgba(255,255,255,0.04)', border: negSupplier ? '1px solid rgba(245,158,11,0.35)' : '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '0.75rem', color: negSupplier ? 'rgb(245,158,11)' : 'rgb(80,92,110)', fontSize: '0.75rem', fontWeight: 700, cursor: negSupplier ? 'pointer' : 'not-allowed' }}>
+                      style={{ width: '100%', background: negSupplier ? 'rgba(245,158,11,0.14)' : 'rgba(240,236,228,0.04)', border: negSupplier ? '1px solid rgba(245,158,11,0.35)' : '1px solid rgba(240,236,228,0.06)', borderRadius: '10px', padding: '0.75rem', color: negSupplier ? 'rgb(245,158,11)' : 'rgba(240,236,228,0.24)', fontSize: '0.75rem', fontWeight: 700, cursor: negSupplier ? 'pointer' : 'not-allowed' }}>
                       {negLoading ? '🧠 A gerar estratégia de negociação…' : '🤝 Iniciar Negociação AI'}
                     </motion.button>
 
@@ -853,14 +853,14 @@ export default function ProcurementPage() {
             {/* Empty state */}
             {panelMode === 'list' && (
               <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px', color: 'rgb(80,92,110)', textAlign: 'center', border: '1px dashed rgba(255,255,255,0.07)', borderRadius: '16px' }}>
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px', color: 'rgba(240,236,228,0.24)', textAlign: 'center', border: '1px dashed rgba(240,236,228,0.06)', borderRadius: '16px' }}>
                 <div style={{ fontSize: '3rem', marginBottom: '0.75rem', opacity: 0.4 }}>🤝</div>
                 <div style={{ fontSize: '0.88rem', fontWeight: 600, marginBottom: '0.25rem' }}>Procurement AI Engine</div>
                 <div style={{ fontSize: '0.72rem', maxWidth: '280px', lineHeight: 1.6 }}>
                   Selecciona um RFQ para ver detalhes, propostas e negociação autónoma.
                 </div>
                 <motion.button whileTap={tapScale} onClick={() => setPanelMode('create')}
-                  style={{ marginTop: '1.25rem', background: 'rgba(77,163,255,0.12)', border: '1px solid rgba(77,163,255,0.3)', borderRadius: '10px', padding: '0.625rem 1.25rem', color: 'rgb(77,163,255)', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
+                  style={{ marginTop: '1.25rem', background: 'rgba(154,124,74,0.12)', border: '1px solid rgba(154,124,74,0.28)', borderRadius: '10px', padding: '0.625rem 1.25rem', color: '#d4b47a', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
                   + Criar primeiro RFQ
                 </motion.button>
               </motion.div>

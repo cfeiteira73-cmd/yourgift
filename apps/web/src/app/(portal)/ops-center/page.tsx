@@ -169,7 +169,7 @@ function HealthRing({ score }: { score: number }) {
   const color = score >= 80 ? '#10b981' : score >= 60 ? '#f59e0b' : '#ef4444';
   return (
     <svg width={88} height={88} viewBox="0 0 88 88">
-      <circle cx={44} cy={44} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={8} />
+      <circle cx={44} cy={44} r={r} fill="none" stroke="rgba(240,236,228,0.06)" strokeWidth={8} />
       <circle
         cx={44} cy={44} r={r} fill="none"
         stroke={color} strokeWidth={8}
@@ -288,7 +288,7 @@ export default function OpsCenterPage() {
               </motion.span>
             )}
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14, margin: 0 }}>
+          <p style={{ color: 'rgba(240,236,228,0.35)', fontSize: 14, margin: 0 }}>
             Missão de controlo em tempo real · Auto-refresh 30s
             {lastRefresh && ` · Atualizado ${timeAgo(lastRefresh.toISOString())}`}
           </p>
@@ -301,7 +301,7 @@ export default function OpsCenterPage() {
             disabled={loading}
             style={{
               padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600,
-              background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)',
+              background: 'rgba(240,236,228,0.06)', color: '#fff', border: '1px solid rgba(240,236,228,0.10)',
               cursor: loading ? 'not-allowed' : 'pointer', alignSelf: 'flex-start', marginTop: 8,
             }}
           >
@@ -325,9 +325,9 @@ export default function OpsCenterPage() {
             onClick={() => setTab(t.key)}
             style={{
               padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap',
-              background: tab === t.key ? 'rgba(255,255,255,0.1)' : 'transparent',
-              color: tab === t.key ? '#fff' : 'rgba(255,255,255,0.4)',
-              border: tab === t.key ? '1px solid rgba(255,255,255,0.15)' : '1px solid transparent',
+              background: tab === t.key ? 'rgba(240,236,228,0.10)' : 'transparent',
+              color: tab === t.key ? '#fff' : 'rgba(240,236,228,0.35)',
+              border: tab === t.key ? '1px solid rgba(240,236,228,0.14)' : '1px solid transparent',
               cursor: 'pointer',
             }}
           >
@@ -375,9 +375,9 @@ function LoadingSkeleton() {
 function StatCard({ label, value, sub, color }: { label: string; value: string | number; sub?: string; color?: string }) {
   return (
     <div className="yg-card" style={{ padding: 20 }}>
-      <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, marginBottom: 8 }}>{label}</p>
+      <p style={{ color: 'rgba(240,236,228,0.35)', fontSize: 12, marginBottom: 8 }}>{label}</p>
       <p style={{ fontSize: 28, fontWeight: 700, color: color ?? '#fff', margin: 0 }}>{value}</p>
-      {sub && <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, marginTop: 4 }}>{sub}</p>}
+      {sub && <p style={{ color: 'rgba(240,236,228,0.28)', fontSize: 12, marginTop: 4 }}>{sub}</p>}
     </div>
   );
 }
@@ -435,7 +435,7 @@ function OverviewTab({ data }: { data: Dashboard }) {
                 <span style={{ flex: 1, fontSize: 13, color: 'rgba(255,255,255,0.7)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {a.description}
                 </span>
-                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', whiteSpace: 'nowrap' }}>{timeAgo(a.detected_at)}</span>
+                <span style={{ fontSize: 12, color: 'rgba(240,236,228,0.28)', whiteSpace: 'nowrap' }}>{timeAgo(a.detected_at)}</span>
               </div>
             ))}
           </div>
@@ -464,7 +464,7 @@ function StuckTab({ orders }: { orders: StuckOrder[] }) {
                 <p style={{ fontSize: 14, fontWeight: 600, color: '#fff', margin: 0 }}>
                   {o.reference} · {o.clients?.company_name ?? 'Cliente desconhecido'}
                 </p>
-                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: '2px 0 0' }}>
+                <p style={{ fontSize: 12, color: 'rgba(240,236,228,0.35)', margin: '2px 0 0' }}>
                   Status: <span style={{ color: 'rgba(255,255,255,0.6)' }}>{o.status}</span>
                   {' · '}Parado há <span style={{ color: o.severity === 'critical' ? '#ef4444' : '#f59e0b', fontWeight: 600 }}>{o.hours_stuck}h</span>
                 </p>
@@ -472,7 +472,7 @@ function StuckTab({ orders }: { orders: StuckOrder[] }) {
             </div>
             <div style={{ textAlign: 'right' }}>
               <p style={{ fontSize: 14, fontWeight: 600, color: '#fff', margin: 0 }}>{fmtEur(o.total_amount, o.currency)}</p>
-              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', margin: 0 }}>Atualizado {timeAgo(o.updated_at)}</p>
+              <p style={{ fontSize: 11, color: 'rgba(240,236,228,0.28)', margin: 0 }}>Atualizado {timeAgo(o.updated_at)}</p>
             </div>
           </div>
         </motion.div>
@@ -512,7 +512,7 @@ function WebhooksTab({
                   }}>{w.status}</span>
                   <span style={{ fontSize: 13, color: '#fff', fontWeight: 500 }}>{w.event_type}</span>
                 </div>
-                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', margin: 0 }}>
+                <p style={{ fontSize: 12, color: 'rgba(240,236,228,0.28)', margin: 0 }}>
                   {w.endpoint_url} · {w.retry_count} tentativas · {timeAgo(w.created_at)}
                 </p>
                 {w.last_error && (
@@ -527,8 +527,8 @@ function WebhooksTab({
                 disabled={actioning === w.id}
                 style={{
                   padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600,
-                  background: 'rgba(77,163,255,0.15)', color: '#4da3ff',
-                  border: '1px solid rgba(77,163,255,0.2)', cursor: actioning === w.id ? 'not-allowed' : 'pointer',
+                  background: 'rgba(154,124,74,0.14)', color: '#4da3ff',
+                  border: '1px solid rgba(154,124,74,0.18)', cursor: actioning === w.id ? 'not-allowed' : 'pointer',
                 }}
               >
                 {actioning === w.id ? '⟳' : '↻ Retry'}
@@ -564,7 +564,7 @@ function PaymentsTab({ payments }: { payments: Dashboard['payments'] }) {
                       <p style={{ fontSize: 14, fontWeight: 600, color: urgent ? '#ef4444' : '#fff', margin: 0 }}>
                         {fmtEur(d.amount, d.currency)} · {d.reason ?? 'Sem motivo'}
                       </p>
-                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: '2px 0 0' }}>
+                      <p style={{ fontSize: 12, color: 'rgba(240,236,228,0.35)', margin: '2px 0 0' }}>
                         {d.stripe_dispute_id ?? d.id}
                         {hoursLeft !== null && (
                           <> · <span style={{ color: urgent ? '#ef4444' : '#f59e0b', fontWeight: 600 }}>
@@ -599,7 +599,7 @@ function PaymentsTab({ payments }: { payments: Dashboard['payments'] }) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <p style={{ fontSize: 13, color: '#fff', fontWeight: 500, margin: 0 }}>{p.event_type}</p>
-                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', margin: 0 }}>{p.object_id} · {timeAgo(p.created_at)}</p>
+                    <p style={{ fontSize: 11, color: 'rgba(240,236,228,0.28)', margin: 0 }}>{p.object_id} · {timeAgo(p.created_at)}</p>
                   </div>
                   {p.amount && <p style={{ fontSize: 14, fontWeight: 700, color: '#ef4444', margin: 0 }}>{fmtEur(p.amount / 100)}</p>}
                 </div>
@@ -623,7 +623,7 @@ function PaymentsTab({ payments }: { payments: Dashboard['payments'] }) {
                     <p style={{ fontSize: 13, color: '#fff', fontWeight: 500, margin: 0 }}>
                       Settlement {s.settlement_date}
                     </p>
-                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', margin: 0 }}>
+                    <p style={{ fontSize: 11, color: 'rgba(240,236,228,0.28)', margin: 0 }}>
                       Gross: {fmtEur(s.gross_volume)} · Net: {fmtEur(s.net_settled)}
                     </p>
                   </div>
@@ -631,7 +631,7 @@ function PaymentsTab({ payments }: { payments: Dashboard['payments'] }) {
                     <p style={{ fontSize: 14, fontWeight: 700, color: s.drift_amount > 0 ? '#ef4444' : '#10b981', margin: 0 }}>
                       {s.drift_amount > 0 ? '+' : ''}{fmtEur(s.drift_amount)}
                     </p>
-                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', margin: 0 }}>{s.status}</p>
+                    <p style={{ fontSize: 11, color: 'rgba(240,236,228,0.28)', margin: 0 }}>{s.status}</p>
                   </div>
                 </div>
               </div>
@@ -665,13 +665,13 @@ function ProductionTab({ production }: { production: Dashboard['production'] }) 
                         {b.omega_final_sla_rules?.name ?? 'SLA breach'}
                       </span>
                     </div>
-                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', margin: 0 }}>
+                    <p style={{ fontSize: 12, color: 'rgba(240,236,228,0.28)', margin: 0 }}>
                       {b.entity_type} · {b.entity_id.slice(0, 12)}…
                     </p>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <p style={{ fontSize: 16, fontWeight: 700, color: '#ef4444', margin: 0 }}>{b.hours_overdue}h</p>
-                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', margin: 0 }}>em atraso</p>
+                    <p style={{ fontSize: 11, color: 'rgba(240,236,228,0.28)', margin: 0 }}>em atraso</p>
                   </div>
                 </div>
               </div>
@@ -696,7 +696,7 @@ function ProductionTab({ production }: { production: Dashboard['production'] }) 
                     <p style={{ fontSize: 14, fontWeight: 600, color: o.is_overdue ? '#ef4444' : '#fff', margin: 0 }}>
                       {o.reference} · {o.clients?.company_name ?? '—'}
                     </p>
-                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: '2px 0 0' }}>
+                    <p style={{ fontSize: 12, color: 'rgba(240,236,228,0.35)', margin: '2px 0 0' }}>
                       {o.is_overdue
                         ? <span style={{ color: '#ef4444', fontWeight: 600 }}>ATRASADO {Math.abs(o.hours_to_deadline ?? 0)}h</span>
                         : <span style={{ color: '#f59e0b' }}>Vence em {o.hours_to_deadline}h</span>
@@ -747,13 +747,13 @@ function AnomaliesTab({
                   <SevBadge sev={a.severity} />
                   <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{a.anomaly_type}</span>
                   {a.confidence_score && (
-                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>
+                    <span style={{ fontSize: 11, color: 'rgba(240,236,228,0.28)' }}>
                       {Math.round(a.confidence_score * 100)}% confiança
                     </span>
                   )}
                 </div>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', margin: '0 0 4px' }}>{a.description}</p>
-                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', margin: 0 }}>
+                <p style={{ fontSize: 11, color: 'rgba(240,236,228,0.28)', margin: 0 }}>
                   {a.entity_type}{a.entity_id ? ` · ${a.entity_id.slice(0, 12)}…` : ''} · {timeAgo(a.detected_at)}
                 </p>
               </div>

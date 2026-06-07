@@ -57,8 +57,8 @@ export function CostBreakdown({ data }: CostBreakdownProps) {
               fontSize: '0.875rem',
             }}
           >
-            <span style={{ color: row.muted ? 'rgb(120,130,150)' : 'rgb(170,180,198)' }}>{row.label}</span>
-            <span style={{ color: row.muted ? 'rgb(120,130,150)' : 'rgb(245,247,251)', fontWeight: 500 }}>
+            <span style={{ color: row.muted ? 'rgba(240,236,228,0.42)' : 'rgb(170,180,198)' }}>{row.label}</span>
+            <span style={{ color: row.muted ? 'rgba(240,236,228,0.42)' : '#f0ece4', fontWeight: 500 }}>
               {formatPrice(row.value)}
             </span>
           </div>
@@ -69,7 +69,7 @@ export function CostBreakdown({ data }: CostBreakdownProps) {
       <div
         style={{
           height: '1px',
-          background: 'rgba(255,255,255,0.07)',
+          background: 'rgba(240,236,228,0.06)',
           margin: '1rem 0 0.875rem',
         }}
       />
@@ -79,7 +79,7 @@ export function CostBreakdown({ data }: CostBreakdownProps) {
           style={{
             fontSize: '0.875rem',
             fontWeight: 700,
-            color: 'rgb(245,247,251)',
+            color: '#f0ece4',
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
           }}
@@ -90,7 +90,7 @@ export function CostBreakdown({ data }: CostBreakdownProps) {
           style={{
             fontSize: '1.5rem',
             fontWeight: 800,
-            color: 'rgb(99,230,190)',
+            color: '#b8975e',
             letterSpacing: '-0.02em',
           }}
         >

@@ -73,22 +73,22 @@ function StepIndicator({ current }: { current: number }) {
                   fontWeight: 700,
                   transition: 'all 200ms ease',
                   ...(isCompleted
-                    ? { background: 'rgb(99,230,190)', color: 'rgb(7,17,31)' }
+                    ? { background: '#b8975e', color: '#090907' }
                     : isCurrent
-                    ? { background: 'rgb(77,163,255)', color: 'rgb(7,17,31)', boxShadow: '0 0 0 4px rgba(77,163,255,0.2)' }
-                    : { background: 'rgba(255,255,255,0.06)', color: 'rgb(120,130,150)', border: '1px solid rgba(255,255,255,0.08)' }),
+                    ? { background: '#d4b47a', color: '#090907', boxShadow: '0 0 0 4px rgba(154,124,74,0.18)' }
+                    : { background: 'rgba(240,236,228,0.06)', color: 'rgba(240,236,228,0.42)', border: '1px solid rgba(240,236,228,0.06)' }),
                 }}
               >
                 {isCompleted ? (
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                 ) : n}
               </div>
-              <span style={{ fontSize: '0.7rem', fontWeight: isCurrent ? 600 : 400, color: isCurrent ? 'rgb(77,163,255)' : isCompleted ? 'rgb(99,230,190)' : 'rgb(120,130,150)', whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: '0.7rem', fontWeight: isCurrent ? 600 : 400, color: isCurrent ? '#d4b47a' : isCompleted ? '#b8975e' : 'rgba(240,236,228,0.42)', whiteSpace: 'nowrap' }}>
                 {label}
               </span>
             </div>
             {idx < steps.length - 1 && (
-              <div style={{ flex: 1, height: '2px', margin: '0 0.75rem', marginTop: '-1rem', background: isCompleted ? 'rgb(99,230,190)' : 'rgba(255,255,255,0.06)', transition: 'background 300ms ease' }} />
+              <div style={{ flex: 1, height: '2px', margin: '0 0.75rem', marginTop: '-1rem', background: isCompleted ? '#b8975e' : 'rgba(240,236,228,0.06)', transition: 'background 300ms ease' }} />
             )}
           </div>
         );
@@ -271,12 +271,12 @@ export default function NewQuotePage() {
         <div style={{ marginBottom: '1.75rem' }}>
           <Link
             href="/dashboard"
-            style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.375rem', marginBottom: '1rem' }}
+            style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.375rem', marginBottom: '1rem' }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
             Dashboard
           </Link>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em' }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em' }}>
             Pedir Orçamento
           </h1>
         </div>
@@ -286,13 +286,13 @@ export default function NewQuotePage() {
         {/* ── STEP 1 — Produtos ── */}
         {step === 1 && (
           <div>
-            <h2 style={{ fontSize: '1rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '1.25rem' }}>
+            <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#f0ece4', marginBottom: '1.25rem' }}>
               Seleciona os produtos
             </h2>
 
             {/* Search */}
             <div style={{ position: 'relative', marginBottom: '1.25rem' }}>
-              <svg style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'rgb(120,130,150)', pointerEvents: 'none' }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
+              <svg style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(240,236,228,0.42)', pointerEvents: 'none' }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
               <input
                 type="text"
                 placeholder="Pesquisar produto (ex: caneta, mochila, t-shirt...)"
@@ -300,20 +300,20 @@ export default function NewQuotePage() {
                 onChange={(e) => handleSearch(e.target.value)}
                 style={{
                   width: '100%',
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'rgba(240,236,228,0.04)',
+                  border: '1px solid rgba(240,236,228,0.06)',
                   borderRadius: '10px',
                   padding: '0.75rem 1rem 0.75rem 2.75rem',
                   fontSize: '0.875rem',
-                  color: 'rgb(245,247,251)',
+                  color: '#f0ece4',
                   outline: 'none',
                 }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(77,163,255,0.4)')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)')}
+                onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(154,124,74,0.35)')}
+                onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(240,236,228,0.06)')}
               />
               {searching && (
                 <div style={{ position: 'absolute', right: '0.875rem', top: '50%', transform: 'translateY(-50%)' }}>
-                  <div style={{ width: '16px', height: '16px', border: '2px solid rgba(77,163,255,0.3)', borderTopColor: 'rgb(77,163,255)', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                  <div style={{ width: '16px', height: '16px', border: '2px solid rgba(154,124,74,0.28)', borderTopColor: '#d4b47a', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
                 </div>
               )}
             </div>
@@ -347,7 +347,7 @@ export default function NewQuotePage() {
                           aspectRatio: '1',
                           borderRadius: '8px',
                           overflow: 'hidden',
-                          background: 'rgba(255,255,255,0.05)',
+                          background: 'rgba(240,236,228,0.06)',
                           marginBottom: '0.625rem',
                           display: 'flex',
                           alignItems: 'center',
@@ -361,11 +361,11 @@ export default function NewQuotePage() {
                           <span style={{ fontSize: '2rem' }}>🎁</span>
                         )}
                       </div>
-                      <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'rgb(245,247,251)', marginBottom: '0.25rem', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#f0ece4', marginBottom: '0.25rem', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {product.title}
                       </p>
                       {product.base_price != null && product.base_price > 0 && (
-                        <p style={{ fontSize: '0.75rem', color: 'rgb(99,230,190)', marginBottom: '0.5rem' }}>
+                        <p style={{ fontSize: '0.75rem', color: '#b8975e', marginBottom: '0.5rem' }}>
                           A partir de {formatPrice(product.base_price)}
                         </p>
                       )}
@@ -380,9 +380,9 @@ export default function NewQuotePage() {
                           fontSize: '0.75rem',
                           fontWeight: 600,
                           cursor: already ? 'not-allowed' : 'pointer',
-                          background: already ? 'rgba(99,230,190,0.1)' : 'rgba(77,163,255,0.15)',
-                          color: already ? 'rgb(99,230,190)' : 'rgb(77,163,255)',
-                          border: already ? '1px solid rgba(99,230,190,0.2)' : '1px solid rgba(77,163,255,0.2)',
+                          background: already ? 'rgba(184,151,94,0.10)' : 'rgba(154,124,74,0.14)',
+                          color: already ? '#b8975e' : '#d4b47a',
+                          border: already ? '1px solid rgba(184,151,94,0.18)' : '1px solid rgba(154,124,74,0.18)',
                           transition: 'all 150ms ease',
                         }}
                       >
@@ -397,7 +397,7 @@ export default function NewQuotePage() {
             {/* Selected items */}
             {selectedItems.length > 0 && (
               <div style={{ marginBottom: '1.5rem' }}>
-                <h3 style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '0.75rem' }}>
+                <h3 style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '0.75rem' }}>
                   Produtos selecionados ({selectedItems.length})
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
@@ -407,7 +407,7 @@ export default function NewQuotePage() {
                       className="yg-card"
                       style={{ padding: '0.875rem', display: 'flex', gap: '0.875rem', alignItems: 'center', flexWrap: 'wrap' }}
                     >
-                      <div style={{ width: '44px', height: '44px', borderRadius: '8px', overflow: 'hidden', background: 'rgba(255,255,255,0.05)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ width: '44px', height: '44px', borderRadius: '8px', overflow: 'hidden', background: 'rgba(240,236,228,0.06)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {item.product.images?.[0] ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={item.product.images[0]?.includes("apis.makito.es") ? `/api/images/makito?url=${encodeURIComponent(item.product.images[0])}` : item.product.images[0]} alt="" referrerPolicy="no-referrer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -415,7 +415,7 @@ export default function NewQuotePage() {
                           <span style={{ fontSize: '1.1rem' }}>🎁</span>
                         )}
                       </div>
-                      <p style={{ flex: 1, fontSize: '0.875rem', fontWeight: 600, color: 'rgb(245,247,251)', minWidth: '120px' }}>
+                      <p style={{ flex: 1, fontSize: '0.875rem', fontWeight: 600, color: '#f0ece4', minWidth: '120px' }}>
                         {item.product.title}
                       </p>
                       {/* Quantity */}
@@ -423,7 +423,7 @@ export default function NewQuotePage() {
                         <button type="button"
                           
                           onClick={() => updateItem(item.product.id, { quantity: Math.max(1, item.quantity - 10) })}
-                          style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgb(170,180,198)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                          style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid rgba(240,236,228,0.10)', background: 'rgba(240,236,228,0.04)', color: 'rgb(170,180,198)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >
                           −
                         </button>
@@ -432,12 +432,12 @@ export default function NewQuotePage() {
                           min="1"
                           value={item.quantity}
                           onChange={(e) => updateItem(item.product.id, { quantity: Math.max(1, parseInt(e.target.value) || 1) })}
-                          style={{ width: '60px', textAlign: 'center', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', padding: '0.3rem', fontSize: '0.875rem', color: 'rgb(245,247,251)', outline: 'none' }}
+                          style={{ width: '60px', textAlign: 'center', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.10)', borderRadius: '6px', padding: '0.3rem', fontSize: '0.875rem', color: '#f0ece4', outline: 'none' }}
                         />
                         <button type="button"
                           
                           onClick={() => updateItem(item.product.id, { quantity: item.quantity + 10 })}
-                          style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgb(170,180,198)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                          style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid rgba(240,236,228,0.10)', background: 'rgba(240,236,228,0.04)', color: 'rgb(170,180,198)', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >
                           +
                         </button>
@@ -446,7 +446,7 @@ export default function NewQuotePage() {
                       <select
                         value={item.technique}
                         onChange={(e) => updateItem(item.product.id, { technique: e.target.value })}
-                        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', padding: '0.3rem 0.5rem', fontSize: '0.8rem', color: 'rgb(170,180,198)', outline: 'none', cursor: 'pointer' }}
+                        style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.10)', borderRadius: '6px', padding: '0.3rem 0.5rem', fontSize: '0.8rem', color: 'rgb(170,180,198)', outline: 'none', cursor: 'pointer' }}
                       >
                         {TECHNIQUES.map((t) => (
                           <option key={t.id} value={t.id}>{t.label}</option>
@@ -467,7 +467,7 @@ export default function NewQuotePage() {
             )}
 
             {selectedItems.length === 0 && !searchQuery && (
-              <div style={{ padding: '2.5rem', textAlign: 'center', color: 'rgb(120,130,150)', fontSize: '0.875rem' }}>
+              <div style={{ padding: '2.5rem', textAlign: 'center', color: 'rgba(240,236,228,0.42)', fontSize: '0.875rem' }}>
                 Pesquisa um produto para começar
               </div>
             )}
@@ -483,8 +483,8 @@ export default function NewQuotePage() {
                   fontSize: '0.875rem',
                   fontWeight: 700,
                   cursor: selectedItems.length === 0 ? 'not-allowed' : 'pointer',
-                  background: selectedItems.length === 0 ? 'rgba(77,163,255,0.3)' : 'rgb(77,163,255)',
-                  color: 'rgb(7,17,31)',
+                  background: selectedItems.length === 0 ? 'rgba(154,124,74,0.28)' : '#d4b47a',
+                  color: '#090907',
                   border: 'none',
                   opacity: selectedItems.length === 0 ? 0.5 : 1,
                   transition: 'all 150ms ease',
@@ -499,7 +499,7 @@ export default function NewQuotePage() {
         {/* ── STEP 2 — Detalhes ── */}
         {step === 2 && (
           <div>
-            <h2 style={{ fontSize: '1rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '1.5rem' }}>
+            <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#f0ece4', marginBottom: '1.5rem' }}>
               Detalhes do pedido
             </h2>
 
@@ -508,36 +508,36 @@ export default function NewQuotePage() {
               {/* Dates */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '0.5rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '0.5rem' }}>
                     Data do evento
                   </label>
                   <input
                     type="date"
                     value={eventDate}
                     onChange={(e) => setEventDate(e.target.value)}
-                    style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '0.625rem 0.875rem', fontSize: '0.875rem', color: 'rgb(245,247,251)', outline: 'none', colorScheme: 'dark' }}
-                    onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(77,163,255,0.4)')}
-                    onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)')}
+                    style={{ width: '100%', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '10px', padding: '0.625rem 0.875rem', fontSize: '0.875rem', color: '#f0ece4', outline: 'none', colorScheme: 'dark' }}
+                    onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(154,124,74,0.35)')}
+                    onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(240,236,228,0.06)')}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '0.5rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '0.5rem' }}>
                     Data de entrega pretendida
                   </label>
                   <input
                     type="date"
                     value={deliveryDate}
                     onChange={(e) => setDeliveryDate(e.target.value)}
-                    style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '0.625rem 0.875rem', fontSize: '0.875rem', color: 'rgb(245,247,251)', outline: 'none', colorScheme: 'dark' }}
-                    onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(77,163,255,0.4)')}
-                    onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)')}
+                    style={{ width: '100%', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '10px', padding: '0.625rem 0.875rem', fontSize: '0.875rem', color: '#f0ece4', outline: 'none', colorScheme: 'dark' }}
+                    onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(154,124,74,0.35)')}
+                    onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(240,236,228,0.06)')}
                   />
                 </div>
               </div>
 
               {/* Notes */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '0.5rem' }}>
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '0.5rem' }}>
                   Notas adicionais
                 </label>
                 <textarea
@@ -545,15 +545,15 @@ export default function NewQuotePage() {
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Informações relevantes: cores da empresa, tamanhos, prazo urgente, etc."
                   rows={4}
-                  style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '0.75rem 0.875rem', fontSize: '0.875rem', color: 'rgb(245,247,251)', outline: 'none', resize: 'vertical', lineHeight: 1.6 }}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(77,163,255,0.4)')}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)')}
+                  style={{ width: '100%', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '10px', padding: '0.75rem 0.875rem', fontSize: '0.875rem', color: '#f0ece4', outline: 'none', resize: 'vertical', lineHeight: 1.6 }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(154,124,74,0.35)')}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(240,236,228,0.06)')}
                 />
               </div>
 
               {/* Artwork upload */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '0.5rem' }}>
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '0.5rem' }}>
                   Arte / Ficheiros
                 </label>
 
@@ -564,7 +564,7 @@ export default function NewQuotePage() {
                   onDrop={(e) => { e.preventDefault(); setDragOver(false); handleArtworkUpload(e.dataTransfer.files); }}
                   style={{
                     display: 'block',
-                    border: `2px dashed ${dragOver ? 'rgb(77,163,255)' : 'rgba(255,255,255,0.1)'}`,
+                    border: `2px dashed ${dragOver ? '#d4b47a' : 'rgba(240,236,228,0.10)'}`,
                     borderRadius: '12px',
                     padding: '2rem',
                     textAlign: 'center',
@@ -583,8 +583,8 @@ export default function NewQuotePage() {
                   />
                   {artworkUploading ? (
                     <>
-                      <div style={{ width: '24px', height: '24px', border: '2px solid rgba(77,163,255,0.3)', borderTopColor: 'rgb(77,163,255)', borderRadius: '50%', animation: 'spin 0.7s linear infinite', margin: '0 auto 0.625rem' }} />
-                      <p style={{ fontSize: '0.875rem', color: 'rgb(77,163,255)' }}>A carregar...</p>
+                      <div style={{ width: '24px', height: '24px', border: '2px solid rgba(154,124,74,0.28)', borderTopColor: '#d4b47a', borderRadius: '50%', animation: 'spin 0.7s linear infinite', margin: '0 auto 0.625rem' }} />
+                      <p style={{ fontSize: '0.875rem', color: '#d4b47a' }}>A carregar...</p>
                     </>
                   ) : (
                     <>
@@ -592,7 +592,7 @@ export default function NewQuotePage() {
                       <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'rgb(170,180,198)', marginBottom: '0.25rem' }}>
                         Arrasta ou clica para carregar artes
                       </p>
-                      <p style={{ fontSize: '0.75rem', color: 'rgb(120,130,150)' }}>
+                      <p style={{ fontSize: '0.75rem', color: 'rgba(240,236,228,0.42)' }}>
                         PNG, JPG, PDF, AI, EPS — máx. {MAX_FILE_MB}MB por ficheiro
                       </p>
                     </>
@@ -605,16 +605,16 @@ export default function NewQuotePage() {
                     {artworkFiles.map((file, idx) => (
                       <div
                         key={idx}
-                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', background: 'rgba(99,230,190,0.06)', border: '1px solid rgba(99,230,190,0.15)', borderRadius: '8px' }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', background: 'rgba(99,230,190,0.06)', border: '1px solid rgba(184,151,94,0.14)', borderRadius: '8px' }}
                       >
-                        <svg style={{ color: 'rgb(99,230,190)', flexShrink: 0 }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
-                        <span style={{ flex: 1, fontSize: '0.8rem', color: 'rgb(99,230,190)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <svg style={{ color: '#b8975e', flexShrink: 0 }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
+                        <span style={{ flex: 1, fontSize: '0.8rem', color: '#b8975e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {file.name}
                         </span>
                         <button type="button"
                           
                           onClick={() => setArtworkFiles((prev) => prev.filter((_, i) => i !== idx))}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgb(120,130,150)', padding: '0' }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(240,236,228,0.42)', padding: '0' }}
                         >
                           ×
                         </button>
@@ -635,14 +635,14 @@ export default function NewQuotePage() {
               <button type="button"
                 
                 onClick={() => setStep(1)}
-                style={{ padding: '0.625rem 1.25rem', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgb(170,180,198)' }}
+                style={{ padding: '0.625rem 1.25rem', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', background: 'rgba(240,236,228,0.06)', border: '1px solid rgba(240,236,228,0.10)', color: 'rgb(170,180,198)' }}
               >
                 ← Anterior
               </button>
               <button type="button"
                 
                 onClick={() => { setError(''); setStep(3); }}
-                style={{ padding: '0.625rem 1.5rem', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', background: 'rgb(77,163,255)', color: 'rgb(7,17,31)', border: 'none' }}
+                style={{ padding: '0.625rem 1.5rem', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', background: '#d4b47a', color: '#090907', border: 'none' }}
               >
                 Próximo →
               </button>
@@ -653,13 +653,13 @@ export default function NewQuotePage() {
         {/* ── STEP 3 — Confirmação ── */}
         {step === 3 && (
           <div>
-            <h2 style={{ fontSize: '1rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '1.5rem' }}>
+            <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#f0ece4', marginBottom: '1.5rem' }}>
               Confirmação
             </h2>
 
             {/* Summary */}
             <div className="yg-card" style={{ padding: '1.5rem', marginBottom: '1.25rem' }}>
-              <h3 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '1rem' }}>
+              <h3 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '1rem' }}>
                 Produtos selecionados
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
@@ -668,13 +668,13 @@ export default function NewQuotePage() {
                   return (
                     <div
                       key={item.product.id}
-                      style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.625rem 0', borderBottom: '1px solid rgba(255,255,255,0.04)', gap: '0.5rem' }}
+                      style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.625rem 0', borderBottom: '1px solid rgba(240,236,228,0.04)', gap: '0.5rem' }}
                     >
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'rgb(245,247,251)', marginBottom: '0.1rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#f0ece4', marginBottom: '0.1rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {item.product.title}
                         </p>
-                        <p style={{ fontSize: '0.75rem', color: 'rgb(120,130,150)' }}>
+                        <p style={{ fontSize: '0.75rem', color: 'rgba(240,236,228,0.42)' }}>
                           {tech?.label} · {item.quantity} un.
                         </p>
                       </div>
@@ -685,14 +685,14 @@ export default function NewQuotePage() {
 
               {/* Estimate */}
               {low > 0 && (
-                <div style={{ marginTop: '1.25rem', padding: '0.875rem 1rem', background: 'rgba(99,230,190,0.06)', border: '1px solid rgba(99,230,190,0.15)', borderRadius: '10px' }}>
-                  <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgb(99,230,190)', marginBottom: '0.25rem' }}>
+                <div style={{ marginTop: '1.25rem', padding: '0.875rem 1rem', background: 'rgba(99,230,190,0.06)', border: '1px solid rgba(184,151,94,0.14)', borderRadius: '10px' }}>
+                  <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#b8975e', marginBottom: '0.25rem' }}>
                     Estimativa de preço
                   </p>
-                  <p style={{ fontSize: '1.25rem', fontWeight: 800, color: 'rgb(99,230,190)' }}>
+                  <p style={{ fontSize: '1.25rem', fontWeight: 800, color: '#b8975e' }}>
                     {formatPrice(low)} – {formatPrice(high)}
                   </p>
-                  <p style={{ fontSize: '0.75rem', color: 'rgb(120,130,150)', marginTop: '0.2rem' }}>
+                  <p style={{ fontSize: '0.75rem', color: 'rgba(240,236,228,0.42)', marginTop: '0.2rem' }}>
                     Preço final calculado após análise da equipa YourGift.
                   </p>
                 </div>
@@ -700,27 +700,27 @@ export default function NewQuotePage() {
 
               {/* Dates & notes recap */}
               {(eventDate || deliveryDate || notes) && (
-                <div style={{ marginTop: '1rem', padding: '0.875rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px' }}>
+                <div style={{ marginTop: '1rem', padding: '0.875rem', background: 'rgba(240,236,228,0.04)', borderRadius: '8px' }}>
                   {eventDate && (
-                    <p style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)' }}>
+                    <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)' }}>
                       <span style={{ color: 'rgb(170,180,198)', fontWeight: 500 }}>Evento:</span>{' '}
                       {new Date(eventDate).toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </p>
                   )}
                   {deliveryDate && (
-                    <p style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)', marginTop: '0.25rem' }}>
+                    <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)', marginTop: '0.25rem' }}>
                       <span style={{ color: 'rgb(170,180,198)', fontWeight: 500 }}>Entrega:</span>{' '}
                       {new Date(deliveryDate).toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </p>
                   )}
                   {notes && (
-                    <p style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)', marginTop: '0.25rem' }}>
+                    <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)', marginTop: '0.25rem' }}>
                       <span style={{ color: 'rgb(170,180,198)', fontWeight: 500 }}>Notas:</span>{' '}
                       {notes.length > 100 ? notes.slice(0, 100) + '...' : notes}
                     </p>
                   )}
                   {artworkFiles.length > 0 && (
-                    <p style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)', marginTop: '0.25rem' }}>
+                    <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)', marginTop: '0.25rem' }}>
                       <span style={{ color: 'rgb(170,180,198)', fontWeight: 500 }}>Artes:</span>{' '}
                       {artworkFiles.length} ficheiro{artworkFiles.length !== 1 ? 's' : ''}
                     </p>
@@ -731,17 +731,17 @@ export default function NewQuotePage() {
 
             {/* Terms */}
             <label
-              style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer', marginBottom: '1.5rem', padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}
+              style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer', marginBottom: '1.5rem', padding: '1rem', background: 'rgba(240,236,228,0.04)', borderRadius: '10px', border: '1px solid rgba(240,236,228,0.06)' }}
             >
               <input
                 type="checkbox"
                 checked={termsAccepted}
                 onChange={(e) => setTermsAccepted(e.target.checked)}
-                style={{ marginTop: '2px', accentColor: 'rgb(77,163,255)', width: '16px', height: '16px', cursor: 'pointer' }}
+                style={{ marginTop: '2px', accentColor: '#d4b47a', width: '16px', height: '16px', cursor: 'pointer' }}
               />
               <span style={{ fontSize: '0.875rem', color: 'rgb(170,180,198)', lineHeight: 1.5 }}>
                 Concordo com os{' '}
-                <a href="/termos" target="_blank" rel="noopener noreferrer" style={{ color: 'rgb(77,163,255)', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
+                <a href="/termos" target="_blank" rel="noopener noreferrer" style={{ color: '#d4b47a', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
                   termos e condições
                 </a>
                 {' '}da YourGift, incluindo a política de cancelamento e prazo mínimo de produção.
@@ -758,7 +758,7 @@ export default function NewQuotePage() {
               <button type="button"
                 
                 onClick={() => setStep(2)}
-                style={{ padding: '0.625rem 1.25rem', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgb(170,180,198)' }}
+                style={{ padding: '0.625rem 1.25rem', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', background: 'rgba(240,236,228,0.06)', border: '1px solid rgba(240,236,228,0.10)', color: 'rgb(170,180,198)' }}
               >
                 ← Anterior
               </button>
@@ -772,8 +772,8 @@ export default function NewQuotePage() {
                   fontSize: '0.875rem',
                   fontWeight: 700,
                   cursor: !termsAccepted || submitting ? 'not-allowed' : 'pointer',
-                  background: !termsAccepted || submitting ? 'rgba(99,230,190,0.3)' : 'rgb(99,230,190)',
-                  color: 'rgb(7,17,31)',
+                  background: !termsAccepted || submitting ? 'rgba(99,230,190,0.3)' : '#b8975e',
+                  color: '#090907',
                   border: 'none',
                   opacity: !termsAccepted || submitting ? 0.6 : 1,
                   display: 'inline-flex',
@@ -783,7 +783,7 @@ export default function NewQuotePage() {
               >
                 {submitting ? (
                   <>
-                    <div style={{ width: '14px', height: '14px', border: '2px solid rgba(7,17,31,0.3)', borderTopColor: 'rgb(7,17,31)', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                    <div style={{ width: '14px', height: '14px', border: '2px solid rgba(7,17,31,0.3)', borderTopColor: '#090907', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
                     A submeter...
                   </>
                 ) : (

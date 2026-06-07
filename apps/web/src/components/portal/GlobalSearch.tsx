@@ -47,11 +47,11 @@ const PAGES: SearchResult[] = [
 ];
 
 const STATUS_COLORS: Record<string, string> = {
-  producing: 'rgb(116,231,255)', in_production: 'rgb(116,231,255)',
-  shipped: 'rgb(77,163,255)', delivered: 'rgb(99,230,190)',
-  pending: 'rgb(245,158,11)', approved: 'rgb(99,230,190)',
-  submitted: 'rgb(245,158,11)', pricing: 'rgb(116,231,255)',
-  cancelled: 'rgb(239,68,68)', draft: 'rgb(100,112,130)',
+  producing: '#b8975e', in_production: '#b8975e',
+  shipped: '#d4b47a', delivered: '#b8975e',
+  pending: 'rgb(245,158,11)', approved: '#b8975e',
+  submitted: 'rgb(245,158,11)', pricing: '#b8975e',
+  cancelled: 'rgb(239,68,68)', draft: 'rgba(240,236,228,0.42)',
 };
 
 // ── Component ──────────────────────────────────────────────────────────────────
@@ -123,7 +123,7 @@ export function GlobalSearch({ isOpen, onClose }: Props) {
         subtitle: `Encomenda · ${o.total_amount ? `€${o.total_amount.toLocaleString('pt-PT')}` : 'Sob consulta'}`,
         href: `/orders/${o.id}`,
         icon: '📦',
-        statusColor: STATUS_COLORS[o.status] ?? 'rgb(120,130,150)',
+        statusColor: STATUS_COLORS[o.status] ?? 'rgba(240,236,228,0.42)',
       }));
 
       quoteResults = (quotesRes.data ?? []).map((q: any) => ({
@@ -132,7 +132,7 @@ export function GlobalSearch({ isOpen, onClose }: Props) {
         subtitle: `Orçamento · ${q.total_amount ? `€${q.total_amount.toLocaleString('pt-PT')}` : 'Sem valor'}`,
         href: `/quotes/${q.id}`,
         icon: '📋',
-        statusColor: STATUS_COLORS[q.status] ?? 'rgb(120,130,150)',
+        statusColor: STATUS_COLORS[q.status] ?? 'rgba(240,236,228,0.42)',
       }));
     }
 
@@ -212,15 +212,15 @@ export function GlobalSearch({ isOpen, onClose }: Props) {
               position: 'fixed', top: '12%', left: '50%', transform: 'translateX(-50%)',
               width: '100%', maxWidth: '560px',
               background: 'rgb(10,18,32)',
-              border: '1px solid rgba(255,255,255,0.1)',
+              border: '1px solid rgba(240,236,228,0.10)',
               borderRadius: '18px',
-              boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(77,163,255,0.1)',
+              boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(154,124,74,0.10)',
               zIndex: 9999, overflow: 'hidden',
             }}
           >
             {/* Search input */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem 1.125rem', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgb(80,92,110)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem 1.125rem', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(240,236,228,0.24)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                 <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
               </svg>
               <input
@@ -236,28 +236,28 @@ export function GlobalSearch({ isOpen, onClose }: Props) {
               />
               {loading && (
                 <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="10" stroke="rgb(77,163,255)" strokeWidth="3" strokeOpacity="0.25" />
-                  <path d="M12 2a10 10 0 019.6 7.3" stroke="rgb(77,163,255)" strokeWidth="3" strokeLinecap="round" />
+                  <circle cx="12" cy="12" r="10" stroke="#d4b47a" strokeWidth="3" strokeOpacity="0.25" />
+                  <path d="M12 2a10 10 0 019.6 7.3" stroke="#d4b47a" strokeWidth="3" strokeLinecap="round" />
                 </svg>
               )}
-              <kbd style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)', background: 'rgba(255,255,255,0.06)', borderRadius: '6px', padding: '0.15rem 0.5rem', fontFamily: 'monospace' }}>ESC</kbd>
+              <kbd style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)', background: 'rgba(240,236,228,0.06)', borderRadius: '6px', padding: '0.15rem 0.5rem', fontFamily: 'monospace' }}>ESC</kbd>
             </div>
 
             {/* Results */}
             <div ref={listRef} style={{ maxHeight: '400px', overflowY: 'auto', padding: '0.5rem' }}>
               {displayItems.length === 0 && query.trim() && !loading ? (
-                <div style={{ padding: '2rem', textAlign: 'center', color: 'rgb(80,92,110)', fontSize: '0.85rem' }}>
+                <div style={{ padding: '2rem', textAlign: 'center', color: 'rgba(240,236,228,0.24)', fontSize: '0.85rem' }}>
                   Sem resultados para "{query}"
                 </div>
               ) : (
                 <>
                   {!query.trim() && (
-                    <div style={{ padding: '0.375rem 0.75rem 0.25rem', fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgb(60,72,90)' }}>
+                    <div style={{ padding: '0.375rem 0.75rem 0.25rem', fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(240,236,228,0.24)' }}>
                       Ações rápidas
                     </div>
                   )}
                   {query.trim() && results.length > 0 && (
-                    <div style={{ padding: '0.375rem 0.75rem 0.25rem', fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgb(60,72,90)' }}>
+                    <div style={{ padding: '0.375rem 0.75rem 0.25rem', fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(240,236,228,0.24)' }}>
                       Resultados
                     </div>
                   )}
@@ -265,36 +265,36 @@ export function GlobalSearch({ isOpen, onClose }: Props) {
                     <motion.div
                       key={item.id}
                       onClick={() => navigate(item.href)}
-                      whileHover={{ background: 'rgba(77,163,255,0.08)' }}
+                      whileHover={{ background: 'rgba(154,124,74,0.08)' }}
                       style={{
                         display: 'flex', alignItems: 'center', gap: '0.75rem',
                         padding: '0.625rem 0.75rem', borderRadius: '10px', cursor: 'pointer',
-                        background: selectedIndex === i ? 'rgba(77,163,255,0.1)' : 'transparent',
-                        border: selectedIndex === i ? '1px solid rgba(77,163,255,0.2)' : '1px solid transparent',
+                        background: selectedIndex === i ? 'rgba(154,124,74,0.10)' : 'transparent',
+                        border: selectedIndex === i ? '1px solid rgba(154,124,74,0.18)' : '1px solid transparent',
                         transition: 'background 100ms',
                       }}
                       onMouseEnter={() => setSelectedIndex(i)}
                     >
                       <div style={{
                         width: '34px', height: '34px', borderRadius: '9px', flexShrink: 0,
-                        background: selectedIndex === i ? 'rgba(77,163,255,0.15)' : 'rgba(255,255,255,0.05)',
+                        background: selectedIndex === i ? 'rgba(154,124,74,0.14)' : 'rgba(240,236,228,0.06)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem',
                       }}>
                         {item.icon}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: '0.83rem', fontWeight: 600, color: 'rgb(220,230,245)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <div style={{ fontSize: '0.83rem', fontWeight: 600, color: 'rgba(240,236,228,0.75)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           {item.title}
                           {item.statusColor && (
                             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: item.statusColor, flexShrink: 0 }} />
                           )}
                         </div>
-                        <div style={{ fontSize: '0.7rem', color: 'rgb(80,92,110)', marginTop: '0.05rem' }}>{item.subtitle}</div>
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.05rem' }}>{item.subtitle}</div>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                        <span style={{ fontSize: '0.58rem', color: 'rgb(60,72,90)', background: 'rgba(255,255,255,0.05)', borderRadius: '5px', padding: '0.1rem 0.35rem' }}>{typeLabel(item.type)}</span>
+                        <span style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)', background: 'rgba(240,236,228,0.06)', borderRadius: '5px', padding: '0.1rem 0.35rem' }}>{typeLabel(item.type)}</span>
                         {selectedIndex === i && (
-                          <kbd style={{ fontSize: '0.62rem', color: 'rgb(77,163,255)', background: 'rgba(77,163,255,0.12)', borderRadius: '5px', padding: '0.1rem 0.4rem', fontFamily: 'monospace' }}>↵</kbd>
+                          <kbd style={{ fontSize: '0.62rem', color: '#d4b47a', background: 'rgba(154,124,74,0.12)', borderRadius: '5px', padding: '0.1rem 0.4rem', fontFamily: 'monospace' }}>↵</kbd>
                         )}
                       </div>
                     </motion.div>
@@ -304,11 +304,11 @@ export function GlobalSearch({ isOpen, onClose }: Props) {
             </div>
 
             {/* Footer */}
-            <div style={{ padding: '0.625rem 1.125rem', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <div style={{ padding: '0.625rem 1.125rem', borderTop: '1px solid rgba(240,236,228,0.06)', display: 'flex', gap: '1rem', alignItems: 'center' }}>
               {[['↑↓', 'navegar'], ['↵', 'abrir'], ['esc', 'fechar']].map(([key, label]) => (
                 <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <kbd style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', background: 'rgba(255,255,255,0.06)', borderRadius: '5px', padding: '0.1rem 0.4rem', fontFamily: 'monospace' }}>{key}</kbd>
-                  <span style={{ fontSize: '0.62rem', color: 'rgb(60,72,90)' }}>{label}</span>
+                  <kbd style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', background: 'rgba(240,236,228,0.06)', borderRadius: '5px', padding: '0.1rem 0.4rem', fontFamily: 'monospace' }}>{key}</kbd>
+                  <span style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)' }}>{label}</span>
                 </div>
               ))}
             </div>

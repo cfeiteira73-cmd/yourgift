@@ -109,10 +109,10 @@ function ProductCard({ product, selected, onSelect }: { product: Product; select
       onClick={onSelect}
       style={{
         borderRadius: '16px',
-        border: selected ? '1.5px solid rgb(77,163,255)' : '1px solid rgba(255,255,255,0.07)',
+        border: selected ? '1.5px solid #d4b47a' : '1px solid rgba(240,236,228,0.06)',
         background: selected
-          ? 'linear-gradient(135deg,rgba(77,163,255,0.12) 0%,rgba(116,231,255,0.06) 100%)'
-          : 'linear-gradient(135deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.01) 100%)',
+          ? 'linear-gradient(135deg,rgba(154,124,74,0.12) 0%,rgba(116,231,255,0.06) 100%)'
+          : 'linear-gradient(135deg,rgba(240,236,228,0.04) 0%,rgba(255,255,255,0.01) 100%)',
         cursor: 'pointer',
         overflow: 'hidden',
         position: 'relative',
@@ -123,15 +123,15 @@ function ProductCard({ product, selected, onSelect }: { product: Product; select
         <div style={{
           position: 'absolute', top: '0.5rem', right: '0.5rem', zIndex: 2,
           width: '22px', height: '22px', borderRadius: '50%',
-          background: 'rgb(77,163,255)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: '#d4b47a', display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: '0.7rem', fontWeight: 700, color: '#fff',
         }}>✓</div>
       )}
       {/* Image */}
       <div style={{
-        height: '140px', background: 'rgba(255,255,255,0.03)',
+        height: '140px', background: 'rgba(240,236,228,0.04)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        overflow: 'hidden', borderBottom: '1px solid rgba(255,255,255,0.05)',
+        overflow: 'hidden', borderBottom: '1px solid rgba(240,236,228,0.06)',
       }}>
         {img ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -151,9 +151,9 @@ function ProductCard({ product, selected, onSelect }: { product: Product; select
           {product.title}
         </div>
         <div style={{ marginTop: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.35rem', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: '0.58rem', color: 'rgb(80,92,110)', fontWeight: 600 }}>{product.supplierRef}</span>
+          <span style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)', fontWeight: 600 }}>{product.supplierRef}</span>
           {variantCount > 0 && (
-            <span style={{ fontSize: '0.55rem', background: 'rgba(77,163,255,0.12)', color: 'rgb(77,163,255)', padding: '0.1rem 0.35rem', borderRadius: '4px', fontWeight: 700 }}>
+            <span style={{ fontSize: '0.55rem', background: 'rgba(154,124,74,0.12)', color: '#d4b47a', padding: '0.1rem 0.35rem', borderRadius: '4px', fontWeight: 700 }}>
               {variantCount} cor{variantCount !== 1 ? 'es' : ''}
             </span>
           )}
@@ -321,14 +321,14 @@ export default function ConfiguratorPage() {
         {/* Header */}
         <motion.div {...fadeUp(0)} style={{ marginBottom: '1.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.35rem' }}>
-            <Link href="/orders" style={{ fontSize: '0.7rem', color: 'rgb(80,92,110)', textDecoration: 'none' }}>Encomendas</Link>
-            <span style={{ color: 'rgb(60,72,90)', fontSize: '0.7rem' }}>›</span>
-            <span style={{ fontSize: '0.7rem', color: 'rgb(77,163,255)', fontWeight: 600 }}>Configurador</span>
+            <Link href="/orders" style={{ fontSize: '0.7rem', color: 'rgba(240,236,228,0.24)', textDecoration: 'none' }}>Encomendas</Link>
+            <span style={{ color: 'rgba(240,236,228,0.24)', fontSize: '0.7rem' }}>›</span>
+            <span style={{ fontSize: '0.7rem', color: '#d4b47a', fontWeight: 600 }}>Configurador</span>
           </div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
             Visual Product Builder
           </h1>
-          <p style={{ fontSize: '0.78rem', color: 'rgb(80,92,110)' }}>
+          <p style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.24)' }}>
             Configura produto, técnica e quantidade — pricing em tempo real.
           </p>
         </motion.div>
@@ -354,24 +354,24 @@ export default function ConfiguratorPage() {
                 >
                   <div style={{
                     width: '28px', height: '28px', borderRadius: '50%',
-                    background: active ? 'rgb(77,163,255)' : done ? 'rgba(77,163,255,0.25)' : 'rgba(255,255,255,0.06)',
-                    border: active ? 'none' : done ? '1.5px solid rgba(77,163,255,0.5)' : '1.5px solid rgba(255,255,255,0.1)',
+                    background: active ? '#d4b47a' : done ? 'rgba(154,124,74,0.22)' : 'rgba(240,236,228,0.06)',
+                    border: active ? 'none' : done ? '1.5px solid rgba(154,124,74,0.45)' : '1.5px solid rgba(240,236,228,0.10)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '0.7rem', fontWeight: 800,
-                    color: active ? '#fff' : done ? 'rgb(77,163,255)' : 'rgb(80,92,110)',
+                    color: active ? '#fff' : done ? '#d4b47a' : 'rgba(240,236,228,0.24)',
                     flexShrink: 0,
                     transition: 'all 300ms',
                   }}>
                     {done ? '✓' : s}
                   </div>
-                  <span style={{ fontSize: '0.72rem', fontWeight: 600, color: active ? 'rgb(200,215,235)' : 'rgb(80,92,110)', transition: 'color 300ms' }}>
+                  <span style={{ fontSize: '0.72rem', fontWeight: 600, color: active ? 'rgb(200,215,235)' : 'rgba(240,236,228,0.24)', transition: 'color 300ms' }}>
                     {labels[i]}
                   </span>
                 </button>
                 {i < 2 && (
                   <div style={{
                     flex: 1, height: '1px', margin: '0 0.75rem',
-                    background: done ? 'rgba(77,163,255,0.4)' : 'rgba(255,255,255,0.07)',
+                    background: done ? 'rgba(154,124,74,0.35)' : 'rgba(240,236,228,0.06)',
                     transition: 'background 300ms',
                   }} />
                 )}
@@ -400,7 +400,7 @@ export default function ConfiguratorPage() {
                     placeholder="Pesquisar produtos…"
                     style={{
                       width: '100%', boxSizing: 'border-box',
-                      background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)',
                       borderRadius: '10px', padding: '0.6rem 0.75rem 0.6rem 2.25rem',
                       color: 'rgb(200,215,235)', fontSize: '0.78rem', outline: 'none',
                     }}
@@ -412,10 +412,10 @@ export default function ConfiguratorPage() {
                       key={cat.id}
                       onClick={() => handleCategoryChange(cat.id)}
                       style={{
-                        background: category === cat.id ? 'rgba(77,163,255,0.2)' : 'rgba(255,255,255,0.04)',
-                        border: category === cat.id ? '1px solid rgba(77,163,255,0.5)' : '1px solid rgba(255,255,255,0.07)',
+                        background: category === cat.id ? 'rgba(154,124,74,0.18)' : 'rgba(240,236,228,0.04)',
+                        border: category === cat.id ? '1px solid rgba(154,124,74,0.45)' : '1px solid rgba(240,236,228,0.06)',
                         borderRadius: '8px', padding: '0.4rem 0.75rem',
-                        color: category === cat.id ? 'rgb(77,163,255)' : 'rgb(120,135,155)',
+                        color: category === cat.id ? '#d4b47a' : 'rgb(120,135,155)',
                         fontSize: '0.68rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
                       }}
                     >
@@ -426,10 +426,10 @@ export default function ConfiguratorPage() {
               </div>
 
               {/* Results info */}
-              <div style={{ fontSize: '0.68rem', color: 'rgb(80,92,110)', marginBottom: '0.75rem' }}>
+              <div style={{ fontSize: '0.68rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.75rem' }}>
                 {loading ? 'A carregar…' : `${total.toLocaleString('pt-PT')} produtos`}
                 {selectedProduct && (
-                  <span style={{ marginLeft: '0.75rem', color: 'rgb(77,163,255)', fontWeight: 600 }}>
+                  <span style={{ marginLeft: '0.75rem', color: '#d4b47a', fontWeight: 600 }}>
                     ✓ {selectedProduct.title.slice(0, 40)}
                   </span>
                 )}
@@ -455,7 +455,7 @@ export default function ConfiguratorPage() {
                     />
                   ))}
                   {products.length === 0 && (
-                    <div style={{ gridColumn: '1/-1', padding: '3rem', textAlign: 'center', color: 'rgb(80,92,110)', fontSize: '0.8rem' }}>
+                    <div style={{ gridColumn: '1/-1', padding: '3rem', textAlign: 'center', color: 'rgba(240,236,228,0.24)', fontSize: '0.8rem' }}>
                       Nenhum produto encontrado. Tenta outra pesquisa.
                     </div>
                   )}
@@ -471,9 +471,9 @@ export default function ConfiguratorPage() {
                     return (
                       <button type="button" key={i} onClick={() => handlePageChange(pageOffset)} style={{
                         width: '32px', height: '32px', borderRadius: '8px',
-                        background: active ? 'rgba(77,163,255,0.2)' : 'rgba(255,255,255,0.04)',
-                        border: active ? '1px solid rgba(77,163,255,0.5)' : '1px solid rgba(255,255,255,0.07)',
-                        color: active ? 'rgb(77,163,255)' : 'rgb(120,135,155)',
+                        background: active ? 'rgba(154,124,74,0.18)' : 'rgba(240,236,228,0.04)',
+                        border: active ? '1px solid rgba(154,124,74,0.45)' : '1px solid rgba(240,236,228,0.06)',
+                        color: active ? '#d4b47a' : 'rgb(120,135,155)',
                         fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer',
                       }}>
                         {i + 1}
@@ -490,9 +490,9 @@ export default function ConfiguratorPage() {
                   onClick={proceedToStep2}
                   disabled={!selectedProduct}
                   style={{
-                    background: selectedProduct ? 'linear-gradient(135deg,rgb(77,163,255),rgb(116,231,255))' : 'rgba(255,255,255,0.06)',
+                    background: selectedProduct ? 'linear-gradient(135deg,#d4b47a,#b8975e)' : 'rgba(240,236,228,0.06)',
                     border: 'none', borderRadius: '12px', padding: '0.75rem 2rem',
-                    color: selectedProduct ? '#fff' : 'rgb(80,92,110)',
+                    color: selectedProduct ? '#fff' : 'rgba(240,236,228,0.24)',
                     fontSize: '0.82rem', fontWeight: 700, cursor: selectedProduct ? 'pointer' : 'not-allowed',
                     transition: 'all 250ms',
                   }}
@@ -521,7 +521,7 @@ export default function ConfiguratorPage() {
                   <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
                     {/* Main image */}
                     <div style={{
-                      flex: 1, aspectRatio: '1', background: 'rgba(255,255,255,0.03)',
+                      flex: 1, aspectRatio: '1', background: 'rgba(240,236,228,0.04)',
                       borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
                       overflow: 'hidden', minHeight: '200px',
                     }}>
@@ -542,8 +542,8 @@ export default function ConfiguratorPage() {
                           <motion.div key={i} whileTap={tapScale} onClick={() => setSelectedImage(img)}
                             style={{
                               width: '52px', height: '52px', borderRadius: '8px',
-                              background: 'rgba(255,255,255,0.04)', overflow: 'hidden',
-                              border: selectedImage === img ? '1.5px solid rgb(77,163,255)' : '1px solid rgba(255,255,255,0.07)',
+                              background: 'rgba(240,236,228,0.04)', overflow: 'hidden',
+                              border: selectedImage === img ? '1.5px solid #d4b47a' : '1px solid rgba(240,236,228,0.06)',
                               cursor: 'pointer',
                             }}
                           >
@@ -560,10 +560,10 @@ export default function ConfiguratorPage() {
                       <div style={{ fontSize: '1rem', fontWeight: 800, color: 'rgb(220,232,248)', lineHeight: 1.3, marginBottom: '0.4rem' }}>
                         {selectedProduct.title}
                       </div>
-                      <div style={{ fontSize: '0.68rem', color: 'rgb(80,92,110)', marginBottom: '0.75rem' }}>
+                      <div style={{ fontSize: '0.68rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.75rem' }}>
                         {selectedProduct.supplierRef} · {selectedProduct.supplier}
                       </div>
-                      <div style={{ fontSize: '0.72rem', color: 'rgb(140,155,175)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      <div style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.42)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {selectedProduct.description}
                       </div>
                     </div>
@@ -573,7 +573,7 @@ export default function ConfiguratorPage() {
                 {/* Variant / Colour picker */}
                 {selectedProduct.variants.length > 0 && (
                   <div className="yg-card" style={{ padding: '1.25rem' }}>
-                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgb(80,92,110)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.875rem' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.875rem' }}>
                       Cor / Variante
                       {selectedVariant && <span style={{ marginLeft: '0.5rem', color: 'rgb(200,215,235)', fontWeight: 600, textTransform: 'none', letterSpacing: 0 }}>— {selectedVariant.color ?? selectedVariant.sku}</span>}
                     </div>
@@ -594,12 +594,12 @@ export default function ConfiguratorPage() {
                               width: bg ? '28px' : 'auto', height: '28px',
                               minWidth: bg ? '28px' : '60px',
                               borderRadius: bg ? '50%' : '8px',
-                              background: bg ?? 'rgba(255,255,255,0.05)',
-                              border: isSelected ? '2.5px solid rgb(77,163,255)' : '1.5px solid rgba(255,255,255,0.1)',
+                              background: bg ?? 'rgba(240,236,228,0.06)',
+                              border: isSelected ? '2.5px solid #d4b47a' : '1.5px solid rgba(240,236,228,0.10)',
                               cursor: 'pointer', padding: bg ? 0 : '0 0.5rem',
                               fontSize: '0.6rem', fontWeight: 700,
-                              color: bg ? 'transparent' : isSelected ? 'rgb(77,163,255)' : 'rgb(140,155,175)',
-                              boxShadow: isSelected ? '0 0 0 3px rgba(77,163,255,0.25)' : 'none',
+                              color: bg ? 'transparent' : isSelected ? '#d4b47a' : 'rgba(240,236,228,0.42)',
+                              boxShadow: isSelected ? '0 0 0 3px rgba(154,124,74,0.22)' : 'none',
                               transition: 'border-color 200ms, box-shadow 200ms',
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
                             }}
@@ -609,7 +609,7 @@ export default function ConfiguratorPage() {
                         );
                       })}
                       {selectedProduct.variants.length > 32 && (
-                        <span style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)', alignSelf: 'center', fontStyle: 'italic' }}>
+                        <span style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)', alignSelf: 'center', fontStyle: 'italic' }}>
                           +{selectedProduct.variants.length - 32} mais
                         </span>
                       )}
@@ -619,7 +619,7 @@ export default function ConfiguratorPage() {
 
                 {/* Technique selector */}
                 <div className="yg-card" style={{ padding: '1.25rem' }}>
-                  <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgb(80,92,110)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.875rem' }}>
+                  <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.875rem' }}>
                     Técnica de Personalização
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: '0.5rem' }}>
@@ -634,8 +634,8 @@ export default function ConfiguratorPage() {
                             if (quantity < t.min) setQuantity(t.min);
                           }}
                           style={{
-                            background: active ? 'rgba(77,163,255,0.12)' : 'rgba(255,255,255,0.03)',
-                            border: active ? '1.5px solid rgba(77,163,255,0.5)' : '1px solid rgba(255,255,255,0.07)',
+                            background: active ? 'rgba(154,124,74,0.12)' : 'rgba(240,236,228,0.04)',
+                            border: active ? '1.5px solid rgba(154,124,74,0.45)' : '1px solid rgba(240,236,228,0.06)',
                             borderRadius: '12px', padding: '0.75rem',
                             cursor: 'pointer', textAlign: 'left',
                             transition: 'all 200ms',
@@ -643,12 +643,12 @@ export default function ConfiguratorPage() {
                         >
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                             <span style={{ fontSize: '1rem' }}>{t.emoji}</span>
-                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: active ? 'rgb(77,163,255)' : 'rgb(200,215,235)' }}>{t.label}</span>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: active ? '#d4b47a' : 'rgb(200,215,235)' }}>{t.label}</span>
                           </div>
-                          <div style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)', lineHeight: 1.4 }}>{t.desc}</div>
+                          <div style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)', lineHeight: 1.4 }}>{t.desc}</div>
                           <div style={{ marginTop: '0.35rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: '0.62rem', color: 'rgb(99,230,190)', fontWeight: 700 }}>+{fmtEur(t.baseCost)}/un</span>
-                            <span style={{ fontSize: '0.58rem', color: 'rgb(60,72,90)' }}>min {t.min}un</span>
+                            <span style={{ fontSize: '0.62rem', color: '#b8975e', fontWeight: 700 }}>+{fmtEur(t.baseCost)}/un</span>
+                            <span style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)' }}>min {t.min}un</span>
                           </div>
                         </motion.button>
                       );
@@ -658,7 +658,7 @@ export default function ConfiguratorPage() {
 
                 {/* Quantity selector */}
                 <div className="yg-card" style={{ padding: '1.25rem' }}>
-                  <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgb(80,92,110)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.875rem' }}>
+                  <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.875rem' }}>
                     Quantidade
                     <span style={{ marginLeft: '0.5rem', color: 'rgb(200,215,235)', fontWeight: 700, textTransform: 'none', letterSpacing: 0, fontSize: '0.82rem' }}>
                       {quantity.toLocaleString('pt-PT')} unidades
@@ -672,10 +672,10 @@ export default function ConfiguratorPage() {
                         whileTap={tapScale}
                         onClick={() => setQuantity(Math.max(tech.min, q))}
                         style={{
-                          background: quantity === q ? 'rgba(77,163,255,0.2)' : 'rgba(255,255,255,0.04)',
-                          border: quantity === q ? '1px solid rgba(77,163,255,0.5)' : '1px solid rgba(255,255,255,0.07)',
+                          background: quantity === q ? 'rgba(154,124,74,0.18)' : 'rgba(240,236,228,0.04)',
+                          border: quantity === q ? '1px solid rgba(154,124,74,0.45)' : '1px solid rgba(240,236,228,0.06)',
                           borderRadius: '8px', padding: '0.35rem 0.75rem',
-                          color: quantity === q ? 'rgb(77,163,255)' : 'rgb(120,135,155)',
+                          color: quantity === q ? '#d4b47a' : 'rgb(120,135,155)',
                           fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer',
                         }}
                       >
@@ -689,21 +689,21 @@ export default function ConfiguratorPage() {
                       type="range" min={tech.min} max={1000} step={tech.min < 10 ? 1 : 10}
                       value={quantity}
                       onChange={e => setQuantity(Number(e.target.value))}
-                      style={{ flex: 1, accentColor: 'rgb(77,163,255)' }}
+                      style={{ flex: 1, accentColor: '#d4b47a' }}
                     />
                     <input
                       type="number" min={tech.min} max={10000}
                       value={quantity}
                       onChange={e => setQuantity(Math.max(tech.min, Number(e.target.value)))}
                       style={{
-                        width: '80px', background: 'rgba(255,255,255,0.05)',
-                        border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px',
+                        width: '80px', background: 'rgba(240,236,228,0.06)',
+                        border: '1px solid rgba(240,236,228,0.10)', borderRadius: '8px',
                         padding: '0.4rem 0.5rem', color: 'rgb(200,215,235)', fontSize: '0.78rem', textAlign: 'center',
                       }}
                     />
                   </div>
                   {qtyDiscount > 0 && (
-                    <div style={{ marginTop: '0.5rem', fontSize: '0.65rem', color: 'rgb(99,230,190)', fontWeight: 700 }}>
+                    <div style={{ marginTop: '0.5rem', fontSize: '0.65rem', color: '#b8975e', fontWeight: 700 }}>
                       🎉 Desconto de volume: {(qtyDiscount * 100).toFixed(0)}% aplicado ({fmtEur(discountAmount)} de poupança)
                     </div>
                   )}
@@ -717,15 +717,15 @@ export default function ConfiguratorPage() {
                 {/* Delivery country + branding notes */}
                 <div className="yg-card" style={{ padding: '1.25rem', display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>
                   <div>
-                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgb(80,92,110)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
                       País de Entrega
                     </div>
                     <select
                       value={country}
                       onChange={e => setCountry(e.target.value)}
                       style={{
-                        width: '100%', background: 'rgba(255,255,255,0.05)',
-                        border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px',
+                        width: '100%', background: 'rgba(240,236,228,0.06)',
+                        border: '1px solid rgba(240,236,228,0.06)', borderRadius: '8px',
                         padding: '0.5rem', color: 'rgb(200,215,235)', fontSize: '0.78rem',
                       }}
                     >
@@ -736,7 +736,7 @@ export default function ConfiguratorPage() {
                     </select>
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgb(80,92,110)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
                       Notas de Personalização
                     </div>
                     <textarea
@@ -745,8 +745,8 @@ export default function ConfiguratorPage() {
                       placeholder="Ex: Logo branco em fundo azul, posição frente-centro, ficheiro enviado por email…"
                       rows={3}
                       style={{
-                        width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.04)',
-                        border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px',
+                        width: '100%', boxSizing: 'border-box', background: 'rgba(240,236,228,0.04)',
+                        border: '1px solid rgba(240,236,228,0.06)', borderRadius: '8px',
                         padding: '0.5rem 0.75rem', color: 'rgb(200,215,235)', fontSize: '0.75rem',
                         resize: 'vertical', lineHeight: 1.5,
                       }}
@@ -758,23 +758,23 @@ export default function ConfiguratorPage() {
 
               {/* Right — Live Pricing Panel */}
               <div style={{ position: 'sticky', top: '1.5rem' }}>
-                <div className="yg-card" style={{ padding: '1.5rem', borderColor: 'rgba(77,163,255,0.15)' }}>
+                <div className="yg-card" style={{ padding: '1.5rem', borderColor: 'rgba(154,124,74,0.14)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
-                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgb(99,230,190)', boxShadow: '0 0 6px rgba(99,230,190,0.7)' }} />
-                    <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(99,230,190)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#b8975e', boxShadow: '0 0 6px rgba(99,230,190,0.7)' }} />
+                    <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#b8975e', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                       Pricing em Tempo Real
                     </span>
                   </div>
 
                   {/* Selected product summary */}
-                  <div style={{ marginBottom: '1.25rem', padding: '0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ marginBottom: '1.25rem', padding: '0.75rem', background: 'rgba(240,236,228,0.04)', borderRadius: '10px', border: '1px solid rgba(240,236,228,0.06)' }}>
                     <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgb(200,215,235)', lineHeight: 1.3 }}>
                       {selectedProduct.title.slice(0, 50)}
                     </div>
                     {selectedVariant?.color && (
-                      <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginTop: '0.2rem' }}>Cor: {selectedVariant.color}</div>
+                      <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.2rem' }}>Cor: {selectedVariant.color}</div>
                     )}
-                    <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)' }}>Técnica: {tech?.label}</div>
+                    <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)' }}>Técnica: {tech?.label}</div>
                   </div>
 
                   {/* Price breakdown */}
@@ -787,24 +787,24 @@ export default function ConfiguratorPage() {
                       { label: `Envio (${country})`, value: `+${fmtEur(shipping)}` },
                     ].map(row => (
                       <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '0.5rem' }}>
-                        <span style={{ fontSize: '0.68rem', color: row.bold ? 'rgb(170,185,205)' : 'rgb(80,92,110)', fontWeight: row.bold ? 700 : 400 }}>
+                        <span style={{ fontSize: '0.68rem', color: row.bold ? 'rgb(170,185,205)' : 'rgba(240,236,228,0.24)', fontWeight: row.bold ? 700 : 400 }}>
                           {row.label}
-                          {row.note && <span style={{ marginLeft: '0.25rem', color: 'rgb(60,72,90)', fontSize: '0.58rem' }}>({row.note})</span>}
+                          {row.note && <span style={{ marginLeft: '0.25rem', color: 'rgba(240,236,228,0.24)', fontSize: '0.58rem' }}>({row.note})</span>}
                         </span>
-                        <span style={{ fontSize: row.bold ? '0.82rem' : '0.72rem', color: row.bold ? 'rgb(200,215,235)' : 'rgb(140,155,175)', fontWeight: row.bold ? 700 : 400, fontVariantNumeric: 'tabular-nums' }}>
+                        <span style={{ fontSize: row.bold ? '0.82rem' : '0.72rem', color: row.bold ? 'rgb(200,215,235)' : 'rgba(240,236,228,0.42)', fontWeight: row.bold ? 700 : 400, fontVariantNumeric: 'tabular-nums' }}>
                           {row.value}
                         </span>
                       </div>
                     ))}
                     {qtyDiscount > 0 && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                        <span style={{ fontSize: '0.68rem', color: 'rgb(99,230,190)' }}>Desconto {(qtyDiscount * 100).toFixed(0)}%</span>
-                        <span style={{ fontSize: '0.72rem', color: 'rgb(99,230,190)', fontWeight: 700 }}>-{fmtEur(discountAmount)}</span>
+                        <span style={{ fontSize: '0.68rem', color: '#b8975e' }}>Desconto {(qtyDiscount * 100).toFixed(0)}%</span>
+                        <span style={{ fontSize: '0.72rem', color: '#b8975e', fontWeight: 700 }}>-{fmtEur(discountAmount)}</span>
                       </div>
                     )}
                   </div>
 
-                  <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', margin: '0.875rem 0' }} />
+                  <div style={{ height: '1px', background: 'rgba(240,236,228,0.06)', margin: '0.875rem 0' }} />
 
                   {/* Total */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
@@ -812,17 +812,17 @@ export default function ConfiguratorPage() {
                     <AnimatedPrice value={finalTotal} className="text-kpi" />
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <span style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>Custo por unidade</span>
-                    <span style={{ fontSize: '0.78rem', color: 'rgb(77,163,255)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                    <span style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)' }}>Custo por unidade</span>
+                    <span style={{ fontSize: '0.78rem', color: '#d4b47a', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
                       {fmtEur(unitFinal)} /un
                     </span>
                   </div>
 
                   {/* Delivery estimate */}
-                  <div style={{ padding: '0.75rem', background: 'rgba(99,230,190,0.06)', borderRadius: '10px', border: '1px solid rgba(99,230,190,0.15)', marginBottom: '1.25rem' }}>
-                    <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>🚚 Entrega estimada</div>
-                    <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(99,230,190)' }}>{deliveryDate}</div>
-                    <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginTop: '0.1rem' }}>{deliveryDays} dias úteis após aprovação de arte</div>
+                  <div style={{ padding: '0.75rem', background: 'rgba(99,230,190,0.06)', borderRadius: '10px', border: '1px solid rgba(184,151,94,0.14)', marginBottom: '1.25rem' }}>
+                    <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>🚚 Entrega estimada</div>
+                    <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#b8975e' }}>{deliveryDate}</div>
+                    <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.1rem' }}>{deliveryDays} dias úteis após aprovação de arte</div>
                   </div>
 
                   {/* CTA */}
@@ -830,7 +830,7 @@ export default function ConfiguratorPage() {
                     whileTap={tapScale}
                     onClick={() => setStep(3)}
                     style={{
-                      width: '100%', background: 'linear-gradient(135deg,rgb(77,163,255),rgb(116,231,255))',
+                      width: '100%', background: 'linear-gradient(135deg,#d4b47a,#b8975e)',
                       border: 'none', borderRadius: '12px', padding: '0.875rem',
                       color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer',
                       letterSpacing: '-0.01em',
@@ -840,7 +840,7 @@ export default function ConfiguratorPage() {
                   </motion.button>
                   <button type="button"
                     onClick={() => setStep(1)}
-                    style={{ width: '100%', background: 'none', border: 'none', marginTop: '0.625rem', color: 'rgb(80,92,110)', fontSize: '0.7rem', cursor: 'pointer' }}
+                    style={{ width: '100%', background: 'none', border: 'none', marginTop: '0.625rem', color: 'rgba(240,236,228,0.24)', fontSize: '0.7rem', cursor: 'pointer' }}
                   >
                     ← Mudar produto
                   </button>
@@ -868,16 +868,16 @@ export default function ConfiguratorPage() {
               >
                 <div style={{
                   width: '64px', height: '64px', borderRadius: '50%',
-                  background: 'linear-gradient(135deg,rgba(77,163,255,0.2),rgba(99,230,190,0.2))',
-                  border: '1.5px solid rgba(77,163,255,0.4)',
+                  background: 'linear-gradient(135deg,rgba(154,124,74,0.18),rgba(184,151,94,0.18))',
+                  border: '1.5px solid rgba(154,124,74,0.35)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: '1.75rem', marginBottom: '0.875rem',
-                  boxShadow: '0 0 32px rgba(77,163,255,0.2)',
+                  boxShadow: '0 0 32px rgba(154,124,74,0.18)',
                 }}>✨</div>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>
                   Configuração Pronta!
                 </h2>
-                <p style={{ fontSize: '0.78rem', color: 'rgb(80,92,110)', textAlign: 'center' }}>
+                <p style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.24)', textAlign: 'center' }}>
                   Revê o resumo e lança a encomenda em segundos.
                 </p>
               </motion.div>
@@ -894,20 +894,20 @@ export default function ConfiguratorPage() {
                     { label: 'Entrega Estimada', value: deliveryDate },
                   ].map(item => (
                     <div key={item.label}>
-                      <div style={{ fontSize: '0.62rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.2rem' }}>{item.label}</div>
+                      <div style={{ fontSize: '0.62rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.2rem' }}>{item.label}</div>
                       <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'rgb(200,215,235)', lineHeight: 1.3 }}>{item.value}</div>
                     </div>
                   ))}
                 </div>
 
                 {brandingNotes && (
-                  <div style={{ marginBottom: '1.25rem', padding: '0.75rem', background: 'rgba(77,163,255,0.05)', borderRadius: '10px', border: '1px solid rgba(77,163,255,0.12)' }}>
-                    <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.3rem' }}>Notas de Arte</div>
+                  <div style={{ marginBottom: '1.25rem', padding: '0.75rem', background: 'rgba(77,163,255,0.05)', borderRadius: '10px', border: '1px solid rgba(154,124,74,0.12)' }}>
+                    <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.3rem' }}>Notas de Arte</div>
                     <div style={{ fontSize: '0.75rem', color: 'rgb(170,185,205)', lineHeight: 1.5 }}>{brandingNotes}</div>
                   </div>
                 )}
 
-                <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', marginBottom: '1.25rem' }} />
+                <div style={{ height: '1px', background: 'rgba(240,236,228,0.06)', marginBottom: '1.25rem' }} />
 
                 {/* Final pricing */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
@@ -916,22 +916,22 @@ export default function ConfiguratorPage() {
                 </div>
                 {qtyDiscount > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-                    <span style={{ fontSize: '0.78rem', color: 'rgb(99,230,190)' }}>Desconto volume ({(qtyDiscount * 100).toFixed(0)}%)</span>
-                    <span style={{ fontSize: '0.78rem', color: 'rgb(99,230,190)', fontWeight: 700 }}>-{fmtEur(discountAmount)}</span>
+                    <span style={{ fontSize: '0.78rem', color: '#b8975e' }}>Desconto volume ({(qtyDiscount * 100).toFixed(0)}%)</span>
+                    <span style={{ fontSize: '0.78rem', color: '#b8975e', fontWeight: 700 }}>-{fmtEur(discountAmount)}</span>
                   </div>
                 )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                   <span style={{ fontSize: '0.78rem', color: 'rgb(120,135,155)' }}>Envio</span>
                   <span style={{ fontSize: '0.78rem', color: 'rgb(170,185,205)', fontVariantNumeric: 'tabular-nums' }}>{fmtEur(shipping)}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'rgba(77,163,255,0.08)', borderRadius: '12px', border: '1px solid rgba(77,163,255,0.2)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'rgba(154,124,74,0.08)', borderRadius: '12px', border: '1px solid rgba(154,124,74,0.18)' }}>
                   <div>
                     <div style={{ fontSize: '0.72rem', color: 'rgb(120,135,155)', marginBottom: '0.15rem' }}>Total Estimado (IVA excl.)</div>
-                    <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>Sujeito a confirmação de arte e stock</div>
+                    <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)' }}>Sujeito a confirmação de arte e stock</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div className="text-kpi" style={{ color: 'rgb(77,163,255)' }}>{fmtEur(finalTotal)}</div>
-                    <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>{fmtEur(unitFinal)}/un</div>
+                    <div className="text-kpi" style={{ color: '#d4b47a' }}>{fmtEur(finalTotal)}</div>
+                    <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)' }}>{fmtEur(unitFinal)}/un</div>
                   </div>
                 </div>
               </div>
@@ -942,12 +942,12 @@ export default function ConfiguratorPage() {
                   <motion.div
                     whileTap={tapScale}
                     style={{
-                      background: 'linear-gradient(135deg,rgb(77,163,255),rgb(116,231,255))',
+                      background: 'linear-gradient(135deg,#d4b47a,#b8975e)',
                       borderRadius: '14px', padding: '1rem',
                       textAlign: 'center', color: '#fff',
                       fontSize: '0.88rem', fontWeight: 700,
                       cursor: 'pointer', letterSpacing: '-0.01em',
-                      boxShadow: '0 8px 24px rgba(77,163,255,0.3)',
+                      boxShadow: '0 8px 24px rgba(154,124,74,0.28)',
                     }}
                   >
                     🚀 Lançar Encomenda
@@ -958,9 +958,9 @@ export default function ConfiguratorPage() {
                     whileTap={tapScale}
                     onClick={() => setStep(2)}
                     style={{
-                      background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)',
                       borderRadius: '12px', padding: '0.75rem',
-                      color: 'rgb(140,155,175)', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer',
+                      color: 'rgba(240,236,228,0.42)', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer',
                     }}
                   >
                     ← Editar Configuração
@@ -969,9 +969,9 @@ export default function ConfiguratorPage() {
                     <motion.div
                       whileTap={tapScale}
                       style={{
-                        background: 'rgba(116,231,255,0.08)', border: '1px solid rgba(116,231,255,0.2)',
+                        background: 'rgba(116,231,255,0.08)', border: '1px solid rgba(184,151,94,0.18)',
                         borderRadius: '12px', padding: '0.75rem',
-                        color: 'rgb(116,231,255)', fontSize: '0.78rem', fontWeight: 600,
+                        color: '#b8975e', fontSize: '0.78rem', fontWeight: 600,
                         cursor: 'pointer', textAlign: 'center',
                       }}
                     >

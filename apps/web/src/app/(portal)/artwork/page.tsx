@@ -46,11 +46,11 @@ type SubmissionStatus = 'draft' | 'submitted' | 'in_review' | 'revision_requeste
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const STATUS_CONFIG: Record<SubmissionStatus, { label: string; color: string; bg: string; emoji: string }> = {
-  draft:              { label: 'Rascunho',            color: 'rgb(80,92,110)',    bg: 'rgba(80,92,110,0.15)',    emoji: '📝' },
-  submitted:          { label: 'Submetido',            color: 'rgb(77,163,255)',   bg: 'rgba(77,163,255,0.12)',   emoji: '📤' },
-  in_review:          { label: 'Em Revisão',           color: 'rgb(116,231,255)',  bg: 'rgba(116,231,255,0.12)',  emoji: '🔍' },
+  draft:              { label: 'Rascunho',            color: 'rgba(240,236,228,0.24)',    bg: 'rgba(80,92,110,0.15)',    emoji: '📝' },
+  submitted:          { label: 'Submetido',            color: '#d4b47a',   bg: 'rgba(154,124,74,0.12)',   emoji: '📤' },
+  in_review:          { label: 'Em Revisão',           color: '#b8975e',  bg: 'rgba(116,231,255,0.12)',  emoji: '🔍' },
   revision_requested: { label: 'Revisão Pedida',       color: 'rgb(245,158,11)',   bg: 'rgba(245,158,11,0.12)',   emoji: '🔄' },
-  approved:           { label: 'Aprovado',             color: 'rgb(99,230,190)',   bg: 'rgba(99,230,190,0.12)',   emoji: '✅' },
+  approved:           { label: 'Aprovado',             color: '#b8975e',   bg: 'rgba(184,151,94,0.12)',   emoji: '✅' },
   rejected:           { label: 'Rejeitado',            color: 'rgb(239,68,68)',    bg: 'rgba(239,68,68,0.12)',    emoji: '❌' },
 };
 
@@ -103,7 +103,7 @@ function VersionTimeline({ versions, currentUrl, onSelect }: { versions: Version
   if (versions.length === 0) return null;
   return (
     <div style={{ marginBottom: '1.25rem' }}>
-      <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(80,92,110)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+      <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
         Histórico de Versões ({versions.length})
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
@@ -115,33 +115,33 @@ function VersionTimeline({ versions, currentUrl, onSelect }: { versions: Version
             style={{
               display: 'flex', alignItems: 'center', gap: '0.75rem',
               padding: '0.5rem 0.75rem', borderRadius: '10px',
-              background: currentUrl === v.file_url ? 'rgba(77,163,255,0.1)' : 'rgba(255,255,255,0.03)',
-              border: currentUrl === v.file_url ? '1px solid rgba(77,163,255,0.3)' : '1px solid rgba(255,255,255,0.06)',
+              background: currentUrl === v.file_url ? 'rgba(154,124,74,0.10)' : 'rgba(240,236,228,0.04)',
+              border: currentUrl === v.file_url ? '1px solid rgba(154,124,74,0.28)' : '1px solid rgba(240,236,228,0.06)',
               cursor: 'pointer',
             }}
           >
             <div style={{
               width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0,
-              background: currentUrl === v.file_url ? 'rgba(77,163,255,0.3)' : 'rgba(255,255,255,0.08)',
+              background: currentUrl === v.file_url ? 'rgba(154,124,74,0.28)' : 'rgba(240,236,228,0.06)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.65rem', fontWeight: 800, color: currentUrl === v.file_url ? 'rgb(77,163,255)' : 'rgb(120,135,155)',
+              fontSize: '0.65rem', fontWeight: 800, color: currentUrl === v.file_url ? '#d4b47a' : 'rgb(120,135,155)',
             }}>
               v{v.version_number}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: '0.68rem', color: 'rgb(170,185,205)', fontWeight: 600 }}>
                 Versão {v.version_number}
-                {v.version_number === versions.length && <span style={{ marginLeft: '0.35rem', color: 'rgb(99,230,190)', fontSize: '0.58rem' }}>• LATEST</span>}
+                {v.version_number === versions.length && <span style={{ marginLeft: '0.35rem', color: '#b8975e', fontSize: '0.58rem' }}>• LATEST</span>}
               </div>
-              <div style={{ fontSize: '0.58rem', color: 'rgb(80,92,110)' }}>
+              <div style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)' }}>
                 {fmtTime(v.created_at)} · {fmtBytes(v.file_size)}
               </div>
-              {v.notes && <div style={{ fontSize: '0.58rem', color: 'rgb(80,92,110)', marginTop: '0.1rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.notes}</div>}
+              {v.notes && <div style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.1rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.notes}</div>}
             </div>
             <a
               href={v.file_url} target="_blank" rel="noopener noreferrer"
               onClick={e => e.stopPropagation()}
-              style={{ fontSize: '0.65rem', color: 'rgb(77,163,255)', textDecoration: 'none', flexShrink: 0 }}
+              style={{ fontSize: '0.65rem', color: '#d4b47a', textDecoration: 'none', flexShrink: 0 }}
             >
               ↗
             </a>
@@ -168,12 +168,12 @@ function CommentThread({ comments, onAdd, loading }: { comments: Comment[]; onAd
 
   return (
     <div>
-      <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(80,92,110)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.625rem' }}>
+      <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.625rem' }}>
         Comentários ({comments.length})
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.75rem', maxHeight: '200px', overflowY: 'auto' }} className="scroll-thin">
         {comments.length === 0 && (
-          <div style={{ padding: '1rem', textAlign: 'center', color: 'rgb(80,92,110)', fontSize: '0.72rem' }}>
+          <div style={{ padding: '1rem', textAlign: 'center', color: 'rgba(240,236,228,0.24)', fontSize: '0.72rem' }}>
             Nenhum comentário ainda.
           </div>
         )}
@@ -186,15 +186,15 @@ function CommentThread({ comments, onAdd, loading }: { comments: Comment[]; onAd
               transition={springSnappy}
               style={{
                 padding: '0.625rem 0.75rem', borderRadius: '10px',
-                background: c.is_admin ? 'rgba(245,158,11,0.06)' : 'rgba(255,255,255,0.04)',
-                border: c.is_admin ? '1px solid rgba(245,158,11,0.15)' : '1px solid rgba(255,255,255,0.06)',
+                background: c.is_admin ? 'rgba(245,158,11,0.06)' : 'rgba(240,236,228,0.04)',
+                border: c.is_admin ? '1px solid rgba(245,158,11,0.15)' : '1px solid rgba(240,236,228,0.06)',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
-                <span style={{ fontSize: '0.6rem', fontWeight: 700, color: c.is_admin ? 'rgb(245,158,11)' : 'rgb(77,163,255)' }}>
+                <span style={{ fontSize: '0.6rem', fontWeight: 700, color: c.is_admin ? 'rgb(245,158,11)' : '#d4b47a' }}>
                   {c.is_admin ? '🔑 Admin' : '👤 ' + (c.author_email?.split('@')[0] ?? 'Cliente')}
                 </span>
-                <span style={{ fontSize: '0.55rem', color: 'rgb(60,72,90)' }}>{fmtTime(c.created_at)}</span>
+                <span style={{ fontSize: '0.55rem', color: 'rgba(240,236,228,0.24)' }}>{fmtTime(c.created_at)}</span>
               </div>
               <div style={{ fontSize: '0.7rem', color: 'rgb(170,185,205)', lineHeight: 1.5 }}>{c.content}</div>
             </motion.div>
@@ -210,7 +210,7 @@ function CommentThread({ comments, onAdd, loading }: { comments: Comment[]; onAd
           placeholder="Adicionar comentário… (Ctrl+Enter para enviar)"
           rows={2}
           style={{
-            flex: 1, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+            flex: 1, background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)',
             borderRadius: '8px', padding: '0.5rem 0.625rem', color: 'rgb(200,215,235)', fontSize: '0.72rem',
             resize: 'none', lineHeight: 1.4,
           }}
@@ -220,10 +220,10 @@ function CommentThread({ comments, onAdd, loading }: { comments: Comment[]; onAd
           onClick={send}
           disabled={!draft.trim() || sending || loading}
           style={{
-            background: draft.trim() ? 'rgba(77,163,255,0.2)' : 'rgba(255,255,255,0.04)',
-            border: draft.trim() ? '1px solid rgba(77,163,255,0.4)' : '1px solid rgba(255,255,255,0.06)',
+            background: draft.trim() ? 'rgba(154,124,74,0.18)' : 'rgba(240,236,228,0.04)',
+            border: draft.trim() ? '1px solid rgba(154,124,74,0.35)' : '1px solid rgba(240,236,228,0.06)',
             borderRadius: '8px', padding: '0.5rem 0.75rem',
-            color: draft.trim() ? 'rgb(77,163,255)' : 'rgb(80,92,110)',
+            color: draft.trim() ? '#d4b47a' : 'rgba(240,236,228,0.24)',
             fontSize: '0.72rem', fontWeight: 700, cursor: draft.trim() ? 'pointer' : 'not-allowed',
             flexShrink: 0,
           }}
@@ -443,10 +443,10 @@ export default function ArtworkPage() {
         {/* Header */}
         <motion.div {...fadeUp(0)} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.75rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
               Aprovação de Artes {isAdmin && <span style={{ fontSize: '0.7rem', color: 'rgb(245,158,11)', marginLeft: '0.5rem', fontWeight: 700 }}>ADMIN</span>}
             </h1>
-            <p style={{ fontSize: '0.78rem', color: 'rgb(80,92,110)' }}>
+            <p style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.24)' }}>
               {isAdmin ? 'Gestão completa de submissões de arte e aprovações.' : 'Submete e acompanha as tuas artes para aprovação.'}
             </p>
           </div>
@@ -454,9 +454,9 @@ export default function ArtworkPage() {
             whileTap={tapScale}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
-              background: 'linear-gradient(135deg,rgba(77,163,255,0.2),rgba(116,231,255,0.1))',
-              border: '1px solid rgba(77,163,255,0.3)', borderRadius: '10px',
-              padding: '0.6rem 1rem', color: 'rgb(77,163,255)', fontSize: '0.78rem', fontWeight: 700,
+              background: 'linear-gradient(135deg,rgba(154,124,74,0.18),rgba(184,151,94,0.10))',
+              border: '1px solid rgba(154,124,74,0.28)', borderRadius: '10px',
+              padding: '0.6rem 1rem', color: '#d4b47a', fontSize: '0.78rem', fontWeight: 700,
               cursor: 'pointer',
             }}
           >
@@ -508,10 +508,10 @@ export default function ArtworkPage() {
                   key={tab.id}
                   onClick={() => handleFilterChange(tab.id)}
                   style={{
-                    background: statusFilter === tab.id ? 'rgba(77,163,255,0.2)' : 'rgba(255,255,255,0.04)',
-                    border: statusFilter === tab.id ? '1px solid rgba(77,163,255,0.4)' : '1px solid rgba(255,255,255,0.07)',
+                    background: statusFilter === tab.id ? 'rgba(154,124,74,0.18)' : 'rgba(240,236,228,0.04)',
+                    border: statusFilter === tab.id ? '1px solid rgba(154,124,74,0.35)' : '1px solid rgba(240,236,228,0.06)',
                     borderRadius: '8px', padding: '0.3rem 0.6rem',
-                    color: statusFilter === tab.id ? 'rgb(77,163,255)' : 'rgb(100,112,130)',
+                    color: statusFilter === tab.id ? '#d4b47a' : 'rgba(240,236,228,0.42)',
                     fontSize: '0.62rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
                   }}
                 >
@@ -527,7 +527,7 @@ export default function ArtworkPage() {
                   <div key={i} className="skeleton skeleton-card" style={{ borderRadius: '12px' }} />
                 ))
               ) : submissions.length === 0 ? (
-                <div style={{ padding: '2.5rem', textAlign: 'center', color: 'rgb(80,92,110)', fontSize: '0.75rem' }}>
+                <div style={{ padding: '2.5rem', textAlign: 'center', color: 'rgba(240,236,228,0.24)', fontSize: '0.75rem' }}>
                   Nenhuma submissão encontrada.
                 </div>
               ) : (
@@ -546,8 +546,8 @@ export default function ArtworkPage() {
                         onClick={() => loadDetail(sub)}
                         style={{
                           padding: '0.875rem 1rem', borderRadius: '12px',
-                          border: isSelected ? '1.5px solid rgba(77,163,255,0.5)' : '1px solid rgba(255,255,255,0.06)',
-                          background: isSelected ? 'rgba(77,163,255,0.08)' : 'rgba(255,255,255,0.03)',
+                          border: isSelected ? '1.5px solid rgba(154,124,74,0.45)' : '1px solid rgba(240,236,228,0.06)',
+                          background: isSelected ? 'rgba(154,124,74,0.08)' : 'rgba(240,236,228,0.04)',
                           cursor: 'pointer',
                         }}
                       >
@@ -558,16 +558,16 @@ export default function ArtworkPage() {
                           <StatusBadge status={sub.status} />
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', justifyContent: 'space-between' }}>
-                          <span style={{ fontSize: '0.58rem', color: 'rgb(80,92,110)' }}>
+                          <span style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)' }}>
                             {isAdmin ? sub.submitter_email?.split('@')[0] : fmtTime(sub.created_at)}
                           </span>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                             {sub.version_count > 1 && (
-                              <span style={{ fontSize: '0.58rem', background: 'rgba(116,231,255,0.1)', color: 'rgb(116,231,255)', padding: '0.1rem 0.3rem', borderRadius: '4px', fontWeight: 700 }}>
+                              <span style={{ fontSize: '0.58rem', background: 'rgba(184,151,94,0.10)', color: '#b8975e', padding: '0.1rem 0.3rem', borderRadius: '4px', fontWeight: 700 }}>
                                 v{sub.version_count}
                               </span>
                             )}
-                            <span style={{ fontSize: '0.55rem', color: 'rgb(60,72,90)' }}>{fmtTime(sub.updated_at)}</span>
+                            <span style={{ fontSize: '0.55rem', color: 'rgba(240,236,228,0.24)' }}>{fmtTime(sub.updated_at)}</span>
                           </div>
                         </div>
                       </motion.div>
@@ -588,8 +588,8 @@ export default function ArtworkPage() {
                 exit={{ opacity: 0 }}
                 style={{
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  minHeight: '400px', color: 'rgb(80,92,110)', textAlign: 'center',
-                  border: '1px dashed rgba(255,255,255,0.07)', borderRadius: '16px',
+                  minHeight: '400px', color: 'rgba(240,236,228,0.24)', textAlign: 'center',
+                  border: '1px dashed rgba(240,236,228,0.06)', borderRadius: '16px',
                 }}
               >
                 <div style={{ fontSize: '3rem', marginBottom: '0.75rem', opacity: 0.4 }}>🎨</div>
@@ -621,13 +621,13 @@ export default function ArtworkPage() {
                           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                             <StatusBadge status={selected.status} />
                             {selected.version_count > 1 && (
-                              <span style={{ fontSize: '0.6rem', color: 'rgb(116,231,255)', fontWeight: 700 }}>v{selected.version_count}</span>
+                              <span style={{ fontSize: '0.6rem', color: '#b8975e', fontWeight: 700 }}>v{selected.version_count}</span>
                             )}
                           </div>
                         </div>
                         <a
                           href={selected.file_url} target="_blank" rel="noopener noreferrer"
-                          style={{ fontSize: '0.7rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}
+                          style={{ fontSize: '0.7rem', color: '#d4b47a', textDecoration: 'none', fontWeight: 600 }}
                         >
                           ↗ Abrir
                         </a>
@@ -636,8 +636,8 @@ export default function ArtworkPage() {
                       {/* Image preview with annotation layer */}
                       {isImage(selected.file_type, previewUrl ?? selected.file_url) && (
                         <div style={{
-                          background: 'rgba(255,255,255,0.03)', borderRadius: '10px',
-                          marginBottom: '0.875rem', border: '1px solid rgba(255,255,255,0.05)',
+                          background: 'rgba(240,236,228,0.04)', borderRadius: '10px',
+                          marginBottom: '0.875rem', border: '1px solid rgba(240,236,228,0.06)',
                           padding: '0.75rem',
                         }}>
                           <ArtworkAnnotationLayer
@@ -656,15 +656,15 @@ export default function ArtworkPage() {
                           { label: 'Data', value: new Date(selected.created_at).toLocaleDateString('pt-PT') },
                         ].map(m => (
                           <div key={m.label}>
-                            <div style={{ fontSize: '0.58rem', color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.15rem' }}>{m.label}</div>
+                            <div style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.15rem' }}>{m.label}</div>
                             <div style={{ fontSize: '0.72rem', color: 'rgb(170,185,205)', fontWeight: 600 }}>{m.value}</div>
                           </div>
                         ))}
                       </div>
 
                       {selected.notes && (
-                        <div style={{ padding: '0.625rem 0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '0.875rem' }}>
-                          <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>Notas</div>
+                        <div style={{ padding: '0.625rem 0.75rem', background: 'rgba(240,236,228,0.04)', borderRadius: '8px', border: '1px solid rgba(240,236,228,0.06)', marginBottom: '0.875rem' }}>
+                          <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>Notas</div>
                           <div style={{ fontSize: '0.72rem', color: 'rgb(170,185,205)', lineHeight: 1.5 }}>{selected.notes}</div>
                         </div>
                       )}
@@ -685,7 +685,7 @@ export default function ArtworkPage() {
                           {analyzing ? '🧠 Analisando…' : '🧠 Análise AI'}
                         </motion.button>
                         {aiAnalysis && (
-                          <span style={{ fontSize: '0.62rem', color: 'rgb(99,230,190)' }}>✓ Análise concluída</span>
+                          <span style={{ fontSize: '0.62rem', color: '#b8975e' }}>✓ Análise concluída</span>
                         )}
                       </div>
 
@@ -725,7 +725,7 @@ export default function ArtworkPage() {
                         {actionSuccess ? (
                           <motion.div
                             initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                            style={{ padding: '1rem', textAlign: 'center', color: 'rgb(99,230,190)', fontSize: '0.82rem', fontWeight: 700 }}
+                            style={{ padding: '1rem', textAlign: 'center', color: '#b8975e', fontSize: '0.82rem', fontWeight: 700 }}
                           >
                             ✅ Acção registada com sucesso
                           </motion.div>
@@ -738,14 +738,14 @@ export default function ArtworkPage() {
                               rows={3}
                               style={{
                                 width: '100%', boxSizing: 'border-box',
-                                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                                background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)',
                                 borderRadius: '8px', padding: '0.625rem 0.75rem', color: 'rgb(200,215,235)', fontSize: '0.75rem',
                                 resize: 'vertical', lineHeight: 1.5, marginBottom: '0.875rem',
                               }}
                             />
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
                               {[
-                                { action: 'approve' as const,  label: '✅ Aprovar',         bg: 'rgba(99,230,190,0.15)',  border: 'rgba(99,230,190,0.35)',  color: 'rgb(99,230,190)' },
+                                { action: 'approve' as const,  label: '✅ Aprovar',         bg: 'rgba(184,151,94,0.14)',  border: 'rgba(99,230,190,0.35)',  color: '#b8975e' },
                                 { action: 'revision' as const, label: '🔄 Pedir Revisão',   bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.35)', color: 'rgb(245,158,11)' },
                                 { action: 'reject' as const,   label: '❌ Rejeitar',         bg: 'rgba(239,68,68,0.12)',  border: 'rgba(239,68,68,0.35)',  color: 'rgb(239,68,68)' },
                               ].map(btn => (

@@ -74,16 +74,16 @@ export interface DecisionCardData {
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
 const RISK_CONFIG = {
-  GREEN:  { bg: 'rgba(99,230,190,0.08)',  border: 'rgba(99,230,190,0.2)',  text: 'rgb(99,230,190)',  dot: '#63e6be', label: 'RISCO BAIXO' },
+  GREEN:  { bg: 'rgba(184,151,94,0.08)',  border: 'rgba(184,151,94,0.18)',  text: '#b8975e',  dot: '#63e6be', label: 'RISCO BAIXO' },
   AMBER:  { bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.2)',  text: 'rgb(251,191,36)',  dot: '#fbbf24', label: 'RISCO MÉDIO' },
   RED:    { bg: 'rgba(239,68,68,0.08)',   border: 'rgba(239,68,68,0.2)',   text: 'rgb(239,68,68)',   dot: '#ef4444', label: 'RISCO ALTO'  },
 };
 
 const ACTION_CONFIG = {
-  APPROVE:                  { bg: 'rgb(99,230,190)',  text: 'rgb(7,17,31)',      label: 'Aprovar' },
-  APPROVE_WITH_CONDITIONS:  { bg: 'rgb(251,191,36)',  text: 'rgb(7,17,31)',      label: 'Aprovar com condições' },
-  REQUEST_REVISION:         { bg: 'rgb(77,163,255)',  text: 'rgb(7,17,31)',      label: 'Pedir revisão' },
-  REJECT:                   { bg: 'rgb(239,68,68)',   text: 'rgb(245,247,251)',  label: 'Rejeitar' },
+  APPROVE:                  { bg: '#b8975e',  text: '#090907',      label: 'Aprovar' },
+  APPROVE_WITH_CONDITIONS:  { bg: 'rgb(251,191,36)',  text: '#090907',      label: 'Aprovar com condições' },
+  REQUEST_REVISION:         { bg: '#d4b47a',  text: '#090907',      label: 'Pedir revisão' },
+  REJECT:                   { bg: 'rgb(239,68,68)',   text: '#f0ece4',  label: 'Rejeitar' },
 };
 
 const TIER_CONFIG = {
@@ -91,7 +91,7 @@ const TIER_CONFIG = {
   SILVER:    { bg: 'rgba(170,180,198,0.1)', text: 'rgb(170,180,198)', border: 'rgba(170,180,198,0.2)' },
   BRONZE:    { bg: 'rgba(234,179,8,0.1)',   text: 'rgb(234,179,8)',   border: 'rgba(234,179,8,0.2)'   },
   PROBATION: { bg: 'rgba(239,68,68,0.1)',   text: 'rgb(239,68,68)',   border: 'rgba(239,68,68,0.2)'   },
-  NEW:       { bg: 'rgba(77,163,255,0.1)',  text: 'rgb(77,163,255)',  border: 'rgba(77,163,255,0.2)'  },
+  NEW:       { bg: 'rgba(154,124,74,0.10)',  text: '#d4b47a',  border: 'rgba(154,124,74,0.18)'  },
 };
 
 // ── Helper components ─────────────────────────────────────────────────────────
@@ -102,7 +102,7 @@ function fmt(n: number, decimals = 2) {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '0.875rem' }}>
+    <p style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '0.875rem' }}>
       {children}
     </p>
   );
@@ -110,9 +110,9 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function Row({ label, value, accent, large }: { label: string; value: string; accent?: boolean; large?: boolean }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '0.5rem 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-      <span style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)' }}>{label}</span>
-      <span style={{ fontSize: large ? '1.1rem' : '0.875rem', fontWeight: large ? 800 : 600, color: accent ? 'rgb(99,230,190)' : 'rgb(245,247,251)', letterSpacing: large ? '-0.02em' : 'normal' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '0.5rem 0', borderBottom: '1px solid rgba(240,236,228,0.04)' }}>
+      <span style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)' }}>{label}</span>
+      <span style={{ fontSize: large ? '1.1rem' : '0.875rem', fontWeight: large ? 800 : 600, color: accent ? '#b8975e' : '#f0ece4', letterSpacing: large ? '-0.02em' : 'normal' }}>
         {value}
       </span>
     </div>
@@ -157,13 +157,13 @@ export function DecisionCard({ card, onApprove, onReject, onRequestRevision }: D
 
   if (done) {
     const labels = { approve: '✓ Aprovado', reject: '✗ Rejeitado', revision: '↩ Revisão solicitada' };
-    const colors = { approve: 'rgb(99,230,190)', reject: 'rgb(239,68,68)', revision: 'rgb(77,163,255)' };
+    const colors = { approve: '#b8975e', reject: 'rgb(239,68,68)', revision: '#d4b47a' };
     return (
       <div className="yg-card" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
         <p style={{ fontSize: '2rem', fontWeight: 800, color: colors[done as keyof typeof colors], marginBottom: '0.5rem' }}>
           {labels[done as keyof typeof labels]}
         </p>
-        <p style={{ color: 'rgb(120,130,150)', fontSize: '0.875rem' }}>Decisão registada · {card.cardId}</p>
+        <p style={{ color: 'rgba(240,236,228,0.42)', fontSize: '0.875rem' }}>Decisão registada · {card.cardId}</p>
       </div>
     );
   }
@@ -178,10 +178,10 @@ export function DecisionCard({ card, onApprove, onReject, onRequestRevision }: D
         <div className="yg-card" style={{ padding: '1.5rem 1.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
             <div>
-              <p style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '0.25rem' }}>
+              <p style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '0.25rem' }}>
                 Decisão de compra
               </p>
-              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'rgb(245,247,251)', lineHeight: 1.3 }}>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#f0ece4', lineHeight: 1.3 }}>
                 {card.summary}
               </h2>
             </div>
@@ -216,13 +216,13 @@ export function DecisionCard({ card, onApprove, onReject, onRequestRevision }: D
           <Row label="IVA" value={`€${fmt(card.cost.vat)}`} />
           {card.cost.handling > 0 && <Row label="Manuseamento" value={`€${fmt(card.cost.handling)}`} />}
           {card.cost.insurance > 0 && <Row label="Seguro" value={`€${fmt(card.cost.insurance)}`} />}
-          <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(240,236,228,0.10)', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'rgb(170,180,198)' }}>Total landed</span>
-            <span style={{ fontSize: '1.75rem', fontWeight: 800, color: 'rgb(99,230,190)', letterSpacing: '-0.03em' }}>€{fmt(card.cost.totalLandedCost)}</span>
+            <span style={{ fontSize: '1.75rem', fontWeight: 800, color: '#b8975e', letterSpacing: '-0.03em' }}>€{fmt(card.cost.totalLandedCost)}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
-            <span style={{ fontSize: '0.75rem', color: 'rgb(120,130,150)' }}>€{fmt(card.cost.costPerUnit)} / unidade · {card.cost.carrier.toUpperCase()} · markup +{card.cost.landingMarkupPct.toFixed(1)}%</span>
-            <span style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.07em', color: card.cost.confidence === 'HIGH' ? 'rgb(99,230,190)' : card.cost.confidence === 'MEDIUM' ? 'rgb(251,191,36)' : 'rgb(239,68,68)', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', padding: '0.1rem 0.4rem' }}>
+            <span style={{ fontSize: '0.75rem', color: 'rgba(240,236,228,0.42)' }}>€{fmt(card.cost.costPerUnit)} / unidade · {card.cost.carrier.toUpperCase()} · markup +{card.cost.landingMarkupPct.toFixed(1)}%</span>
+            <span style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.07em', color: card.cost.confidence === 'HIGH' ? '#b8975e' : card.cost.confidence === 'MEDIUM' ? 'rgb(251,191,36)' : 'rgb(239,68,68)', background: 'rgba(240,236,228,0.06)', borderRadius: '4px', padding: '0.1rem 0.4rem' }}>
               Confiança: {card.cost.confidence}
             </span>
           </div>
@@ -240,16 +240,16 @@ export function DecisionCard({ card, onApprove, onReject, onRequestRevision }: D
               {card.supplier.tier}
             </Pill>
           </div>
-          <p style={{ fontSize: '1rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '0.875rem' }}>{card.supplier.name}</p>
+          <p style={{ fontSize: '1rem', fontWeight: 700, color: '#f0ece4', marginBottom: '0.875rem' }}>{card.supplier.name}</p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem', marginBottom: '0.875rem' }}>
             {[
               { label: 'Encomendas', value: card.supplier.totalOrders > 0 ? String(card.supplier.totalOrders) : '—' },
               { label: 'Entrega a tempo', value: card.supplier.onTimeDeliveryRate !== null ? `${card.supplier.onTimeDeliveryRate}%` : '—' },
               { label: 'Precisão de custo', value: card.supplier.costAccuracyRate !== null ? `${card.supplier.costAccuracyRate}%` : '—' },
             ].map(({ label, value }) => (
-              <div key={label} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '0.75rem', textAlign: 'center' }}>
-                <p style={{ fontSize: '1.1rem', fontWeight: 800, color: 'rgb(245,247,251)', marginBottom: '0.2rem' }}>{value}</p>
-                <p style={{ fontSize: '0.65rem', color: 'rgb(120,130,150)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{label}</p>
+              <div key={label} style={{ background: 'rgba(240,236,228,0.04)', borderRadius: '8px', padding: '0.75rem', textAlign: 'center' }}>
+                <p style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f0ece4', marginBottom: '0.2rem' }}>{value}</p>
+                <p style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.42)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{label}</p>
               </div>
             ))}
           </div>
@@ -257,11 +257,11 @@ export function DecisionCard({ card, onApprove, onReject, onRequestRevision }: D
           {card.supplier.trustScore !== null && (
             <div style={{ marginTop: '0.75rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.375rem' }}>
-                <span style={{ fontSize: '0.7rem', color: 'rgb(120,130,150)' }}>Trust score</span>
-                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>{card.supplier.trustScore}/100</span>
+                <span style={{ fontSize: '0.7rem', color: 'rgba(240,236,228,0.42)' }}>Trust score</span>
+                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#f0ece4' }}>{card.supplier.trustScore}/100</span>
               </div>
-              <div style={{ height: '4px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${card.supplier.trustScore}%`, background: card.supplier.trustScore >= 80 ? 'rgb(99,230,190)' : card.supplier.trustScore >= 60 ? 'rgb(251,191,36)' : 'rgb(239,68,68)', borderRadius: '2px', transition: 'width 800ms ease' }} />
+              <div style={{ height: '4px', background: 'rgba(240,236,228,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${card.supplier.trustScore}%`, background: card.supplier.trustScore >= 80 ? '#b8975e' : card.supplier.trustScore >= 60 ? 'rgb(251,191,36)' : 'rgb(239,68,68)', borderRadius: '2px', transition: 'width 800ms ease' }} />
               </div>
             </div>
           )}
@@ -292,7 +292,7 @@ export function DecisionCard({ card, onApprove, onReject, onRequestRevision }: D
           )}
           {card.recommendation.alternatives && card.recommendation.alternatives.length > 0 && (
             <div style={{ marginBottom: '0.875rem' }}>
-              <p style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '0.5rem' }}>Alternativas</p>
+              <p style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '0.5rem' }}>Alternativas</p>
               <ul style={{ margin: 0, padding: '0 0 0 1rem', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
                 {card.recommendation.alternatives.map((a) => (
                   <li key={a} style={{ fontSize: '0.8rem', color: 'rgb(170,180,198)' }}>{a}</li>
@@ -314,15 +314,15 @@ export function DecisionCard({ card, onApprove, onReject, onRequestRevision }: D
               )}
               {card.budget.utilizationPct !== null && (
                 <div style={{ marginTop: '0.75rem' }}>
-                  <div style={{ height: '6px', background: 'rgba(255,255,255,0.08)', borderRadius: '3px', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${Math.min(100, card.budget.utilizationPct)}%`, background: card.budget.status === 'OVER' ? 'rgb(239,68,68)' : card.budget.status === 'TIGHT' ? 'rgb(251,191,36)' : 'rgb(99,230,190)', borderRadius: '3px', transition: 'width 600ms ease' }} />
+                  <div style={{ height: '6px', background: 'rgba(240,236,228,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${Math.min(100, card.budget.utilizationPct)}%`, background: card.budget.status === 'OVER' ? 'rgb(239,68,68)' : card.budget.status === 'TIGHT' ? 'rgb(251,191,36)' : '#b8975e', borderRadius: '3px', transition: 'width 600ms ease' }} />
                   </div>
-                  <p style={{ fontSize: '0.7rem', color: 'rgb(120,130,150)', marginTop: '0.375rem', textAlign: 'right' }}>{card.budget.utilizationPct.toFixed(1)}% utilizado</p>
+                  <p style={{ fontSize: '0.7rem', color: 'rgba(240,236,228,0.42)', marginTop: '0.375rem', textAlign: 'right' }}>{card.budget.utilizationPct.toFixed(1)}% utilizado</p>
                 </div>
               )}
             </>
           ) : (
-            <p style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)', fontStyle: 'italic' }}>Orçamento não configurado</p>
+            <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)', fontStyle: 'italic' }}>Orçamento não configurado</p>
           )}
         </div>
 
@@ -346,9 +346,9 @@ export function DecisionCard({ card, onApprove, onReject, onRequestRevision }: D
           <div style={{ marginTop: '0.875rem', textAlign: 'center' }}>
             <span style={{
               fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase',
-              color: card.delivery.status === 'ON_TIME' ? 'rgb(99,230,190)' : card.delivery.status === 'TIGHT' ? 'rgb(251,191,36)' : card.delivery.status === 'LATE' ? 'rgb(239,68,68)' : 'rgb(120,130,150)',
-              background: card.delivery.status === 'ON_TIME' ? 'rgba(99,230,190,0.08)' : card.delivery.status === 'TIGHT' ? 'rgba(251,191,36,0.08)' : card.delivery.status === 'LATE' ? 'rgba(239,68,68,0.08)' : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${card.delivery.status === 'ON_TIME' ? 'rgba(99,230,190,0.2)' : card.delivery.status === 'TIGHT' ? 'rgba(251,191,36,0.2)' : card.delivery.status === 'LATE' ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.08)'}`,
+              color: card.delivery.status === 'ON_TIME' ? '#b8975e' : card.delivery.status === 'TIGHT' ? 'rgb(251,191,36)' : card.delivery.status === 'LATE' ? 'rgb(239,68,68)' : 'rgba(240,236,228,0.42)',
+              background: card.delivery.status === 'ON_TIME' ? 'rgba(184,151,94,0.08)' : card.delivery.status === 'TIGHT' ? 'rgba(251,191,36,0.08)' : card.delivery.status === 'LATE' ? 'rgba(239,68,68,0.08)' : 'rgba(240,236,228,0.04)',
+              border: `1px solid ${card.delivery.status === 'ON_TIME' ? 'rgba(184,151,94,0.18)' : card.delivery.status === 'TIGHT' ? 'rgba(251,191,36,0.2)' : card.delivery.status === 'LATE' ? 'rgba(239,68,68,0.2)' : 'rgba(240,236,228,0.06)'}`,
               borderRadius: '6px', padding: '0.3rem 0.75rem',
             }}>
               {card.delivery.status === 'ON_TIME' ? 'Entrega atempada' : card.delivery.status === 'TIGHT' ? 'Janela apertada' : card.delivery.status === 'LATE' ? 'Chegada com atraso' : 'Data não definida'}
@@ -363,7 +363,7 @@ export function DecisionCard({ card, onApprove, onReject, onRequestRevision }: D
               type="button"
               disabled={loading}
               onClick={() => handleAction('approve')}
-              style={{ width: '100%', padding: '0.875rem', borderRadius: '10px', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', background: 'rgb(99,230,190)', color: 'rgb(7,17,31)', fontSize: '0.875rem', fontWeight: 800, letterSpacing: '0.02em', opacity: loading ? 0.6 : 1, transition: 'opacity 150ms ease' }}
+              style={{ width: '100%', padding: '0.875rem', borderRadius: '10px', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', background: '#b8975e', color: '#090907', fontSize: '0.875rem', fontWeight: 800, letterSpacing: '0.02em', opacity: loading ? 0.6 : 1, transition: 'opacity 150ms ease' }}
             >
               {loading ? 'A processar…' : '✓ Aprovar'}
             </button>
@@ -373,7 +373,7 @@ export function DecisionCard({ card, onApprove, onReject, onRequestRevision }: D
               type="button"
               disabled={loading}
               onClick={() => handleAction('revision')}
-              style={{ width: '100%', padding: '0.875rem', borderRadius: '10px', border: '1px solid rgba(77,163,255,0.3)', cursor: loading ? 'not-allowed' : 'pointer', background: 'rgba(77,163,255,0.08)', color: 'rgb(77,163,255)', fontSize: '0.875rem', fontWeight: 700, opacity: loading ? 0.6 : 1 }}
+              style={{ width: '100%', padding: '0.875rem', borderRadius: '10px', border: '1px solid rgba(154,124,74,0.28)', cursor: loading ? 'not-allowed' : 'pointer', background: 'rgba(154,124,74,0.08)', color: '#d4b47a', fontSize: '0.875rem', fontWeight: 700, opacity: loading ? 0.6 : 1 }}
             >
               ↩ Pedir revisão
             </button>

@@ -65,7 +65,7 @@ function StatusDot({ overdue }: { overdue: boolean }) {
       )}
       <span style={{
         width: 8, height: 8, borderRadius: '50%',
-        background: overdue ? 'rgb(239,68,68)' : 'rgb(99,230,190)',
+        background: overdue ? 'rgb(239,68,68)' : '#b8975e',
       }} />
     </span>
   );
@@ -75,11 +75,11 @@ function BudgetRing({ pct, size = 72 }: { pct: number; size?: number }) {
   const r = (size - 8) / 2;
   const circ = 2 * Math.PI * r;
   const fill = Math.min(100, pct);
-  const color = fill > 90 ? 'rgb(239,68,68)' : fill > 70 ? 'rgb(245,158,11)' : 'rgb(77,163,255)';
+  const color = fill > 90 ? 'rgb(239,68,68)' : fill > 70 ? 'rgb(245,158,11)' : '#d4b47a';
 
   return (
     <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={6} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(240,236,228,0.06)" strokeWidth={6} />
       <motion.circle
         cx={size / 2} cy={size / 2} r={r}
         fill="none" stroke={color} strokeWidth={6}
@@ -100,9 +100,9 @@ function BudgetRing({ pct, size = 72 }: { pct: number; size?: number }) {
 }
 
 function CountdownBadge({ days, isOverdue }: { days: number; isOverdue: boolean }) {
-  const color = isOverdue ? 'rgb(239,68,68)' : days <= 7 ? 'rgb(245,158,11)' : 'rgb(77,163,255)';
-  const bg = isOverdue ? 'rgba(239,68,68,0.1)' : days <= 7 ? 'rgba(245,158,11,0.1)' : 'rgba(77,163,255,0.1)';
-  const border = isOverdue ? 'rgba(239,68,68,0.25)' : days <= 7 ? 'rgba(245,158,11,0.25)' : 'rgba(77,163,255,0.25)';
+  const color = isOverdue ? 'rgb(239,68,68)' : days <= 7 ? 'rgb(245,158,11)' : '#d4b47a';
+  const bg = isOverdue ? 'rgba(239,68,68,0.1)' : days <= 7 ? 'rgba(245,158,11,0.1)' : 'rgba(154,124,74,0.10)';
+  const border = isOverdue ? 'rgba(239,68,68,0.25)' : days <= 7 ? 'rgba(245,158,11,0.25)' : 'rgba(154,124,74,0.22)';
 
   return (
     <motion.div
@@ -142,8 +142,8 @@ function RepeatProductCard({ product, index, onReorder }: {
       style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '10px 14px',
-        background: hover ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)',
-        border: '1px solid rgba(255,255,255,0.07)',
+        background: hover ? 'rgba(240,236,228,0.06)' : 'rgba(255,255,255,0.02)',
+        border: '1px solid rgba(240,236,228,0.06)',
         borderRadius: 10,
         cursor: 'default',
         transition: 'background 180ms ease',
@@ -152,8 +152,8 @@ function RepeatProductCard({ product, index, onReorder }: {
       {/* Product image or placeholder */}
       <div style={{
         width: 38, height: 38, borderRadius: 8, flexShrink: 0,
-        background: 'rgba(77,163,255,0.1)',
-        border: '1px solid rgba(77,163,255,0.15)',
+        background: 'rgba(154,124,74,0.10)',
+        border: '1px solid rgba(154,124,74,0.14)',
         overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
         {product.image ? (
@@ -166,7 +166,7 @@ function RepeatProductCard({ product, index, onReorder }: {
 
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: 'rgb(245,247,251)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#f0ece4', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {product.title}
         </p>
         <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
@@ -178,8 +178,8 @@ function RepeatProductCard({ product, index, onReorder }: {
       <span style={{
         flexShrink: 0, fontSize: 11, fontWeight: 700,
         padding: '3px 8px', borderRadius: 9999,
-        background: 'rgba(99,230,190,0.1)', color: 'rgb(99,230,190)',
-        border: '1px solid rgba(99,230,190,0.2)',
+        background: 'rgba(184,151,94,0.10)', color: '#b8975e',
+        border: '1px solid rgba(184,151,94,0.18)',
       }}>
         ×{product.count}
       </span>
@@ -196,8 +196,8 @@ function RepeatProductCard({ product, index, onReorder }: {
             style={{
               flexShrink: 0, fontSize: 11, fontWeight: 600,
               padding: '4px 10px', borderRadius: 7,
-              background: 'rgba(77,163,255,0.15)', color: 'rgb(77,163,255)',
-              border: '1px solid rgba(77,163,255,0.3)', cursor: 'pointer',
+              background: 'rgba(154,124,74,0.14)', color: '#d4b47a',
+              border: '1px solid rgba(154,124,74,0.28)', cursor: 'pointer',
             }}
           >
             Reencomendar
@@ -270,13 +270,13 @@ export function ReorderIntelligence() {
         padding: 24, borderRadius: 12, textAlign: 'center',
         background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)',
       }}>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>{error}</p>
+        <p style={{ fontSize: 13, color: 'rgba(240,236,228,0.45)', marginBottom: 12 }}>{error}</p>
         <button
           onClick={load}
           style={{
             fontSize: 12, fontWeight: 600, padding: '6px 14px', borderRadius: 8,
-            background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)',
-            border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer',
+            background: 'rgba(240,236,228,0.06)', color: 'rgba(255,255,255,0.6)',
+            border: '1px solid rgba(240,236,228,0.10)', cursor: 'pointer',
           }}
         >
           Tentar novamente
@@ -288,7 +288,7 @@ export function ReorderIntelligence() {
   if (!data?.pattern) {
     return (
       <div style={{ padding: 24, textAlign: 'center' }}>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>
+        <p style={{ fontSize: 13, color: 'rgba(240,236,228,0.28)' }}>
           Sem histórico de encomendas suficiente para análise.
         </p>
       </div>
@@ -297,7 +297,7 @@ export function ReorderIntelligence() {
 
   const { pattern, budget, insight, lastOrders } = data;
   const budgetPct = budget.utilizationPct ?? 0;
-  const budgetColor = budgetPct > 90 ? 'rgb(239,68,68)' : budgetPct > 70 ? 'rgb(245,158,11)' : 'rgb(77,163,255)';
+  const budgetColor = budgetPct > 90 ? 'rgb(239,68,68)' : budgetPct > 70 ? 'rgb(245,158,11)' : '#d4b47a';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -314,36 +314,36 @@ export function ReorderIntelligence() {
             : pattern.daysUntilReorder <= 7
             ? 'rgba(245,158,11,0.06)'
             : 'rgba(77,163,255,0.05)',
-          border: `1px solid ${pattern.isOverdue ? 'rgba(239,68,68,0.2)' : pattern.daysUntilReorder <= 7 ? 'rgba(245,158,11,0.2)' : 'rgba(77,163,255,0.15)'}`,
+          border: `1px solid ${pattern.isOverdue ? 'rgba(239,68,68,0.2)' : pattern.daysUntilReorder <= 7 ? 'rgba(245,158,11,0.2)' : 'rgba(154,124,74,0.14)'}`,
           borderRadius: 14,
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(240,236,228,0.35)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Próxima Recomenda Prevista
             </p>
             <CountdownBadge days={pattern.daysUntilReorder} isOverdue={pattern.isOverdue} />
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', marginTop: 8 }}>
+            <p style={{ fontSize: 12, color: 'rgba(240,236,228,0.28)', marginTop: 8 }}>
               {new Date(pattern.predictedNextDate).toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
           </div>
           <div style={{ textAlign: 'right', flexShrink: 0 }}>
             <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginBottom: 4 }}>Intervalo médio</p>
-            <p style={{ fontSize: 22, fontWeight: 800, color: 'rgb(245,247,251)' }}>{pattern.avgIntervalDays}<span style={{ fontSize: 13, fontWeight: 500, marginLeft: 2 }}>d</span></p>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>{pattern.totalOrders} encomendas históricas</p>
+            <p style={{ fontSize: 22, fontWeight: 800, color: '#f0ece4' }}>{pattern.avgIntervalDays}<span style={{ fontSize: 13, fontWeight: 500, marginLeft: 2 }}>d</span></p>
+            <p style={{ fontSize: 11, color: 'rgba(240,236,228,0.22)' }}>{pattern.totalOrders} encomendas históricas</p>
           </div>
         </div>
 
         <div style={{ marginTop: 14, display: 'flex', gap: 16 }}>
           <div>
-            <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>Valor médio</p>
-            <p style={{ fontSize: 15, fontWeight: 700, color: 'rgb(245,247,251)' }}>{fmt.format(pattern.avgOrderValue)}</p>
+            <p style={{ fontSize: 10, color: 'rgba(240,236,228,0.28)' }}>Valor médio</p>
+            <p style={{ fontSize: 15, fontWeight: 700, color: '#f0ece4' }}>{fmt.format(pattern.avgOrderValue)}</p>
           </div>
           {pattern.topCategories.length > 0 && (
             <div>
-              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>Categoria #1</p>
-              <p style={{ fontSize: 13, fontWeight: 600, color: 'rgb(245,247,251)', textTransform: 'capitalize' }}>
+              <p style={{ fontSize: 10, color: 'rgba(240,236,228,0.28)' }}>Categoria #1</p>
+              <p style={{ fontSize: 13, fontWeight: 600, color: '#f0ece4', textTransform: 'capitalize' }}>
                 {pattern.topCategories[0].category}
               </p>
             </div>
@@ -360,13 +360,13 @@ export function ReorderIntelligence() {
           style={{
             padding: '16px 20px',
             background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.07)',
+            border: '1px solid rgba(240,236,228,0.06)',
             borderRadius: 14,
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <div>
-              <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(240,236,228,0.35)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 Budget Mensal
               </p>
               <p style={{ fontSize: 22, fontWeight: 800, color: budgetColor, marginTop: 4 }}>
@@ -374,17 +374,17 @@ export function ReorderIntelligence() {
               </p>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', marginBottom: 2 }}>
+              <p style={{ fontSize: 12, color: 'rgba(240,236,228,0.28)', marginBottom: 2 }}>
                 {fmtCompact.format(budget.spentThisMonth)} de {fmtCompact.format(budget.limit)}
               </p>
-              <p style={{ fontSize: 12, color: budget.remaining > 0 ? 'rgb(99,230,190)' : 'rgb(239,68,68)', fontWeight: 600 }}>
+              <p style={{ fontSize: 12, color: budget.remaining > 0 ? '#b8975e' : 'rgb(239,68,68)', fontWeight: 600 }}>
                 {budget.remaining >= 0 ? `+${fmtCompact.format(budget.remaining)} disponível` : `${fmtCompact.format(Math.abs(budget.remaining))} excedido`}
               </p>
             </div>
           </div>
 
           {/* Progress bar */}
-          <div style={{ height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 9999, overflow: 'hidden' }}>
+          <div style={{ height: 6, background: 'rgba(240,236,228,0.06)', borderRadius: 9999, overflow: 'hidden' }}>
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${Math.min(100, budgetPct)}%` }}
@@ -404,7 +404,7 @@ export function ReorderIntelligence() {
           style={{
             padding: '14px 16px',
             background: 'rgba(99,230,190,0.05)',
-            border: '1px solid rgba(99,230,190,0.12)',
+            border: '1px solid rgba(184,151,94,0.12)',
             borderRadius: 12,
             display: 'flex', gap: 10, alignItems: 'flex-start',
           }}
@@ -421,7 +421,7 @@ export function ReorderIntelligence() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...springGentle, delay: 0.16 }}
         >
-          <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(240,236,228,0.35)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
             Produtos Recorrentes
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -449,7 +449,7 @@ export function ReorderIntelligence() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...springGentle, delay: 0.2 }}
         >
-          <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(240,236,228,0.35)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
             Categorias por Volume
           </p>
           {pattern.topCategories.map((cat, i) => {
@@ -466,12 +466,12 @@ export function ReorderIntelligence() {
                 <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', width: 90, flexShrink: 0, textTransform: 'capitalize', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {cat.category}
                 </span>
-                <div style={{ flex: 1, height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 9999, overflow: 'hidden' }}>
+                <div style={{ flex: 1, height: 4, background: 'rgba(240,236,228,0.06)', borderRadius: 9999, overflow: 'hidden' }}>
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${pct}%` }}
                     transition={{ ...springGentle, delay: 0.3 + i * 0.05 }}
-                    style={{ height: '100%', background: 'rgba(77,163,255,0.7)', borderRadius: 9999 }}
+                    style={{ height: '100%', background: 'rgba(184,151,94,0.55)', borderRadius: 9999 }}
                   />
                 </div>
                 <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', width: 48, textAlign: 'right', flexShrink: 0 }}>
@@ -490,7 +490,7 @@ export function ReorderIntelligence() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...springGentle, delay: 0.24 }}
         >
-          <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(240,236,228,0.35)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
             Últimas Encomendas
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -504,12 +504,12 @@ export function ReorderIntelligence() {
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                   padding: '8px 12px',
                   background: 'rgba(255,255,255,0.02)', borderRadius: 8,
-                  border: '1px solid rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(240,236,228,0.06)',
                 }}
               >
                 <div>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: 'rgb(245,247,251)' }}>{order.ref}</span>
-                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginLeft: 8 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#f0ece4' }}>{order.ref}</span>
+                  <span style={{ fontSize: 11, color: 'rgba(240,236,228,0.28)', marginLeft: 8 }}>
                     {new Date(order.date).toLocaleDateString('pt-PT')}
                   </span>
                 </div>

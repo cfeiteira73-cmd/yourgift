@@ -139,7 +139,7 @@ const RUNBOOKS: Runbook[] = [
 
 function SeverityChip({ s }: { s: 'info' | 'warning' | 'critical' }) {
   const map = {
-    info:     { label: 'Info',      color: 'rgb(77,163,255)',   bg: 'rgba(77,163,255,0.1)',   border: 'rgba(77,163,255,0.2)' },
+    info:     { label: 'Info',      color: '#d4b47a',   bg: 'rgba(154,124,74,0.10)',   border: 'rgba(154,124,74,0.18)' },
     warning:  { label: 'Atenção',   color: 'rgb(245,158,11)',   bg: 'rgba(245,158,11,0.1)',   border: 'rgba(245,158,11,0.2)' },
     critical: { label: 'Crítico',   color: 'rgb(239,68,68)',    bg: 'rgba(239,68,68,0.1)',    border: 'rgba(239,68,68,0.2)' },
   };
@@ -200,11 +200,11 @@ export default function RunbooksPage() {
         {/* Header */}
         <motion.div variants={fadeUp(0)} initial="hidden" animate="visible" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>Runbooks Operacionais</h1>
-            <p style={{ fontSize: '0.75rem', color: 'rgb(80,92,110)' }}>SOPs · Matrizes de Escalação · Protocolos de Incidente · S15 Omega Protocol</p>
+            <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>Runbooks Operacionais</h1>
+            <p style={{ fontSize: '0.75rem', color: 'rgba(240,236,228,0.24)' }}>SOPs · Matrizes de Escalação · Protocolos de Incidente · S15 Omega Protocol</p>
           </div>
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgb(77,163,255)', background: 'rgba(77,163,255,0.1)', border: '1px solid rgba(77,163,255,0.2)', borderRadius: '9999px', padding: '0.3rem 0.75rem' }}>
+            <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#d4b47a', background: 'rgba(154,124,74,0.10)', border: '1px solid rgba(154,124,74,0.18)', borderRadius: '9999px', padding: '0.3rem 0.75rem' }}>
               {visible.length} runbooks
             </span>
           </div>
@@ -216,13 +216,13 @@ export default function RunbooksPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Pesquisar runbooks..."
-            style={{ flex: '1', minWidth: '180px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '10px', padding: '0.45rem 0.875rem', fontSize: '0.78rem', color: 'rgb(220,230,245)', outline: 'none' }}
-            onFocus={e => (e.currentTarget.style.borderColor = 'rgba(77,163,255,0.4)')}
+            style={{ flex: '1', minWidth: '180px', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '10px', padding: '0.45rem 0.875rem', fontSize: '0.78rem', color: 'rgba(240,236,228,0.75)', outline: 'none' }}
+            onFocus={e => (e.currentTarget.style.borderColor = 'rgba(154,124,74,0.35)')}
             onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.09)')}
           />
           {categories.map(cat => (
             <button type="button" key={cat}  onClick={() => setCatFilter(cat)}
-              style={{ padding: '0.35rem 0.75rem', borderRadius: '9999px', fontSize: '0.7rem', fontWeight: catFilter === cat ? 700 : 400, cursor: 'pointer', background: catFilter === cat ? 'rgba(77,163,255,0.14)' : 'rgba(255,255,255,0.04)', color: catFilter === cat ? 'rgb(77,163,255)' : 'rgb(120,130,150)', border: catFilter === cat ? '1px solid rgba(77,163,255,0.3)' : '1px solid rgba(255,255,255,0.07)', transition: 'all 150ms' }}>
+              style={{ padding: '0.35rem 0.75rem', borderRadius: '9999px', fontSize: '0.7rem', fontWeight: catFilter === cat ? 700 : 400, cursor: 'pointer', background: catFilter === cat ? 'rgba(154,124,74,0.12)' : 'rgba(240,236,228,0.04)', color: catFilter === cat ? '#d4b47a' : 'rgba(240,236,228,0.42)', border: catFilter === cat ? '1px solid rgba(154,124,74,0.28)' : '1px solid rgba(240,236,228,0.06)', transition: 'all 150ms' }}>
               {cat}
             </button>
           ))}
@@ -242,27 +242,27 @@ export default function RunbooksPage() {
                 className="yg-card"
                 style={{
                   padding: '1rem 1.125rem', cursor: 'pointer',
-                  borderColor: selectedRunbook?.id === rb.id ? 'rgba(77,163,255,0.35)' : 'rgba(255,255,255,0.08)',
+                  borderColor: selectedRunbook?.id === rb.id ? 'rgba(77,163,255,0.35)' : 'rgba(240,236,228,0.06)',
                   background: selectedRunbook?.id === rb.id ? 'linear-gradient(180deg,rgba(77,163,255,0.06) 0%,rgba(255,255,255,0.02) 100%)' : undefined,
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.375rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0 }}>
-                    <span style={{ fontSize: '0.6rem', fontWeight: 600, color: 'rgb(80,92,110)', flexShrink: 0 }}>{rb.category}</span>
+                    <span style={{ fontSize: '0.6rem', fontWeight: 600, color: 'rgba(240,236,228,0.24)', flexShrink: 0 }}>{rb.category}</span>
                     {rb.adminOnly && <span style={{ fontSize: '0.55rem', fontWeight: 700, color: 'rgb(245,158,11)', background: 'rgba(245,158,11,0.1)', borderRadius: '4px', padding: '0.1rem 0.3rem', flexShrink: 0 }}>ADMIN</span>}
                   </div>
                   <SeverityChip s={rb.severity} />
                 </div>
-                <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(220,230,245)', marginBottom: '0.25rem' }}>{rb.title}</div>
-                <div style={{ fontSize: '0.68rem', color: 'rgb(100,112,130)', lineHeight: 1.4, marginBottom: '0.5rem' }}>{rb.description}</div>
+                <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgba(240,236,228,0.75)', marginBottom: '0.25rem' }}>{rb.title}</div>
+                <div style={{ fontSize: '0.68rem', color: 'rgba(240,236,228,0.42)', lineHeight: 1.4, marginBottom: '0.5rem' }}>{rb.description}</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)' }}>{rb.steps.length} passos</span>
-                  <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(77,163,255)' }}>Abrir →</span>
+                  <span style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)' }}>{rb.steps.length} passos</span>
+                  <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#d4b47a' }}>Abrir →</span>
                 </div>
               </motion.div>
             ))}
             {visible.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '3rem', color: 'rgb(80,92,110)', fontSize: '0.78rem' }}>
+              <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(240,236,228,0.24)', fontSize: '0.78rem' }}>
                 Nenhum runbook encontrado.
               </div>
             )}
@@ -285,11 +285,11 @@ export default function RunbooksPage() {
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                       <SeverityChip s={selectedRunbook.severity} />
-                      <span style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)' }}>{selectedRunbook.category}</span>
+                      <span style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)' }}>{selectedRunbook.category}</span>
                     </div>
                     <h2 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'rgb(230,240,250)', letterSpacing: '-0.02em' }}>{selectedRunbook.title}</h2>
                   </div>
-                  <button type="button" onClick={() => setSelectedRunbook(null)} style={{ fontSize: '1rem', color: 'rgb(80,92,110)', background: 'none', border: 'none', cursor: 'pointer', padding: '0.25rem', flexShrink: 0 }}>✕</button>
+                  <button type="button" onClick={() => setSelectedRunbook(null)} style={{ fontSize: '1rem', color: 'rgba(240,236,228,0.24)', background: 'none', border: 'none', cursor: 'pointer', padding: '0.25rem', flexShrink: 0 }}>✕</button>
                 </div>
 
                 {/* Trigger */}
@@ -301,13 +301,13 @@ export default function RunbooksPage() {
                 {/* Progress */}
                 <div style={{ marginBottom: '0.875rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem' }}>
-                    <span style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>Progresso</span>
-                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color: progress === 100 ? 'rgb(99,230,190)' : 'rgb(77,163,255)' }}>{progress}%</span>
+                    <span style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)' }}>Progresso</span>
+                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color: progress === 100 ? '#b8975e' : '#d4b47a' }}>{progress}%</span>
                   </div>
                   <div className="prog-track">
                     <motion.div
                       className="prog-fill"
-                      style={{ background: progress === 100 ? 'rgb(99,230,190)' : 'rgb(77,163,255)' }}
+                      style={{ background: progress === 100 ? '#b8975e' : '#d4b47a' }}
                       animate={{ width: `${progress}%` }}
                       transition={{ ...springSnappy }}
                     />
@@ -327,31 +327,31 @@ export default function RunbooksPage() {
                         onClick={() => toggleStep(step.id)}
                         style={{
                           display: 'flex', gap: '0.625rem', padding: '0.625rem 0.75rem', borderRadius: '10px', cursor: 'pointer',
-                          background: done ? 'rgba(99,230,190,0.08)' : 'rgba(255,255,255,0.03)',
-                          border: `1px solid ${done ? 'rgba(99,230,190,0.2)' : step.critical ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.06)'}`,
+                          background: done ? 'rgba(184,151,94,0.08)' : 'rgba(240,236,228,0.04)',
+                          border: `1px solid ${done ? 'rgba(184,151,94,0.18)' : step.critical ? 'rgba(239,68,68,0.15)' : 'rgba(240,236,228,0.06)'}`,
                           transition: 'all 180ms',
                           opacity: done ? 0.75 : 1,
                         }}
                       >
                         {/* Checkbox */}
                         <div style={{
-                          width: '20px', height: '20px', borderRadius: '6px', border: `2px solid ${done ? 'rgb(99,230,190)' : 'rgba(255,255,255,0.2)'}`,
-                          background: done ? 'rgba(99,230,190,0.2)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          width: '20px', height: '20px', borderRadius: '6px', border: `2px solid ${done ? '#b8975e' : 'rgba(240,236,228,0.18)'}`,
+                          background: done ? 'rgba(184,151,94,0.18)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
                           flexShrink: 0, marginTop: '1px', transition: 'all 150ms',
                         }}>
-                          {done && <span style={{ fontSize: '0.7rem', color: 'rgb(99,230,190)' }}>✓</span>}
+                          {done && <span style={{ fontSize: '0.7rem', color: '#b8975e' }}>✓</span>}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginBottom: '0.2rem' }}>
-                            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: done ? 'rgb(99,230,190)' : 'rgb(210,220,235)', textDecoration: done ? 'line-through' : 'none', flex: 1 }}>
+                            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: done ? '#b8975e' : 'rgba(240,236,228,0.72)', textDecoration: done ? 'line-through' : 'none', flex: 1 }}>
                               {i + 1}. {step.title}
                             </span>
                             {step.critical && !done && <span style={{ fontSize: '0.55rem', fontWeight: 700, color: 'rgb(239,68,68)', flexShrink: 0 }}>CRÍTICO</span>}
                           </div>
                           <p style={{ fontSize: '0.65rem', color: 'rgb(110,122,140)', lineHeight: 1.45, marginBottom: '0.25rem' }}>{step.description}</p>
                           <div style={{ display: 'flex', gap: '0.75rem' }}>
-                            <span style={{ fontSize: '0.58rem', color: 'rgb(80,92,110)' }}>👤 {step.owner}</span>
-                            <span style={{ fontSize: '0.58rem', color: 'rgb(80,92,110)' }}>⏱ {step.duration}</span>
+                            <span style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)' }}>👤 {step.owner}</span>
+                            <span style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)' }}>⏱ {step.duration}</span>
                           </div>
                         </div>
                       </motion.div>
@@ -360,8 +360,8 @@ export default function RunbooksPage() {
                 </div>
 
                 {/* Escalation */}
-                <div style={{ padding: '0.5rem 0.75rem', background: 'rgba(77,163,255,0.07)', border: '1px solid rgba(77,163,255,0.15)', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '0.58rem', fontWeight: 700, color: 'rgb(77,163,255)', marginBottom: '0.2rem' }}>ESCALAÇÃO</div>
+                <div style={{ padding: '0.5rem 0.75rem', background: 'rgba(77,163,255,0.07)', border: '1px solid rgba(154,124,74,0.14)', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '0.58rem', fontWeight: 700, color: '#d4b47a', marginBottom: '0.2rem' }}>ESCALAÇÃO</div>
                   <div style={{ fontSize: '0.68rem', color: 'rgb(160,175,195)' }}>{selectedRunbook.escalation}</div>
                 </div>
 
@@ -369,11 +369,11 @@ export default function RunbooksPage() {
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'rgba(99,230,190,0.1)', border: '1px solid rgba(99,230,190,0.25)', borderRadius: '10px', textAlign: 'center' }}
+                    style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'rgba(184,151,94,0.10)', border: '1px solid rgba(99,230,190,0.25)', borderRadius: '10px', textAlign: 'center' }}
                   >
                     <div style={{ fontSize: '1.25rem', marginBottom: '0.2rem' }}>✅</div>
-                    <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(99,230,190)' }}>Runbook completo!</div>
-                    <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>Todos os passos foram executados.</div>
+                    <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#b8975e' }}>Runbook completo!</div>
+                    <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)' }}>Todos os passos foram executados.</div>
                   </motion.div>
                 )}
               </motion.div>

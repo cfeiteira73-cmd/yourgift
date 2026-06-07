@@ -117,7 +117,7 @@ export function KPICard({
   index = 0,
   onClick,
 }: KPICardProps) {
-  const trendColor = trend === undefined ? undefined : trend >= 0 ? 'rgb(99,230,190)' : 'rgb(239,68,68)';
+  const trendColor = trend === undefined ? undefined : trend >= 0 ? '#b8975e' : 'rgb(239,68,68)';
 
   return (
     <motion.div
@@ -134,7 +134,7 @@ export function KPICard({
         transform: 'translateZ(0)',
       }}
     >
-      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 8, fontWeight: 500 }}>
+      <p style={{ fontSize: 12, color: 'rgba(240,236,228,0.35)', marginBottom: 8, fontWeight: 500 }}>
         {label}
       </p>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
@@ -154,7 +154,7 @@ export function KPICard({
         )}
       </div>
       {sub && (
-        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>{sub}</p>
+        <p style={{ fontSize: 12, color: 'rgba(240,236,228,0.28)', marginTop: 4 }}>{sub}</p>
       )}
     </motion.div>
   );

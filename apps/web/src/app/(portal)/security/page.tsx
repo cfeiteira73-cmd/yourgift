@@ -80,7 +80,7 @@ function PostureGauge({ score }: { score: number }) {
   return (
     <div className="flex flex-col items-center gap-1">
       <svg width={72} height={72} viewBox="0 0 72 72">
-        <circle cx={36} cy={36} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={6} />
+        <circle cx={36} cy={36} r={r} fill="none" stroke="rgba(240,236,228,0.06)" strokeWidth={6} />
         <circle cx={36} cy={36} r={r} fill="none" stroke={color} strokeWidth={6}
           strokeDasharray={circ} strokeDashoffset={offset}
           strokeLinecap="round" transform="rotate(-90 36 36)"

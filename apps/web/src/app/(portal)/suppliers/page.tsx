@@ -41,7 +41,7 @@ const SUPPLIER_META: Record<string, {
   products?: number; minOrder: number; deliveryDays: string; status: 'active' | 'coming';
 }> = {
   'Midocean': {
-    logo: '🌊', color: 'rgb(77,163,255)',
+    logo: '🌊', color: '#d4b47a',
     description: 'Líder europeu em merchandising corporativo. +2.400 produtos disponíveis.',
     strengths: ['Têxteis', 'Tecnologia', 'Escritório', 'Desporto'],
     products: 2409, minOrder: 25, deliveryDays: '5–10', status: 'active',
@@ -53,7 +53,7 @@ const SUPPLIER_META: Record<string, {
     products: 4573, minOrder: 1, deliveryDays: '7–14', status: 'active',
   },
   'PF Concept': {
-    logo: '🎯', color: 'rgb(99,230,190)',
+    logo: '🎯', color: '#b8975e',
     description: 'Especialistas em produtos sustentáveis e merchandising premium eco-friendly.',
     strengths: ['Ecológico', 'Bebidas', 'Bags', 'Outdoor'],
     products: 28700, minOrder: 50, deliveryDays: '7–14', status: 'active',
@@ -71,7 +71,7 @@ const SUPPLIER_META: Record<string, {
     products: 15600, minOrder: 30, deliveryDays: '8–12', status: 'active',
   },
   'Stanley/Stella': {
-    logo: '👕', color: 'rgb(116,231,255)',
+    logo: '👕', color: '#b8975e',
     description: 'Vestuário orgânico premium. Fair Wear Foundation certificado.',
     strengths: ['Orgânico', 'Ético', 'Vestuário', 'GOTS'],
     products: 4200, minOrder: 50, deliveryDays: '12–18', status: 'coming',
@@ -79,7 +79,7 @@ const SUPPLIER_META: Record<string, {
 };
 
 const DEFAULT_META = {
-  logo: '🏭', color: 'rgb(99,230,190)', status: 'active' as const,
+  logo: '🏭', color: '#b8975e', status: 'active' as const,
   description: 'Fornecedor parceiro certificado da rede YourGift.',
   strengths: ['Qualidade', 'Prazo', 'Preço', 'Serviço'],
   minOrder: 50, deliveryDays: '7–14',
@@ -88,8 +88,8 @@ const DEFAULT_META = {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function scoreColor(s: number) {
-  if (s >= 85) return 'rgb(99,230,190)';
-  if (s >= 70) return 'rgb(77,163,255)';
+  if (s >= 85) return '#b8975e';
+  if (s >= 70) return '#d4b47a';
   if (s >= 55) return 'rgb(245,158,11)';
   return 'rgb(239,68,68)';
 }
@@ -104,7 +104,7 @@ function scoreLabel(s: number) {
 function ScoreBar({ score, delay = 0 }: { score: number; delay?: number }) {
   const col = scoreColor(score);
   return (
-    <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', overflow: 'hidden', width: '100%' }}>
+    <div style={{ height: '4px', background: 'rgba(240,236,228,0.06)', borderRadius: '9999px', overflow: 'hidden', width: '100%' }}>
       <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${Math.min(score, 100)}%` }}
@@ -124,7 +124,7 @@ function RadarBar({ label, score, delay = 0 }: { label: string; score: number | 
         <span style={{ fontSize: '0.62rem', color: 'rgb(90,102,120)' }}>{label}</span>
         <span style={{ fontSize: '0.65rem', fontWeight: 700, color: col }}>{Math.round(score)}</span>
       </div>
-      <div style={{ height: '3px', background: 'rgba(255,255,255,0.05)', borderRadius: '9999px', overflow: 'hidden' }}>
+      <div style={{ height: '3px', background: 'rgba(240,236,228,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${score}%` }}
@@ -162,8 +162,8 @@ function SupplierCard({ supplier, index }: { supplier: SupplierScore; index: num
           {overall}/100
         </span>
         <span style={{ fontSize: '0.58rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '9999px',
-          color: meta.status === 'active' ? 'rgb(99,230,190)' : 'rgb(245,158,11)',
-          background: meta.status === 'active' ? 'rgba(99,230,190,0.1)' : 'rgba(245,158,11,0.1)',
+          color: meta.status === 'active' ? '#b8975e' : 'rgb(245,158,11)',
+          background: meta.status === 'active' ? 'rgba(184,151,94,0.10)' : 'rgba(245,158,11,0.1)',
           border: `1px solid ${meta.status === 'active' ? 'rgba(99,230,190,0.25)' : 'rgba(245,158,11,0.25)'}`,
         }}>
           {meta.status === 'active' ? '● Ativo' : '◌ Em breve'}
@@ -176,8 +176,8 @@ function SupplierCard({ supplier, index }: { supplier: SupplierScore; index: num
           {meta.logo}
         </div>
         <div>
-          <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'rgb(245,247,251)', marginBottom: '0.1rem' }}>{supplier.supplier_name}</h3>
-          <p style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)' }}>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#f0ece4', marginBottom: '0.1rem' }}>{supplier.supplier_name}</h3>
+          <p style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)' }}>
             {meta.products ? `${meta.products.toLocaleString('pt-PT')} produtos` : 'Sob medida'} · Mín. {meta.minOrder} un.
           </p>
         </div>
@@ -202,14 +202,14 @@ function SupplierCard({ supplier, index }: { supplier: SupplierScore; index: num
       </div>
 
       {/* Stats grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.05)', marginBottom: '0.75rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(240,236,228,0.06)', marginBottom: '0.75rem' }}>
         {[
           { label: 'Prazo entrega', value: meta.deliveryDays + ' dias', color: meta.color },
-          { label: 'On-time rate', value: supplier.on_time_delivery_rate != null ? `${Math.round(supplier.on_time_delivery_rate)}%` : '—', color: supplier.on_time_delivery_rate != null ? scoreColor(supplier.on_time_delivery_rate) : 'rgb(80,92,110)' },
-          { label: 'Lead time', value: supplier.avg_lead_time_days != null ? `${supplier.avg_lead_time_days}d` : meta.deliveryDays.split('–')[0] + 'd', color: 'rgb(116,231,255)' },
+          { label: 'On-time rate', value: supplier.on_time_delivery_rate != null ? `${Math.round(supplier.on_time_delivery_rate)}%` : '—', color: supplier.on_time_delivery_rate != null ? scoreColor(supplier.on_time_delivery_rate) : 'rgba(240,236,228,0.24)' },
+          { label: 'Lead time', value: supplier.avg_lead_time_days != null ? `${supplier.avg_lead_time_days}d` : meta.deliveryDays.split('–')[0] + 'd', color: '#b8975e' },
         ].map(s => (
           <div key={s.label}>
-            <div style={{ fontSize: '0.58rem', color: 'rgb(70,82,100)', marginBottom: '0.15rem' }}>{s.label}</div>
+            <div style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.15rem' }}>{s.label}</div>
             <div style={{ fontSize: '0.82rem', fontWeight: 700, color: s.color }}>{s.value}</div>
           </div>
         ))}
@@ -219,7 +219,7 @@ function SupplierCard({ supplier, index }: { supplier: SupplierScore; index: num
       <button type="button"
         
         onClick={() => setExpanded(e => !e)}
-        style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '8px', padding: '0.4rem', cursor: 'pointer', fontSize: '0.65rem', color: 'rgb(100,112,130)', fontWeight: 600 }}
+        style={{ width: '100%', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '8px', padding: '0.4rem', cursor: 'pointer', fontSize: '0.65rem', color: 'rgba(240,236,228,0.42)', fontWeight: 600 }}
       >
         {expanded ? '▲ Ocultar breakdown' : '▼ Ver breakdown de scores'}
       </button>
@@ -232,8 +232,8 @@ function SupplierCard({ supplier, index }: { supplier: SupplierScore; index: num
             exit={{ opacity: 0, height: 0 }}
             style={{ overflow: 'hidden', marginTop: '0.75rem' }}
           >
-            <div style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '9px' }}>
-              <p style={{ fontSize: '0.6rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.625rem' }}>Análise Detalhada</p>
+            <div style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '9px' }}>
+              <p style={{ fontSize: '0.6rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.625rem' }}>Análise Detalhada</p>
               <RadarBar label="Qualidade"       score={supplier.quality_score}       delay={0.05} />
               <RadarBar label="Entrega"         score={supplier.delivery_score}      delay={0.1}  />
               <RadarBar label="Preço"           score={supplier.price_score}         delay={0.15} />
@@ -248,8 +248,8 @@ function SupplierCard({ supplier, index }: { supplier: SupplierScore; index: num
               )}
               {supplier.total_orders != null && (
                 <div style={{ marginTop: '0.375rem' }}>
-                  <span style={{ fontSize: '0.62rem', color: 'rgb(70,82,100)' }}>Total de encomendas: </span>
-                  <span style={{ fontSize: '0.65rem', fontWeight: 600, color: 'rgb(200,210,225)' }}>{supplier.total_orders.toLocaleString('pt-PT')}</span>
+                  <span style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)' }}>Total de encomendas: </span>
+                  <span style={{ fontSize: '0.65rem', fontWeight: 600, color: 'rgba(240,236,228,0.72)' }}>{supplier.total_orders.toLocaleString('pt-PT')}</span>
                 </div>
               )}
             </div>
@@ -275,7 +275,7 @@ const GEOPOLITICAL_RISKS: Record<string, { level: 'low' | 'medium' | 'high'; not
   'Stanley/Stella': { level: 'low',    note: 'BE — UE, certificado Fair Wear' },
 };
 
-const RISK_COLORS = { low: 'rgb(99,230,190)', medium: 'rgb(245,158,11)', high: 'rgb(239,68,68)' };
+const RISK_COLORS = { low: '#b8975e', medium: 'rgb(245,158,11)', high: 'rgb(239,68,68)' };
 const RISK_LABELS = { low: '🟢 Baixo', medium: '🟡 Médio', high: '🔴 Alto' };
 
 function RoutingIntelligencePanel({ suppliers }: { suppliers: SupplierScore[] }) {
@@ -333,7 +333,7 @@ function RoutingIntelligencePanel({ suppliers }: { suppliers: SupplierScore[] })
       style={{ marginTop: '1.25rem', borderRadius: '16px', border: '1px solid rgba(167,139,250,0.2)', background: 'rgba(167,139,250,0.04)', overflow: 'hidden' }}
     >
       {/* Panel header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.25rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.25rem', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span style={{ fontSize: '1rem' }}>🧠</span>
           <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'rgb(200,215,235)' }}>Supplier Intelligence Engine</span>
@@ -342,10 +342,10 @@ function RoutingIntelligencePanel({ suppliers }: { suppliers: SupplierScore[] })
           {([['routing', '⚙️ Routing'], ['risk', '🌍 Risco'], ['ai', '🤖 AI Rec.']] as const).map(([t, label]) => (
             <button type="button" key={t} onClick={() => { setTab(t); if (t === 'ai' && !aiRec) getAiRec(); }}
               style={{
-                background: tab === t ? 'rgba(167,139,250,0.2)' : 'rgba(255,255,255,0.04)',
-                border: tab === t ? '1px solid rgba(167,139,250,0.4)' : '1px solid rgba(255,255,255,0.07)',
+                background: tab === t ? 'rgba(167,139,250,0.2)' : 'rgba(240,236,228,0.04)',
+                border: tab === t ? '1px solid rgba(167,139,250,0.4)' : '1px solid rgba(240,236,228,0.06)',
                 borderRadius: '8px', padding: '0.3rem 0.625rem',
-                color: tab === t ? 'rgb(167,139,250)' : 'rgb(100,112,130)',
+                color: tab === t ? 'rgb(167,139,250)' : 'rgba(240,236,228,0.42)',
                 fontSize: '0.65rem', fontWeight: 600, cursor: 'pointer',
               }}>{label}</button>
           ))}
@@ -362,47 +362,47 @@ function RoutingIntelligencePanel({ suppliers }: { suppliers: SupplierScore[] })
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div>
-                <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.625rem' }}>
+                <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.625rem' }}>
                   Recomendações de Routing
                 </div>
                 {routing.length === 0 ? (
-                  <div style={{ fontSize: '0.72rem', color: 'rgb(80,92,110)', fontStyle: 'italic' }}>
+                  <div style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.24)', fontStyle: 'italic' }}>
                     {suppliers.length > 0 ? `Routing: ${suppliers[0]?.supplier_name} recomendado para alta prioridade (score ${suppliers[0]?.overall_score})` : 'Dados indisponíveis.'}
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                     {routing.slice(0, 4).map((r, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '9px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0.75rem', background: 'rgba(240,236,228,0.04)', borderRadius: '9px', border: '1px solid rgba(240,236,228,0.06)' }}>
                         <div>
                           <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgb(170,185,205)' }}>{r.stage}</div>
-                          <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)' }}>{r.supplier}</div>
+                          <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)' }}>{r.supplier}</div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontSize: '0.65rem', color: 'rgb(99,230,190)', fontWeight: 700 }}>{r.available_slots} slots</div>
-                          <div style={{ fontSize: '0.58rem', color: 'rgb(80,92,110)' }}>{r.lead_time}d</div>
+                          <div style={{ fontSize: '0.65rem', color: '#b8975e', fontWeight: 700 }}>{r.available_slots} slots</div>
+                          <div style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)' }}>{r.lead_time}d</div>
                         </div>
                       </div>
                     ))}
                     {routing.length === 0 && suppliers.slice(0, 3).map((s, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '9px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0.75rem', background: 'rgba(240,236,228,0.04)', borderRadius: '9px', border: '1px solid rgba(240,236,228,0.06)' }}>
                         <div>
                           <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgb(170,185,205)' }}>Prioridade {i + 1}</div>
-                          <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)' }}>{s.supplier_name}</div>
+                          <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)' }}>{s.supplier_name}</div>
                         </div>
-                        <span style={{ fontSize: '0.65rem', color: 'rgb(99,230,190)', fontWeight: 700 }}>Score {s.overall_score}</span>
+                        <span style={{ fontSize: '0.65rem', color: '#b8975e', fontWeight: 700 }}>Score {s.overall_score}</span>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
               <div>
-                <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.625rem' }}>
+                <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.625rem' }}>
                   Gargalos de Produção
                 </div>
                 {bottlenecks.length === 0 ? (
-                  <div style={{ padding: '0.75rem', background: 'rgba(99,230,190,0.06)', borderRadius: '10px', border: '1px solid rgba(99,230,190,0.15)' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'rgb(99,230,190)', fontWeight: 700 }}>✓ Sem gargalos críticos</div>
-                    <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)', marginTop: '0.2rem' }}>Capacidade de produção dentro dos limites normais.</div>
+                  <div style={{ padding: '0.75rem', background: 'rgba(99,230,190,0.06)', borderRadius: '10px', border: '1px solid rgba(184,151,94,0.14)' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#b8975e', fontWeight: 700 }}>✓ Sem gargalos críticos</div>
+                    <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.2rem' }}>Capacidade de produção dentro dos limites normais.</div>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
@@ -410,7 +410,7 @@ function RoutingIntelligencePanel({ suppliers }: { suppliers: SupplierScore[] })
                       <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0.75rem', background: b.utilisation > 90 ? 'rgba(239,68,68,0.06)' : 'rgba(245,158,11,0.06)', borderRadius: '9px', border: `1px solid ${b.utilisation > 90 ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)'}` }}>
                         <div style={{ flex: 1 }}>
                           <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgb(170,185,205)' }}>{b.stage}</div>
-                          <div style={{ height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', marginTop: '0.25rem' }}>
+                          <div style={{ height: '3px', background: 'rgba(240,236,228,0.06)', borderRadius: '9999px', marginTop: '0.25rem' }}>
                             <div style={{ height: '100%', width: `${Math.min(b.utilisation, 100)}%`, background: b.utilisation > 90 ? 'rgb(239,68,68)' : 'rgb(245,158,11)', borderRadius: '9999px', transition: 'width 0.8s' }} />
                           </div>
                         </div>
@@ -438,7 +438,7 @@ function RoutingIntelligencePanel({ suppliers }: { suppliers: SupplierScore[] })
                     <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgb(200,215,235)' }}>{s.supplier_name}</span>
                     <span style={{ fontSize: '0.6rem', fontWeight: 700, color: col }}>{RISK_LABELS[risk.level]}</span>
                   </div>
-                  <div style={{ fontSize: '0.65rem', color: 'rgb(100,112,130)', lineHeight: 1.4 }}>{risk.note}</div>
+                  <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.42)', lineHeight: 1.4 }}>{risk.note}</div>
                 </div>
               );
             })}
@@ -557,10 +557,10 @@ export default function SuppliersPage() {
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '1.5rem' }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
             Supplier Intelligence
           </h1>
-          <p style={{ fontSize: '0.78rem', color: 'rgb(80,92,110)' }}>
+          <p style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.24)' }}>
             Análise de performance em tempo real · {suppliers.length} fornecedores avaliados
           </p>
         </motion.div>
@@ -569,17 +569,17 @@ export default function SuppliersPage() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
           style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.625rem', marginBottom: '1.25rem' }}>
           {[
-            { label: 'Fornecedores Ativos', value: String(suppliers.filter(s => (SUPPLIER_META[s.supplier_name]?.status ?? 'active') === 'active').length), color: 'rgb(77,163,255)', icon: '🏭' },
+            { label: 'Fornecedores Ativos', value: String(suppliers.filter(s => (SUPPLIER_META[s.supplier_name]?.status ?? 'active') === 'active').length), color: '#d4b47a', icon: '🏭' },
             { label: 'Score Médio',          value: String(avgScore) + '/100', color: scoreColor(avgScore), icon: '⭐' },
-            { label: 'Melhor Fornecedor',    value: topSupplier, color: 'rgb(99,230,190)', icon: '🥇' },
-            { label: 'Stock em Rutura',      value: String(inventorySummary.critical), color: inventorySummary.critical > 0 ? 'rgb(239,68,68)' : 'rgb(99,230,190)', icon: '🚨' },
-            { label: 'Stock Baixo',          value: String(inventorySummary.lowStock), color: inventorySummary.lowStock > 0 ? 'rgb(245,158,11)' : 'rgb(99,230,190)', icon: '⚠️' },
+            { label: 'Melhor Fornecedor',    value: topSupplier, color: '#b8975e', icon: '🥇' },
+            { label: 'Stock em Rutura',      value: String(inventorySummary.critical), color: inventorySummary.critical > 0 ? 'rgb(239,68,68)' : '#b8975e', icon: '🚨' },
+            { label: 'Stock Baixo',          value: String(inventorySummary.lowStock), color: inventorySummary.lowStock > 0 ? 'rgb(245,158,11)' : '#b8975e', icon: '⚠️' },
           ].map((s, i) => (
             <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.05 }}
               className="yg-card" style={{ padding: '0.875rem 1rem' }}>
               <div style={{ fontSize: '0.85rem', marginBottom: '0.3rem' }}>{s.icon}</div>
               <div style={{ fontSize: '1.1rem', fontWeight: 800, color: s.color, letterSpacing: '-0.03em', lineHeight: 1, marginBottom: '0.2rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.value}</div>
-              <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)' }}>{s.label}</div>
+              <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)' }}>{s.label}</div>
             </motion.div>
           ))}
         </motion.div>
@@ -604,13 +604,13 @@ export default function SuppliersPage() {
 
         {/* Sort controls */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-          <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'rgb(200,210,225)' }}>
+          <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'rgba(240,236,228,0.72)' }}>
             Scorecard de Fornecedores
           </h2>
-          <div style={{ display: 'flex', gap: '0.375rem', background: 'rgba(255,255,255,0.04)', padding: '3px', borderRadius: '9px', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ display: 'flex', gap: '0.375rem', background: 'rgba(240,236,228,0.04)', padding: '3px', borderRadius: '9px', border: '1px solid rgba(240,236,228,0.06)' }}>
             {([['overall', 'Score Global'], ['quality', 'Qualidade'], ['delivery', 'Entrega']] as const).map(([key, label]) => (
               <button type="button" key={key}  onClick={() => setSortBy(key)}
-                style={{ padding: '0.25rem 0.625rem', borderRadius: '7px', fontSize: '0.68rem', fontWeight: 600, cursor: 'pointer', border: 'none', background: sortBy === key ? 'rgba(77,163,255,0.18)' : 'transparent', color: sortBy === key ? 'rgb(77,163,255)' : 'rgb(100,112,130)' }}>
+                style={{ padding: '0.25rem 0.625rem', borderRadius: '7px', fontSize: '0.68rem', fontWeight: 600, cursor: 'pointer', border: 'none', background: sortBy === key ? 'rgba(77,163,255,0.18)' : 'transparent', color: sortBy === key ? '#d4b47a' : 'rgba(240,236,228,0.42)' }}>
                 {label}
               </button>
             ))}
@@ -621,7 +621,7 @@ export default function SuppliersPage() {
         {loading ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
             {[0, 1, 2, 3, 4, 5].map(i => (
-              <div key={i} style={{ height: '280px', borderRadius: '16px', background: 'rgba(255,255,255,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+              <div key={i} style={{ height: '280px', borderRadius: '16px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />
             ))}
           </div>
         ) : (
@@ -638,8 +638,8 @@ export default function SuppliersPage() {
         {/* Network health summary */}
         {!loading && suppliers.length > 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-            style={{ marginTop: '1.5rem', padding: '1.25rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '14px' }}>
-            <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(200,210,225)', marginBottom: '0.875rem' }}>
+            style={{ marginTop: '1.5rem', padding: '1.25rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '14px' }}>
+            <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgba(240,236,228,0.72)', marginBottom: '0.875rem' }}>
               Saúde da Rede de Fornecimento
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
@@ -653,8 +653,8 @@ export default function SuppliersPage() {
                   <div style={{ fontSize: '1.5rem', fontWeight: 800, color: scoreColor(m.value), letterSpacing: '-0.04em', lineHeight: 1, marginBottom: '0.2rem' }}>
                     {m.value}{m.suffix}
                   </div>
-                  <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>{m.label}</div>
-                  <div style={{ marginTop: '0.4rem', height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
+                  <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)' }}>{m.label}</div>
+                  <div style={{ marginTop: '0.4rem', height: '3px', background: 'rgba(240,236,228,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
                     <motion.div initial={{ width: 0 }} animate={{ width: `${m.value}%` }}
                       transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
                       style={{ height: '100%', background: scoreColor(m.value), borderRadius: '9999px' }} />

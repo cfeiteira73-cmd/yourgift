@@ -10,19 +10,19 @@ import { CompanyMembers } from '@/components/portal/CompanyMembers';
 interface ClientProfile { id: string; name: string | null; company: string | null; tier: string | null; budget_limit: number | null; }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h2 style={{ fontSize:'0.72rem', fontWeight:700, color:'rgb(80,92,110)', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:'0.75rem', marginTop:'1.25rem' }}>{children}</h2>;
+  return <h2 style={{ fontSize:'0.72rem', fontWeight:700, color:'rgba(240,236,228,0.24)', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:'0.75rem', marginTop:'1.25rem' }}>{children}</h2>;
 }
 
 function ToggleItem({ label, desc, enabled, onChange }: { label: string; desc: string; enabled: boolean; onChange: (v: boolean) => void }) {
   return (
-    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'0.875rem 1.125rem', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'0.875rem 1.125rem', borderBottom:'1px solid rgba(240,236,228,0.06)' }}>
       <div>
-        <div style={{ fontSize:'0.8rem', fontWeight:600, color:'rgb(210,220,235)', marginBottom:'0.1rem' }}>{label}</div>
-        <div style={{ fontSize:'0.68rem', color:'rgb(80,92,110)' }}>{desc}</div>
+        <div style={{ fontSize:'0.8rem', fontWeight:600, color:'rgba(240,236,228,0.72)', marginBottom:'0.1rem' }}>{label}</div>
+        <div style={{ fontSize:'0.68rem', color:'rgba(240,236,228,0.24)' }}>{desc}</div>
       </div>
       <button type="button" onClick={() => onChange(!enabled)} style={{
         width:'40px', height:'22px', borderRadius:'11px', border:'none', cursor:'pointer',
-        background: enabled ? 'rgb(77,163,255)' : 'rgba(255,255,255,0.1)',
+        background: enabled ? '#d4b47a' : 'rgba(240,236,228,0.10)',
         position:'relative', transition:'background 200ms', flexShrink:0,
       }}>
         <motion.div animate={{ x: enabled ? 18 : 2 }} transition={{ type:'spring', stiffness:500, damping:30 }}
@@ -111,13 +111,13 @@ export default function SettingsPage() {
       <div style={{ padding:'1.5rem 2rem 3rem', maxWidth:'760px' }}>
 
         <motion.div initial={{ opacity:0, y:-10 }} animate={{ opacity:1, y:0 }} style={{ marginBottom:'1.5rem' }}>
-          <h1 style={{ fontSize:'1.4rem', fontWeight:800, color:'rgb(245,247,251)', letterSpacing:'-0.03em', marginBottom:'0.2rem' }}>Definições</h1>
-          <p style={{ fontSize:'0.78rem', color:'rgb(80,92,110)' }}>Configura a tua conta, notificações e preferências</p>
+          <h1 style={{ fontSize:'1.4rem', fontWeight:800, color:'#f0ece4', letterSpacing:'-0.03em', marginBottom:'0.2rem' }}>Definições</h1>
+          <p style={{ fontSize:'0.78rem', color:'rgba(240,236,228,0.24)' }}>Configura a tua conta, notificações e preferências</p>
         </motion.div>
 
         {loading ? (
           <div style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
-            {[1,2,3].map(i => <div key={i} style={{ height:'100px', borderRadius:'14px', background:'rgba(255,255,255,0.04)', animation:'pulse 1.5s ease-in-out infinite' }} />)}
+            {[1,2,3].map(i => <div key={i} style={{ height:'100px', borderRadius:'14px', background:'rgba(240,236,228,0.04)', animation:'pulse 1.5s ease-in-out infinite' }} />)}
           </div>
         ) : (
           <>
@@ -125,14 +125,14 @@ export default function SettingsPage() {
             <SectionTitle>Perfil</SectionTitle>
             <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.05 }}
               className="yg-card" style={{ overflow:'hidden' }}>
-              <div style={{ padding:'1.125rem', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+              <div style={{ padding:'1.125rem', borderBottom:'1px solid rgba(240,236,228,0.06)' }}>
                 <div style={{ display:'flex', alignItems:'center', gap:'0.875rem', marginBottom:'1.125rem' }}>
-                  <div style={{ width:'52px', height:'52px', borderRadius:'14px', background:'linear-gradient(135deg,rgb(77,163,255),rgb(116,231,255))', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.25rem', fontWeight:800, color:'rgb(7,17,31)', flexShrink:0 }}>
+                  <div style={{ width:'52px', height:'52px', borderRadius:'14px', background:'linear-gradient(135deg,#d4b47a,#b8975e)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.25rem', fontWeight:800, color:'#090907', flexShrink:0 }}>
                     {(name || 'YG').slice(0,2).toUpperCase()}
                   </div>
                   <div>
                     <div style={{ fontSize:'0.85rem', fontWeight:700, color:'rgb(230,240,250)' }}>{name || 'Utilizador'}</div>
-                    <div style={{ fontSize:'0.72rem', color:'rgb(80,92,110)' }}>{userEmail}</div>
+                    <div style={{ fontSize:'0.72rem', color:'rgba(240,236,228,0.24)' }}>{userEmail}</div>
                   </div>
                 </div>
                 <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
@@ -141,19 +141,19 @@ export default function SettingsPage() {
                     { label:'Empresa', value:company, setter:setCompany, placeholder:'Nome da empresa' },
                   ].map(field => (
                     <div key={field.label}>
-                      <label style={{ fontSize:'0.68rem', fontWeight:600, color:'rgb(100,112,130)', display:'block', marginBottom:'0.375rem' }}>{field.label}</label>
+                      <label style={{ fontSize:'0.68rem', fontWeight:600, color:'rgba(240,236,228,0.42)', display:'block', marginBottom:'0.375rem' }}>{field.label}</label>
                       <input value={field.value} onChange={e => field.setter(e.target.value)} placeholder={field.placeholder}
-                        style={{ width:'100%', background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.09)', borderRadius:'9px', padding:'0.5rem 0.75rem', fontSize:'0.8rem', color:'rgb(220,230,245)', outline:'none', transition:'border-color 150ms', boxSizing:'border-box' }}
-                        onFocus={e => (e.currentTarget.style.borderColor='rgba(77,163,255,0.4)')}
+                        style={{ width:'100%', background:'rgba(240,236,228,0.04)', border:'1px solid rgba(255,255,255,0.09)', borderRadius:'9px', padding:'0.5rem 0.75rem', fontSize:'0.8rem', color:'rgba(240,236,228,0.75)', outline:'none', transition:'border-color 150ms', boxSizing:'border-box' }}
+                        onFocus={e => (e.currentTarget.style.borderColor='rgba(154,124,74,0.35)')}
                         onBlur={e => (e.currentTarget.style.borderColor='rgba(255,255,255,0.09)')} />
                     </div>
                   ))}
                 </div>
               </div>
               <div style={{ padding:'0.875rem 1.125rem', display:'flex', justifyContent:'flex-end', gap:'0.625rem', alignItems:'center' }}>
-                {saved && <span style={{ fontSize:'0.72rem', color:'rgb(99,230,190)' }}>✓ Guardado</span>}
+                {saved && <span style={{ fontSize:'0.72rem', color:'#b8975e' }}>✓ Guardado</span>}
                 <motion.button type="button" whileHover={{ scale:1.03 }} whileTap={{ scale:0.97 }} onClick={handleSave}
-                  style={{ background:'rgb(77,163,255)', color:'#fff', border:'none', borderRadius:'9px', padding:'0.5rem 1.125rem', fontSize:'0.8rem', fontWeight:700, cursor:'pointer', boxShadow:'0 4px 12px rgba(77,163,255,0.25)' }}>
+                  style={{ background:'#d4b47a', color:'#fff', border:'none', borderRadius:'9px', padding:'0.5rem 1.125rem', fontSize:'0.8rem', fontWeight:700, cursor:'pointer', boxShadow:'0 4px 12px rgba(154,124,74,0.22)' }}>
                   Guardar alterações
                 </motion.button>
               </div>
@@ -168,10 +168,10 @@ export default function SettingsPage() {
               <ToggleItem label="Atualizações de encomendas" desc="Notificação quando o estado da encomenda muda" enabled={notifs.orders} onChange={v => setNotifs(n=>({...n,orders:v}))} />
               <ToggleItem label="Respostas a orçamentos" desc="Alerta quando um orçamento é respondido" enabled={notifs.quotes} onChange={v => setNotifs(n=>({...n,quotes:v}))} />
               <ToggleItem label="Faturas e pagamentos" desc="Alertas sobre pagamentos e faturas emitidas" enabled={notifs.invoices} onChange={v => setNotifs(n=>({...n,invoices:v}))} />
-              <div style={{ padding:'0.75rem 1.125rem', display:'flex', justifyContent:'flex-end', gap:'0.625rem', alignItems:'center', borderTop:'1px solid rgba(255,255,255,0.05)' }}>
-                {saved && <span style={{ fontSize:'0.72rem', color:'rgb(99,230,190)' }}>✓ Preferências guardadas</span>}
+              <div style={{ padding:'0.75rem 1.125rem', display:'flex', justifyContent:'flex-end', gap:'0.625rem', alignItems:'center', borderTop:'1px solid rgba(240,236,228,0.06)' }}>
+                {saved && <span style={{ fontSize:'0.72rem', color:'#b8975e' }}>✓ Preferências guardadas</span>}
                 <motion.button type="button" whileTap={{ scale:0.97 }} onClick={saveNotificationPrefs} disabled={savingNotifs}
-                  style={{ background:'rgba(77,163,255,0.12)', color:'rgb(77,163,255)', border:'1px solid rgba(77,163,255,0.25)', borderRadius:'8px', padding:'0.4rem 0.875rem', fontSize:'0.75rem', fontWeight:700, cursor:'pointer' }}>
+                  style={{ background:'rgba(154,124,74,0.12)', color:'#d4b47a', border:'1px solid rgba(154,124,74,0.22)', borderRadius:'8px', padding:'0.4rem 0.875rem', fontSize:'0.75rem', fontWeight:700, cursor:'pointer' }}>
                   {savingNotifs ? 'A guardar...' : 'Guardar preferências'}
                 </motion.button>
               </div>
@@ -196,13 +196,13 @@ export default function SettingsPage() {
                   { label:'Budget limite', value: client?.budget_limit ? `€${client.budget_limit.toLocaleString('pt-PT')}` : 'Ilimitado', action:null },
                   { label:'ID de conta', value: client?.id?.slice(0,16).toUpperCase() ?? '—', action:null },
                 ].map(row => (
-                  <div key={row.label} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'0.5rem 0', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+                  <div key={row.label} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'0.5rem 0', borderBottom:'1px solid rgba(240,236,228,0.06)' }}>
                     <div>
-                      <div style={{ fontSize:'0.68rem', color:'rgb(80,92,110)' }}>{row.label}</div>
+                      <div style={{ fontSize:'0.68rem', color:'rgba(240,236,228,0.24)' }}>{row.label}</div>
                       <div style={{ fontSize:'0.8rem', fontWeight:600, color:'rgb(200,215,235)' }}>{row.value}</div>
                     </div>
                     {row.action && (
-                      <button type="button" style={{ fontSize:'0.68rem', fontWeight:600, color:'rgb(77,163,255)', background:'rgba(77,163,255,0.1)', border:'1px solid rgba(77,163,255,0.2)', borderRadius:'8px', padding:'0.3rem 0.625rem', cursor:'pointer' }}>{row.action}</button>
+                      <button type="button" style={{ fontSize:'0.68rem', fontWeight:600, color:'#d4b47a', background:'rgba(154,124,74,0.10)', border:'1px solid rgba(154,124,74,0.18)', borderRadius:'8px', padding:'0.3rem 0.625rem', cursor:'pointer' }}>{row.action}</button>
                     )}
                   </div>
                 ))}
@@ -222,7 +222,7 @@ export default function SettingsPage() {
               style={{ padding:'1rem 1.25rem', background:'rgba(239,68,68,0.06)', border:'1px solid rgba(239,68,68,0.15)', borderRadius:'14px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
               <div>
                 <div style={{ fontSize:'0.82rem', fontWeight:700, color:'rgb(239,68,68)', marginBottom:'0.2rem' }}>Eliminar conta</div>
-                <div style={{ fontSize:'0.7rem', color:'rgb(120,130,150)' }}>Esta ação é irreversível e apaga todos os dados.</div>
+                <div style={{ fontSize:'0.7rem', color:'rgba(240,236,228,0.42)' }}>Esta ação é irreversível e apaga todos os dados.</div>
               </div>
               <button type="button" style={{ fontSize:'0.75rem', fontWeight:700, color:'rgb(239,68,68)', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.25)', borderRadius:'9px', padding:'0.5rem 1rem', cursor:'pointer' }}>
                 Eliminar conta

@@ -144,7 +144,7 @@ export default async function OrderDetailPage({
           href="/orders"
           style={{
             fontSize: '0.8rem',
-            color: 'rgb(120,130,150)',
+            color: 'rgba(240,236,228,0.42)',
             textDecoration: 'none',
             display: 'inline-flex',
             alignItems: 'center',
@@ -175,7 +175,7 @@ export default async function OrderDetailPage({
                 style={{
                   fontSize: '1.5rem',
                   fontWeight: 800,
-                  color: 'rgb(245,247,251)',
+                  color: '#f0ece4',
                   letterSpacing: '-0.02em',
                   fontFamily: 'monospace',
                 }}
@@ -184,7 +184,7 @@ export default async function OrderDetailPage({
               </h1>
               <StatusBadge status={order.status as string} />
             </div>
-            <p style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)' }}>
+            <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)' }}>
               Criada em{' '}
               {new Date(order.created_at as string).toLocaleDateString('pt-PT', {
                 day: 'numeric',
@@ -205,8 +205,8 @@ export default async function OrderDetailPage({
                 fontWeight: 600,
                 cursor: 'not-allowed',
                 opacity: 0.4,
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                background: 'rgba(240,236,228,0.06)',
+                border: '1px solid rgba(240,236,228,0.10)',
                 color: 'rgb(170,180,198)',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -227,9 +227,9 @@ export default async function OrderDetailPage({
                 borderRadius: '9px',
                 fontSize: '0.8rem',
                 fontWeight: 600,
-                background: 'rgba(77,163,255,0.1)',
-                border: '1px solid rgba(77,163,255,0.2)',
-                color: 'rgb(77,163,255)',
+                background: 'rgba(154,124,74,0.10)',
+                border: '1px solid rgba(154,124,74,0.18)',
+                color: '#d4b47a',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.375rem',
@@ -259,7 +259,7 @@ export default async function OrderDetailPage({
 
             {/* Timeline */}
             <div className="yg-card" style={{ padding: '1.5rem' }}>
-              <h2 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '1.25rem' }}>
+              <h2 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '1.25rem' }}>
                 Histórico
               </h2>
               <OrderTimeline steps={timelineSteps} currentStatus={canonStatus} />
@@ -267,12 +267,12 @@ export default async function OrderDetailPage({
 
             {/* Items */}
             <div className="yg-card" style={{ padding: '1.5rem' }}>
-              <h2 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '1rem' }}>
+              <h2 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '1rem' }}>
                 Artigos
               </h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {items.length === 0 ? (
-                  <p style={{ fontSize: '0.875rem', color: 'rgb(120,130,150)' }}>Nenhum artigo registado.</p>
+                  <p style={{ fontSize: '0.875rem', color: 'rgba(240,236,228,0.42)' }}>Nenhum artigo registado.</p>
                 ) : items.map((item) => {
                   const thumb = item.products?.images?.[0];
                   return (
@@ -284,8 +284,8 @@ export default async function OrderDetailPage({
                         alignItems: 'center',
                         padding: '0.75rem',
                         borderRadius: '10px',
-                        background: 'rgba(255,255,255,0.03)',
-                        border: '1px solid rgba(255,255,255,0.05)',
+                        background: 'rgba(240,236,228,0.04)',
+                        border: '1px solid rgba(240,236,228,0.06)',
                       }}
                     >
                       <div
@@ -294,7 +294,7 @@ export default async function OrderDetailPage({
                           height: '52px',
                           borderRadius: '8px',
                           overflow: 'hidden',
-                          background: 'rgba(255,255,255,0.05)',
+                          background: 'rgba(240,236,228,0.06)',
                           flexShrink: 0,
                           display: 'flex',
                           alignItems: 'center',
@@ -309,17 +309,17 @@ export default async function OrderDetailPage({
                         )}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'rgb(245,247,251)', marginBottom: '0.15rem' }}>
+                        <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#f0ece4', marginBottom: '0.15rem' }}>
                           {item.products?.title ?? '—'}
                         </p>
                         {item.product_variants?.color && (
-                          <p style={{ fontSize: '0.75rem', color: 'rgb(120,130,150)' }}>
+                          <p style={{ fontSize: '0.75rem', color: 'rgba(240,236,228,0.42)' }}>
                             {item.product_variants.color} · {item.product_variants.sku}
                           </p>
                         )}
-                        <p style={{ fontSize: '0.75rem', color: 'rgb(120,130,150)' }}>{item.quantity} un.</p>
+                        <p style={{ fontSize: '0.75rem', color: 'rgba(240,236,228,0.42)' }}>{item.quantity} un.</p>
                       </div>
-                      <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'rgb(99,230,190)', flexShrink: 0 }}>
+                      <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#b8975e', flexShrink: 0 }}>
                         {item.unit_price > 0 ? formatPrice(item.unit_price * item.quantity) : 'Sob consulta'}
                       </p>
                     </div>
@@ -331,14 +331,14 @@ export default async function OrderDetailPage({
             {/* Artworks */}
             {artworks.length > 0 && (
               <div className="yg-card" style={{ padding: '1.5rem' }}>
-                <h2 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '1rem' }}>
+                <h2 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '1rem' }}>
                   Artes
                 </h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
                   {artworks.map((art) => {
                     const artStatusColors: Record<string, string> = {
                       pending: 'rgb(245,158,11)',
-                      approved: 'rgb(99,230,190)',
+                      approved: '#b8975e',
                       rejected: 'rgb(239,68,68)',
                       revision_requested: 'rgb(239,68,68)',
                     };
@@ -357,12 +357,12 @@ export default async function OrderDetailPage({
                           gap: '0.75rem',
                           padding: '0.75rem',
                           borderRadius: '10px',
-                          background: 'rgba(255,255,255,0.03)',
-                          border: '1px solid rgba(255,255,255,0.05)',
+                          background: 'rgba(240,236,228,0.04)',
+                          border: '1px solid rgba(240,236,228,0.06)',
                         }}
                       >
                         <svg
-                          style={{ color: artStatusColors[art.status] ?? 'rgb(120,130,150)', flexShrink: 0 }}
+                          style={{ color: artStatusColors[art.status] ?? 'rgba(240,236,228,0.42)', flexShrink: 0 }}
                           width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
                         >
                           <path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z" />
@@ -375,7 +375,7 @@ export default async function OrderDetailPage({
                             rel="noopener noreferrer"
                             style={{
                               fontSize: '0.875rem',
-                              color: 'rgb(77,163,255)',
+                              color: '#d4b47a',
                               textDecoration: 'none',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
@@ -391,7 +391,7 @@ export default async function OrderDetailPage({
                             </p>
                           )}
                         </div>
-                        <span style={{ fontSize: '0.7rem', fontWeight: 600, color: artStatusColors[art.status] ?? 'rgb(120,130,150)', textTransform: 'uppercase', letterSpacing: '0.06em', flexShrink: 0 }}>
+                        <span style={{ fontSize: '0.7rem', fontWeight: 600, color: artStatusColors[art.status] ?? 'rgba(240,236,228,0.42)', textTransform: 'uppercase', letterSpacing: '0.06em', flexShrink: 0 }}>
                           {artStatusLabel[art.status] ?? art.status}
                         </span>
                       </div>
@@ -408,19 +408,19 @@ export default async function OrderDetailPage({
 
             {/* Supplier */}
             <div className="yg-card" style={{ padding: '1.25rem' }}>
-              <h3 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '0.875rem' }}>
+              <h3 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '0.875rem' }}>
                 Fornecedor
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
-                  <span style={{ color: 'rgb(120,130,150)' }}>Fornecedor</span>
-                  <span style={{ color: 'rgb(245,247,251)', fontWeight: 500 }}>
+                  <span style={{ color: 'rgba(240,236,228,0.42)' }}>Fornecedor</span>
+                  <span style={{ color: '#f0ece4', fontWeight: 500 }}>
                     {supplierLabels[(order.supplier as string) ?? ''] ?? (order.supplier as string) ?? '—'}
                   </span>
                 </div>
                 {order.supplier_order_id && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
-                    <span style={{ color: 'rgb(120,130,150)' }}>ID Fornecedor</span>
+                    <span style={{ color: 'rgba(240,236,228,0.42)' }}>ID Fornecedor</span>
                     <span style={{ fontFamily: 'monospace', fontSize: '0.8rem', color: 'rgb(170,180,198)' }}>
                       {order.supplier_order_id as string}
                     </span>
@@ -428,12 +428,12 @@ export default async function OrderDetailPage({
                 )}
                 {order.tracking_number && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', alignItems: 'center' }}>
-                    <span style={{ color: 'rgb(120,130,150)' }}>Tracking</span>
+                    <span style={{ color: 'rgba(240,236,228,0.42)' }}>Tracking</span>
                     <a
                       href={`https://www.google.com/search?q=${encodeURIComponent(order.tracking_number as string)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ fontFamily: 'monospace', fontSize: '0.8rem', color: 'rgb(116,231,255)', textDecoration: 'underline', textUnderlineOffset: '2px' }}
+                      style={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#b8975e', textDecoration: 'underline', textUnderlineOffset: '2px' }}
                     >
                       {order.tracking_number as string}
                     </a>
@@ -445,11 +445,11 @@ export default async function OrderDetailPage({
             {/* Shipping */}
             {shippingAddr && (
               <div className="yg-card" style={{ padding: '1.25rem' }}>
-                <h3 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '0.875rem' }}>
+                <h3 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '0.875rem' }}>
                   Morada de Entrega
                 </h3>
                 <address style={{ fontStyle: 'normal', fontSize: '0.875rem', color: 'rgb(170,180,198)', lineHeight: 1.6 }}>
-                  {shippingAddr.name && <p style={{ fontWeight: 600, color: 'rgb(245,247,251)' }}>{shippingAddr.name}</p>}
+                  {shippingAddr.name && <p style={{ fontWeight: 600, color: '#f0ece4' }}>{shippingAddr.name}</p>}
                   {shippingAddr.street && <p>{shippingAddr.street}</p>}
                   {(shippingAddr.city || shippingAddr.postalCode) && (
                     <p>{shippingAddr.city}{shippingAddr.postalCode && ` ${shippingAddr.postalCode}`}</p>
@@ -462,7 +462,7 @@ export default async function OrderDetailPage({
             {/* Notes */}
             {order.notes && (
               <div className="yg-card" style={{ padding: '1.25rem' }}>
-                <h3 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '0.5rem' }}>
+                <h3 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '0.5rem' }}>
                   Notas
                 </h3>
                 <p style={{ fontSize: '0.875rem', color: 'rgb(170,180,198)', lineHeight: 1.6 }}>

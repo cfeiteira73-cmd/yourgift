@@ -23,12 +23,12 @@ interface Member {
 
 const ROLE_COLORS: Record<string, { bg: string; color: string; label: string }> = {
   admin:  { bg: 'rgba(139,92,246,0.15)', color: 'rgb(167,139,250)', label: 'Admin' },
-  member: { bg: 'rgba(77,163,255,0.12)', color: 'rgb(77,163,255)',  label: 'Membro' },
-  viewer: { bg: 'rgba(100,112,130,0.12)', color: 'rgb(140,155,175)', label: 'Viewer' },
+  member: { bg: 'rgba(154,124,74,0.12)', color: '#d4b47a',  label: 'Membro' },
+  viewer: { bg: 'rgba(100,112,130,0.12)', color: 'rgba(240,236,228,0.42)', label: 'Viewer' },
 };
 
 const STATUS_COLORS: Record<string, { bg: string; color: string; label: string }> = {
-  active:  { bg: 'rgba(99,230,190,0.1)',  color: 'rgb(99,230,190)',  label: 'Ativo' },
+  active:  { bg: 'rgba(184,151,94,0.10)',  color: '#b8975e',  label: 'Ativo' },
   pending: { bg: 'rgba(245,158,11,0.12)', color: 'rgb(245,158,11)', label: 'Convite pendente' },
 };
 
@@ -107,7 +107,7 @@ export function CompanyMembers() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         {[1, 2, 3].map(i => (
-          <div key={i} style={{ height: '52px', borderRadius: '10px', background: 'rgba(255,255,255,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+          <div key={i} style={{ height: '52px', borderRadius: '10px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />
         ))}
       </div>
     );
@@ -127,7 +127,7 @@ export function CompanyMembers() {
       <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <div style={{ fontSize: '1rem', fontWeight: 700, color: 'rgb(230,240,255)' }}>Equipa — {companyName}</div>
-          <div style={{ fontSize: '0.72rem', color: 'rgb(80,92,110)', marginTop: '0.1rem' }}>{members.length} membro{members.length !== 1 ? 's' : ''}</div>
+          <div style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.1rem' }}>{members.length} membro{members.length !== 1 ? 's' : ''}</div>
         </div>
       </div>
 
@@ -135,7 +135,7 @@ export function CompanyMembers() {
       <form onSubmit={handleInvite}
         style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
         <div style={{ flex: 1, minWidth: '200px' }}>
-          <label style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)', fontWeight: 600, display: 'block', marginBottom: '0.3rem' }}>EMAIL</label>
+          <label style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)', fontWeight: 600, display: 'block', marginBottom: '0.3rem' }}>EMAIL</label>
           <input
             type="email"
             value={inviteEmail}
@@ -144,21 +144,21 @@ export function CompanyMembers() {
             required
             style={{
               width: '100%', padding: '0.5rem 0.75rem', borderRadius: '8px',
-              background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-              color: 'rgb(220,230,245)', fontSize: '0.82rem', outline: 'none',
+              background: 'rgba(240,236,228,0.06)', border: '1px solid rgba(240,236,228,0.10)',
+              color: 'rgba(240,236,228,0.75)', fontSize: '0.82rem', outline: 'none',
               boxSizing: 'border-box',
             }}
           />
         </div>
         <div>
-          <label style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)', fontWeight: 600, display: 'block', marginBottom: '0.3rem' }}>PAPEL</label>
+          <label style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)', fontWeight: 600, display: 'block', marginBottom: '0.3rem' }}>PAPEL</label>
           <select
             value={inviteRole}
             onChange={e => setInviteRole(e.target.value as typeof inviteRole)}
             style={{
               padding: '0.5rem 0.75rem', borderRadius: '8px',
-              background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-              color: 'rgb(220,230,245)', fontSize: '0.82rem', cursor: 'pointer',
+              background: 'rgba(240,236,228,0.06)', border: '1px solid rgba(240,236,228,0.10)',
+              color: 'rgba(240,236,228,0.75)', fontSize: '0.82rem', cursor: 'pointer',
             }}
           >
             <option value="admin">Admin</option>
@@ -172,8 +172,8 @@ export function CompanyMembers() {
           style={{
             padding: '0.5rem 1.25rem', borderRadius: '8px', fontSize: '0.8rem',
             fontWeight: 600, cursor: inviting ? 'default' : 'pointer',
-            background: 'rgba(77,163,255,0.15)', border: '1px solid rgba(77,163,255,0.3)',
-            color: 'rgb(77,163,255)', opacity: inviting ? 0.6 : 1, transition: 'opacity 150ms',
+            background: 'rgba(154,124,74,0.14)', border: '1px solid rgba(154,124,74,0.28)',
+            color: '#d4b47a', opacity: inviting ? 0.6 : 1, transition: 'opacity 150ms',
           }}
         >
           {inviting ? 'A enviar…' : 'Convidar'}
@@ -187,9 +187,9 @@ export function CompanyMembers() {
             initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
             style={{
               padding: '0.5rem 0.75rem', borderRadius: '8px', marginBottom: '0.75rem', fontSize: '0.78rem',
-              background: inviteResult.startsWith('✓') ? 'rgba(99,230,190,0.1)' : 'rgba(239,68,68,0.1)',
-              color: inviteResult.startsWith('✓') ? 'rgb(99,230,190)' : 'rgb(239,68,68)',
-              border: `1px solid ${inviteResult.startsWith('✓') ? 'rgba(99,230,190,0.2)' : 'rgba(239,68,68,0.2)'}`,
+              background: inviteResult.startsWith('✓') ? 'rgba(184,151,94,0.10)' : 'rgba(239,68,68,0.1)',
+              color: inviteResult.startsWith('✓') ? '#b8975e' : 'rgb(239,68,68)',
+              border: `1px solid ${inviteResult.startsWith('✓') ? 'rgba(184,151,94,0.18)' : 'rgba(239,68,68,0.2)'}`,
             }}
           >
             {inviteResult}
@@ -200,7 +200,7 @@ export function CompanyMembers() {
       {/* Members list */}
       {members.length === 0 ? (
         <div style={{
-          background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.1)',
+          background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(240,236,228,0.10)',
           borderRadius: '12px', padding: '2rem', textAlign: 'center',
         }}>
           <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>👥</div>
@@ -218,7 +218,7 @@ export function CompanyMembers() {
                 transition={{ delay: i * 0.04 }}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '0.75rem',
-                  background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
+                  background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)',
                   borderRadius: '10px', padding: '0.625rem 0.875rem',
                 }}
               >
@@ -235,7 +235,7 @@ export function CompanyMembers() {
                 {/* Email */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'rgb(210,222,240)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.email}</div>
-                  {m.joined_at && <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>Entrou a {new Date(m.joined_at).toLocaleDateString('pt-PT')}</div>}
+                  {m.joined_at && <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)' }}>Entrou a {new Date(m.joined_at).toLocaleDateString('pt-PT')}</div>}
                 </div>
 
                 {/* Status badge */}
@@ -266,12 +266,12 @@ export function CompanyMembers() {
                   title="Remover membro"
                   style={{
                     background: 'transparent', border: 'none', cursor: 'pointer',
-                    color: 'rgb(100,112,130)', fontSize: '0.9rem', flexShrink: 0,
+                    color: 'rgba(240,236,228,0.42)', fontSize: '0.9rem', flexShrink: 0,
                     padding: '0.1rem 0.2rem', borderRadius: '4px',
                     transition: 'color 150ms',
                   }}
                   onMouseEnter={e => (e.currentTarget.style.color = 'rgb(239,68,68)')}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'rgb(100,112,130)')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(240,236,228,0.42)')}
                 >
                   ✕
                 </button>

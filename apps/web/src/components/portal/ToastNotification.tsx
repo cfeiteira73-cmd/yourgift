@@ -41,11 +41,11 @@ const TOAST_ICONS: Record<ToastType, string> = {
 };
 
 const TOAST_COLORS: Record<ToastType, { border: string; bg: string; text: string }> = {
-  success:  { border: 'rgba(99,230,190,0.3)',  bg: 'rgba(99,230,190,0.08)',  text: 'rgb(99,230,190)' },
-  info:     { border: 'rgba(77,163,255,0.3)',  bg: 'rgba(77,163,255,0.08)',  text: 'rgb(77,163,255)' },
+  success:  { border: 'rgba(99,230,190,0.3)',  bg: 'rgba(184,151,94,0.08)',  text: '#b8975e' },
+  info:     { border: 'rgba(154,124,74,0.28)',  bg: 'rgba(154,124,74,0.08)',  text: '#d4b47a' },
   warning:  { border: 'rgba(245,158,11,0.3)',  bg: 'rgba(245,158,11,0.08)',  text: 'rgb(245,158,11)' },
   error:    { border: 'rgba(239,68,68,0.3)',   bg: 'rgba(239,68,68,0.08)',   text: 'rgb(239,68,68)' },
-  realtime: { border: 'rgba(116,231,255,0.3)', bg: 'rgba(116,231,255,0.08)', text: 'rgb(116,231,255)' },
+  realtime: { border: 'rgba(116,231,255,0.3)', bg: 'rgba(116,231,255,0.08)', text: '#b8975e' },
 };
 
 let toastIdCounter = 0;
@@ -150,7 +150,7 @@ export function ToastContainer() {
                 borderLeft: `3px solid ${colors.text}`,
                 borderRadius: '12px',
                 backdropFilter: 'blur(20px)',
-                boxShadow: `0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04)`,
+                boxShadow: `0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(240,236,228,0.04)`,
                 cursor: 'pointer',
                 pointerEvents: 'auto',
                 userSelect: 'none',
@@ -158,14 +158,14 @@ export function ToastContainer() {
             >
               <span style={{ fontSize: '1rem', flexShrink: 0, marginTop: '1px' }}>{TOAST_ICONS[toast.type]}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(220,230,245)', lineHeight: 1.3 }}>{toast.message}</div>
-                {toast.sub && <div style={{ fontSize: '0.65rem', color: 'rgb(100,112,130)', marginTop: '0.15rem' }}>{toast.sub}</div>}
+                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgba(240,236,228,0.75)', lineHeight: 1.3 }}>{toast.message}</div>
+                {toast.sub && <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.42)', marginTop: '0.15rem' }}>{toast.sub}</div>}
               </div>
               <button
                 type="button"
                 onClick={e => { e.stopPropagation(); dismiss(toast.id); }}
                 aria-label="Fechar notificação"
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgb(80,92,110)', fontSize: '0.8rem', padding: '0', flexShrink: 0, lineHeight: 1 }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(240,236,228,0.24)', fontSize: '0.8rem', padding: '0', flexShrink: 0, lineHeight: 1 }}
               >
                 ✕
               </button>

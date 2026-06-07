@@ -159,10 +159,10 @@ export function ArtworkAnnotationLayer({ submissionId, imageUrl, readOnly = fals
             }}
           >
             <div style={{
-              width: '22px', height: '22px', borderRadius: '50%', border: '2.5px solid rgb(77,163,255)',
-              background: 'rgba(77,163,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.65rem', fontWeight: 800, color: 'rgb(77,163,255)',
-              boxShadow: '0 0 0 4px rgba(77,163,255,0.15)',
+              width: '22px', height: '22px', borderRadius: '50%', border: '2.5px solid #d4b47a',
+              background: 'rgba(154,124,74,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '0.65rem', fontWeight: 800, color: '#d4b47a',
+              boxShadow: '0 0 0 4px rgba(154,124,74,0.14)',
             }}>
               +
             </div>
@@ -184,14 +184,14 @@ export function ArtworkAnnotationLayer({ submissionId, imageUrl, readOnly = fals
               marginTop: '8px',
               zIndex: 30,
               background: 'rgb(14,22,38)',
-              border: '1px solid rgba(77,163,255,0.3)',
+              border: '1px solid rgba(154,124,74,0.28)',
               borderRadius: '10px',
               padding: '0.75rem',
               width: '260px',
               boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
             }}
           >
-            <div style={{ fontSize: '0.68rem', fontWeight: 600, color: 'rgb(77,163,255)', marginBottom: '0.4rem' }}>
+            <div style={{ fontSize: '0.68rem', fontWeight: 600, color: '#d4b47a', marginBottom: '0.4rem' }}>
               📌 Adicionar anotação
             </div>
             <textarea
@@ -205,7 +205,7 @@ export function ArtworkAnnotationLayer({ submissionId, imageUrl, readOnly = fals
               placeholder="Descreve o problema ou comentário…"
               rows={3}
               style={{
-                width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                width: '100%', background: 'rgba(240,236,228,0.06)', border: '1px solid rgba(240,236,228,0.10)',
                 borderRadius: '7px', padding: '0.4rem 0.6rem', color: 'rgb(215,225,240)',
                 fontSize: '0.8rem', resize: 'none', outline: 'none', fontFamily: 'inherit',
                 boxSizing: 'border-box',
@@ -219,8 +219,8 @@ export function ArtworkAnnotationLayer({ submissionId, imageUrl, readOnly = fals
                 style={{
                   flex: 1, padding: '0.35rem', borderRadius: '7px', fontSize: '0.75rem',
                   fontWeight: 700, cursor: 'pointer', border: 'none',
-                  background: inputText.trim() ? 'rgba(77,163,255,0.2)' : 'rgba(255,255,255,0.05)',
-                  color: inputText.trim() ? 'rgb(77,163,255)' : 'rgb(80,92,110)',
+                  background: inputText.trim() ? 'rgba(154,124,74,0.18)' : 'rgba(240,236,228,0.06)',
+                  color: inputText.trim() ? '#d4b47a' : 'rgba(240,236,228,0.24)',
                   transition: 'all 150ms',
                 }}
               >
@@ -231,8 +231,8 @@ export function ArtworkAnnotationLayer({ submissionId, imageUrl, readOnly = fals
                 onClick={() => { setPendingPin(null); setInputText(''); }}
                 style={{
                   padding: '0.35rem 0.6rem', borderRadius: '7px', fontSize: '0.75rem',
-                  fontWeight: 600, cursor: 'pointer', border: '1px solid rgba(255,255,255,0.1)',
-                  background: 'transparent', color: 'rgb(100,112,130)',
+                  fontWeight: 600, cursor: 'pointer', border: '1px solid rgba(240,236,228,0.10)',
+                  background: 'transparent', color: 'rgba(240,236,228,0.42)',
                 }}
               >
                 Esc
@@ -245,7 +245,7 @@ export function ArtworkAnnotationLayer({ submissionId, imageUrl, readOnly = fals
       {/* Annotation list */}
       {rootAnnotations.length > 0 && (
         <div style={{ marginTop: '0.75rem' }}>
-          <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.4rem' }}>
+          <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.4rem' }}>
             {rootAnnotations.length} Anotaç{rootAnnotations.length === 1 ? 'ão' : 'ões'}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
@@ -258,22 +258,22 @@ export function ArtworkAnnotationLayer({ submissionId, imageUrl, readOnly = fals
                 style={{
                   display: 'flex', gap: '0.5rem', padding: '0.5rem 0.625rem',
                   borderRadius: '8px', cursor: 'pointer',
-                  background: activePin === ann.id ? 'rgba(77,163,255,0.1)' : 'rgba(255,255,255,0.03)',
-                  border: `1px solid ${activePin === ann.id ? 'rgba(77,163,255,0.25)' : 'rgba(255,255,255,0.06)'}`,
+                  background: activePin === ann.id ? 'rgba(154,124,74,0.10)' : 'rgba(240,236,228,0.04)',
+                  border: `1px solid ${activePin === ann.id ? 'rgba(154,124,74,0.22)' : 'rgba(240,236,228,0.06)'}`,
                   transition: 'all 150ms',
                 }}
               >
                 <div style={{
                   width: '18px', height: '18px', borderRadius: '50%', flexShrink: 0,
-                  background: 'rgba(77,163,255,0.2)', border: '1.5px solid rgba(77,163,255,0.5)',
+                  background: 'rgba(154,124,74,0.18)', border: '1.5px solid rgba(154,124,74,0.45)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '0.6rem', fontWeight: 800, color: 'rgb(77,163,255)',
+                  fontSize: '0.6rem', fontWeight: 800, color: '#d4b47a',
                 }}>
                   {idx + 1}
                 </div>
                 <div>
                   <div style={{ fontSize: '0.78rem', color: 'rgb(210,222,240)', lineHeight: 1.4 }}>{ann.text}</div>
-                  <div style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)', marginTop: '0.15rem' }}>
+                  <div style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.15rem' }}>
                     {ann.author_email ?? 'Anónimo'} · {new Date(ann.created_at).toLocaleDateString('pt-PT')}
                   </div>
                 </div>
@@ -290,7 +290,7 @@ export function ArtworkAnnotationLayer({ submissionId, imageUrl, readOnly = fals
       )}
 
       {loading && annotations.length === 0 && (
-        <div style={{ fontSize: '0.72rem', color: 'rgb(80,92,110)', padding: '0.5rem 0' }}>A carregar anotações…</div>
+        <div style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.24)', padding: '0.5rem 0' }}>A carregar anotações…</div>
       )}
     </div>
   );
@@ -332,12 +332,12 @@ function AnnotationPin({
         animate={{ scale: active || hover ? 1.2 : 1 }}
         style={{
           width: '22px', height: '22px', borderRadius: '50%',
-          background: active ? 'rgb(77,163,255)' : 'rgba(77,163,255,0.25)',
-          border: `2px solid ${active ? 'rgb(77,163,255)' : 'rgba(77,163,255,0.7)'}`,
+          background: active ? '#d4b47a' : 'rgba(154,124,74,0.22)',
+          border: `2px solid ${active ? '#d4b47a' : 'rgba(184,151,94,0.55)'}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: '0.6rem', fontWeight: 800,
-          color: active ? '#fff' : 'rgb(77,163,255)',
-          boxShadow: active ? '0 0 0 4px rgba(77,163,255,0.25)' : '0 2px 8px rgba(0,0,0,0.5)',
+          color: active ? '#fff' : '#d4b47a',
+          boxShadow: active ? '0 0 0 4px rgba(154,124,74,0.22)' : '0 2px 8px rgba(0,0,0,0.5)',
           transition: 'background 150ms, border-color 150ms, box-shadow 150ms',
         }}
       >
@@ -357,7 +357,7 @@ function AnnotationPin({
               transform: 'translateX(-50%)',
               marginBottom: '4px',
               background: 'rgb(14,22,38)',
-              border: '1px solid rgba(77,163,255,0.3)',
+              border: '1px solid rgba(154,124,74,0.28)',
               borderRadius: '8px',
               padding: '0.4rem 0.6rem',
               width: '180px',

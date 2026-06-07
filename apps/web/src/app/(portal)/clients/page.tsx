@@ -36,9 +36,9 @@ interface Stats { orders: number; quotes: number; totalSpend: number; }
 // ── Tier config ───────────────────────────────────────────────────────────────
 
 const TIER_CFG: Record<string, { label: string; color: string; bg: string; border: string }> = {
-  premium:    { label: 'Premium',    color: 'rgb(99,230,190)',  bg: 'rgba(99,230,190,0.1)',  border: 'rgba(99,230,190,0.25)'  },
-  enterprise: { label: 'Enterprise', color: 'rgb(116,231,255)', bg: 'rgba(116,231,255,0.1)', border: 'rgba(116,231,255,0.25)' },
-  standard:   { label: 'Standard',   color: 'rgb(120,130,150)', bg: 'rgba(120,130,150,0.1)', border: 'rgba(120,130,150,0.2)'  },
+  premium:    { label: 'Premium',    color: '#b8975e',  bg: 'rgba(184,151,94,0.10)',  border: 'rgba(99,230,190,0.25)'  },
+  enterprise: { label: 'Enterprise', color: '#b8975e', bg: 'rgba(184,151,94,0.10)', border: 'rgba(116,231,255,0.25)' },
+  standard:   { label: 'Standard',   color: 'rgba(240,236,228,0.42)', bg: 'rgba(120,130,150,0.1)', border: 'rgba(120,130,150,0.2)'  },
   trial:      { label: 'Trial',       color: 'rgb(245,158,11)', bg: 'rgba(245,158,11,0.1)',  border: 'rgba(245,158,11,0.2)'   },
 };
 
@@ -58,9 +58,9 @@ function timeAgo(iso?: string) {
 
 function InfoRow({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-      <span style={{ fontSize: '0.72rem', color: 'rgb(100,112,130)' }}>{label}</span>
-      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: accent ? 'rgb(77,163,255)' : 'rgb(210,220,235)' }}>{value}</span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0', borderBottom: '1px solid rgba(240,236,228,0.04)' }}>
+      <span style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.42)' }}>{label}</span>
+      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: accent ? '#d4b47a' : 'rgba(240,236,228,0.72)' }}>{value}</span>
     </div>
   );
 }
@@ -81,7 +81,7 @@ function ClientRow({ client, index, onSelect }: {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.05 + index * 0.03 }}
       onClick={() => onSelect(client)}
-      style={{ cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+      style={{ cursor: 'pointer', borderBottom: '1px solid rgba(240,236,228,0.04)' }}
       onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.025)')}
       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
     >
@@ -92,7 +92,7 @@ function ClientRow({ client, index, onSelect }: {
           </div>
           <div>
             <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'rgb(200,215,235)' }}>{client.name ?? '—'}</div>
-            <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>{client.company ?? '—'}</div>
+            <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)' }}>{client.company ?? '—'}</div>
           </div>
         </div>
       </td>
@@ -101,10 +101,10 @@ function ClientRow({ client, index, onSelect }: {
           {tc.label}
         </span>
       </td>
-      <td style={{ padding: '0.75rem 1rem', fontSize: '0.78rem', fontWeight: 700, color: 'rgb(99,230,190)' }}>
+      <td style={{ padding: '0.75rem 1rem', fontSize: '0.78rem', fontWeight: 700, color: '#b8975e' }}>
         {fmtEur(client.totalSpend ?? 0)}
       </td>
-      <td style={{ padding: '0.75rem 1rem', fontSize: '0.78rem', color: 'rgb(77,163,255)', fontWeight: 600 }}>
+      <td style={{ padding: '0.75rem 1rem', fontSize: '0.78rem', color: '#d4b47a', fontWeight: 600 }}>
         {client.orders ?? 0}
       </td>
       <td style={{ padding: '0.75rem 1rem', fontSize: '0.78rem', color: 'rgb(245,158,11)', fontWeight: 600 }}>
@@ -114,14 +114,14 @@ function ClientRow({ client, index, onSelect }: {
         {client.budget_limit ? (
           <span style={{ fontSize: '0.72rem', color: 'rgb(167,139,250)' }}>{fmtEur(client.budget_limit)}</span>
         ) : (
-          <span style={{ fontSize: '0.68rem', color: 'rgb(60,72,90)' }}>Ilimitado</span>
+          <span style={{ fontSize: '0.68rem', color: 'rgba(240,236,228,0.24)' }}>Ilimitado</span>
         )}
       </td>
-      <td style={{ padding: '0.75rem 1rem', fontSize: '0.68rem', color: 'rgb(70,82,100)' }}>
+      <td style={{ padding: '0.75rem 1rem', fontSize: '0.68rem', color: 'rgba(240,236,228,0.24)' }}>
         {timeAgo(client.created_at)}
       </td>
       <td style={{ padding: '0.75rem 1rem' }}>
-        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: (client.activeOrders ?? 0) > 0 ? 'rgb(99,230,190)' : 'rgb(50,62,80)', boxShadow: (client.activeOrders ?? 0) > 0 ? '0 0 6px rgba(99,230,190,0.5)' : 'none' }} />
+        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: (client.activeOrders ?? 0) > 0 ? '#b8975e' : 'rgb(50,62,80)', boxShadow: (client.activeOrders ?? 0) > 0 ? '0 0 6px rgba(99,230,190,0.5)' : 'none' }} />
       </td>
     </motion.tr>
   );
@@ -142,24 +142,24 @@ function ClientDrawer({ client, onClose }: { client: ClientWithStats; onClose: (
       style={{
         position: 'fixed', top: 0, right: 0, bottom: 0,
         width: '340px', background: 'rgb(10,20,38)',
-        borderLeft: '1px solid rgba(255,255,255,0.07)',
+        borderLeft: '1px solid rgba(240,236,228,0.06)',
         zIndex: 50, overflowY: 'auto', padding: '1.5rem',
         boxShadow: '-20px 0 60px rgba(0,0,0,0.5)',
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Detalhe do Cliente</h3>
-        <button type="button" onClick={onClose} style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '8px', width: '30px', height: '30px', cursor: 'pointer', color: 'rgb(120,130,150)', fontSize: '0.9rem' }}>✕</button>
+        <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f0ece4' }}>Detalhe do Cliente</h3>
+        <button type="button" onClick={onClose} style={{ background: 'rgba(240,236,228,0.06)', border: 'none', borderRadius: '8px', width: '30px', height: '30px', cursor: 'pointer', color: 'rgba(240,236,228,0.42)', fontSize: '0.9rem' }}>✕</button>
       </div>
 
       {/* Avatar + name */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginBottom: '1.25rem', padding: '1rem', background: 'rgba(255,255,255,0.025)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-        <div style={{ width: '48px', height: '48px', borderRadius: '14px', flexShrink: 0, background: `linear-gradient(135deg, ${tc.color}, ${tc.color}80)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 800, color: 'rgb(7,17,31)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginBottom: '1.25rem', padding: '1rem', background: 'rgba(255,255,255,0.025)', borderRadius: '12px', border: '1px solid rgba(240,236,228,0.06)' }}>
+        <div style={{ width: '48px', height: '48px', borderRadius: '14px', flexShrink: 0, background: `linear-gradient(135deg, ${tc.color}, ${tc.color}80)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 800, color: '#090907' }}>
           {initials}
         </div>
         <div>
-          <div style={{ fontSize: '1rem', fontWeight: 800, color: 'rgb(245,247,251)' }}>{client.name ?? '—'}</div>
-          <div style={{ fontSize: '0.72rem', color: 'rgb(100,112,130)' }}>{client.company ?? '—'}</div>
+          <div style={{ fontSize: '1rem', fontWeight: 800, color: '#f0ece4' }}>{client.name ?? '—'}</div>
+          <div style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.42)' }}>{client.company ?? '—'}</div>
           <span style={{ fontSize: '0.6rem', fontWeight: 700, color: tc.color, background: tc.bg, border: `1px solid ${tc.border}`, borderRadius: '9999px', padding: '0.1rem 0.4rem', marginTop: '0.25rem', display: 'inline-block' }}>
             {tc.label}
           </span>
@@ -169,13 +169,13 @@ function ClientDrawer({ client, onClose }: { client: ClientWithStats; onClose: (
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', marginBottom: '1.25rem' }}>
         {[
-          { label: 'Encomendas', value: String(client.orders ?? 0), color: 'rgb(77,163,255)' },
+          { label: 'Encomendas', value: String(client.orders ?? 0), color: '#d4b47a' },
           { label: 'Orçamentos', value: String(client.quotes ?? 0), color: 'rgb(245,158,11)' },
-          { label: 'Volume Total', value: fmtEur(client.totalSpend ?? 0), color: 'rgb(99,230,190)' },
+          { label: 'Volume Total', value: fmtEur(client.totalSpend ?? 0), color: '#b8975e' },
         ].map(s => (
-          <div key={s.label} style={{ padding: '0.625rem', background: 'rgba(255,255,255,0.025)', borderRadius: '9px', border: '1px solid rgba(255,255,255,0.04)', textAlign: 'center' }}>
+          <div key={s.label} style={{ padding: '0.625rem', background: 'rgba(255,255,255,0.025)', borderRadius: '9px', border: '1px solid rgba(240,236,228,0.04)', textAlign: 'center' }}>
             <div style={{ fontSize: '1rem', fontWeight: 800, color: s.color, letterSpacing: '-0.02em' }}>{s.value}</div>
-            <div style={{ fontSize: '0.58rem', color: 'rgb(70,82,100)', marginTop: '0.1rem' }}>{s.label}</div>
+            <div style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.1rem' }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -193,11 +193,11 @@ function ClientDrawer({ client, onClose }: { client: ClientWithStats; onClose: (
       {/* Actions */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         <a href={`mailto:?subject=YourGift — ${client.company ?? client.name}`}
-          style={{ display: 'block', textAlign: 'center', padding: '0.6rem', background: 'rgba(77,163,255,0.1)', border: '1px solid rgba(77,163,255,0.25)', borderRadius: '9px', fontSize: '0.75rem', fontWeight: 600, color: 'rgb(77,163,255)', textDecoration: 'none' }}>
+          style={{ display: 'block', textAlign: 'center', padding: '0.6rem', background: 'rgba(154,124,74,0.10)', border: '1px solid rgba(154,124,74,0.22)', borderRadius: '9px', fontSize: '0.75rem', fontWeight: 600, color: '#d4b47a', textDecoration: 'none' }}>
           ✉ Contactar cliente
         </a>
         <a href="/orders"
-          style={{ display: 'block', textAlign: 'center', padding: '0.6rem', background: 'rgba(99,230,190,0.06)', border: '1px solid rgba(99,230,190,0.2)', borderRadius: '9px', fontSize: '0.75rem', fontWeight: 600, color: 'rgb(99,230,190)', textDecoration: 'none' }}>
+          style={{ display: 'block', textAlign: 'center', padding: '0.6rem', background: 'rgba(99,230,190,0.06)', border: '1px solid rgba(184,151,94,0.18)', borderRadius: '9px', fontSize: '0.75rem', fontWeight: 600, color: '#b8975e', textDecoration: 'none' }}>
           📦 Ver encomendas
         </a>
       </div>
@@ -329,10 +329,10 @@ export default function ClientsPage() {
         <div style={{ padding: '1.5rem 2rem 3rem' }}>
 
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '1.5rem' }}>
-            <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
+            <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
               Enterprise Client Management
             </h1>
-            <p style={{ fontSize: '0.78rem', color: 'rgb(80,92,110)' }}>
+            <p style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.24)' }}>
               Visão global de todos os clientes · {allClients.length} registados
             </p>
           </motion.div>
@@ -341,16 +341,16 @@ export default function ClientsPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
             style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.625rem', marginBottom: '1.25rem' }}>
             {[
-              { label: 'Total Clientes',    value: String(allClients.length),    color: 'rgb(77,163,255)',   icon: '👥' },
-              { label: 'Com Encomendas Ativas', value: String(activeCount),      color: 'rgb(99,230,190)',   icon: '📦' },
+              { label: 'Total Clientes',    value: String(allClients.length),    color: '#d4b47a',   icon: '👥' },
+              { label: 'Com Encomendas Ativas', value: String(activeCount),      color: '#b8975e',   icon: '📦' },
               { label: 'Receita Global',    value: fmtEur(totalRevenue),          color: 'rgb(167,139,250)', icon: '💶' },
-              { label: 'Premium + Enterprise', value: String((tierCounts.premium ?? 0) + (tierCounts.enterprise ?? 0)), color: 'rgb(116,231,255)', icon: '💎' },
+              { label: 'Premium + Enterprise', value: String((tierCounts.premium ?? 0) + (tierCounts.enterprise ?? 0)), color: '#b8975e', icon: '💎' },
               { label: 'Média por Cliente', value: allClients.length > 0 ? fmtEur(totalRevenue / allClients.length) : '—', color: 'rgb(245,158,11)', icon: '📊' },
             ].map((kpi, i) => (
               <motion.div key={kpi.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.05 }}
                 className="yg-card" style={{ padding: '0.875rem 1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                  <span style={{ fontSize: '0.58rem', fontWeight: 600, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{kpi.label}</span>
+                  <span style={{ fontSize: '0.58rem', fontWeight: 600, color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{kpi.label}</span>
                   <span style={{ fontSize: '0.8rem' }}>{kpi.icon}</span>
                 </div>
                 <div style={{ fontSize: '1.1rem', fontWeight: 800, color: kpi.color, letterSpacing: '-0.03em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{kpi.value}</div>
@@ -362,14 +362,14 @@ export default function ClientsPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.12 }}
             style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
             <button type="button" onClick={() => setTierFilter(null)}
-              style={{ fontSize: '0.7rem', fontWeight: 600, padding: '0.3rem 0.75rem', borderRadius: '9999px', border: `1px solid ${!tierFilter ? 'rgba(77,163,255,0.4)' : 'rgba(255,255,255,0.07)'}`, background: !tierFilter ? 'rgba(77,163,255,0.12)' : 'rgba(255,255,255,0.03)', color: !tierFilter ? 'rgb(77,163,255)' : 'rgb(80,92,110)', cursor: 'pointer' }}>
+              style={{ fontSize: '0.7rem', fontWeight: 600, padding: '0.3rem 0.75rem', borderRadius: '9999px', border: `1px solid ${!tierFilter ? 'rgba(154,124,74,0.35)' : 'rgba(240,236,228,0.06)'}`, background: !tierFilter ? 'rgba(154,124,74,0.12)' : 'rgba(240,236,228,0.04)', color: !tierFilter ? '#d4b47a' : 'rgba(240,236,228,0.24)', cursor: 'pointer' }}>
               Todos ({allClients.length})
             </button>
             {Object.entries(TIER_CFG).map(([tier, cfg]) => {
               const count = tierCounts[tier] ?? 0;
               return count > 0 ? (
                 <button type="button" key={tier}  onClick={() => setTierFilter(tierFilter === tier ? null : tier)}
-                  style={{ fontSize: '0.7rem', fontWeight: 600, padding: '0.3rem 0.75rem', borderRadius: '9999px', border: `1px solid ${tierFilter === tier ? cfg.border : 'rgba(255,255,255,0.07)'}`, background: tierFilter === tier ? cfg.bg : 'rgba(255,255,255,0.02)', color: tierFilter === tier ? cfg.color : 'rgb(80,92,110)', cursor: 'pointer' }}>
+                  style={{ fontSize: '0.7rem', fontWeight: 600, padding: '0.3rem 0.75rem', borderRadius: '9999px', border: `1px solid ${tierFilter === tier ? cfg.border : 'rgba(240,236,228,0.06)'}`, background: tierFilter === tier ? cfg.bg : 'rgba(255,255,255,0.02)', color: tierFilter === tier ? cfg.color : 'rgba(240,236,228,0.24)', cursor: 'pointer' }}>
                   {cfg.label} ({count})
                 </button>
               ) : null;
@@ -378,34 +378,34 @@ export default function ClientsPage() {
 
           {/* Search */}
           <div style={{ position: 'relative', marginBottom: '1rem' }}>
-            <svg style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'rgb(80,92,110)' }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(240,236,228,0.24)' }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
             <input type="text" placeholder="Pesquisar por nome ou empresa..." value={search} onChange={e => setSearch(e.target.value)}
-              style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '11px', padding: '0.6rem 1rem 0.6rem 2.5rem', fontSize: '0.82rem', color: 'rgb(200,210,225)', outline: 'none', boxSizing: 'border-box' }}
+              style={{ width: '100%', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '11px', padding: '0.6rem 1rem 0.6rem 2.5rem', fontSize: '0.82rem', color: 'rgba(240,236,228,0.72)', outline: 'none', boxSizing: 'border-box' }}
               onFocus={e => (e.currentTarget.style.borderColor = 'rgba(77,163,255,0.35)')}
-              onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)')}
+              onBlur={e => (e.currentTarget.style.borderColor = 'rgba(240,236,228,0.06)')}
             />
           </div>
 
           {/* Table */}
           {loading ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {[1, 2, 3, 4].map(i => <div key={i} style={{ height: '56px', borderRadius: '10px', background: 'rgba(255,255,255,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
+              {[1, 2, 3, 4].map(i => <div key={i} style={{ height: '56px', borderRadius: '10px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
             </div>
           ) : (
-            <div style={{ borderRadius: '14px', border: '1px solid rgba(255,255,255,0.07)', overflow: 'hidden' }}>
+            <div style={{ borderRadius: '14px', border: '1px solid rgba(240,236,228,0.06)', overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ background: 'rgba(255,255,255,0.025)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <tr style={{ background: 'rgba(255,255,255,0.025)', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
                     {['Cliente', 'Plano', 'Volume Total', 'Encomendas', 'Orçamentos', 'Budget', 'Registo', 'Ativo'].map(h => (
-                      <th key={h} style={{ padding: '0.625rem 1rem', textAlign: 'left', fontSize: '0.62rem', fontWeight: 700, color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
+                      <th key={h} style={{ padding: '0.625rem 1rem', textAlign: 'left', fontSize: '0.62rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {filteredClients.length === 0 ? (
-                    <tr><td colSpan={8} style={{ textAlign: 'center', padding: '2rem', color: 'rgb(60,72,90)', fontSize: '0.78rem' }}>Nenhum cliente encontrado</td></tr>
+                    <tr><td colSpan={8} style={{ textAlign: 'center', padding: '2rem', color: 'rgba(240,236,228,0.24)', fontSize: '0.78rem' }}>Nenhum cliente encontrado</td></tr>
                   ) : (
                     filteredClients.map((c, i) => (
                       <ClientRow key={c.id} client={c} index={i} onSelect={setSelectedClient} />
@@ -421,13 +421,13 @@ export default function ClientsPage() {
         <div style={{ padding: '1.5rem 2rem 3rem', maxWidth: '860px' }}>
 
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '1.75rem' }}>
-            <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>A Minha Conta</h1>
-            <p style={{ fontSize: '0.78rem', color: 'rgb(80,92,110)' }}>Perfil e informações da sua conta YourGift</p>
+            <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>A Minha Conta</h1>
+            <p style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.24)' }}>Perfil e informações da sua conta YourGift</p>
           </motion.div>
 
           {loading ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {[1, 2, 3].map(i => <div key={i} style={{ height: '120px', borderRadius: '16px', background: 'rgba(255,255,255,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
+              {[1, 2, 3].map(i => <div key={i} style={{ height: '120px', borderRadius: '16px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
@@ -435,26 +435,26 @@ export default function ClientsPage() {
               {/* Profile card */}
               <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.05 }}
                 className="yg-card" style={{ padding: '1.5rem', gridColumn: '1 / -1', display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
-                <div style={{ width: '64px', height: '64px', borderRadius: '18px', flexShrink: 0, background: 'linear-gradient(135deg,rgb(77,163,255),rgb(116,231,255))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 800, color: 'rgb(7,17,31)', boxShadow: '0 0 20px rgba(77,163,255,0.3)' }}>
+                <div style={{ width: '64px', height: '64px', borderRadius: '18px', flexShrink: 0, background: 'linear-gradient(135deg,#d4b47a,#b8975e)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 800, color: '#090907', boxShadow: '0 0 20px rgba(154,124,74,0.28)' }}>
                   {initials}
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.375rem', flexWrap: 'wrap' }}>
-                    <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.02em' }}>{client?.name ?? 'Utilizador'}</h2>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.02em' }}>{client?.name ?? 'Utilizador'}</h2>
                     <span style={{ fontSize: '0.65rem', fontWeight: 700, color: tc.color, background: tc.bg, border: `1px solid ${tc.border}`, borderRadius: '9999px', padding: '0.2rem 0.6rem' }}>{tc.label}</span>
                   </div>
-                  <p style={{ fontSize: '0.82rem', color: 'rgb(120,130,150)', marginBottom: '0.25rem' }}>{client?.company ?? '—'}</p>
-                  <p style={{ fontSize: '0.75rem', color: 'rgb(80,92,110)' }}>{userEmail}</p>
+                  <p style={{ fontSize: '0.82rem', color: 'rgba(240,236,228,0.42)', marginBottom: '0.25rem' }}>{client?.company ?? '—'}</p>
+                  <p style={{ fontSize: '0.75rem', color: 'rgba(240,236,228,0.24)' }}>{userEmail}</p>
                 </div>
                 <div style={{ display: 'flex', gap: '1.5rem', textAlign: 'center' }}>
                   {[
-                    { label: 'Encomendas', value: stats.orders, color: 'rgb(77,163,255)' },
+                    { label: 'Encomendas', value: stats.orders, color: '#d4b47a' },
                     { label: 'Orçamentos', value: stats.quotes, color: 'rgb(245,158,11)' },
-                    { label: 'Total Gasto', value: fmtEur(stats.totalSpend), color: 'rgb(99,230,190)' },
+                    { label: 'Total Gasto', value: fmtEur(stats.totalSpend), color: '#b8975e' },
                   ].map(s => (
                     <div key={s.label}>
                       <div style={{ fontSize: '1.25rem', fontWeight: 800, color: s.color, letterSpacing: '-0.03em' }}>{s.value}</div>
-                      <div style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)' }}>{s.label}</div>
+                      <div style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)' }}>{s.label}</div>
                     </div>
                   ))}
                 </div>
@@ -463,7 +463,7 @@ export default function ClientsPage() {
               {/* Account details */}
               <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.1 }}
                 className="yg-card" style={{ padding: '1.25rem 1.375rem' }}>
-                <h3 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '0.625rem' }}>Detalhes da Conta</h3>
+                <h3 style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f0ece4', marginBottom: '0.625rem' }}>Detalhes da Conta</h3>
                 <InfoRow label="Nome" value={client?.name ?? '—'} />
                 <InfoRow label="Empresa" value={client?.company ?? '—'} />
                 <InfoRow label="Email" value={userEmail} accent />
@@ -475,14 +475,14 @@ export default function ClientsPage() {
               {/* Activity */}
               <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.15 }}
                 className="yg-card" style={{ padding: '1.25rem 1.375rem' }}>
-                <h3 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '0.625rem' }}>Atividade</h3>
+                <h3 style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f0ece4', marginBottom: '0.625rem' }}>Atividade</h3>
                 {[
-                  { icon: '📦', label: 'Total de encomendas', value: String(stats.orders),      color: 'rgb(77,163,255)'  },
+                  { icon: '📦', label: 'Total de encomendas', value: String(stats.orders),      color: '#d4b47a'  },
                   { icon: '📋', label: 'Total de orçamentos', value: String(stats.quotes),      color: 'rgb(245,158,11)'  },
-                  { icon: '💶', label: 'Volume total',         value: fmtEur(stats.totalSpend), color: 'rgb(99,230,190)'  },
+                  { icon: '💶', label: 'Volume total',         value: fmtEur(stats.totalSpend), color: '#b8975e'  },
                   { icon: '⭐', label: 'Nível de cliente',     value: tc.label,                  color: tc.color           },
                 ].map((item, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', padding: '0.5rem 0', borderBottom: i < 3 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', padding: '0.5rem 0', borderBottom: i < 3 ? '1px solid rgba(240,236,228,0.04)' : 'none' }}>
                     <span style={{ fontSize: '1rem' }}>{item.icon}</span>
                     <span style={{ fontSize: '0.75rem', color: 'rgb(130,142,160)', flex: 1 }}>{item.label}</span>
                     <span style={{ fontSize: '0.8rem', fontWeight: 700, color: item.color }}>{item.value}</span>

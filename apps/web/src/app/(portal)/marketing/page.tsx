@@ -14,22 +14,22 @@ interface ClientProfile { id: string; name: string | null; company: string | nul
 interface Order { id: string; status: string; total_amount: number | null; created_at: string; }
 
 const CAMPAIGN_TEMPLATES = [
-  { id: 1, name: 'Kit Boas-Vindas Corporativo', status: 'active', type: 'Onboarding', reach: '250 colaboradores', icon: '🎁', color: 'rgb(99,230,190)', budget: '€3.200', start: 'Jan 2025' },
-  { id: 2, name: 'Evento Anual TechSummit 2025', status: 'planned', type: 'Evento', reach: '500 convidados', icon: '🏆', color: 'rgb(77,163,255)', budget: '€8.500', start: 'Jun 2025' },
+  { id: 1, name: 'Kit Boas-Vindas Corporativo', status: 'active', type: 'Onboarding', reach: '250 colaboradores', icon: '🎁', color: '#b8975e', budget: '€3.200', start: 'Jan 2025' },
+  { id: 2, name: 'Evento Anual TechSummit 2025', status: 'planned', type: 'Evento', reach: '500 convidados', icon: '🏆', color: '#d4b47a', budget: '€8.500', start: 'Jun 2025' },
   { id: 3, name: 'Merchandising Verão', status: 'draft', type: 'Sazonal', reach: 'Todos os clientes', icon: '☀️', color: 'rgb(245,158,11)', budget: '€2.100', start: 'Jul 2025' },
   { id: 4, name: 'Programa Fidelização VIP', status: 'active', type: 'Fidelização', reach: '45 clientes VIP', icon: '⭐', color: 'rgb(167,139,250)', budget: '€5.600', start: 'Mar 2025' },
 ];
 
 const STATUS_CFG = {
-  active:  { label: 'Ativa',    color: 'rgb(99,230,190)',  bg: 'rgba(99,230,190,0.1)'  },
-  planned: { label: 'Planeada', color: 'rgb(77,163,255)',  bg: 'rgba(77,163,255,0.1)'  },
-  draft:   { label: 'Rascunho', color: 'rgb(120,130,150)', bg: 'rgba(120,130,150,0.1)' },
-  ended:   { label: 'Terminada',color: 'rgb(60,72,90)',    bg: 'rgba(60,72,90,0.1)'    },
+  active:  { label: 'Ativa',    color: '#b8975e',  bg: 'rgba(184,151,94,0.10)'  },
+  planned: { label: 'Planeada', color: '#d4b47a',  bg: 'rgba(154,124,74,0.10)'  },
+  draft:   { label: 'Rascunho', color: 'rgba(240,236,228,0.42)', bg: 'rgba(120,130,150,0.1)' },
+  ended:   { label: 'Terminada',color: 'rgba(240,236,228,0.24)',    bg: 'rgba(60,72,90,0.1)'    },
 };
 
 const PROMO_TOOLS = [
-  { icon: '📊', label: 'Relatório de Campanha', desc: 'Analisa o ROI e impacto', action: 'Ver relatório', href: '/reports', color: 'rgb(77,163,255)' },
-  { icon: '🎨', label: 'Kit de Design', desc: 'Templates prontos a usar', action: 'Explorar kits', href: '/assets', color: 'rgb(99,230,190)' },
+  { icon: '📊', label: 'Relatório de Campanha', desc: 'Analisa o ROI e impacto', action: 'Ver relatório', href: '/reports', color: '#d4b47a' },
+  { icon: '🎨', label: 'Kit de Design', desc: 'Templates prontos a usar', action: 'Explorar kits', href: '/assets', color: '#b8975e' },
   { icon: '📦', label: 'Catálogo de Promoções', desc: 'Produtos com melhores margens', action: 'Ver catálogo', href: '/products', color: 'rgb(245,158,11)' },
   { icon: '💌', label: 'Orçamento de Campanha', desc: 'Pede um orçamento personalizado', action: 'Pedir agora', href: '/quotes/new', color: 'rgb(167,139,250)' },
 ];
@@ -93,49 +93,49 @@ Tom: profissional e criativo. Responde em Português de Portugal.`,
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
         <span style={{ fontSize: '1.125rem' }}>✦</span>
         <div>
-          <p style={{ fontSize: '0.82rem', fontWeight: 800, color: 'rgb(210,220,235)' }}>AI Campaign Brief Generator</p>
-          <p style={{ fontSize: '0.68rem', color: 'rgb(80,92,110)' }}>Descreve a tua campanha e recebe um brief completo com produtos, timeline e budget estimado</p>
+          <p style={{ fontSize: '0.82rem', fontWeight: 800, color: 'rgba(240,236,228,0.72)' }}>AI Campaign Brief Generator</p>
+          <p style={{ fontSize: '0.68rem', color: 'rgba(240,236,228,0.24)' }}>Descreve a tua campanha e recebe um brief completo com produtos, timeline e budget estimado</p>
         </div>
       </div>
 
       <textarea value={prompt} onChange={e => setPrompt(e.target.value)} rows={2}
         placeholder="Ex: Queremos presentear 300 colaboradores com kits de boas-vindas premium para o início do ano fiscal..."
-        style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '0.75rem', color: 'rgb(210,220,235)', fontSize: '0.78rem', resize: 'vertical', lineHeight: 1.5, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', marginBottom: '0.625rem' }}
+        style={{ width: '100%', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.10)', borderRadius: '10px', padding: '0.75rem', color: 'rgba(240,236,228,0.72)', fontSize: '0.78rem', resize: 'vertical', lineHeight: 1.5, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', marginBottom: '0.625rem' }}
       />
 
       {/* Quick idea chips */}
       <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap', marginBottom: '0.875rem' }}>
         {IDEAS.map(idea => (
           <button type="button" key={idea.title}  onClick={() => generate(idea.prompt)}
-            style={{ padding: '0.22rem 0.6rem', borderRadius: '9999px', fontSize: '0.65rem', fontWeight: 500, cursor: 'pointer', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgb(120,130,150)', transition: 'all 150ms' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(77,163,255,0.4)'; (e.currentTarget as HTMLElement).style.color = 'rgb(77,163,255)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'; (e.currentTarget as HTMLElement).style.color = 'rgb(120,130,150)'; }}>
+            style={{ padding: '0.22rem 0.6rem', borderRadius: '9999px', fontSize: '0.65rem', fontWeight: 500, cursor: 'pointer', background: 'rgba(240,236,228,0.06)', border: '1px solid rgba(240,236,228,0.10)', color: 'rgba(240,236,228,0.42)', transition: 'all 150ms' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(154,124,74,0.35)'; (e.currentTarget as HTMLElement).style.color = '#d4b47a'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(240,236,228,0.10)'; (e.currentTarget as HTMLElement).style.color = 'rgba(240,236,228,0.42)'; }}>
             {idea.icon} {idea.title}
           </button>
         ))}
       </div>
 
       <motion.button type="button" onClick={() => generate()} disabled={!prompt.trim() || loading} whileTap={{ scale: 0.97 }}
-        style={{ padding: '0.55rem 1.25rem', borderRadius: '9px', fontSize: '0.78rem', fontWeight: 700, cursor: prompt.trim() && !loading ? 'pointer' : 'not-allowed', background: prompt.trim() && !loading ? 'linear-gradient(135deg, rgb(77,163,255), rgb(99,230,190))' : 'rgba(255,255,255,0.06)', color: prompt.trim() && !loading ? '#fff' : 'rgb(80,92,110)', border: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', transition: 'all 200ms', marginBottom: result ? '0.875rem' : 0 }}>
+        style={{ padding: '0.55rem 1.25rem', borderRadius: '9px', fontSize: '0.78rem', fontWeight: 700, cursor: prompt.trim() && !loading ? 'pointer' : 'not-allowed', background: prompt.trim() && !loading ? 'linear-gradient(135deg, #d4b47a, #b8975e)' : 'rgba(240,236,228,0.06)', color: prompt.trim() && !loading ? '#fff' : 'rgba(240,236,228,0.24)', border: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', transition: 'all 200ms', marginBottom: result ? '0.875rem' : 0 }}>
         {loading ? (
-          <><span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid #fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> A gerar brief...</>
+          <><span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid rgba(240,236,228,0.28)', borderTop: '2px solid #fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> A gerar brief...</>
         ) : '✦ Gerar Brief de Campanha'}
       </motion.button>
 
       <AnimatePresence>
         {result && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '1rem 1.125rem' }}>
+            style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '10px', padding: '1rem 1.125rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.625rem' }}>
-              <p style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(77,163,255)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Brief Gerado</p>
-              <button type="button" onClick={() => setResult('')} style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)', background: 'none', border: 'none', cursor: 'pointer' }}>× limpar</button>
+              <p style={{ fontSize: '0.65rem', fontWeight: 700, color: '#d4b47a', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Brief Gerado</p>
+              <button type="button" onClick={() => setResult('')} style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)', background: 'none', border: 'none', cursor: 'pointer' }}>× limpar</button>
             </div>
             <pre style={{ fontSize: '0.76rem', color: 'rgb(195,210,230)', lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontFamily: 'inherit', margin: 0, marginBottom: '0.875rem' }}>{result}</pre>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <Link href="/quotes/new" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.4rem 0.875rem', borderRadius: '8px', background: 'rgba(77,163,255,0.15)', border: '1px solid rgba(77,163,255,0.25)', color: 'rgb(77,163,255)', fontSize: '0.7rem', fontWeight: 700, textDecoration: 'none' }}>
+              <Link href="/quotes/new" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.4rem 0.875rem', borderRadius: '8px', background: 'rgba(154,124,74,0.14)', border: '1px solid rgba(154,124,74,0.22)', color: '#d4b47a', fontSize: '0.7rem', fontWeight: 700, textDecoration: 'none' }}>
                 → Pedir Orçamento
               </Link>
-              <Link href="/products" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.4rem 0.875rem', borderRadius: '8px', background: 'rgba(99,230,190,0.12)', border: '1px solid rgba(99,230,190,0.2)', color: 'rgb(99,230,190)', fontSize: '0.7rem', fontWeight: 700, textDecoration: 'none' }}>
+              <Link href="/products" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.4rem 0.875rem', borderRadius: '8px', background: 'rgba(184,151,94,0.12)', border: '1px solid rgba(184,151,94,0.18)', color: '#b8975e', fontSize: '0.7rem', fontWeight: 700, textDecoration: 'none' }}>
                 → Ver Catálogo
               </Link>
             </div>
@@ -186,7 +186,7 @@ export default function MarketingPage() {
     return `€${n.toFixed(0)}`;
   }
 
-  const tierColor = client?.tier === 'premium' ? 'rgb(245,158,11)' : client?.tier === 'enterprise' ? 'rgb(167,139,250)' : client?.tier === 'vip' ? 'rgb(99,230,190)' : 'rgb(77,163,255)';
+  const tierColor = client?.tier === 'premium' ? 'rgb(245,158,11)' : client?.tier === 'enterprise' ? 'rgb(167,139,250)' : client?.tier === 'vip' ? '#b8975e' : '#d4b47a';
   const tierLabel = client?.tier ? client.tier.charAt(0).toUpperCase() + client.tier.slice(1) : 'Standard';
 
   return (
@@ -198,15 +198,15 @@ export default function MarketingPage() {
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
           style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>Marketing & Promoções</h1>
-            <p style={{ fontSize: '0.78rem', color: 'rgb(80,92,110)' }}>Campanhas de merchandising e estratégia de marca{client?.company ? ` · ${client.company}` : ''}</p>
+            <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>Marketing & Promoções</h1>
+            <p style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.24)' }}>Campanhas de merchandising e estratégia de marca{client?.company ? ` · ${client.company}` : ''}</p>
           </div>
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             {client?.tier && (
               <span style={{ fontSize: '0.68rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: '9999px', background: `${tierColor}18`, color: tierColor, border: `1px solid ${tierColor}30` }}>{tierLabel}</span>
             )}
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <Link href="/quotes/new" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', background: 'linear-gradient(135deg,rgb(77,163,255),rgb(116,100,255))', color: '#fff', padding: '0.5rem 1.125rem', borderRadius: '10px', fontSize: '0.82rem', fontWeight: 700, textDecoration: 'none', boxShadow: '0 4px 14px rgba(77,163,255,0.25)' }}>
+              <Link href="/quotes/new" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', background: 'linear-gradient(135deg,#d4b47a,rgb(116,100,255))', color: '#fff', padding: '0.5rem 1.125rem', borderRadius: '10px', fontSize: '0.82rem', fontWeight: 700, textDecoration: 'none', boxShadow: '0 4px 14px rgba(154,124,74,0.22)' }}>
                 + Nova Campanha
               </Link>
             </motion.div>
@@ -218,16 +218,16 @@ export default function MarketingPage() {
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
             style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', marginBottom: '1.5rem' }}>
             {[
-              { label: 'Total investido', value: fmtEur(stats.totalSpend), color: 'rgb(99,230,190)', icon: '💰' },
-              { label: 'Este mês', value: fmtEur(stats.thisMonth), color: 'rgb(77,163,255)', icon: '📅' },
+              { label: 'Total investido', value: fmtEur(stats.totalSpend), color: '#b8975e', icon: '💰' },
+              { label: 'Este mês', value: fmtEur(stats.thisMonth), color: '#d4b47a', icon: '📅' },
               { label: 'Encomendas ativas', value: String(stats.activeOrders), color: 'rgb(245,158,11)', icon: '📦' },
               { label: 'Entregues', value: String(stats.deliveredOrders), color: 'rgb(167,139,250)', icon: '✓' },
             ].map((k, i) => (
               <motion.div key={k.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.05 }}
-                style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '0.875rem 1rem' }}>
+                style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '12px', padding: '0.875rem 1rem' }}>
                 <div style={{ fontSize: '0.9rem', marginBottom: '0.2rem' }}>{k.icon}</div>
                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: k.color, letterSpacing: '-0.03em' }}>{k.value}</div>
-                <div style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)', marginTop: '0.15rem' }}>{k.label}</div>
+                <div style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.15rem' }}>{k.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -253,19 +253,19 @@ export default function MarketingPage() {
                     <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: `${c.color}15`, border: `1px solid ${c.color}25`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.125rem', flexShrink: 0 }}>{c.icon}</div>
                     <div>
                       <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(230,240,250)' }}>{c.name}</h3>
-                      <span style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)' }}>{c.type} · desde {c.start}</span>
+                      <span style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)' }}>{c.type} · desde {c.start}</span>
                     </div>
                   </div>
                   <span style={{ fontSize: '0.6rem', fontWeight: 700, color: sc.color, background: sc.bg, borderRadius: '9999px', padding: '0.15rem 0.45rem', flexShrink: 0 }}>{sc.label}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.625rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.625rem', borderTop: '1px solid rgba(240,236,228,0.06)' }}>
                   <div>
-                    <div style={{ fontSize: '0.6rem', color: 'rgb(70,82,100)' }}>Alcance</div>
+                    <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)' }}>Alcance</div>
                     <div style={{ fontSize: '0.72rem', fontWeight: 600, color: c.color }}>{c.reach}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '0.6rem', color: 'rgb(70,82,100)' }}>Budget</div>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(99,230,190)' }}>{c.budget}</div>
+                    <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)' }}>Budget</div>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#b8975e' }}>{c.budget}</div>
                   </div>
                 </div>
               </motion.div>
@@ -280,7 +280,7 @@ export default function MarketingPage() {
             <motion.div key={t.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.06 }}
               className="yg-card" style={{ padding: '1.125rem' }}>
               <div style={{ fontSize: '1.5rem', marginBottom: '0.625rem' }}>{t.icon}</div>
-              <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(220,230,245)', marginBottom: '0.375rem' }}>{t.label}</h3>
+              <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgba(240,236,228,0.75)', marginBottom: '0.375rem' }}>{t.label}</h3>
               <p style={{ fontSize: '0.68rem', color: 'rgb(90,102,120)', marginBottom: '0.75rem', lineHeight: 1.5 }}>{t.desc}</p>
               <Link href={t.href} style={{ fontSize: '0.7rem', fontWeight: 700, color: t.color, textDecoration: 'none' }}>{t.action} →</Link>
             </motion.div>
@@ -298,10 +298,10 @@ export default function MarketingPage() {
               whileHover={{ y: -2 }}
               className="yg-card" style={{ padding: '1rem', cursor: 'pointer' }}>
               <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{idea.icon}</div>
-              <span style={{ fontSize: '0.58rem', fontWeight: 700, color: 'rgb(77,163,255)', background: 'rgba(77,163,255,0.1)', borderRadius: '9999px', padding: '0.1rem 0.4rem', marginBottom: '0.5rem', display: 'inline-block' }}>{idea.tag}</span>
-              <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(220,230,245)', marginBottom: '0.375rem', lineHeight: 1.3 }}>{idea.title}</h3>
-              <p style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)', lineHeight: 1.5, marginBottom: '0.75rem' }}>{idea.desc}</p>
-              <Link href="/quotes/new" style={{ display: 'block', fontSize: '0.68rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}>Pedir orçamento →</Link>
+              <span style={{ fontSize: '0.58rem', fontWeight: 700, color: '#d4b47a', background: 'rgba(154,124,74,0.10)', borderRadius: '9999px', padding: '0.1rem 0.4rem', marginBottom: '0.5rem', display: 'inline-block' }}>{idea.tag}</span>
+              <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgba(240,236,228,0.75)', marginBottom: '0.375rem', lineHeight: 1.3 }}>{idea.title}</h3>
+              <p style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)', lineHeight: 1.5, marginBottom: '0.75rem' }}>{idea.desc}</p>
+              <Link href="/quotes/new" style={{ display: 'block', fontSize: '0.68rem', color: '#d4b47a', textDecoration: 'none', fontWeight: 600 }}>Pedir orçamento →</Link>
             </motion.div>
           ))}
         </div>

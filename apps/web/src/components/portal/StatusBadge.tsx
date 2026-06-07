@@ -33,24 +33,24 @@ interface StatusConfig {
 export const ORDER_STATUS_MAP: Record<string, StatusConfig> = {
   created:           { label: 'Criada',       bg: 'rgba(107,114,128,0.12)', text: 'rgb(156,163,175)',   border: 'rgba(107,114,128,0.2)',  dot: '#9ca3af' },
   pending:           { label: 'Pendente',      bg: 'rgba(107,114,128,0.12)', text: 'rgb(156,163,175)',   border: 'rgba(107,114,128,0.2)',  dot: '#9ca3af' },
-  paid:              { label: 'Pago',          bg: 'rgba(77,163,255,0.12)',  text: 'rgb(77,163,255)',    border: 'rgba(77,163,255,0.22)',  dot: '#4da3ff' },
-  confirmed:         { label: 'Confirmado',    bg: 'rgba(77,163,255,0.12)',  text: 'rgb(77,163,255)',    border: 'rgba(77,163,255,0.22)',  dot: '#4da3ff' },
-  payment_confirmed: { label: 'Pago',          bg: 'rgba(77,163,255,0.12)',  text: 'rgb(77,163,255)',    border: 'rgba(77,163,255,0.22)',  dot: '#4da3ff' },
+  paid:              { label: 'Pago',          bg: 'rgba(154,124,74,0.12)',  text: '#d4b47a',    border: 'rgba(77,163,255,0.22)',  dot: '#4da3ff' },
+  confirmed:         { label: 'Confirmado',    bg: 'rgba(154,124,74,0.12)',  text: '#d4b47a',    border: 'rgba(77,163,255,0.22)',  dot: '#4da3ff' },
+  payment_confirmed: { label: 'Pago',          bg: 'rgba(154,124,74,0.12)',  text: '#d4b47a',    border: 'rgba(77,163,255,0.22)',  dot: '#4da3ff' },
   approved:          { label: 'Aprovada',      bg: 'rgba(167,139,250,0.12)', text: 'rgb(167,139,250)',   border: 'rgba(167,139,250,0.22)', dot: '#a78bfa' },
   producing:         { label: 'Em Produção',   bg: 'rgba(245,158,11,0.12)',  text: 'rgb(245,158,11)',    border: 'rgba(245,158,11,0.22)',  dot: '#f59e0b' },
   in_production:     { label: 'Em Produção',   bg: 'rgba(245,158,11,0.12)',  text: 'rgb(245,158,11)',    border: 'rgba(245,158,11,0.22)',  dot: '#f59e0b' },
-  shipped:           { label: 'Enviada',       bg: 'rgba(116,231,255,0.12)', text: 'rgb(116,231,255)',   border: 'rgba(116,231,255,0.2)',  dot: '#74e7ff' },
-  delivered:         { label: 'Entregue',      bg: 'rgba(99,230,190,0.12)',  text: 'rgb(99,230,190)',    border: 'rgba(99,230,190,0.2)',   dot: '#63e6be' },
+  shipped:           { label: 'Enviada',       bg: 'rgba(116,231,255,0.12)', text: '#b8975e',   border: 'rgba(184,151,94,0.18)',  dot: '#74e7ff' },
+  delivered:         { label: 'Entregue',      bg: 'rgba(184,151,94,0.12)',  text: '#b8975e',    border: 'rgba(184,151,94,0.18)',   dot: '#63e6be' },
   cancelled:         { label: 'Cancelada',     bg: 'rgba(239,68,68,0.12)',   text: 'rgb(239,68,68)',     border: 'rgba(239,68,68,0.2)',    dot: '#ef4444' },
 };
 
 export const QUOTE_STATUS_MAP: Record<string, StatusConfig> = {
   draft:     { label: 'Rascunho',    bg: 'rgba(107,114,128,0.12)', text: 'rgb(156,163,175)',  border: 'rgba(107,114,128,0.2)',  dot: '#9ca3af' },
-  submitted: { label: 'Submetido',   bg: 'rgba(77,163,255,0.12)',  text: 'rgb(77,163,255)',   border: 'rgba(77,163,255,0.22)', dot: '#4da3ff' },
+  submitted: { label: 'Submetido',   bg: 'rgba(154,124,74,0.12)',  text: '#d4b47a',   border: 'rgba(77,163,255,0.22)', dot: '#4da3ff' },
   pricing:   { label: 'A calcular',  bg: 'rgba(245,158,11,0.12)',  text: 'rgb(245,158,11)',   border: 'rgba(245,158,11,0.22)', dot: '#f59e0b' },
-  approved:  { label: 'Aprovado',    bg: 'rgba(99,230,190,0.12)',  text: 'rgb(99,230,190)',   border: 'rgba(99,230,190,0.2)',  dot: '#63e6be' },
+  approved:  { label: 'Aprovado',    bg: 'rgba(184,151,94,0.12)',  text: '#b8975e',   border: 'rgba(184,151,94,0.18)',  dot: '#63e6be' },
   rejected:  { label: 'Rejeitado',   bg: 'rgba(239,68,68,0.12)',   text: 'rgb(239,68,68)',    border: 'rgba(239,68,68,0.2)',   dot: '#ef4444' },
-  converted: { label: 'Convertido',  bg: 'rgba(116,231,255,0.12)', text: 'rgb(116,231,255)',  border: 'rgba(116,231,255,0.2)', dot: '#74e7ff' },
+  converted: { label: 'Convertido',  bg: 'rgba(116,231,255,0.12)', text: '#b8975e',  border: 'rgba(184,151,94,0.18)', dot: '#74e7ff' },
 };
 
 interface StatusBadgeProps {

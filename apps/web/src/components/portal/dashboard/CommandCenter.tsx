@@ -121,7 +121,7 @@ function DonutChart({ segments, total }: { segments: { label: string; value: num
   return (
     <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
       <svg width="112" height="112" viewBox="0 0 112 112">
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={stroke} />
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(240,236,228,0.06)" strokeWidth={stroke} />
         {segments.map((seg, i) => {
           const pct = total > 0 ? seg.value / total : 0;
           const dash = pct * circumference;
@@ -137,8 +137,8 @@ function DonutChart({ segments, total }: { segments: { label: string; value: num
         })}
       </svg>
       <div style={{ position: 'absolute', textAlign: 'center', pointerEvents: 'none' }}>
-        <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.04em', lineHeight: 1 }}>{total}</div>
-        <div style={{ fontSize: '0.58rem', color: 'rgb(100,112,130)' }}>Total</div>
+        <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.04em', lineHeight: 1 }}>{total}</div>
+        <div style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.42)' }}>Total</div>
       </div>
     </div>
   );
@@ -163,8 +163,8 @@ function PerformanceChart({ series, labels }: { series: { label: string; data: n
       {[100, 75, 50].map((y) => {
         const yPx = H - ((y - minV) / range) * H;
         return <g key={y}>
-          <line x1={0} y1={yPx} x2={W} y2={yPx} stroke="rgba(255,255,255,0.05)" strokeWidth="1" strokeDasharray="3 3" />
-          <text x={-2} y={yPx + 3} textAnchor="end" fontSize={7} fill="rgb(70,82,100)">{y}%</text>
+          <line x1={0} y1={yPx} x2={W} y2={yPx} stroke="rgba(240,236,228,0.06)" strokeWidth="1" strokeDasharray="3 3" />
+          <text x={-2} y={yPx + 3} textAnchor="end" fontSize={7} fill="rgba(240,236,228,0.24)">{y}%</text>
         </g>;
       })}
       {series.map((s) => {
@@ -183,7 +183,7 @@ function PerformanceChart({ series, labels }: { series: { label: string; data: n
       {labels.map((lbl, i) => {
         const step = Math.floor(labels.length / 4);
         if (i !== 0 && i % step !== 0 && i !== labels.length - 1) return null;
-        return <text key={i} x={(i / (labels.length - 1)) * W} y={H + 12} textAnchor="middle" fontSize={7} fill="rgb(70,82,100)">{lbl}</text>;
+        return <text key={i} x={(i / (labels.length - 1)) * W} y={H + 12} textAnchor="middle" fontSize={7} fill="rgba(240,236,228,0.24)">{lbl}</text>;
       })}
     </svg>
   );
@@ -194,7 +194,7 @@ function PerformanceChart({ series, labels }: { series: { label: string; data: n
 function ScoreBar({ score, color }: { score: number; color: string }) {
   const pct = Math.min(Math.max(score, 0), 100);
   return (
-    <div style={{ height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', overflow: 'hidden', width: '100%' }}>
+    <div style={{ height: '3px', background: 'rgba(240,236,228,0.06)', borderRadius: '9999px', overflow: 'hidden', width: '100%' }}>
       <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${pct}%` }}
@@ -208,20 +208,20 @@ function ScoreBar({ score, color }: { score: number; color: string }) {
 // ── Status pill ───────────────────────────────────────────────────────────────
 
 const STATUS_CFG: Record<string, { label: string; color: string; bg: string }> = {
-  draft:              { label: 'Rascunho',     color: 'rgb(120,130,150)', bg: 'rgba(120,130,150,0.12)' },
+  draft:              { label: 'Rascunho',     color: 'rgba(240,236,228,0.42)', bg: 'rgba(120,130,150,0.12)' },
   pending:            { label: 'A aguardar',   color: 'rgb(245,158,11)',  bg: 'rgba(245,158,11,0.12)'  },
-  confirmed:          { label: 'Confirmado',   color: 'rgb(77,163,255)',  bg: 'rgba(77,163,255,0.12)'  },
-  payment_confirmed:  { label: 'Pago',         color: 'rgb(77,163,255)',  bg: 'rgba(77,163,255,0.12)'  },
-  approved:           { label: 'Aprovada',     color: 'rgb(99,230,190)',  bg: 'rgba(99,230,190,0.12)'  },
-  producing:          { label: 'Em produção',  color: 'rgb(116,231,255)', bg: 'rgba(116,231,255,0.12)' },
-  in_production:      { label: 'Em produção',  color: 'rgb(116,231,255)', bg: 'rgba(116,231,255,0.12)' },
-  shipped:            { label: 'Em trânsito',  color: 'rgb(77,163,255)',  bg: 'rgba(77,163,255,0.12)'  },
-  delivered:          { label: 'Entregue',     color: 'rgb(99,230,190)',  bg: 'rgba(99,230,190,0.12)'  },
+  confirmed:          { label: 'Confirmado',   color: '#d4b47a',  bg: 'rgba(154,124,74,0.12)'  },
+  payment_confirmed:  { label: 'Pago',         color: '#d4b47a',  bg: 'rgba(154,124,74,0.12)'  },
+  approved:           { label: 'Aprovada',     color: '#b8975e',  bg: 'rgba(184,151,94,0.12)'  },
+  producing:          { label: 'Em produção',  color: '#b8975e', bg: 'rgba(116,231,255,0.12)' },
+  in_production:      { label: 'Em produção',  color: '#b8975e', bg: 'rgba(116,231,255,0.12)' },
+  shipped:            { label: 'Em trânsito',  color: '#d4b47a',  bg: 'rgba(154,124,74,0.12)'  },
+  delivered:          { label: 'Entregue',     color: '#b8975e',  bg: 'rgba(184,151,94,0.12)'  },
   cancelled:          { label: 'Cancelado',    color: 'rgb(239,68,68)',   bg: 'rgba(239,68,68,0.12)'   },
 };
 
 function StatusPill({ status }: { status: string }) {
-  const cfg = STATUS_CFG[status] ?? { label: status, color: 'rgb(120,130,150)', bg: 'rgba(120,130,150,0.12)' };
+  const cfg = STATUS_CFG[status] ?? { label: status, color: 'rgba(240,236,228,0.42)', bg: 'rgba(120,130,150,0.12)' };
   return (
     <span style={{
       display: 'inline-block', padding: '0.18rem 0.5rem', borderRadius: '9999px',
@@ -233,18 +233,18 @@ function StatusPill({ status }: { status: string }) {
 // ── Static mock data ───────────────────────────────────────────────────────────
 
 const NOTIFS = [
-  { icon: '📦', title: 'Nova encomenda recebida', sub: '#YG-2024-1025', time: '2 min atrás', dot: 'rgb(77,163,255)' },
-  { icon: '🎨', title: 'Arte aprovada', sub: 'Logotipo "TechCorp"', time: '15 min atrás', dot: 'rgb(99,230,190)' },
-  { icon: '✅', title: 'Produção concluída', sub: '#YG-2024-1023', time: '1 hora atrás', dot: 'rgb(99,230,190)' },
-  { icon: '🚚', title: 'Entrega realizada', sub: '#YG-2024-1021', time: '2 horas atrás', dot: 'rgb(116,231,255)' },
+  { icon: '📦', title: 'Nova encomenda recebida', sub: '#YG-2024-1025', time: '2 min atrás', dot: '#d4b47a' },
+  { icon: '🎨', title: 'Arte aprovada', sub: 'Logotipo "TechCorp"', time: '15 min atrás', dot: '#b8975e' },
+  { icon: '✅', title: 'Produção concluída', sub: '#YG-2024-1023', time: '1 hora atrás', dot: '#b8975e' },
+  { icon: '🚚', title: 'Entrega realizada', sub: '#YG-2024-1021', time: '2 horas atrás', dot: '#b8975e' },
   { icon: '💶', title: 'Pagamento recebido', sub: '#YG-2024-1022', time: '3 horas atrás', dot: 'rgb(167,139,250)' },
 ];
 const TOP_PRODUCTS = [
-  { rank: 1, name: 'T-shirt Personalizada',  units: 350, revenue: '€4.850', color: 'rgb(99,230,190)' },
-  { rank: 2, name: 'Caneca Personalizada',    units: 260, revenue: '€3.360', color: 'rgb(77,163,255)' },
+  { rank: 1, name: 'T-shirt Personalizada',  units: 350, revenue: '€4.850', color: '#b8975e' },
+  { rank: 2, name: 'Caneca Personalizada',    units: 260, revenue: '€3.360', color: '#d4b47a' },
   { rank: 3, name: 'Saco Tote Personalizado', units: 220, revenue: '€2.420', color: 'rgb(245,158,11)' },
   { rank: 4, name: 'Garrafa Térmica',         units: 180, revenue: '€2.160', color: 'rgb(167,139,250)' },
-  { rank: 5, name: 'Hoodie Personalizado',    units: 150, revenue: '€3.750', color: 'rgb(116,231,255)' },
+  { rank: 5, name: 'Hoodie Personalizado',    units: 150, revenue: '€3.750', color: '#b8975e' },
 ];
 const MOCKUPS = [
   { client: 'TechSolutions - T-shirt',   time: 'Criada há 2 horas', ok: true  },
@@ -270,16 +270,16 @@ const FEATURES = [
 ];
 const PERF_LABELS = ['1 Mai','3','5','8','10','12','15','17','19','22','24','26','29 Mai'];
 const PERF_SERIES = [
-  { label: 'Qualidade',     data: [96,97,98,97,99,98,98,99,99,98,99,98,99], color: 'rgb(99,230,190)'  },
-  { label: 'Pontualidade',  data: [92,94,95,93,96,95,97,96,96,95,97,96,96], color: 'rgb(77,163,255)'  },
+  { label: 'Qualidade',     data: [96,97,98,97,99,98,98,99,99,98,99,98,99], color: '#b8975e'  },
+  { label: 'Pontualidade',  data: [92,94,95,93,96,95,97,96,96,95,97,96,96], color: '#d4b47a'  },
   { label: 'Produtividade', data: [88,90,93,91,94,92,95,94,94,93,95,94,94], color: 'rgb(167,139,250)' },
 ];
 
 // ── Supplier score color helper ────────────────────────────────────────────────
 
 function scoreColor(s: number): string {
-  if (s >= 85) return 'rgb(99,230,190)';
-  if (s >= 70) return 'rgb(77,163,255)';
+  if (s >= 85) return '#b8975e';
+  if (s >= 70) return '#d4b47a';
   if (s >= 55) return 'rgb(245,158,11)';
   return 'rgb(239,68,68)';
 }
@@ -289,14 +289,14 @@ function scoreColor(s: number): string {
 function slaStatusColor(dbColor: string): string {
   // Database colors from sla_definitions.color — normalize to our palette
   const c = (dbColor ?? '').toLowerCase();
-  if (c.includes('green') || c === '#10b981' || c === '#22c55e') return 'rgb(99,230,190)';
-  if (c.includes('blue')  || c === '#3b82f6' || c === '#60a5fa') return 'rgb(77,163,255)';
+  if (c.includes('green') || c === '#10b981' || c === '#22c55e') return '#b8975e';
+  if (c.includes('blue')  || c === '#3b82f6' || c === '#60a5fa') return '#d4b47a';
   if (c.includes('yellow')|| c === '#f59e0b' || c === '#eab308') return 'rgb(245,158,11)';
   if (c.includes('red')   || c === '#ef4444' || c === '#dc2626') return 'rgb(239,68,68)';
   if (c.includes('purple')|| c === '#8b5cf6') return 'rgb(167,139,250)';
-  if (c.includes('cyan')  || c === '#06b6d4') return 'rgb(116,231,255)';
+  if (c.includes('cyan')  || c === '#06b6d4') return '#b8975e';
   // Fallback: try to use the color directly if it's an RGB/hex value
-  return dbColor.startsWith('#') || dbColor.startsWith('rgb') ? dbColor : 'rgb(77,163,255)';
+  return dbColor.startsWith('#') || dbColor.startsWith('rgb') ? dbColor : '#d4b47a';
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -332,18 +332,18 @@ export function CommandCenter({
   const fmt = (n: number) => new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n);
 
   const kpis = [
-    { label: 'Receita (Mês)',      value: fmt(animRevenue),             trend: '+18,2% vs mês anterior',  color: 'rgb(77,163,255)',   icon: '📈', data: dailyRevenue },
-    { label: 'Encomendas (Mês)',   value: String(Math.round(animOrders)), trend: '+12,5% vs mês anterior', color: 'rgb(116,231,255)', icon: '📦', data: dailyRevenue.map((_, i) => i * 3 + 100) },
-    { label: 'Produção Ativa',     value: String(Math.round(animActive)), trend: 'Em produção agora',       color: 'rgb(99,230,190)',   icon: '🏭', data: null },
+    { label: 'Receita (Mês)',      value: fmt(animRevenue),             trend: '+18,2% vs mês anterior',  color: '#d4b47a',   icon: '📈', data: dailyRevenue },
+    { label: 'Encomendas (Mês)',   value: String(Math.round(animOrders)), trend: '+12,5% vs mês anterior', color: '#b8975e', icon: '📦', data: dailyRevenue.map((_, i) => i * 3 + 100) },
+    { label: 'Produção Ativa',     value: String(Math.round(animActive)), trend: 'Em produção agora',       color: '#b8975e',   icon: '🏭', data: null },
     { label: 'Entregas (Mês)',     value: String(Math.round(animDelivered)), trend: '+22% vs mês anterior', color: 'rgb(167,243,208)', icon: '🚚', data: dailyRevenue.map(v => v * 0.8) },
     { label: 'Receita Global',     value: fmt(animGlobalRev),           trend: 'Todas as transacções',     color: 'rgb(167,139,250)',  icon: '💰', data: null },
   ];
 
   const pipeSegs = [
     { label: 'Em produção',           value: Math.max(pipeline.producing ?? 0, 8),   color: 'rgb(245,158,11)'  },
-    { label: 'Aguardando aprovação',  value: Math.max(pipeline.pending ?? 0,   5),   color: 'rgb(116,231,255)' },
+    { label: 'Aguardando aprovação',  value: Math.max(pipeline.pending ?? 0,   5),   color: '#b8975e' },
     { label: 'Controlo de qualidade', value: Math.max(pipeline.confirmed ?? 0, 6),   color: 'rgb(239,68,68)'   },
-    { label: 'Prontas para envio',    value: Math.max(pipeline.shipped ?? 0,   4),   color: 'rgb(99,230,190)'  },
+    { label: 'Prontas para envio',    value: Math.max(pipeline.shipped ?? 0,   4),   color: '#b8975e'  },
   ];
   const pipeTotal = pipeSegs.reduce((s, g) => s + g.value, 0);
 
@@ -365,16 +365,16 @@ export function CommandCenter({
         ok: true,
       }))
     : [
-        { icon: '🎨', title: 'Verificação de Artes',    desc: 'Todas as artes aprovadas',  color: 'rgb(99,230,190)',  ok: true  },
-        { icon: '⚡', title: 'Otimização de Produção',  desc: '3 sugestões de otimização', color: 'rgb(77,163,255)',  ok: false },
-        { icon: '📅', title: 'Previsão de Entregas',    desc: '98% das entregas no prazo', color: 'rgb(77,163,255)',  ok: false },
-        { icon: '🖨️', title: 'Qualidade de Impressão', desc: 'Índice de qualidade: 98,5%',color: 'rgb(77,163,255)',  ok: false },
+        { icon: '🎨', title: 'Verificação de Artes',    desc: 'Todas as artes aprovadas',  color: '#b8975e',  ok: true  },
+        { icon: '⚡', title: 'Otimização de Produção',  desc: '3 sugestões de otimização', color: '#d4b47a',  ok: false },
+        { icon: '📅', title: 'Previsão de Entregas',    desc: '98% das entregas no prazo', color: '#d4b47a',  ok: false },
+        { icon: '🖨️', title: 'Qualidade de Impressão', desc: 'Índice de qualidade: 98,5%',color: '#d4b47a',  ok: false },
       ];
 
   const hasInventoryAlert = (inventoryAlerts?.total ?? 0) > 0;
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'rgb(7,17,31)' }}>
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#090907' }}>
 
       {/* ══ MAIN SCROLL ══ */}
       <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', minWidth: 0 }}>
@@ -382,37 +382,37 @@ export function CommandCenter({
         {/* Top bar */}
         <div style={{
           padding: '0.875rem 1.25rem',
-          borderBottom: '1px solid rgba(255,255,255,0.05)',
+          borderBottom: '1px solid rgba(240,236,228,0.06)',
           display: 'flex', alignItems: 'center', gap: '0.875rem',
-          background: 'rgba(7,17,31,0.9)', backdropFilter: 'blur(12px)',
+          background: 'rgba(9,9,7,0.9)', backdropFilter: 'blur(12px)',
           position: 'sticky', top: 0, zIndex: 10,
         }}>
           <div style={{ flexShrink: 0 }}>
-            <h1 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.025em', lineHeight: 1.2 }}>
+            <h1 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.025em', lineHeight: 1.2 }}>
               Olá, bem-vindo à Yourgift! 👋
             </h1>
-            <p style={{ fontSize: '0.68rem', color: 'rgb(80,92,110)' }}>
+            <p style={{ fontSize: '0.68rem', color: 'rgba(240,236,228,0.24)' }}>
               Aqui está o que está a acontecer com o teu negócio hoje.
             </p>
           </div>
 
           {/* Search */}
           <div style={{ flex: 1, position: 'relative', maxWidth: '360px' }}>
-            <svg style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'rgb(80,92,110)', pointerEvents: 'none' }}
+            <svg style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(240,236,228,0.24)', pointerEvents: 'none' }}
               width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
             <input type="text" placeholder="Pesquisar encomendas, clientes, produtos..." style={{
-              width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+              width: '100%', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)',
               borderRadius: '10px', padding: '0.45rem 2.5rem 0.45rem 2.125rem',
-              fontSize: '0.75rem', color: 'rgb(200,210,225)', outline: 'none',
+              fontSize: '0.75rem', color: 'rgba(240,236,228,0.72)', outline: 'none',
             }}
               onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(77,163,255,0.35)')}
-              onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)')}
+              onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(240,236,228,0.06)')}
             />
             <kbd style={{
               position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)',
-              fontSize: '0.55rem', color: 'rgb(80,92,110)', background: 'rgba(255,255,255,0.06)',
+              fontSize: '0.55rem', color: 'rgba(240,236,228,0.24)', background: 'rgba(240,236,228,0.06)',
               borderRadius: '4px', padding: '0.1rem 0.35rem', fontFamily: 'monospace',
             }}>⌘K</kbd>
           </div>
@@ -421,7 +421,7 @@ export function CommandCenter({
             {[['🔔', 12], ['✉️', 0], ['📅', 0], ['⚙️', 0]].map(([icon, badge], idx) => (
               <motion.button key={idx} type="button" whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }} style={{
                 position: 'relative', width: '32px', height: '32px', border: 'none', cursor: 'pointer',
-                background: 'rgba(255,255,255,0.05)', borderRadius: '8px', fontSize: '0.8rem',
+                background: 'rgba(240,236,228,0.06)', borderRadius: '8px', fontSize: '0.8rem',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 {icon}
@@ -438,10 +438,10 @@ export function CommandCenter({
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
             <Link href="/quotes/new" style={{
               display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
-              background: 'rgb(77,163,255)', color: '#fff',
+              background: '#d4b47a', color: '#fff',
               padding: '0.45rem 0.875rem', borderRadius: '9px',
               fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap',
-              boxShadow: '0 4px 12px rgba(77,163,255,0.3)',
+              boxShadow: '0 4px 12px rgba(154,124,74,0.28)',
             }}>
               + Nova Encomenda
             </Link>
@@ -505,14 +505,14 @@ export function CommandCenter({
                 transition={{ duration: 0.4, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
                 className="yg-card" style={{ padding: '0.75rem 0.875rem', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                  <span style={{ fontSize: '0.6rem', fontWeight: 600, color: 'rgb(100,112,130)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{kpi.label}</span>
+                  <span style={{ fontSize: '0.6rem', fontWeight: 600, color: 'rgba(240,236,228,0.42)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{kpi.label}</span>
                   <span style={{ fontSize: '0.9rem', opacity: 0.7 }}>{kpi.icon}</span>
                 </div>
                 <div style={{ fontSize: '1.25rem', fontWeight: 800, color: kpi.color, letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '0.25rem' }}>
                   {kpi.value}
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.58rem', color: 'rgb(99,230,190)' }}>▲ {kpi.trend}</span>
+                  <span style={{ fontSize: '0.58rem', color: '#b8975e' }}>▲ {kpi.trend}</span>
                   {kpi.data && <Sparkline data={kpi.data} color={kpi.color} width={55} height={22} />}
                 </div>
               </motion.div>
@@ -530,12 +530,12 @@ export function CommandCenter({
               {/* Total Clients */}
               <div style={{
                 padding: '0.625rem 0.875rem', borderRadius: '10px',
-                background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.05)',
+                background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(240,236,228,0.06)',
                 display: 'flex', alignItems: 'center', gap: '0.625rem',
               }}>
                 <span style={{ fontSize: '1.2rem' }}>👥</span>
                 <div>
-                  <div style={{ fontSize: '1rem', fontWeight: 800, color: 'rgb(77,163,255)', letterSpacing: '-0.03em', lineHeight: 1 }}>
+                  <div style={{ fontSize: '1rem', fontWeight: 800, color: '#d4b47a', letterSpacing: '-0.03em', lineHeight: 1 }}>
                     {Math.round(animTotalClients)}
                   </div>
                   <div style={{ fontSize: '0.58rem', color: 'rgb(90,102,120)', marginTop: '0.1rem' }}>Clientes Ativos</div>
@@ -545,7 +545,7 @@ export function CommandCenter({
               {/* Premium Clients */}
               <div style={{
                 padding: '0.625rem 0.875rem', borderRadius: '10px',
-                background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.05)',
+                background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(240,236,228,0.06)',
                 display: 'flex', alignItems: 'center', gap: '0.625rem',
               }}>
                 <span style={{ fontSize: '1.2rem' }}>💎</span>
@@ -562,14 +562,14 @@ export function CommandCenter({
                 padding: '0.625rem 0.875rem', borderRadius: '10px',
                 background: (inventoryAlerts?.critical ?? 0) > 0
                   ? 'rgba(239,68,68,0.06)' : 'rgba(255,255,255,0.025)',
-                border: `1px solid ${(inventoryAlerts?.critical ?? 0) > 0 ? 'rgba(239,68,68,0.18)' : 'rgba(255,255,255,0.05)'}`,
+                border: `1px solid ${(inventoryAlerts?.critical ?? 0) > 0 ? 'rgba(239,68,68,0.18)' : 'rgba(240,236,228,0.06)'}`,
                 display: 'flex', alignItems: 'center', gap: '0.625rem',
               }}>
                 <span style={{ fontSize: '1.2rem' }}>📦</span>
                 <div>
                   <div style={{
                     fontSize: '1rem', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1,
-                    color: (inventoryAlerts?.critical ?? 0) > 0 ? 'rgb(239,68,68)' : 'rgb(99,230,190)',
+                    color: (inventoryAlerts?.critical ?? 0) > 0 ? 'rgb(239,68,68)' : '#b8975e',
                   }}>
                     {inventoryAlerts?.critical ?? 0}
                   </div>
@@ -582,14 +582,14 @@ export function CommandCenter({
                 padding: '0.625rem 0.875rem', borderRadius: '10px',
                 background: (inventoryAlerts?.lowStock ?? 0) > 0
                   ? 'rgba(245,158,11,0.06)' : 'rgba(255,255,255,0.025)',
-                border: `1px solid ${(inventoryAlerts?.lowStock ?? 0) > 0 ? 'rgba(245,158,11,0.18)' : 'rgba(255,255,255,0.05)'}`,
+                border: `1px solid ${(inventoryAlerts?.lowStock ?? 0) > 0 ? 'rgba(245,158,11,0.18)' : 'rgba(240,236,228,0.06)'}`,
                 display: 'flex', alignItems: 'center', gap: '0.625rem',
               }}>
                 <span style={{ fontSize: '1.2rem' }}>⚠️</span>
                 <div>
                   <div style={{
                     fontSize: '1rem', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1,
-                    color: (inventoryAlerts?.lowStock ?? 0) > 0 ? 'rgb(245,158,11)' : 'rgb(99,230,190)',
+                    color: (inventoryAlerts?.lowStock ?? 0) > 0 ? 'rgb(245,158,11)' : '#b8975e',
                   }}>
                     {inventoryAlerts?.lowStock ?? 0}
                   </div>
@@ -607,8 +607,8 @@ export function CommandCenter({
               transition={{ duration: 0.5, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
               className="yg-card" style={{ padding: '0.875rem 1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Encomendas Recentes</h3>
-                <Link href="/orders" style={{ fontSize: '0.65rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}>Ver todas →</Link>
+                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f0ece4' }}>Encomendas Recentes</h3>
+                <Link href="/orders" style={{ fontSize: '0.65rem', color: '#d4b47a', textDecoration: 'none', fontWeight: 600 }}>Ver todas →</Link>
               </div>
               {displayOrders.map((order, i) => {
                 const clientName = order.order_items?.[0]?.products?.title ?? '—';
@@ -620,12 +620,12 @@ export function CommandCenter({
                       display: 'grid', gridTemplateColumns: '88px 1fr 44px 68px 82px',
                       alignItems: 'center', gap: '0.375rem',
                       padding: '0.4rem 0',
-                      borderBottom: i < displayOrders.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                      borderBottom: i < displayOrders.length - 1 ? '1px solid rgba(240,236,228,0.04)' : 'none',
                     }}>
-                    <span style={{ fontSize: '0.67rem', fontFamily: 'monospace', fontWeight: 700, color: 'rgb(200,210,225)' }}>{order.ref}</span>
+                    <span style={{ fontSize: '0.67rem', fontFamily: 'monospace', fontWeight: 700, color: 'rgba(240,236,228,0.72)' }}>{order.ref}</span>
                     <span style={{ fontSize: '0.67rem', color: 'rgb(110,122,140)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{clientName}</span>
                     <span style={{ fontSize: '0.67rem', color: 'rgb(90,102,120)' }}>{qty} Un.</span>
-                    <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgb(99,230,190)' }}>
+                    <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#b8975e' }}>
                       {order.total_amount ? `€${order.total_amount.toFixed(2).replace('.', ',')}` : '—'}
                     </span>
                     <StatusPill status={order.status} />
@@ -639,8 +639,8 @@ export function CommandCenter({
               transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
               className="yg-card" style={{ padding: '0.875rem 1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Produção — Pipeline</h3>
-                <Link href="/production" style={{ fontSize: '0.65rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}>Ver pipeline →</Link>
+                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f0ece4' }}>Produção — Pipeline</h3>
+                <Link href="/production" style={{ fontSize: '0.65rem', color: '#d4b47a', textDecoration: 'none', fontWeight: 600 }}>Ver pipeline →</Link>
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.75rem' }}>
                 <DonutChart segments={pipeSegs} total={pipeTotal} />
@@ -664,21 +664,21 @@ export function CommandCenter({
               transition={{ duration: 0.5, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
               className="yg-card" style={{ padding: '0.875rem 1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(245,247,251)', lineHeight: 1.3 }}>
+                <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: '#f0ece4', lineHeight: 1.3 }}>
                   {slaDefinitions && slaDefinitions.length > 0 ? 'Monitor SLA — Produção' : 'Sistema de Produção Inteligente'}
                 </h3>
                 <span style={{
                   fontSize: '0.55rem', fontWeight: 700,
-                  color: slaDefinitions && slaDefinitions.length > 0 ? 'rgb(116,231,255)' : 'rgb(99,230,190)',
-                  background: slaDefinitions && slaDefinitions.length > 0 ? 'rgba(116,231,255,0.1)' : 'rgba(99,230,190,0.1)',
-                  border: `1px solid ${slaDefinitions && slaDefinitions.length > 0 ? 'rgba(116,231,255,0.2)' : 'rgba(99,230,190,0.2)'}`,
+                  color: slaDefinitions && slaDefinitions.length > 0 ? '#b8975e' : '#b8975e',
+                  background: slaDefinitions && slaDefinitions.length > 0 ? 'rgba(184,151,94,0.10)' : 'rgba(184,151,94,0.10)',
+                  border: `1px solid ${slaDefinitions && slaDefinitions.length > 0 ? 'rgba(184,151,94,0.18)' : 'rgba(184,151,94,0.18)'}`,
                   borderRadius: '9999px', padding: '0.12rem 0.45rem', flexShrink: 0, marginLeft: '0.375rem',
                 }}>
                   {slaDefinitions && slaDefinitions.length > 0 ? `${slaDefinitions.length} Estágios` : 'IA Ativa'}
                 </span>
               </div>
               {slaItems.map((item, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', padding: '0.4rem 0', borderBottom: i < slaItems.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', padding: '0.4rem 0', borderBottom: i < slaItems.length - 1 ? '1px solid rgba(240,236,228,0.04)' : 'none' }}>
                   <div style={{
                     width: '28px', height: '28px', borderRadius: '8px', flexShrink: 0,
                     background: `${item.color}18`,
@@ -687,7 +687,7 @@ export function CommandCenter({
                   }}>{item.icon}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'rgb(200,215,235)', lineHeight: 1.3 }}>{item.title}</div>
-                    <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginTop: '0.1rem' }}>{item.desc}</div>
+                    <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.1rem' }}>{item.desc}</div>
                   </div>
                   <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.color, flexShrink: 0, marginTop: '0.35rem', boxShadow: `0 0 6px ${item.color}60` }} />
                 </div>
@@ -705,10 +705,10 @@ export function CommandCenter({
               style={{ padding: '0.875rem 1rem', marginBottom: '0.625rem' }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.625rem' }}>
-                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>
+                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f0ece4' }}>
                   Saúde dos Fornecedores — Score Global
                 </h3>
-                <Link href="/suppliers" style={{ fontSize: '0.65rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}>
+                <Link href="/suppliers" style={{ fontSize: '0.65rem', color: '#d4b47a', textDecoration: 'none', fontWeight: 600 }}>
                   Ver todos →
                 </Link>
               </div>
@@ -732,16 +732,16 @@ export function CommandCenter({
                         {s.supplier_name ?? `Fornecedor ${i + 1}`}
                       </div>
                       <div style={{ fontSize: '1.05rem', fontWeight: 800, color: col, letterSpacing: '-0.03em', lineHeight: 1, marginBottom: '0.35rem' }}>
-                        {sc}<span style={{ fontSize: '0.55rem', fontWeight: 500, color: 'rgb(80,92,110)' }}>/100</span>
+                        {sc}<span style={{ fontSize: '0.55rem', fontWeight: 500, color: 'rgba(240,236,228,0.24)' }}>/100</span>
                       </div>
                       <ScoreBar score={sc} color={col} />
                       {(s.quality_score != null || s.delivery_score != null) && (
                         <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.3rem' }}>
                           {s.quality_score != null && (
-                            <span style={{ fontSize: '0.55rem', color: 'rgb(80,92,110)' }}>Q: <span style={{ color: scoreColor(s.quality_score) }}>{Math.round(s.quality_score)}</span></span>
+                            <span style={{ fontSize: '0.55rem', color: 'rgba(240,236,228,0.24)' }}>Q: <span style={{ color: scoreColor(s.quality_score) }}>{Math.round(s.quality_score)}</span></span>
                           )}
                           {s.delivery_score != null && (
-                            <span style={{ fontSize: '0.55rem', color: 'rgb(80,92,110)' }}>E: <span style={{ color: scoreColor(s.delivery_score) }}>{Math.round(s.delivery_score)}</span></span>
+                            <span style={{ fontSize: '0.55rem', color: 'rgba(240,236,228,0.24)' }}>E: <span style={{ color: scoreColor(s.delivery_score) }}>{Math.round(s.delivery_score)}</span></span>
                           )}
                         </div>
                       )}
@@ -760,8 +760,8 @@ export function CommandCenter({
               transition={{ duration: 0.5, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
               className="yg-card" style={{ padding: '0.875rem 1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Top Produtos (Mês)</h3>
-                <Link href="/products" style={{ fontSize: '0.65rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}>Ver catálogo →</Link>
+                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f0ece4' }}>Top Produtos (Mês)</h3>
+                <Link href="/products" style={{ fontSize: '0.65rem', color: '#d4b47a', textDecoration: 'none', fontWeight: 600 }}>Ver catálogo →</Link>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 {TOP_PRODUCTS.map((p, i) => (
@@ -770,8 +770,8 @@ export function CommandCenter({
                     <span style={{ fontSize: '0.6rem', fontWeight: 800, color: p.color, width: '12px', textAlign: 'center' }}>{p.rank}</span>
                     <div style={{ width: '26px', height: '26px', borderRadius: '7px', background: `${p.color}15`, border: `1px solid ${p.color}25`, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem' }}>🎁</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: '0.68rem', fontWeight: 600, color: 'rgb(200,210,225)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
-                      <div style={{ fontSize: '0.58rem', color: 'rgb(80,92,110)' }}>{p.units} un.</div>
+                      <div style={{ fontSize: '0.68rem', fontWeight: 600, color: 'rgba(240,236,228,0.72)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                      <div style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)' }}>{p.units} un.</div>
                     </div>
                     <span style={{ fontSize: '0.68rem', fontWeight: 700, color: p.color }}>{p.revenue}</span>
                   </motion.div>
@@ -784,8 +784,8 @@ export function CommandCenter({
               transition={{ duration: 0.5, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
               className="yg-card" style={{ padding: '0.875rem 1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Performance de Produção</h3>
-                <Link href="/reports" style={{ fontSize: '0.65rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}>Ver relatório →</Link>
+                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f0ece4' }}>Performance de Produção</h3>
+                <Link href="/reports" style={{ fontSize: '0.65rem', color: '#d4b47a', textDecoration: 'none', fontWeight: 600 }}>Ver relatório →</Link>
               </div>
               <div style={{ paddingLeft: '20px' }}>
                 <PerformanceChart series={PERF_SERIES} labels={PERF_LABELS} />
@@ -806,23 +806,23 @@ export function CommandCenter({
               transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="yg-card" style={{ padding: '0.875rem 1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Maquetes Recentes</h3>
-                <Link href="/assets" style={{ fontSize: '0.65rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}>Ver todas →</Link>
+                <h3 style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f0ece4' }}>Maquetes Recentes</h3>
+                <Link href="/assets" style={{ fontSize: '0.65rem', color: '#d4b47a', textDecoration: 'none', fontWeight: 600 }}>Ver todas →</Link>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 {MOCKUPS.map((m, i) => (
                   <motion.div key={i} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 + i * 0.06 }}
                     style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <div style={{ width: '34px', height: '34px', borderRadius: '8px', flexShrink: 0, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem' }}>🎨</div>
+                    <div style={{ width: '34px', height: '34px', borderRadius: '8px', flexShrink: 0, background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem' }}>🎨</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: '0.68rem', fontWeight: 600, color: 'rgb(200,210,225)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.client}</div>
-                      <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)' }}>{m.time}</div>
+                      <div style={{ fontSize: '0.68rem', fontWeight: 600, color: 'rgba(240,236,228,0.72)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.client}</div>
+                      <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)' }}>{m.time}</div>
                     </div>
                     <span style={{
                       fontSize: '0.58rem', fontWeight: 700,
-                      color: m.ok ? 'rgb(99,230,190)' : 'rgb(245,158,11)',
-                      background: m.ok ? 'rgba(99,230,190,0.1)' : 'rgba(245,158,11,0.1)',
-                      border: `1px solid ${m.ok ? 'rgba(99,230,190,0.2)' : 'rgba(245,158,11,0.2)'}`,
+                      color: m.ok ? '#b8975e' : 'rgb(245,158,11)',
+                      background: m.ok ? 'rgba(184,151,94,0.10)' : 'rgba(245,158,11,0.1)',
+                      border: `1px solid ${m.ok ? 'rgba(184,151,94,0.18)' : 'rgba(245,158,11,0.2)'}`,
                       borderRadius: '9999px', padding: '0.12rem 0.4rem', whiteSpace: 'nowrap',
                     }}>{m.ok ? 'Aprovada' : 'Pendente'}</span>
                   </motion.div>
@@ -837,11 +837,11 @@ export function CommandCenter({
             {FEATURES.map((f) => (
               <div key={f.label} style={{
                 padding: '0.625rem 0.75rem', borderRadius: '10px',
-                background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)',
+                background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(240,236,228,0.06)',
               }}>
                 <span style={{ fontSize: '0.9rem', display: 'block', marginBottom: '0.25rem' }}>{f.icon}</span>
                 <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(190,200,220)', marginBottom: '0.2rem' }}>{f.label}</div>
-                <div style={{ fontSize: '0.58rem', color: 'rgb(70,82,100)', lineHeight: 1.4 }}>{f.desc}</div>
+                <div style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)', lineHeight: 1.4 }}>{f.desc}</div>
               </div>
             ))}
           </motion.div>
@@ -851,31 +851,31 @@ export function CommandCenter({
       {/* ══ RIGHT PANEL ══ */}
       <div style={{
         width: '260px', flexShrink: 0,
-        borderLeft: '1px solid rgba(255,255,255,0.06)',
-        background: 'rgb(8,15,28)',
+        borderLeft: '1px solid rgba(240,236,228,0.06)',
+        background: '#0f0f0c',
         overflowY: 'auto', overflowX: 'hidden',
         display: 'flex', flexDirection: 'column',
       }}>
         {/* Notificações */}
         <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          style={{ padding: '0.875rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          style={{ padding: '0.875rem', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Notificações</h3>
-            <button type="button" style={{ fontSize: '0.62rem', color: 'rgb(77,163,255)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Ver todas</button>
+            <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: '#f0ece4' }}>Notificações</h3>
+            <button type="button" style={{ fontSize: '0.62rem', color: '#d4b47a', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Ver todas</button>
           </div>
           {NOTIFS.map((n, i) => (
             <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 + i * 0.06 }}
               style={{
                 display: 'flex', gap: '0.5rem', alignItems: 'flex-start', padding: '0.4rem 0',
-                borderBottom: i < NOTIFS.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none',
+                borderBottom: i < NOTIFS.length - 1 ? '1px solid rgba(240,236,228,0.04)' : 'none',
               }}>
               <div style={{ width: '28px', height: '28px', borderRadius: '8px', flexShrink: 0, background: `${n.dot}18`, border: `1px solid ${n.dot}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}>{n.icon}</div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: '0.68rem', fontWeight: 600, color: 'rgb(210,225,240)', lineHeight: 1.3 }}>{n.title}</div>
-                <div style={{ fontSize: '0.58rem', color: 'rgb(80,92,110)', marginTop: '0.05rem' }}>{n.sub}</div>
+                <div style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.05rem' }}>{n.sub}</div>
               </div>
-              <span style={{ fontSize: '0.55rem', color: 'rgb(60,72,90)', flexShrink: 0, whiteSpace: 'nowrap' }}>{n.time}</span>
+              <span style={{ fontSize: '0.55rem', color: 'rgba(240,236,228,0.24)', flexShrink: 0, whiteSpace: 'nowrap' }}>{n.time}</span>
             </motion.div>
           ))}
         </motion.div>
@@ -883,15 +883,15 @@ export function CommandCenter({
         {/* Ações rápidas */}
         <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.35 }}
-          style={{ padding: '0.875rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '0.5rem' }}>Ações Rápidas</h3>
+          style={{ padding: '0.875rem', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
+          <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: '#f0ece4', marginBottom: '0.5rem' }}>Ações Rápidas</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.3rem' }}>
             {QUICK_ACTIONS.map((a) => (
               <Link key={a.label} href={a.href} style={{ textDecoration: 'none' }}>
                 <motion.div whileHover={{ scale: 1.04, y: -1 }} whileTap={{ scale: 0.96 }}
                   style={{
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem', padding: '0.5rem 0.25rem',
-                    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '9px', cursor: 'pointer', textAlign: 'center',
+                    background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '9px', cursor: 'pointer', textAlign: 'center',
                   }}>
                   <span style={{ fontSize: '1rem' }}>{a.icon}</span>
                   <span style={{ fontSize: '0.55rem', color: 'rgb(130,142,160)', lineHeight: 1.2, fontWeight: 500 }}>{a.label}</span>
@@ -904,15 +904,15 @@ export function CommandCenter({
         {/* Portfolio & Operational Stats */}
         <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.45 }}
-          style={{ padding: '0.875rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          style={{ padding: '0.875rem', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Portfolio — Visão Geral</h3>
+            <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: '#f0ece4' }}>Portfolio — Visão Geral</h3>
           </div>
           {[
             {
               icon: '👥', label: 'Clientes Totais',
               value: totalClients != null ? String(totalClients) : '—',
-              color: 'rgb(77,163,255)',
+              color: '#d4b47a',
             },
             {
               icon: '💎', label: 'Premium / Enterprise',
@@ -922,7 +922,7 @@ export function CommandCenter({
             {
               icon: '💰', label: 'Receita Global (Total)',
               value: allTimeRevenue != null ? fmt(allTimeRevenue) : '—',
-              color: 'rgb(99,230,190)',
+              color: '#b8975e',
             },
             {
               icon: '📋', label: 'Orçamentos Pendentes',
@@ -933,10 +933,10 @@ export function CommandCenter({
             <div key={row.label} style={{
               display: 'flex', alignItems: 'center', gap: '0.5rem',
               padding: '0.35rem 0',
-              borderBottom: '1px solid rgba(255,255,255,0.03)',
+              borderBottom: '1px solid rgba(240,236,228,0.04)',
             }}>
               <span style={{ fontSize: '0.85rem' }}>{row.icon}</span>
-              <span style={{ fontSize: '0.65rem', color: 'rgb(100,112,130)', flex: 1 }}>{row.label}</span>
+              <span style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.42)', flex: 1 }}>{row.label}</span>
               <span style={{ fontSize: '0.72rem', fontWeight: 700, color: row.color }}>{row.value}</span>
             </div>
           ))}
@@ -947,13 +947,13 @@ export function CommandCenter({
           transition={{ duration: 0.5, delay: 0.5 }}
           style={{ padding: '0.875rem', flex: 1 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.625rem' }}>
-            <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Armazenamento</h3>
-            <button type="button" style={{ fontSize: '0.62rem', color: 'rgb(77,163,255)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Ver todos →</button>
+            <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: '#f0ece4' }}>Armazenamento</h3>
+            <button type="button" style={{ fontSize: '0.62rem', color: '#d4b47a', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Ver todos →</button>
           </div>
           {[
-            { label: 'Logótipos',    used: '2.4 GB', pct: 42, color: 'rgb(77,163,255)',   icon: '🖼️' },
+            { label: 'Logótipos',    used: '2.4 GB', pct: 42, color: '#d4b47a',   icon: '🖼️' },
             { label: 'Maquetes',     used: '1.8 GB', pct: 31, color: 'rgb(167,139,250)', icon: '🎨' },
-            { label: 'Artes Finais', used: '4.2 GB', pct: 72, color: 'rgb(99,230,190)',  icon: '✅' },
+            { label: 'Artes Finais', used: '4.2 GB', pct: 72, color: '#b8975e',  icon: '✅' },
             { label: 'Documentos',   used: '1.1 GB', pct: 19, color: 'rgb(245,158,11)',  icon: '📄' },
           ].map((s) => (
             <div key={s.label} style={{ marginBottom: '0.5rem' }}>
@@ -962,22 +962,22 @@ export function CommandCenter({
                 <span style={{ fontSize: '0.68rem', color: 'rgb(150,162,180)', flex: 1 }}>{s.label}</span>
                 <span style={{ fontSize: '0.65rem', fontWeight: 600, color: s.color }}>{s.used}</span>
               </div>
-              <div style={{ height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
+              <div style={{ height: '3px', background: 'rgba(240,236,228,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
                 <motion.div initial={{ width: 0 }} animate={{ width: `${s.pct}%` }}
                   transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
                   style={{ height: '100%', background: s.color, borderRadius: '9999px' }} />
               </div>
             </div>
           ))}
-          <div style={{ marginTop: '0.75rem', padding: '0.625rem 0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '9px', border: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ marginTop: '0.75rem', padding: '0.625rem 0.75rem', background: 'rgba(240,236,228,0.04)', borderRadius: '9px', border: '1px solid rgba(240,236,228,0.06)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem' }}>
               <span style={{ fontSize: '0.62rem', color: 'rgb(90,102,120)' }}>Total utilizado: 9.5 GB / 50 GB</span>
-              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'rgb(77,163,255)' }}>19%</span>
+              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: '#d4b47a' }}>19%</span>
             </div>
-            <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
+            <div style={{ height: '4px', background: 'rgba(240,236,228,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
               <motion.div initial={{ width: 0 }} animate={{ width: '19%' }}
                 transition={{ duration: 1.2, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
-                style={{ height: '100%', borderRadius: '9999px', background: 'linear-gradient(90deg, rgb(77,163,255), rgb(99,230,190))' }} />
+                style={{ height: '100%', borderRadius: '9999px', background: 'linear-gradient(90deg, #d4b47a, #b8975e)' }} />
             </div>
           </div>
         </motion.div>
@@ -985,28 +985,28 @@ export function CommandCenter({
         {/* ── Phase 12: Analytics Quick View ─────────────────────────────────── */}
         <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.55 }}
-          style={{ padding: '0.875rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          style={{ padding: '0.875rem', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.625rem' }}>
-            <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(245,247,251)' }}>Analytics · 30 dias</h3>
-            <span style={{ fontSize: '0.58rem', color: 'rgb(77,163,255)', padding: '0.08rem 0.375rem', borderRadius: '9999px', background: 'rgba(77,163,255,0.1)', border: '1px solid rgba(77,163,255,0.2)' }}>LIVE</span>
+            <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: '#f0ece4' }}>Analytics · 30 dias</h3>
+            <span style={{ fontSize: '0.58rem', color: '#d4b47a', padding: '0.08rem 0.375rem', borderRadius: '9999px', background: 'rgba(154,124,74,0.10)', border: '1px solid rgba(154,124,74,0.18)' }}>LIVE</span>
           </div>
           {[
-            { label: 'Encomendas ativas', value: String(activeOrders), color: 'rgb(99,230,190)', icon: '📦' },
+            { label: 'Encomendas ativas', value: String(activeOrders), color: '#b8975e', icon: '📦' },
             { label: 'Orçamentos pendentes', value: String(pendingQuotes), color: 'rgb(245,158,11)', icon: '💬' },
-            { label: 'Receita este mês', value: `€${totalThisMonth >= 1000 ? (totalThisMonth / 1000).toFixed(1) + 'k' : totalThisMonth.toFixed(0)}`, color: 'rgb(77,163,255)', icon: '💰' },
+            { label: 'Receita este mês', value: `€${totalThisMonth >= 1000 ? (totalThisMonth / 1000).toFixed(1) + 'k' : totalThisMonth.toFixed(0)}`, color: '#d4b47a', icon: '💰' },
             ...(slaViolations != null && slaViolations > 0
               ? [{ label: 'SLA em violação', value: String(slaViolations), color: 'rgb(239,68,68)', icon: '⚠️' }]
-              : [{ label: 'SLA compliance', value: '100%', color: 'rgb(99,230,190)', icon: '✓' }]
+              : [{ label: 'SLA compliance', value: '100%', color: '#b8975e', icon: '✓' }]
             ),
           ].map((row) => (
-            <div key={row.label} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.35rem 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+            <div key={row.label} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.35rem 0', borderBottom: '1px solid rgba(240,236,228,0.04)' }}>
               <span style={{ fontSize: '0.75rem', flexShrink: 0 }}>{row.icon}</span>
-              <span style={{ fontSize: '0.65rem', color: 'rgb(120,130,150)', flex: 1 }}>{row.label}</span>
+              <span style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.42)', flex: 1 }}>{row.label}</span>
               <span style={{ fontSize: '0.72rem', fontWeight: 700, color: row.color }}>{row.value}</span>
             </div>
           ))}
           <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.375rem' }}>
-            <a href="/reports" style={{ flex: 1, fontSize: '0.62rem', fontWeight: 600, color: 'rgb(77,163,255)', textAlign: 'center', padding: '0.3rem', background: 'rgba(77,163,255,0.08)', borderRadius: '7px', textDecoration: 'none', border: '1px solid rgba(77,163,255,0.15)', display: 'block' }}>
+            <a href="/reports" style={{ flex: 1, fontSize: '0.62rem', fontWeight: 600, color: '#d4b47a', textAlign: 'center', padding: '0.3rem', background: 'rgba(154,124,74,0.08)', borderRadius: '7px', textDecoration: 'none', border: '1px solid rgba(154,124,74,0.14)', display: 'block' }}>
               Relatórios →
             </a>
           </div>

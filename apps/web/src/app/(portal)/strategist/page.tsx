@@ -41,8 +41,8 @@ function fmtEur(n: number) {
 }
 
 function SeverityDot({ s }: { s: string }) {
-  const colors: Record<string, string> = { success: 'rgb(99,230,190)', info: 'rgb(77,163,255)', warning: 'rgb(245,158,11)', critical: 'rgb(239,68,68)' };
-  return <span style={{ display: 'inline-block', width: '7px', height: '7px', borderRadius: '50%', background: colors[s] ?? 'rgb(140,155,175)', flexShrink: 0 }} />;
+  const colors: Record<string, string> = { success: '#b8975e', info: '#d4b47a', warning: 'rgb(245,158,11)', critical: 'rgb(239,68,68)' };
+  return <span style={{ display: 'inline-block', width: '7px', height: '7px', borderRadius: '50%', background: colors[s] ?? 'rgba(240,236,228,0.42)', flexShrink: 0 }} />;
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -164,10 +164,10 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
         {/* Header */}
         <motion.div variants={fadeUp(0)} initial="hidden" animate="visible" style={{ marginBottom: '1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '12px', background: 'linear-gradient(135deg,rgb(77,163,255),rgb(116,231,255))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0 }}>🧠</div>
+            <div style={{ width: '36px', height: '36px', borderRadius: '12px', background: 'linear-gradient(135deg,#d4b47a,#b8975e)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0 }}>🧠</div>
             <div>
-              <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em' }}>Estratega de Merchandising AI</h1>
-              <p style={{ fontSize: '0.72rem', color: 'rgb(80,92,110)' }}>Inteligência artificial ao serviço do teu procurement · S18 Omega Protocol</p>
+              <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em' }}>Estratega de Merchandising AI</h1>
+              <p style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.24)' }}>Inteligência artificial ao serviço do teu procurement · S18 Omega Protocol</p>
             </div>
           </div>
         </motion.div>
@@ -183,7 +183,7 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
 
               {/* Tab bar */}
-              <motion.div {...delayedFadeUp(0, 0.05)} style={{ display: 'flex', gap: '0.3rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '0.3rem' }}>
+              <motion.div {...delayedFadeUp(0, 0.05)} style={{ display: 'flex', gap: '0.3rem', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '12px', padding: '0.3rem' }}>
                 {TABS.map(tab => (
                   <motion.button
                     key={tab.id}
@@ -193,7 +193,7 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
                     style={{
                       flex: 1, padding: '0.4rem 0.5rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', border: 'none',
                       background: activeTab === tab.id ? 'rgba(77,163,255,0.16)' : 'transparent',
-                      color: activeTab === tab.id ? 'rgb(77,163,255)' : 'rgb(100,112,130)',
+                      color: activeTab === tab.id ? '#d4b47a' : 'rgba(240,236,228,0.42)',
                       transition: 'all 150ms',
                     }}
                   >
@@ -217,12 +217,12 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
                   {/* Insights tab */}
                   {activeTab === 'insights' && (
                     <div>
-                      <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(140,155,175)', marginBottom: '0.75rem', display: 'flex', justifyContent: 'space-between' }}>
+                      <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgba(240,236,228,0.42)', marginBottom: '0.75rem', display: 'flex', justifyContent: 'space-between' }}>
                         <span>INSIGHTS ACTIVOS</span>
-                        <span style={{ color: 'rgb(80,92,110)' }}>{insights.length} total</span>
+                        <span style={{ color: 'rgba(240,236,228,0.24)' }}>{insights.length} total</span>
                       </div>
                       {insights.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '2rem', color: 'rgb(80,92,110)', fontSize: '0.75rem' }}>Sem dados suficientes para gerar insights.<br/>Cria encomendas para activar a inteligência.</div>
+                        <div style={{ textAlign: 'center', padding: '2rem', color: 'rgba(240,236,228,0.24)', fontSize: '0.75rem' }}>Sem dados suficientes para gerar insights.<br/>Cria encomendas para activar a inteligência.</div>
                       ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
                           {insights.map((ins, i) => (
@@ -231,12 +231,12 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
                               initial={{ opacity: 0, x: -10 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ ...springSnappy, delay: i * 0.07 }}
-                              style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}
+                              style={{ padding: '0.75rem', background: 'rgba(240,236,228,0.04)', borderRadius: '10px', border: '1px solid rgba(240,236,228,0.06)' }}
                             >
                               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.3rem' }}>
                                 <SeverityDot s={ins.severity} />
-                                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgb(220,230,245)', flex: 1 }}>{ins.title}</span>
-                                {ins.value && <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'rgb(99,230,190)', flexShrink: 0 }}>{ins.value}</span>}
+                                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgba(240,236,228,0.75)', flex: 1 }}>{ins.title}</span>
+                                {ins.value && <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#b8975e', flexShrink: 0 }}>{ins.value}</span>}
                               </div>
                               <p style={{ fontSize: '0.68rem', color: 'rgb(120,132,150)', lineHeight: 1.5, marginLeft: '1rem' }}>{ins.body}</p>
                             </motion.div>
@@ -249,7 +249,7 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
                   {/* Memory tab */}
                   {activeTab === 'memory' && (
                     <div>
-                      <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(140,155,175)', marginBottom: '0.75rem' }}>MEMÓRIA DE PROCUREMENT</div>
+                      <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgba(240,236,228,0.42)', marginBottom: '0.75rem' }}>MEMÓRIA DE PROCUREMENT</div>
                       {memory ? (
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
                           {[
@@ -257,18 +257,18 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
                             { label: 'Valor médio', value: fmtEur(memory.avgOrderValue) },
                             { label: 'Intervalo médio', value: memory.avgDaysBetweenOrders > 0 ? `${memory.avgDaysBetweenOrders} dias` : 'N/A' },
                             { label: 'Receita 30 dias', value: fmtEur(memory.last30Revenue) },
-                            { label: 'Tendência spend', value: memory.spendTrend >= 0 ? `+${memory.spendTrend}%` : `${memory.spendTrend}%`, color: memory.spendTrend >= 0 ? 'rgb(99,230,190)' : 'rgb(239,68,68)' },
+                            { label: 'Tendência spend', value: memory.spendTrend >= 0 ? `+${memory.spendTrend}%` : `${memory.spendTrend}%`, color: memory.spendTrend >= 0 ? '#b8975e' : 'rgb(239,68,68)' },
                             { label: 'Conversão orçamentos', value: `${memory.quoteConversionRate}%` },
                             { label: 'Próxima encomenda', value: memory.nextOrderDue ?? 'Sem padrão', span: true },
                           ].map((item, i) => (
-                            <div key={item.label} style={{ padding: '0.625rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', gridColumn: ('span' in item && item.span) ? 'span 2' : 'span 1' }}>
-                              <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>{item.label}</div>
-                              <div style={{ fontSize: '0.82rem', fontWeight: 800, color: ('color' in item && item.color) ? item.color : 'rgb(77,163,255)', letterSpacing: '-0.02em' }}>{item.value}</div>
+                            <div key={item.label} style={{ padding: '0.625rem', background: 'rgba(240,236,228,0.04)', borderRadius: '8px', gridColumn: ('span' in item && item.span) ? 'span 2' : 'span 1' }}>
+                              <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>{item.label}</div>
+                              <div style={{ fontSize: '0.82rem', fontWeight: 800, color: ('color' in item && item.color) ? item.color : '#d4b47a', letterSpacing: '-0.02em' }}>{item.value}</div>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <div style={{ textAlign: 'center', padding: '2rem', color: 'rgb(80,92,110)', fontSize: '0.75rem' }}>Dados de memória indisponíveis.</div>
+                        <div style={{ textAlign: 'center', padding: '2rem', color: 'rgba(240,236,228,0.24)', fontSize: '0.75rem' }}>Dados de memória indisponíveis.</div>
                       )}
                     </div>
                   )}
@@ -276,19 +276,19 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
                   {/* Forecast tab */}
                   {activeTab === 'forecast' && (
                     <div>
-                      <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(140,155,175)', marginBottom: '0.75rem', display: 'flex', justifyContent: 'space-between' }}>
+                      <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgba(240,236,228,0.42)', marginBottom: '0.75rem', display: 'flex', justifyContent: 'space-between' }}>
                         <span>PREVISÃO 4 SEMANAS</span>
-                        {forecast && <span style={{ color: forecast.trend === 'crescimento' ? 'rgb(99,230,190)' : forecast.trend === 'queda' ? 'rgb(239,68,68)' : 'rgb(77,163,255)', fontWeight: 700 }}>↗ {forecast.trend}</span>}
+                        {forecast && <span style={{ color: forecast.trend === 'crescimento' ? '#b8975e' : forecast.trend === 'queda' ? 'rgb(239,68,68)' : '#d4b47a', fontWeight: 700 }}>↗ {forecast.trend}</span>}
                       </div>
                       {forecast ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                           {forecast.forecast.map((w, i) => (
                             <motion.div key={w.week} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ ...springSnappy, delay: i * 0.08 }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.2rem' }}>
-                                <span style={{ fontSize: '0.68rem', color: 'rgb(140,155,175)' }}>{w.label}</span>
+                                <span style={{ fontSize: '0.68rem', color: 'rgba(240,236,228,0.42)' }}>{w.label}</span>
                                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                  <span style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>conf. {w.confidence}%</span>
-                                  <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(99,230,190)' }}>{fmtEur(w.adjustedPredicted)}</span>
+                                  <span style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)' }}>conf. {w.confidence}%</span>
+                                  <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#b8975e' }}>{fmtEur(w.adjustedPredicted)}</span>
                                 </div>
                               </div>
                               <div className="prog-track">
@@ -302,12 +302,12 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
                               </div>
                             </motion.div>
                           ))}
-                          <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.06)', fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>
+                          <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(240,236,228,0.06)', fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)' }}>
                             Pipeline contribui: {fmtEur(forecast.pipelineContribution)}/semana
                           </div>
                         </div>
                       ) : (
-                        <div style={{ textAlign: 'center', padding: '2rem', color: 'rgb(80,92,110)', fontSize: '0.75rem' }}>Dados insuficientes para previsão.</div>
+                        <div style={{ textAlign: 'center', padding: '2rem', color: 'rgba(240,236,228,0.24)', fontSize: '0.75rem' }}>Dados insuficientes para previsão.</div>
                       )}
                     </div>
                   )}
@@ -315,25 +315,25 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
                   {/* Catalogue tab */}
                   {activeTab === 'catalogue' && (
                     <div>
-                      <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(140,155,175)', marginBottom: '0.75rem' }}>PRODUTOS RECOMENDADOS</div>
+                      <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgba(240,236,228,0.42)', marginBottom: '0.75rem' }}>PRODUTOS RECOMENDADOS</div>
                       {products.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '2rem', color: 'rgb(80,92,110)', fontSize: '0.75rem' }}>Catálogo indisponível.</div>
+                        <div style={{ textAlign: 'center', padding: '2rem', color: 'rgba(240,236,228,0.24)', fontSize: '0.75rem' }}>Catálogo indisponível.</div>
                       ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                           {products.slice(0, 8).map((p, i) => (
                             <motion.div key={p.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springSnappy, delay: i * 0.05 }}
-                              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0.625rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', cursor: 'pointer', transition: 'background 150ms' }}
-                              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(77,163,255,0.08)')}
-                              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.03)')}
+                              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0.625rem', background: 'rgba(240,236,228,0.04)', borderRadius: '8px', cursor: 'pointer', transition: 'background 150ms' }}
+                              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(154,124,74,0.08)')}
+                              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(240,236,228,0.04)')}
                               onClick={() => sendMessage(`Fala-me sobre o produto "${p.name}" e quando seria adequado para a minha empresa.`)}
                             >
                               <div style={{ minWidth: 0 }}>
-                                <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'rgb(210,220,235)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
-                                {p.category && <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)' }}>{p.category}</div>}
+                                <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'rgba(240,236,228,0.72)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
+                                {p.category && <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)' }}>{p.category}</div>}
                               </div>
                               <div style={{ flexShrink: 0, textAlign: 'right' }}>
-                                {p.unit_price && <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(77,163,255)' }}>{fmtEur(p.unit_price)}</div>}
-                                {p.min_qty && <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)' }}>mín. {p.min_qty}</div>}
+                                {p.unit_price && <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#d4b47a' }}>{fmtEur(p.unit_price)}</div>}
+                                {p.min_qty && <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)' }}>mín. {p.min_qty}</div>}
                               </div>
                             </motion.div>
                           ))}
@@ -349,19 +349,19 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
             {/* RIGHT: AI Chat */}
             <motion.div {...delayedFadeUp(1, 0.06)} className="yg-card" style={{ display: 'flex', flexDirection: 'column', height: '580px' }}>
               {/* Chat header */}
-              <div style={{ padding: '1rem 1.125rem', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: 'linear-gradient(135deg,rgb(77,163,255),rgb(99,230,190))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', flexShrink: 0 }}>🧠</div>
+              <div style={{ padding: '1rem 1.125rem', borderBottom: '1px solid rgba(240,236,228,0.06)', display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: 'linear-gradient(135deg,#d4b47a,#b8975e)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', flexShrink: 0 }}>🧠</div>
                 <div>
-                  <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'rgb(220,230,245)' }}>Estratega AI</div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'rgba(240,236,228,0.75)' }}>Estratega AI</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                     <span className="status-pulse status-pulse-green" style={{ width: '5px', height: '5px' }} />
-                    <span style={{ fontSize: '0.6rem', color: 'rgb(99,230,190)' }}>Claude · Online</span>
+                    <span style={{ fontSize: '0.6rem', color: '#b8975e' }}>Claude · Online</span>
                   </div>
                 </div>
               </div>
 
               {/* Quick prompts */}
-              <div style={{ padding: '0.625rem 1rem', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
+              <div style={{ padding: '0.625rem 1rem', borderBottom: '1px solid rgba(240,236,228,0.06)', display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
                 {QUICK_PROMPTS.map(qp => (
                   <motion.button
                     key={qp.label}
@@ -369,9 +369,9 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
                     whileTap={tapScale}
                     onClick={() => sendMessage(qp.prompt)}
                     disabled={chatLoading}
-                    style={{ fontSize: '0.62rem', fontWeight: 600, padding: '0.2rem 0.45rem', borderRadius: '7px', cursor: 'pointer', background: 'rgba(255,255,255,0.05)', color: 'rgb(140,155,175)', border: '1px solid rgba(255,255,255,0.08)', transition: 'all 150ms', whiteSpace: 'nowrap' }}
-                    onMouseEnter={e => { (e.currentTarget.style.background = 'rgba(77,163,255,0.1)'); (e.currentTarget.style.color = 'rgb(77,163,255)'); }}
-                    onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(255,255,255,0.05)'); (e.currentTarget.style.color = 'rgb(140,155,175)'); }}
+                    style={{ fontSize: '0.62rem', fontWeight: 600, padding: '0.2rem 0.45rem', borderRadius: '7px', cursor: 'pointer', background: 'rgba(240,236,228,0.06)', color: 'rgba(240,236,228,0.42)', border: '1px solid rgba(240,236,228,0.06)', transition: 'all 150ms', whiteSpace: 'nowrap' }}
+                    onMouseEnter={e => { (e.currentTarget.style.background = 'rgba(154,124,74,0.10)'); (e.currentTarget.style.color = '#d4b47a'); }}
+                    onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(240,236,228,0.06)'); (e.currentTarget.style.color = 'rgba(240,236,228,0.42)'); }}
                   >
                     {qp.label}
                   </motion.button>
@@ -392,8 +392,8 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
                       maxWidth: '85%',
                       padding: '0.625rem 0.875rem',
                       borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
-                      background: msg.role === 'user' ? 'rgba(77,163,255,0.2)' : 'rgba(255,255,255,0.05)',
-                      border: msg.role === 'user' ? '1px solid rgba(77,163,255,0.3)' : '1px solid rgba(255,255,255,0.08)',
+                      background: msg.role === 'user' ? 'rgba(154,124,74,0.18)' : 'rgba(240,236,228,0.06)',
+                      border: msg.role === 'user' ? '1px solid rgba(154,124,74,0.28)' : '1px solid rgba(240,236,228,0.06)',
                       fontSize: '0.75rem',
                       color: msg.role === 'user' ? 'rgb(220,235,255)' : 'rgb(200,215,235)',
                       lineHeight: 1.55,
@@ -406,7 +406,7 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
                 {chatLoading && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', gap: '4px', alignItems: 'center', padding: '0.5rem' }}>
                     {[0, 1, 2].map(i => (
-                      <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgb(77,163,255)', animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite` }} />
+                      <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#d4b47a', animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite` }} />
                     ))}
                   </motion.div>
                 )}
@@ -414,7 +414,7 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
               </div>
 
               {/* Input */}
-              <div style={{ padding: '0.75rem 1rem', borderTop: '1px solid rgba(255,255,255,0.07)', display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
+              <div style={{ padding: '0.75rem 1rem', borderTop: '1px solid rgba(240,236,228,0.06)', display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
                 <textarea
                   ref={inputRef}
                   value={chatInput}
@@ -424,11 +424,11 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
                   disabled={chatLoading}
                   rows={2}
                   style={{
-                    flex: 1, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '10px',
-                    padding: '0.5rem 0.75rem', fontSize: '0.78rem', color: 'rgb(220,230,245)', outline: 'none', resize: 'none',
+                    flex: 1, background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '10px',
+                    padding: '0.5rem 0.75rem', fontSize: '0.78rem', color: 'rgba(240,236,228,0.75)', outline: 'none', resize: 'none',
                     transition: 'border-color 150ms', lineHeight: 1.45,
                   }}
-                  onFocus={e => (e.currentTarget.style.borderColor = 'rgba(77,163,255,0.4)')}
+                  onFocus={e => (e.currentTarget.style.borderColor = 'rgba(154,124,74,0.35)')}
                   onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.09)')}
                 />
                 <motion.button
@@ -438,7 +438,7 @@ Responde sempre em Português (PT-PT). Sê estratégico, quantitativo e accioná
                   disabled={!chatInput.trim() || chatLoading}
                   style={{
                     width: '40px', height: '40px', borderRadius: '10px', border: 'none', cursor: chatInput.trim() && !chatLoading ? 'pointer' : 'not-allowed',
-                    background: chatInput.trim() && !chatLoading ? 'rgb(77,163,255)' : 'rgba(77,163,255,0.25)',
+                    background: chatInput.trim() && !chatLoading ? '#d4b47a' : 'rgba(154,124,74,0.22)',
                     color: '#fff', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                     transition: 'all 150ms',
                   }}

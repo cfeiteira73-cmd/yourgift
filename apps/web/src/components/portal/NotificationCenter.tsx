@@ -124,10 +124,10 @@ export function NotificationCenter() {
           width: 32, height: 32,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           borderRadius: 8,
-          background: open ? 'rgba(255,255,255,0.08)' : 'transparent',
+          background: open ? 'rgba(240,236,228,0.06)' : 'transparent',
           border: 'none',
           cursor: 'pointer',
-          color: 'rgb(140,155,175)',
+          color: 'rgba(240,236,228,0.42)',
           transition: 'all 0.15s',
         }}
         aria-label="Notificações"
@@ -165,7 +165,7 @@ export function NotificationCenter() {
               position: 'absolute', right: 0, top: 40,
               width: 360,
               background: '#0e1015',
-              border: '1px solid rgba(255,255,255,0.1)',
+              border: '1px solid rgba(240,236,228,0.10)',
               borderRadius: 16,
               boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
               zIndex: 200,
@@ -176,7 +176,7 @@ export function NotificationCenter() {
             <div style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '12px 16px',
-              borderBottom: '1px solid rgba(255,255,255,0.06)',
+              borderBottom: '1px solid rgba(240,236,228,0.06)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ color: 'white', fontSize: 12, fontWeight: 600 }}>Notificações</span>
@@ -206,13 +206,13 @@ export function NotificationCenter() {
             {/* Notification list */}
             <div style={{ maxHeight: 420, overflowY: 'auto' }}>
               {loading && notifications.length === 0 ? (
-                <div style={{ padding: '32px 16px', textAlign: 'center', color: 'rgba(255,255,255,0.25)', fontSize: 11 }}>
+                <div style={{ padding: '32px 16px', textAlign: 'center', color: 'rgba(240,236,228,0.22)', fontSize: 11 }}>
                   A carregar…
                 </div>
               ) : notifications.length === 0 ? (
                 <div style={{ padding: '32px 16px', textAlign: 'center' }}>
                   <div style={{ fontSize: 24, marginBottom: 8 }}>🔔</div>
-                  <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11 }}>Sem notificações</p>
+                  <p style={{ color: 'rgba(240,236,228,0.28)', fontSize: 11 }}>Sem notificações</p>
                 </div>
               ) : notifications.map((n) => (
                 <motion.div
@@ -220,7 +220,7 @@ export function NotificationCenter() {
                   layout
                   style={{
                     padding: '10px 16px',
-                    borderBottom: '1px solid rgba(255,255,255,0.04)',
+                    borderBottom: '1px solid rgba(240,236,228,0.04)',
                     background: n.read_at ? 'transparent' : 'rgba(77,163,255,0.04)',
                     cursor: 'pointer',
                   }}
@@ -230,7 +230,7 @@ export function NotificationCenter() {
                     <div style={{
                       width: 6, height: 6, borderRadius: '50%',
                       marginTop: 5, flexShrink: 0,
-                      background: n.read_at ? 'rgba(255,255,255,0.1)' : (PRIORITY_DOT[n.priority] ?? 'rgba(255,255,255,0.2)'),
+                      background: n.read_at ? 'rgba(240,236,228,0.10)' : (PRIORITY_DOT[n.priority] ?? 'rgba(240,236,228,0.18)'),
                     }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -242,7 +242,7 @@ export function NotificationCenter() {
                           {n.title}
                         </p>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                          <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 9 }}>
+                          <span style={{ color: 'rgba(240,236,228,0.18)', fontSize: 9 }}>
                             {timeAgo(n.created_at)}
                           </span>
                           <button
@@ -250,7 +250,7 @@ export function NotificationCenter() {
                             onClick={e => { e.stopPropagation(); dismiss(n.id); }}
                             style={{
                               background: 'none', border: 'none', cursor: 'pointer',
-                              color: 'rgba(255,255,255,0.2)', fontSize: 12, padding: '0 2px',
+                              color: 'rgba(240,236,228,0.18)', fontSize: 12, padding: '0 2px',
                               lineHeight: 1,
                             }}
                           >×</button>
@@ -283,11 +283,11 @@ export function NotificationCenter() {
             {/* Footer */}
             <div style={{
               padding: '8px 16px',
-              borderTop: '1px solid rgba(255,255,255,0.06)',
+              borderTop: '1px solid rgba(240,236,228,0.06)',
               display: 'flex', justifyContent: 'center',
             }}>
               <a href="/activity" onClick={() => setOpen(false)}
-                style={{ color: 'rgba(255,255,255,0.3)', fontSize: 10, textDecoration: 'none' }}>
+                style={{ color: 'rgba(240,236,228,0.28)', fontSize: 10, textDecoration: 'none' }}>
                 Ver toda a actividade →
               </a>
             </div>

@@ -34,7 +34,7 @@ function CapacityBar({ used, capacity, criticalCount, warningCount }: {
   used: number; capacity: number; criticalCount: number; warningCount: number;
 }) {
   const pct = Math.min(100, capacity > 0 ? (used / capacity) * 100 : 0);
-  const color = pct > 90 ? 'rgb(239,68,68)' : pct > 70 ? 'rgb(245,158,11)' : 'rgb(99,230,190)';
+  const color = pct > 90 ? 'rgb(239,68,68)' : pct > 70 ? 'rgb(245,158,11)' : '#b8975e';
   return (
     <div style={{ marginTop: 8 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
@@ -45,7 +45,7 @@ function CapacityBar({ used, capacity, criticalCount, warningCount }: {
           {Math.round(pct)}%
         </span>
       </div>
-      <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 9999, overflow: 'hidden' }}>
+      <div style={{ height: 4, background: 'rgba(240,236,228,0.06)', borderRadius: 9999, overflow: 'hidden' }}>
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
@@ -95,7 +95,7 @@ export function ManufacturingHeatmap({ stages, loading }: ManufacturingHeatmapPr
             ? 'rgba(239,68,68,0.35)'
             : hasWarning
             ? 'rgba(245,158,11,0.3)'
-            : 'rgba(255,255,255,0.07)';
+            : 'rgba(240,236,228,0.06)';
 
           // Heatmap background: intensity drives opacity
           const heatBg = hasCritical
@@ -132,7 +132,7 @@ export function ManufacturingHeatmap({ stages, loading }: ManufacturingHeatmapPr
                   animate={{ scale: 1, opacity: 1 }}
                   style={{
                     fontSize: 20, fontWeight: 800,
-                    color: hasCritical ? 'rgb(239,68,68)' : hasWarning ? 'rgb(245,158,11)' : 'rgb(245,247,251)',
+                    color: hasCritical ? 'rgb(239,68,68)' : hasWarning ? 'rgb(245,158,11)' : '#f0ece4',
                   }}
                 >
                   {stage.count}
@@ -158,7 +158,7 @@ export function ManufacturingHeatmap({ stages, loading }: ManufacturingHeatmapPr
 
               {/* Avg hours */}
               {stage.avgHours > 0 && (
-                <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 6 }}>
+                <p style={{ fontSize: 10, color: 'rgba(240,236,228,0.22)', marginTop: 6 }}>
                   Média {stage.avgHours.toFixed(1)}h em estágio
                 </p>
               )}
@@ -172,7 +172,7 @@ export function ManufacturingHeatmap({ stages, loading }: ManufacturingHeatmapPr
         {stages.map((stage, i) => {
           const pct = Math.round((stage.count / (stages.reduce((s, x) => s + x.count, 0) || 1)) * 100);
           const hasCritical = stage.criticalCount > 0;
-          const color = hasCritical ? 'rgb(239,68,68)' : stage.warningCount > 0 ? 'rgb(245,158,11)' : 'rgba(77,163,255,0.7)';
+          const color = hasCritical ? 'rgb(239,68,68)' : stage.warningCount > 0 ? 'rgb(245,158,11)' : 'rgba(184,151,94,0.55)';
           return (
             <div key={stage.key} style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
               <div style={{
@@ -180,12 +180,12 @@ export function ManufacturingHeatmap({ stages, loading }: ManufacturingHeatmapPr
                 gap: 2, minWidth: 60,
               }}>
                 <div style={{ height: 3, background: color, borderRadius: 9999, width: `${Math.max(8, pct * 0.8)}px`, transition: 'width 0.5s ease' }} />
-                <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: 9, color: 'rgba(240,236,228,0.28)', whiteSpace: 'nowrap' }}>
                   {stage.label.slice(0, 8)} ({stage.count})
                 </span>
               </div>
               {i < stages.length - 1 && (
-                <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: 10 }}>→</span>
+                <span style={{ color: 'rgba(240,236,228,0.14)', fontSize: 10 }}>→</span>
               )}
             </div>
           );
@@ -217,13 +217,13 @@ export function SLATimeline({ items }: SLATimelineProps) {
       {items.map((item, i) => {
         const elapsedPct = (item.hoursElapsed / maxH) * 100;
         const expectedPct = (item.hoursExpected / maxH) * 100;
-        const barColor = item.status === 'critical' ? 'rgb(239,68,68)' : item.status === 'warning' ? 'rgb(245,158,11)' : 'rgb(77,163,255)';
+        const barColor = item.status === 'critical' ? 'rgb(239,68,68)' : item.status === 'warning' ? 'rgb(245,158,11)' : '#d4b47a';
         return (
           <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, minWidth: 28 }}>
             {/* Expected line */}
             <div style={{ width: '100%', display: 'flex', justifyContent: 'center', flex: 1, alignItems: 'flex-end', position: 'relative' }}>
               <div style={{
-                width: '40%', background: 'rgba(255,255,255,0.1)', borderRadius: '2px 2px 0 0',
+                width: '40%', background: 'rgba(240,236,228,0.10)', borderRadius: '2px 2px 0 0',
                 height: `${expectedPct}%`, position: 'absolute', bottom: 0,
               }} />
               <motion.div
@@ -236,7 +236,7 @@ export function SLATimeline({ items }: SLATimelineProps) {
                 }}
               />
             </div>
-            <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.3)', textAlign: 'center', lineHeight: 1.2 }}>
+            <span style={{ fontSize: 8, color: 'rgba(240,236,228,0.28)', textAlign: 'center', lineHeight: 1.2 }}>
               {item.label.slice(0, 6)}
             </span>
           </div>

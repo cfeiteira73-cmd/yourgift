@@ -49,13 +49,13 @@ function SystemHealthRing({ score }: { score: number }) {
   return (
     <div className="flex flex-col items-center gap-1">
       <svg width={100} height={100} viewBox="0 0 100 100">
-        <circle cx={50} cy={50} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={8} />
+        <circle cx={50} cy={50} r={r} fill="none" stroke="rgba(240,236,228,0.06)" strokeWidth={8} />
         <circle cx={50} cy={50} r={r} fill="none" stroke={color} strokeWidth={8}
           strokeDasharray={circ} strokeDashoffset={offset}
           strokeLinecap="round" transform="rotate(-90 50 50)"
           style={{ transition: 'stroke-dashoffset 1.2s ease', filter: `drop-shadow(0 0 8px ${color}40)` }} />
         <text x={50} y={46} textAnchor="middle" fill="white" fontSize={20} fontWeight="700">{score}</text>
-        <text x={50} y={60} textAnchor="middle" fontSize={7} fill="rgba(255,255,255,0.4)">{label}</text>
+        <text x={50} y={60} textAnchor="middle" fontSize={7} fill="rgba(240,236,228,0.35)">{label}</text>
       </svg>
     </div>
   );

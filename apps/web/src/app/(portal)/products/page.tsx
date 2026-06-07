@@ -51,7 +51,7 @@ export default async function ProductsPage({
       {/* CSS hover effects — cannot use event handlers in RSC */}
       <style>{`
         .product-card-link:hover {
-          border-color: rgba(77,163,255,0.25) !important;
+          border-color: rgba(154,124,74,0.22) !important;
           background: rgba(77,163,255,0.05) !important;
         }
       `}</style>
@@ -64,10 +64,10 @@ export default async function ProductsPage({
           marginBottom: '1.75rem', flexWrap: 'wrap', gap: '1rem',
         }}>
           <div>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
               Catálogo
             </h1>
-            <p style={{ fontSize: '0.8rem', color: 'rgb(80,92,110)' }}>
+            <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.24)' }}>
               {total > 0
                 ? <>{total.toLocaleString('pt-PT')} produtos disponíveis</>
                 : 'Explora o nosso catálogo de merchandising'}
@@ -76,7 +76,7 @@ export default async function ProductsPage({
           <Link
             href="/quotes/new"
             style={{
-              background: 'linear-gradient(135deg, rgb(77,163,255), rgb(116,100,255))',
+              background: 'linear-gradient(135deg, #d4b47a, rgb(116,100,255))',
               color: '#fff',
               padding: '0.5rem 1.125rem',
               borderRadius: '10px',
@@ -86,7 +86,7 @@ export default async function ProductsPage({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.375rem',
-              boxShadow: '0 4px 16px rgba(77,163,255,0.25)',
+              boxShadow: '0 4px 16px rgba(154,124,74,0.22)',
             }}
           >
             + Pedir Orçamento
@@ -102,16 +102,16 @@ export default async function ProductsPage({
         {products.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '6rem 2rem' }}>
             <p style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔍</p>
-            <p style={{ fontSize: '1.125rem', fontWeight: 600, color: 'rgb(245,247,251)', marginBottom: '0.5rem' }}>
+            <p style={{ fontSize: '1.125rem', fontWeight: 600, color: '#f0ece4', marginBottom: '0.5rem' }}>
               Nenhum produto encontrado
             </p>
-            <p style={{ fontSize: '0.875rem', color: 'rgb(120,130,150)', marginBottom: '1.5rem' }}>
+            <p style={{ fontSize: '0.875rem', color: 'rgba(240,236,228,0.42)', marginBottom: '1.5rem' }}>
               Tenta ajustar os filtros de pesquisa.
             </p>
             <Link
               href="/products"
               style={{
-                color: 'rgb(77,163,255)',
+                color: '#d4b47a',
                 fontSize: '0.875rem',
                 fontWeight: 600,
                 textDecoration: 'none',
@@ -142,8 +142,8 @@ export default async function ProductsPage({
                     className="product-card-link"
                     style={{
                       display: 'block',
-                      background: 'rgba(255,255,255,0.03)',
-                      border: '1px solid rgba(255,255,255,0.06)',
+                      background: 'rgba(240,236,228,0.04)',
+                      border: '1px solid rgba(240,236,228,0.06)',
                       borderRadius: '14px',
                       overflow: 'hidden',
                       textDecoration: 'none',
@@ -153,7 +153,7 @@ export default async function ProductsPage({
                     {/* Image */}
                     <div style={{
                       aspectRatio: '1',
-                      background: 'rgba(255,255,255,0.04)',
+                      background: 'rgba(240,236,228,0.04)',
                       overflow: 'hidden',
                       display: 'flex',
                       alignItems: 'center',
@@ -178,18 +178,18 @@ export default async function ProductsPage({
 
                     {/* Info */}
                     <div style={{ padding: '0.75rem' }}>
-                      <p style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)', marginBottom: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <p style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)', marginBottom: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {product.supplierRef}
                       </p>
                       <p style={{
-                        fontSize: '0.75rem', fontWeight: 600, color: 'rgb(200,210,225)',
+                        fontSize: '0.75rem', fontWeight: 600, color: 'rgba(240,236,228,0.72)',
                         lineHeight: 1.35, marginBottom: '0.5rem',
                         display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
                       }}>
                         {product.title}
                       </p>
-                      <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgb(77,163,255)' }}>
+                      <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#d4b47a' }}>
                         Sob consulta
                       </p>
                     </div>
@@ -206,12 +206,12 @@ export default async function ProductsPage({
                     href={`/products?${new URLSearchParams({ ...searchParams, page: String(currentPage - 1) })}`}
                     style={{
                       padding: '0.4rem 1rem',
-                      background: 'rgba(255,255,255,0.04)',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'rgba(240,236,228,0.04)',
+                      border: '1px solid rgba(240,236,228,0.06)',
                       borderRadius: '9px',
                       fontSize: '0.8rem',
                       fontWeight: 600,
-                      color: 'rgb(160,170,190)',
+                      color: 'rgba(240,236,228,0.58)',
                       textDecoration: 'none',
                       transition: 'border-color 150ms ease',
                     }}
@@ -219,7 +219,7 @@ export default async function ProductsPage({
                     ← Anterior
                   </Link>
                 )}
-                <span style={{ fontSize: '0.8rem', color: 'rgb(80,92,110)', padding: '0 0.75rem' }}>
+                <span style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.24)', padding: '0 0.75rem' }}>
                   Página {currentPage} de {totalPages}
                 </span>
                 {currentPage < totalPages && (
@@ -227,12 +227,12 @@ export default async function ProductsPage({
                     href={`/products?${new URLSearchParams({ ...searchParams, page: String(currentPage + 1) })}`}
                     style={{
                       padding: '0.4rem 1rem',
-                      background: 'rgba(255,255,255,0.04)',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'rgba(240,236,228,0.04)',
+                      border: '1px solid rgba(240,236,228,0.06)',
                       borderRadius: '9px',
                       fontSize: '0.8rem',
                       fontWeight: 600,
-                      color: 'rgb(160,170,190)',
+                      color: 'rgba(240,236,228,0.58)',
                       textDecoration: 'none',
                       transition: 'border-color 150ms ease',
                     }}

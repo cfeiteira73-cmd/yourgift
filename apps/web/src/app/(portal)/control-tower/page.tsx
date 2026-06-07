@@ -82,7 +82,7 @@ function HealthGauge({ score }: { score: number }) {
   return (
     <div className="flex flex-col items-center">
       <svg width={90} height={90} viewBox="0 0 90 90">
-        <circle cx={45} cy={45} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={7} />
+        <circle cx={45} cy={45} r={r} fill="none" stroke="rgba(240,236,228,0.06)" strokeWidth={7} />
         <circle cx={45} cy={45} r={r} fill="none" stroke={color} strokeWidth={7}
           strokeDasharray={circ} strokeDashoffset={offset}
           strokeLinecap="round" transform="rotate(-90 45 45)"

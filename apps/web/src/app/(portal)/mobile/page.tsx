@@ -39,12 +39,12 @@ const EVENT_ICONS: Record<string, string> = {
 };
 
 const QUICK_ACTIONS = [
-  { label: 'Nova Encomenda', href: '/orders/new', emoji: '📦', color: 'rgb(77,163,255)' },
-  { label: 'Orçamento',     href: '/quotes/new',  emoji: '📋', color: 'rgb(116,231,255)' },
-  { label: 'Cockpit',       href: '/cockpit',     emoji: '🎯', color: 'rgb(99,230,190)' },
+  { label: 'Nova Encomenda', href: '/orders/new', emoji: '📦', color: '#d4b47a' },
+  { label: 'Orçamento',     href: '/quotes/new',  emoji: '📋', color: '#b8975e' },
+  { label: 'Cockpit',       href: '/cockpit',     emoji: '🎯', color: '#b8975e' },
   { label: 'Estratega AI',  href: '/strategist',  emoji: '🧠', color: 'rgb(167,139,250)' },
   { label: 'Produção',      href: '/production',  emoji: '⚙️', color: 'rgb(245,158,11)' },
-  { label: 'Relatórios',    href: '/reports',     emoji: '📊', color: 'rgb(99,230,190)' },
+  { label: 'Relatórios',    href: '/reports',     emoji: '📊', color: '#b8975e' },
 ];
 
 export default function MobileCommandPage() {
@@ -109,10 +109,10 @@ export default function MobileCommandPage() {
   };
 
   const kpis = summary ? [
-    { label: 'Receita 30d',    value: fmtEur(summary.totalRevenue), color: 'rgb(99,230,190)',  icon: '💰' },
-    { label: 'Encomendas',     value: String(summary.totalOrders),   color: 'rgb(77,163,255)',  icon: '📦' },
+    { label: 'Receita 30d',    value: fmtEur(summary.totalRevenue), color: '#b8975e',  icon: '💰' },
+    { label: 'Encomendas',     value: String(summary.totalOrders),   color: '#d4b47a',  icon: '📦' },
     { label: 'Activas',        value: String(summary.activeOrders),  color: 'rgb(245,158,11)', icon: '⚙️' },
-    { label: 'Orçamentos',     value: String(summary.totalQuotes),   color: 'rgb(116,231,255)', icon: '📋' },
+    { label: 'Orçamentos',     value: String(summary.totalQuotes),   color: '#b8975e', icon: '📋' },
   ] : [];
 
   return (
@@ -130,7 +130,7 @@ export default function MobileCommandPage() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: '40px' }}
               exit={{ opacity: 0, height: 0 }}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgb(77,163,255)', fontSize: '0.72rem', fontWeight: 600 }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d4b47a', fontSize: '0.72rem', fontWeight: 600 }}
             >
               <span className="animate-spin-slow" style={{ marginRight: '0.5rem', display: 'inline-block' }}>↻</span>
               A actualizar…
@@ -140,10 +140,10 @@ export default function MobileCommandPage() {
 
         {/* Greeting */}
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={springSnappy} style={{ marginBottom: '1.25rem' }}>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em' }}>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em' }}>
             Olá{client?.name ? `, ${client.name.split(' ')[0]}` : ''}! 👋
           </h1>
-          <p style={{ fontSize: '0.72rem', color: 'rgb(80,92,110)' }}>
+          <p style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.24)' }}>
             {new Date().toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
         </motion.div>
@@ -168,7 +168,7 @@ export default function MobileCommandPage() {
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: `linear-gradient(90deg,transparent,${kpi.color},transparent)` }} />
                 <div style={{ fontSize: '1.1rem', marginBottom: '0.25rem' }}>{kpi.icon}</div>
                 <div style={{ fontSize: '1.3rem', fontWeight: 800, color: kpi.color, letterSpacing: '-0.035em', lineHeight: 1 }}>{kpi.value}</div>
-                <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginTop: '0.2rem' }}>{kpi.label}</div>
+                <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.2rem' }}>{kpi.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -176,7 +176,7 @@ export default function MobileCommandPage() {
 
         {/* Quick actions grid */}
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springSnappy, delay: 0.15 }} style={{ marginBottom: '1.25rem' }}>
-          <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgb(80,92,110)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.625rem' }}>
+          <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.625rem' }}>
             Ações Rápidas
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
@@ -188,8 +188,8 @@ export default function MobileCommandPage() {
                     style={{
                       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                       padding: '0.875rem 0.5rem', borderRadius: '14px', gap: '0.35rem',
-                      background: 'linear-gradient(180deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.02) 100%)',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'linear-gradient(180deg,rgba(240,236,228,0.06) 0%,rgba(255,255,255,0.02) 100%)',
+                      border: '1px solid rgba(240,236,228,0.06)',
                       cursor: 'pointer', textAlign: 'center',
                     }}
                   >
@@ -204,9 +204,9 @@ export default function MobileCommandPage() {
 
         {/* Recent activity */}
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springSnappy, delay: 0.28 }}>
-          <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgb(80,92,110)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.625rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.625rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>Actividade Recente</span>
-            <Link href="/cockpit" style={{ fontSize: '0.65rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 700 }}>Ver tudo →</Link>
+            <Link href="/cockpit" style={{ fontSize: '0.65rem', color: '#d4b47a', textDecoration: 'none', fontWeight: 700 }}>Ver tudo →</Link>
           </div>
           <div className="yg-card" style={{ overflow: 'hidden' }}>
             {loading ? (
@@ -214,7 +214,7 @@ export default function MobileCommandPage() {
                 {[1,2,3].map(i => <div key={i} className="skeleton skeleton-text" style={{ marginBottom: '0.5rem' }} />)}
               </div>
             ) : activity.length === 0 ? (
-              <div style={{ padding: '2rem', textAlign: 'center', color: 'rgb(80,92,110)', fontSize: '0.75rem' }}>Sem actividade recente.</div>
+              <div style={{ padding: '2rem', textAlign: 'center', color: 'rgba(240,236,228,0.24)', fontSize: '0.75rem' }}>Sem actividade recente.</div>
             ) : (
               activity.slice(0, 8).map((ev, i) => (
                 <motion.div
@@ -225,17 +225,17 @@ export default function MobileCommandPage() {
                   style={{
                     display: 'flex', alignItems: 'flex-start', gap: '0.625rem',
                     padding: '0.625rem 0.875rem',
-                    borderBottom: i < activity.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                    borderBottom: i < activity.length - 1 ? '1px solid rgba(240,236,228,0.06)' : 'none',
                   }}
                 >
                   <div style={{ fontSize: '0.85rem', flexShrink: 0 }}>{EVENT_ICONS[ev.type] ?? '●'}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: '0.7rem', color: 'rgb(200,215,235)', lineHeight: 1.35, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.description}</div>
                     {ev.amount && ev.amount > 0 && (
-                      <div style={{ fontSize: '0.62rem', color: 'rgb(99,230,190)', fontWeight: 700 }}>{fmtEur(ev.amount)}</div>
+                      <div style={{ fontSize: '0.62rem', color: '#b8975e', fontWeight: 700 }}>{fmtEur(ev.amount)}</div>
                     )}
                   </div>
-                  <div style={{ fontSize: '0.58rem', color: 'rgb(60,72,90)', flexShrink: 0 }}>{fmtTime(ev.timestamp)}</div>
+                  <div style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)', flexShrink: 0 }}>{fmtTime(ev.timestamp)}</div>
                 </motion.div>
               ))
             )}

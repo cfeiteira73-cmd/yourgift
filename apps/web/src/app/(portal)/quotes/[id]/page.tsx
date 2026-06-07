@@ -76,7 +76,7 @@ function Skeleton({ w, h }: { w: string; h: string }) {
         width: w,
         height: h,
         borderRadius: '6px',
-        background: 'rgba(255,255,255,0.05)',
+        background: 'rgba(240,236,228,0.06)',
         animation: 'pulse 1.5s ease-in-out infinite',
       }}
     />
@@ -212,7 +212,7 @@ export default function QuoteDetailPage() {
           <p style={{ color: 'rgb(239,68,68)', fontSize: '0.875rem', marginBottom: '1rem' }}>
             {error || 'Orçamento não encontrado.'}
           </p>
-          <Link href="/dashboard" style={{ color: 'rgb(77,163,255)', fontSize: '0.875rem', textDecoration: 'none' }}>
+          <Link href="/dashboard" style={{ color: '#d4b47a', fontSize: '0.875rem', textDecoration: 'none' }}>
             ← Dashboard
           </Link>
         </div>
@@ -237,12 +237,12 @@ export default function QuoteDetailPage() {
     : null;
 
   const statusIconColor: Record<string, string> = {
-    draft:     'rgb(120,130,150)',
-    submitted: 'rgb(77,163,255)',
+    draft:     'rgba(240,236,228,0.42)',
+    submitted: '#d4b47a',
     pricing:   'rgb(245,158,11)',
-    approved:  'rgb(99,230,190)',
+    approved:  '#b8975e',
     rejected:  'rgb(239,68,68)',
-    converted: 'rgb(116,231,255)',
+    converted: '#b8975e',
   };
 
   return (
@@ -257,7 +257,7 @@ export default function QuoteDetailPage() {
         {/* Breadcrumb */}
         <Link
           href="/dashboard"
-          style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.375rem', marginBottom: '1.5rem' }}
+          style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.375rem', marginBottom: '1.5rem' }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 18l-6-6 6-6" />
@@ -269,12 +269,12 @@ export default function QuoteDetailPage() {
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.375rem', flexWrap: 'wrap' }}>
-              <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.02em', fontFamily: 'monospace' }}>
+              <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.02em', fontFamily: 'monospace' }}>
                 {quote.ref}
               </h1>
               <StatusBadge status={quote.status} type="quote" />
             </div>
-            <p style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)' }}>
+            <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)' }}>
               Criado em{' '}
               {new Date(quote.created_at).toLocaleDateString('pt-PT', {
                 day: 'numeric',
@@ -317,20 +317,20 @@ export default function QuoteDetailPage() {
               width: '10px',
               height: '10px',
               borderRadius: '50%',
-              background: statusIconColor[quote.status] ?? 'rgb(120,130,150)',
+              background: statusIconColor[quote.status] ?? 'rgba(240,236,228,0.42)',
               flexShrink: 0,
               ...(quote.status === 'submitted' || quote.status === 'pricing'
                 ? { animation: 'pulse 2s ease-in-out infinite' }
                 : {}),
             }}
           />
-          <p style={{ fontSize: '0.875rem', color: 'rgb(245,247,251)', lineHeight: 1.5 }}>
+          <p style={{ fontSize: '0.875rem', color: '#f0ece4', lineHeight: 1.5 }}>
             {explanation}
             {quote.status === 'converted' && quote.converted_order_ref && (
               <> {' '}
                 <Link
                   href={`/orders`}
-                  style={{ color: 'rgb(116,231,255)', textDecoration: 'underline', textUnderlineOffset: '2px', fontWeight: 600 }}
+                  style={{ color: '#b8975e', textDecoration: 'underline', textUnderlineOffset: '2px', fontWeight: 600 }}
                 >
                   {quote.converted_order_ref}
                 </Link>
@@ -352,8 +352,8 @@ export default function QuoteDetailPage() {
 
             {/* Items table */}
             <div className="yg-card" style={{ overflow: 'hidden' }}>
-              <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <h2 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(120,130,150)' }}>
+              <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
+                <h2 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)' }}>
                   Produtos
                 </h2>
               </div>
@@ -364,14 +364,14 @@ export default function QuoteDetailPage() {
                 style={{
                   gridTemplateColumns: '1fr 80px 120px 100px 100px',
                   padding: '0.625rem 1.25rem',
-                  borderBottom: '1px solid rgba(255,255,255,0.04)',
+                  borderBottom: '1px solid rgba(240,236,228,0.04)',
                   gap: '0.5rem',
                 }}
               >
                 {['Produto', 'Qtd.', 'Técnica', 'Preço unit.', 'Total'].map((h) => (
                   <span
                     key={h}
-                    style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgb(120,130,150)' }}
+                    style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)' }}
                   >
                     {h}
                   </span>
@@ -379,7 +379,7 @@ export default function QuoteDetailPage() {
               </div>
 
               {items.length === 0 ? (
-                <div style={{ padding: '2rem', textAlign: 'center', color: 'rgb(120,130,150)', fontSize: '0.875rem' }}>
+                <div style={{ padding: '2rem', textAlign: 'center', color: 'rgba(240,236,228,0.42)', fontSize: '0.875rem' }}>
                   Nenhum produto no orçamento.
                 </div>
               ) : (
@@ -391,7 +391,7 @@ export default function QuoteDetailPage() {
                     <div
                       key={idx}
                       style={{
-                        borderBottom: idx < items.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                        borderBottom: idx < items.length - 1 ? '1px solid rgba(240,236,228,0.04)' : 'none',
                       }}
                     >
                       {/* Desktop */}
@@ -404,7 +404,7 @@ export default function QuoteDetailPage() {
                           alignItems: 'center',
                         }}
                       >
-                        <span style={{ fontSize: '0.875rem', fontWeight: 500, color: 'rgb(245,247,251)' }}>
+                        <span style={{ fontSize: '0.875rem', fontWeight: 500, color: '#f0ece4' }}>
                           {item.product_title}
                         </span>
                         <span style={{ fontSize: '0.875rem', color: 'rgb(170,180,198)' }}>{item.quantity}</span>
@@ -412,7 +412,7 @@ export default function QuoteDetailPage() {
                         <span style={{ fontSize: '0.875rem', color: 'rgb(170,180,198)' }}>
                           {item.unit_price != null ? formatPrice(item.unit_price) : '—'}
                         </span>
-                        <span style={{ fontSize: '0.875rem', fontWeight: 600, color: rowTotal != null ? 'rgb(99,230,190)' : 'rgb(120,130,150)' }}>
+                        <span style={{ fontSize: '0.875rem', fontWeight: 600, color: rowTotal != null ? '#b8975e' : 'rgba(240,236,228,0.42)' }}>
                           {rowTotal != null ? formatPrice(rowTotal) : '—'}
                         </span>
                       </div>
@@ -422,14 +422,14 @@ export default function QuoteDetailPage() {
                         className="flex flex-col md:hidden"
                         style={{ padding: '0.875rem 1rem', gap: '0.25rem' }}
                       >
-                        <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'rgb(245,247,251)' }}>
+                        <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#f0ece4' }}>
                           {item.product_title}
                         </p>
-                        <p style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)' }}>
+                        <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)' }}>
                           {item.quantity} un. · {tech}
                         </p>
                         {rowTotal != null && (
-                          <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'rgb(99,230,190)' }}>
+                          <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#b8975e' }}>
                             {formatPrice(rowTotal)}
                           </p>
                         )}
@@ -443,35 +443,35 @@ export default function QuoteDetailPage() {
             {/* Additional details */}
             {(quote.event_date || quote.delivery_date || quote.notes || (quote.artwork_urls?.length ?? 0) > 0) && (
               <div className="yg-card" style={{ padding: '1.5rem' }}>
-                <h2 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '1rem' }}>
+                <h2 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '1rem' }}>
                   Detalhes
                 </h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
                   {quote.event_date && (
                     <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.875rem' }}>
-                      <span style={{ color: 'rgb(120,130,150)', minWidth: '130px' }}>Data do evento</span>
-                      <span style={{ color: 'rgb(245,247,251)' }}>
+                      <span style={{ color: 'rgba(240,236,228,0.42)', minWidth: '130px' }}>Data do evento</span>
+                      <span style={{ color: '#f0ece4' }}>
                         {new Date(quote.event_date).toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </span>
                     </div>
                   )}
                   {quote.delivery_date && (
                     <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.875rem' }}>
-                      <span style={{ color: 'rgb(120,130,150)', minWidth: '130px' }}>Entrega pretendida</span>
-                      <span style={{ color: 'rgb(245,247,251)' }}>
+                      <span style={{ color: 'rgba(240,236,228,0.42)', minWidth: '130px' }}>Entrega pretendida</span>
+                      <span style={{ color: '#f0ece4' }}>
                         {new Date(quote.delivery_date).toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </span>
                     </div>
                   )}
                   {quote.notes && (
                     <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.875rem' }}>
-                      <span style={{ color: 'rgb(120,130,150)', minWidth: '130px', flexShrink: 0 }}>Notas</span>
+                      <span style={{ color: 'rgba(240,236,228,0.42)', minWidth: '130px', flexShrink: 0 }}>Notas</span>
                       <span style={{ color: 'rgb(170,180,198)', lineHeight: 1.5 }}>{quote.notes}</span>
                     </div>
                   )}
                   {(quote.artwork_urls?.length ?? 0) > 0 && (
                     <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.875rem' }}>
-                      <span style={{ color: 'rgb(120,130,150)', minWidth: '130px', flexShrink: 0 }}>Artes</span>
+                      <span style={{ color: 'rgba(240,236,228,0.42)', minWidth: '130px', flexShrink: 0 }}>Artes</span>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                         {quote.artwork_urls!.map((url, i) => (
                           <a
@@ -479,7 +479,7 @@ export default function QuoteDetailPage() {
                             href={url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            style={{ color: 'rgb(77,163,255)', textDecoration: 'underline', textUnderlineOffset: '2px', fontSize: '0.8rem' }}
+                            style={{ color: '#d4b47a', textDecoration: 'underline', textUnderlineOffset: '2px', fontSize: '0.8rem' }}
                           >
                             Ficheiro {i + 1}
                           </a>
@@ -502,7 +502,7 @@ export default function QuoteDetailPage() {
 
             {/* Action card */}
             <div className="yg-card" style={{ padding: '1.25rem' }}>
-              <h3 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(120,130,150)', marginBottom: '0.875rem' }}>
+              <h3 style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)', marginBottom: '0.875rem' }}>
                 Ação
               </h3>
 
@@ -522,8 +522,8 @@ export default function QuoteDetailPage() {
                     fontSize: '0.875rem',
                     fontWeight: 700,
                     cursor: actionLoading ? 'not-allowed' : 'pointer',
-                    background: actionLoading ? 'rgba(77,163,255,0.4)' : 'rgb(77,163,255)',
-                    color: 'rgb(7,17,31)',
+                    background: actionLoading ? 'rgba(154,124,74,0.35)' : '#d4b47a',
+                    color: '#090907',
                     border: 'none',
                     display: 'flex',
                     alignItems: 'center',
@@ -532,7 +532,7 @@ export default function QuoteDetailPage() {
                   }}
                 >
                   {actionLoading ? (
-                    <><div style={{ width: '14px', height: '14px', border: '2px solid rgba(7,17,31,0.3)', borderTopColor: 'rgb(7,17,31)', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />A submeter...</>
+                    <><div style={{ width: '14px', height: '14px', border: '2px solid rgba(7,17,31,0.3)', borderTopColor: '#090907', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />A submeter...</>
                   ) : 'Submeter para análise'}
                 </button>
               )}
@@ -550,9 +550,9 @@ export default function QuoteDetailPage() {
                     borderRadius: '10px',
                     fontSize: '0.875rem',
                     fontWeight: 700,
-                    background: 'rgba(77,163,255,0.1)',
-                    color: 'rgb(77,163,255)',
-                    border: '1px solid rgba(77,163,255,0.25)',
+                    background: 'rgba(154,124,74,0.10)',
+                    color: '#d4b47a',
+                    border: '1px solid rgba(154,124,74,0.22)',
                     textDecoration: 'none',
                     boxSizing: 'border-box',
                   }}
@@ -573,8 +573,8 @@ export default function QuoteDetailPage() {
                     fontSize: '0.875rem',
                     fontWeight: 700,
                     cursor: actionLoading ? 'not-allowed' : 'pointer',
-                    background: actionLoading ? 'rgba(99,230,190,0.4)' : 'rgb(99,230,190)',
-                    color: 'rgb(7,17,31)',
+                    background: actionLoading ? 'rgba(99,230,190,0.4)' : '#b8975e',
+                    color: '#090907',
                     border: 'none',
                     display: 'flex',
                     alignItems: 'center',
@@ -583,15 +583,15 @@ export default function QuoteDetailPage() {
                   }}
                 >
                   {actionLoading ? (
-                    <><div style={{ width: '14px', height: '14px', border: '2px solid rgba(7,17,31,0.3)', borderTopColor: 'rgb(7,17,31)', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />A processar...</>
+                    <><div style={{ width: '14px', height: '14px', border: '2px solid rgba(7,17,31,0.3)', borderTopColor: '#090907', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />A processar...</>
                   ) : 'Confirmar Encomenda →'}
                 </button>
               )}
 
               {(quote.status === 'submitted' || quote.status === 'pricing') && (
                 <div style={{ textAlign: 'center', padding: '0.5rem 0' }}>
-                  <div style={{ width: '20px', height: '20px', border: '2px solid rgba(77,163,255,0.3)', borderTopColor: 'rgb(77,163,255)', borderRadius: '50%', animation: 'spin 1.4s linear infinite', margin: '0 auto 0.5rem' }} />
-                  <p style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)' }}>A aguardar resposta...</p>
+                  <div style={{ width: '20px', height: '20px', border: '2px solid rgba(154,124,74,0.28)', borderTopColor: '#d4b47a', borderRadius: '50%', animation: 'spin 1.4s linear infinite', margin: '0 auto 0.5rem' }} />
+                  <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)' }}>A aguardar resposta...</p>
                 </div>
               )}
 
@@ -632,9 +632,9 @@ export default function QuoteDetailPage() {
                     fontSize: '0.875rem',
                     fontWeight: 600,
                     textDecoration: 'none',
-                    background: 'rgba(116,231,255,0.1)',
-                    border: '1px solid rgba(116,231,255,0.2)',
-                    color: 'rgb(116,231,255)',
+                    background: 'rgba(184,151,94,0.10)',
+                    border: '1px solid rgba(184,151,94,0.18)',
+                    color: '#b8975e',
                     textAlign: 'center',
                   }}
                 >
@@ -643,10 +643,10 @@ export default function QuoteDetailPage() {
               )}
 
               {/* Contact support always visible */}
-              <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(240,236,228,0.06)' }}>
                 <a
                   href="mailto:hello@yourgift.pt"
-                  style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.375rem', justifyContent: 'center' }}
+                  style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.375rem', justifyContent: 'center' }}
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
                   Contactar equipa
@@ -667,9 +667,9 @@ export default function QuoteDetailPage() {
                 fontSize: '0.8rem',
                 fontWeight: 600,
                 textDecoration: 'none',
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                color: 'rgb(120,130,150)',
+                background: 'rgba(240,236,228,0.04)',
+                border: '1px solid rgba(240,236,228,0.06)',
+                color: 'rgba(240,236,228,0.42)',
                 transition: 'all 150ms ease',
               }}
             >

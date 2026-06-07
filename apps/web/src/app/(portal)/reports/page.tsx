@@ -82,7 +82,7 @@ function fmtEurFull(n: number) {
 
 // ── Charts ───────────────────────────────────────────────────────────────────
 
-function BarChart({ data, color = 'rgb(77,163,255)', height = 120 }: {
+function BarChart({ data, color = '#d4b47a', height = 120 }: {
   data: { label: string; value: number }[];
   color?: string;
   height?: number;
@@ -99,9 +99,9 @@ function BarChart({ data, color = 'rgb(77,163,255)', height = 120 }: {
         const y = height - bh;
         return (
           <g key={i}>
-            <rect x={x} y={0} width={barW} height={height} rx={6} fill="rgba(255,255,255,0.04)" />
+            <rect x={x} y={0} width={barW} height={height} rx={6} fill="rgba(240,236,228,0.04)" />
             <rect x={x} y={y} width={barW} height={bh} rx={6} fill={color} opacity={0.85} />
-            <text x={x + barW / 2} y={height + 16} textAnchor="middle" fontSize={9} fill="rgb(80,92,110)">{d.label}</text>
+            <text x={x + barW / 2} y={height + 16} textAnchor="middle" fontSize={9} fill="rgba(240,236,228,0.24)">{d.label}</text>
           </g>
         );
       })}
@@ -109,7 +109,7 @@ function BarChart({ data, color = 'rgb(77,163,255)', height = 120 }: {
   );
 }
 
-function LineChart({ data, color = 'rgb(99,230,190)', height = 80, width = 300 }: {
+function LineChart({ data, color = '#b8975e', height = 80, width = 300 }: {
   data: number[];
   color?: string;
   height?: number;
@@ -170,15 +170,15 @@ function KPICard({ label, value, sub, icon, color, trend, delay = 0 }: {
         background: color, opacity: 0.06, filter: 'blur(20px)', pointerEvents: 'none',
       }} />
       <div style={{ position: 'absolute', top: '-4px', right: '0.875rem', fontSize: '2rem', opacity: 0.1 }}>{icon}</div>
-      <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgb(80,92,110)', marginBottom: '0.4rem' }}>{label}</p>
+      <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.24)', marginBottom: '0.4rem' }}>{label}</p>
       <p style={{ fontSize: '1.6rem', fontWeight: 800, color, letterSpacing: '-0.04em', lineHeight: 1.1 }}>{value}</p>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.3rem' }}>
-        <span style={{ fontSize: '0.75rem', color: 'rgb(100,112,130)' }}>{sub}</span>
+        <span style={{ fontSize: '0.75rem', color: 'rgba(240,236,228,0.42)' }}>{sub}</span>
         {trend !== undefined && trend !== 0 && (
           <span style={{
             fontSize: '0.65rem', fontWeight: 700, padding: '0.1rem 0.4rem', borderRadius: '9999px',
-            background: trend > 0 ? 'rgba(99,230,190,0.12)' : 'rgba(239,68,68,0.12)',
-            color: trend > 0 ? 'rgb(99,230,190)' : 'rgb(239,68,68)',
+            background: trend > 0 ? 'rgba(184,151,94,0.12)' : 'rgba(239,68,68,0.12)',
+            color: trend > 0 ? '#b8975e' : 'rgb(239,68,68)',
           }}>
             {trend > 0 ? '▲' : '▼'} {Math.abs(trend)}%
           </span>
@@ -194,8 +194,8 @@ function tierColor(tier: string | null | undefined) {
   switch (tier) {
     case 'premium': return 'rgb(245,158,11)';
     case 'enterprise': return 'rgb(167,139,250)';
-    case 'vip': return 'rgb(99,230,190)';
-    default: return 'rgb(77,163,255)';
+    case 'vip': return '#b8975e';
+    default: return '#d4b47a';
   }
 }
 
@@ -288,15 +288,15 @@ function AdminReports({ allOrders, allQuotes, allClients }: {
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.25rem' }}>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em' }}>Inteligência Financeira</h1>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em' }}>Inteligência Financeira</h1>
             <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.5rem', borderRadius: '9999px', background: 'rgba(167,139,250,0.15)', color: 'rgb(167,139,250)', border: '1px solid rgba(167,139,250,0.2)' }}>ADMIN</span>
           </div>
-          <p style={{ fontSize: '0.8rem', color: 'rgb(80,92,110)' }}>Vista global da plataforma — receita, clientes e pipeline</p>
+          <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.24)' }}>Vista global da plataforma — receita, clientes e pipeline</p>
         </div>
-        <div style={{ display: 'flex', gap: '0.375rem', background: 'rgba(255,255,255,0.04)', padding: '4px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ display: 'flex', gap: '0.375rem', background: 'rgba(240,236,228,0.04)', padding: '4px', borderRadius: '10px', border: '1px solid rgba(240,236,228,0.06)' }}>
           {(['3m', '6m', '12m'] as const).map((p) => (
             <motion.button key={p} type="button" onClick={() => setPeriod(p)} whileTap={{ scale: 0.95 }}
-              style={{ padding: '0.3rem 0.75rem', borderRadius: '7px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', transition: 'all 150ms ease', background: period === p ? 'rgba(77,163,255,0.18)' : 'transparent', color: period === p ? 'rgb(77,163,255)' : 'rgb(100,112,130)', border: 'none' }}>
+              style={{ padding: '0.3rem 0.75rem', borderRadius: '7px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', transition: 'all 150ms ease', background: period === p ? 'rgba(77,163,255,0.18)' : 'transparent', color: period === p ? '#d4b47a' : 'rgba(240,236,228,0.42)', border: 'none' }}>
               {p === '3m' ? '3 meses' : p === '6m' ? '6 meses' : '12 meses'}
             </motion.button>
           ))}
@@ -305,8 +305,8 @@ function AdminReports({ allOrders, allQuotes, allClients }: {
 
       {/* Global KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem', marginBottom: '1.25rem' }}>
-        <KPICard label="Receita Total" value={fmtEur(animTotal)} sub="toda a plataforma" icon="💰" color="rgb(99,230,190)" delay={0.05} />
-        <KPICard label="Este mês" value={fmtEur(animMonth)} sub="receita corrente" icon="📅" color="rgb(77,163,255)" trend={analytics.monthTrend} delay={0.1} />
+        <KPICard label="Receita Total" value={fmtEur(animTotal)} sub="toda a plataforma" icon="💰" color="#b8975e" delay={0.05} />
+        <KPICard label="Este mês" value={fmtEur(animMonth)} sub="receita corrente" icon="📅" color="#d4b47a" trend={analytics.monthTrend} delay={0.1} />
         <KPICard label="Ticket médio" value={fmtEur(animAvg)} sub="por encomenda" icon="📊" color="rgb(167,139,250)" delay={0.15} />
         <KPICard label="Conversão" value={`${analytics.conversionRate}%`} sub="orçamentos→pedidos" icon="🎯" color="rgb(245,158,11)" delay={0.2} />
       </div>
@@ -314,27 +314,27 @@ function AdminReports({ allOrders, allQuotes, allClients }: {
       {/* Secondary KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.5rem', marginBottom: '1.25rem' }}>
         {[
-          { label: 'Clientes ativos', value: allClients.length, color: 'rgb(77,163,255)' },
-          { label: 'Encomendas ativas', value: analytics.activeOrders, color: 'rgb(99,230,190)' },
+          { label: 'Clientes ativos', value: allClients.length, color: '#d4b47a' },
+          { label: 'Encomendas ativas', value: analytics.activeOrders, color: '#b8975e' },
           { label: 'Orçamentos totais', value: analytics.totalQuotes, color: 'rgb(245,158,11)' },
-          { label: 'Pipeline orçamentos', value: `€${(analytics.quoteValue / 1000).toFixed(0)}k`, color: 'rgb(116,231,255)', isString: true },
+          { label: 'Pipeline orçamentos', value: `€${(analytics.quoteValue / 1000).toFixed(0)}k`, color: '#b8975e', isString: true },
           { label: 'Taxa conversão', value: `${analytics.conversionRate}%`, color: 'rgb(167,139,250)', isString: true },
         ].map((k, i) => (
           <motion.div key={k.label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 + i * 0.05, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '0.875rem 1rem' }}>
+            style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '12px', padding: '0.875rem 1rem' }}>
             <div style={{ fontSize: '1.25rem', fontWeight: 800, color: k.color, letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
               {typeof k.value === 'number' ? k.value.toLocaleString('pt-PT') : k.value}
             </div>
-            <div style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)', fontWeight: 500 }}>{k.label}</div>
+            <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)', fontWeight: 500 }}>{k.label}</div>
           </motion.div>
         ))}
       </div>
 
       {/* Tab navigation */}
-      <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '4px', width: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '1rem', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '10px', padding: '4px', width: 'fit-content' }}>
         {TABS.map(tab => (
           <motion.button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} whileTap={{ scale: 0.96 }}
-            style={{ padding: '0.375rem 1rem', borderRadius: '7px', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', border: 'none', transition: 'all 150ms', background: activeTab === tab.id ? 'rgba(77,163,255,0.18)' : 'transparent', color: activeTab === tab.id ? 'rgb(77,163,255)' : 'rgb(100,112,130)' }}>
+            style={{ padding: '0.375rem 1rem', borderRadius: '7px', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', border: 'none', transition: 'all 150ms', background: activeTab === tab.id ? 'rgba(77,163,255,0.18)' : 'transparent', color: activeTab === tab.id ? '#d4b47a' : 'rgba(240,236,228,0.42)' }}>
             {tab.label}
           </motion.button>
         ))}
@@ -349,41 +349,41 @@ function AdminReports({ allOrders, allQuotes, allClients }: {
               <div className="yg-card" style={{ padding: '1.375rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
                   <div>
-                    <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>Receita mensal</p>
-                    <p style={{ fontSize: '1.1rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em' }}>
+                    <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>Receita mensal</p>
+                    <p style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em' }}>
                       {period === '3m' ? '3' : period === '6m' ? '6' : '12'} meses
                     </p>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>Máximo</p>
-                    <p style={{ fontSize: '0.875rem', fontWeight: 700, color: 'rgb(77,163,255)' }}>{fmtEur(Math.max(...analytics.monthlyData.map(d => d.value), 0))}</p>
+                    <p style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)' }}>Máximo</p>
+                    <p style={{ fontSize: '0.875rem', fontWeight: 700, color: '#d4b47a' }}>{fmtEur(Math.max(...analytics.monthlyData.map(d => d.value), 0))}</p>
                   </div>
                 </div>
                 <div style={{ height: '140px' }}>
-                  <BarChart data={analytics.monthlyData} color="rgb(77,163,255)" height={120} />
+                  <BarChart data={analytics.monthlyData} color="#d4b47a" height={120} />
                 </div>
               </div>
 
               {/* Revenue by tier */}
               <div className="yg-card" style={{ padding: '1.375rem' }}>
-                <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>Receita por tier</p>
-                <p style={{ fontSize: '1.1rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '1.25rem' }}>Distribuição</p>
+                <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>Receita por tier</p>
+                <p style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '1.25rem' }}>Distribuição</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   {analytics.tierData.length === 0 ? (
-                    <p style={{ fontSize: '0.75rem', color: 'rgb(80,92,110)' }}>Sem dados suficientes</p>
+                    <p style={{ fontSize: '0.75rem', color: 'rgba(240,236,228,0.24)' }}>Sem dados suficientes</p>
                   ) : analytics.tierData.map((t) => {
                     const totalTierRev = analytics.tierData.reduce((s, x) => s + x.value, 0);
                     const pct = totalTierRev > 0 ? (t.value / totalTierRev) * 100 : 0;
                     return (
                       <div key={t.label}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                          <span style={{ fontSize: '0.72rem', color: 'rgb(120,130,150)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          <span style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.42)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: t.color, display: 'inline-block' }} />
                             {t.label}
                           </span>
                           <span style={{ fontSize: '0.72rem', fontWeight: 700, color: t.color }}>{fmtEur(t.value)}</span>
                         </div>
-                        <div style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '9999px', overflow: 'hidden' }}>
+                        <div style={{ height: '6px', background: 'rgba(240,236,228,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
                           <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
                             style={{ height: '100%', borderRadius: '9999px', background: t.color }} />
                         </div>
@@ -398,17 +398,17 @@ function AdminReports({ allOrders, allQuotes, allClients }: {
             <div className="yg-card" style={{ padding: '1.375rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', alignItems: 'flex-end' }}>
                 <div>
-                  <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>Tendência 30 dias</p>
-                  <p style={{ fontSize: '1.25rem', fontWeight: 800, color: 'rgb(99,230,190)', letterSpacing: '-0.04em' }}>{fmtEur(analytics.sparkline.reduce((s, v) => s + v, 0))}</p>
+                  <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>Tendência 30 dias</p>
+                  <p style={{ fontSize: '1.25rem', fontWeight: 800, color: '#b8975e', letterSpacing: '-0.04em' }}>{fmtEur(analytics.sparkline.reduce((s, v) => s + v, 0))}</p>
                 </div>
-                <span style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>receita diária acumulada</span>
+                <span style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)' }}>receita diária acumulada</span>
               </div>
               <div style={{ height: '80px' }}>
-                <LineChart data={analytics.sparkline} color="rgb(99,230,190)" height={80} width={600} />
+                <LineChart data={analytics.sparkline} color="#b8975e" height={80} width={600} />
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
-                <span style={{ fontSize: '0.7rem', color: 'rgb(80,92,110)' }}>Há 30 dias</span>
-                <span style={{ fontSize: '0.7rem', color: 'rgb(80,92,110)' }}>Hoje</span>
+                <span style={{ fontSize: '0.7rem', color: 'rgba(240,236,228,0.24)' }}>Há 30 dias</span>
+                <span style={{ fontSize: '0.7rem', color: 'rgba(240,236,228,0.24)' }}>Hoje</span>
               </div>
             </div>
           </motion.div>
@@ -418,12 +418,12 @@ function AdminReports({ allOrders, allQuotes, allClients }: {
         {activeTab === 'clients' && (
           <motion.div key="clients" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.3 }}>
             <div className="yg-card" style={{ overflow: 'hidden' }}>
-              <div style={{ padding: '1.25rem 1.375rem', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ padding: '1.25rem 1.375rem', borderBottom: '1px solid rgba(240,236,228,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgb(80,92,110)', marginBottom: '0.15rem' }}>Top Clientes</p>
-                  <p style={{ fontSize: '1.1rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em' }}>Por receita gerada</p>
+                  <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.24)', marginBottom: '0.15rem' }}>Top Clientes</p>
+                  <p style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em' }}>Por receita gerada</p>
                 </div>
-                <span style={{ fontSize: '0.72rem', color: 'rgb(80,92,110)' }}>{allClients.length} clientes totais</span>
+                <span style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.24)' }}>{allClients.length} clientes totais</span>
               </div>
               <div style={{ padding: '0.5rem 0' }}>
                 {analytics.topClients.map((c, i) => {
@@ -431,24 +431,24 @@ function AdminReports({ allOrders, allQuotes, allClients }: {
                   const tc = tierColor(c.tier);
                   return (
                     <motion.div key={c.id} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                      style={{ display: 'grid', gridTemplateColumns: '24px 1fr auto auto', alignItems: 'center', gap: '0.875rem', padding: '0.625rem 1.375rem', borderBottom: i < analytics.topClients.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
-                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: i === 0 ? 'rgb(245,158,11)' : 'rgb(80,92,110)', textAlign: 'center' }}>#{i + 1}</span>
+                      style={{ display: 'grid', gridTemplateColumns: '24px 1fr auto auto', alignItems: 'center', gap: '0.875rem', padding: '0.625rem 1.375rem', borderBottom: i < analytics.topClients.length - 1 ? '1px solid rgba(240,236,228,0.04)' : 'none' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: i === 0 ? 'rgb(245,158,11)' : 'rgba(240,236,228,0.24)', textAlign: 'center' }}>#{i + 1}</span>
                       <div style={{ minWidth: 0 }}>
-                        <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'rgb(210,220,235)', marginBottom: '0.2rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {c.name ?? 'N/A'} {c.company ? <span style={{ color: 'rgb(80,92,110)', fontWeight: 400 }}>· {c.company}</span> : null}
+                        <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'rgba(240,236,228,0.72)', marginBottom: '0.2rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {c.name ?? 'N/A'} {c.company ? <span style={{ color: 'rgba(240,236,228,0.24)', fontWeight: 400 }}>· {c.company}</span> : null}
                         </div>
-                        <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '9999px', overflow: 'hidden' }}>
+                        <div style={{ height: '4px', background: 'rgba(240,236,228,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
                           <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.8, delay: 0.3 + i * 0.04, ease: [0.16, 1, 0.3, 1] }}
                             style={{ height: '100%', borderRadius: '9999px', background: tc }} />
                         </div>
                       </div>
                       <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem', borderRadius: '9999px', background: `${tc}18`, color: tc, fontWeight: 600, textTransform: 'capitalize', whiteSpace: 'nowrap' }}>{c.tier ?? 'std'}</span>
-                      <span style={{ fontSize: '0.875rem', fontWeight: 800, color: 'rgb(99,230,190)', whiteSpace: 'nowrap' }}>{fmtEur(c.spend)}</span>
+                      <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#b8975e', whiteSpace: 'nowrap' }}>{fmtEur(c.spend)}</span>
                     </motion.div>
                   );
                 })}
                 {analytics.topClients.length === 0 && (
-                  <div style={{ padding: '2rem', textAlign: 'center', color: 'rgb(80,92,110)', fontSize: '0.82rem' }}>Sem dados de clientes disponíveis</div>
+                  <div style={{ padding: '2rem', textAlign: 'center', color: 'rgba(240,236,228,0.24)', fontSize: '0.82rem' }}>Sem dados de clientes disponíveis</div>
                 )}
               </div>
             </div>
@@ -461,22 +461,22 @@ function AdminReports({ allOrders, allQuotes, allClients }: {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               {/* Quote funnel */}
               <div className="yg-card" style={{ padding: '1.375rem' }}>
-                <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>Funil de orçamentos</p>
-                <p style={{ fontSize: '1.1rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '1.25rem' }}>{analytics.totalQuotes} total</p>
+                <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>Funil de orçamentos</p>
+                <p style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '1.25rem' }}>{analytics.totalQuotes} total</p>
                 {[
-                  { label: 'Submetidos', value: analytics.totalQuotes, color: 'rgb(77,163,255)' },
+                  { label: 'Submetidos', value: analytics.totalQuotes, color: '#d4b47a' },
                   { label: 'Em análise', value: analytics.pendingQ, color: 'rgb(245,158,11)' },
-                  { label: 'Aprovados', value: analytics.approvedQ, color: 'rgb(99,230,190)' },
+                  { label: 'Aprovados', value: analytics.approvedQ, color: '#b8975e' },
                   { label: 'Convertidos', value: analytics.convertedQ, color: 'rgb(167,243,208)' },
                 ].map((step, i) => {
                   const pct = analytics.totalQuotes > 0 ? (step.value / analytics.totalQuotes) * 100 : 0;
                   return (
                     <div key={step.label} style={{ marginBottom: '0.75rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                        <span style={{ fontSize: '0.72rem', color: 'rgb(120,130,150)' }}>{step.label}</span>
+                        <span style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.42)' }}>{step.label}</span>
                         <span style={{ fontSize: '0.72rem', fontWeight: 700, color: step.color }}>{step.value}</span>
                       </div>
-                      <div style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '9999px', overflow: 'hidden' }}>
+                      <div style={{ height: '6px', background: 'rgba(240,236,228,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
                         <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.9, delay: 0.3 + i * 0.1, ease: [0.16, 1, 0.3, 1] }}
                           style={{ height: '100%', borderRadius: '9999px', background: step.color }} />
                       </div>
@@ -487,18 +487,18 @@ function AdminReports({ allOrders, allQuotes, allClients }: {
 
               {/* Revenue breakdown stats */}
               <div className="yg-card" style={{ padding: '1.375rem' }}>
-                <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>KPIs de pipeline</p>
-                <p style={{ fontSize: '1.1rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '1.25rem' }}>Performance global</p>
+                <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>KPIs de pipeline</p>
+                <p style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '1.25rem' }}>Performance global</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   {[
-                    { label: 'Taxa de conversão', value: `${analytics.conversionRate}%`, color: analytics.conversionRate >= 30 ? 'rgb(99,230,190)' : analytics.conversionRate >= 15 ? 'rgb(245,158,11)' : 'rgb(239,68,68)' },
-                    { label: 'Pipeline activo (€)', value: fmtEur(analytics.quoteValue), color: 'rgb(77,163,255)' },
+                    { label: 'Taxa de conversão', value: `${analytics.conversionRate}%`, color: analytics.conversionRate >= 30 ? '#b8975e' : analytics.conversionRate >= 15 ? 'rgb(245,158,11)' : 'rgb(239,68,68)' },
+                    { label: 'Pipeline activo (€)', value: fmtEur(analytics.quoteValue), color: '#d4b47a' },
                     { label: 'Orçamentos pendentes', value: String(analytics.pendingQ), color: 'rgb(245,158,11)' },
-                    { label: 'Orçamentos aprovados', value: String(analytics.approvedQ), color: 'rgb(99,230,190)' },
+                    { label: 'Orçamentos aprovados', value: String(analytics.approvedQ), color: '#b8975e' },
                     { label: 'Total convertidos', value: String(analytics.convertedQ), color: 'rgb(167,139,250)' },
                   ].map(kpi => (
-                    <div key={kpi.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '0.75rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                      <span style={{ fontSize: '0.75rem', color: 'rgb(120,130,150)' }}>{kpi.label}</span>
+                    <div key={kpi.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '0.75rem', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'rgba(240,236,228,0.42)' }}>{kpi.label}</span>
                       <span style={{ fontSize: '0.875rem', fontWeight: 800, color: kpi.color }}>{kpi.value}</span>
                     </div>
                   ))}
@@ -574,19 +574,19 @@ function ClientReports({ client, orders, quotes }: {
   const animAvg = useCountUp(Math.round(analytics.avgOrderValue), 1200, 500);
 
   const funnelSteps = [
-    { label: 'Submetidos', value: analytics.totalQuotes, color: 'rgb(77,163,255)' },
+    { label: 'Submetidos', value: analytics.totalQuotes, color: '#d4b47a' },
     { label: 'Em análise', value: analytics.pendingQuotes, color: 'rgb(245,158,11)' },
-    { label: 'Aprovados', value: analytics.approvedQuotes, color: 'rgb(99,230,190)' },
+    { label: 'Aprovados', value: analytics.approvedQuotes, color: '#b8975e' },
     { label: 'Convertidos', value: analytics.convertedQuotes, color: 'rgb(167,243,208)' },
   ];
   const funnelMax = Math.max(analytics.totalQuotes, 1);
 
   const pipelineStages = [
-    { key: 'pending', label: 'Pendente', color: 'rgb(120,130,150)' },
-    { key: 'confirmed', label: 'Confirmado', color: 'rgb(77,163,255)' },
+    { key: 'pending', label: 'Pendente', color: 'rgba(240,236,228,0.42)' },
+    { key: 'confirmed', label: 'Confirmado', color: '#d4b47a' },
     { key: 'producing', label: 'Produção', color: 'rgb(245,158,11)' },
-    { key: 'shipped', label: 'Enviado', color: 'rgb(116,231,255)' },
-    { key: 'delivered', label: 'Entregue', color: 'rgb(99,230,190)' },
+    { key: 'shipped', label: 'Enviado', color: '#b8975e' },
+    { key: 'delivered', label: 'Entregue', color: '#b8975e' },
   ];
 
   return (
@@ -596,13 +596,13 @@ function ClientReports({ client, orders, quotes }: {
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>Relatórios</h1>
-          <p style={{ fontSize: '0.8rem', color: 'rgb(80,92,110)' }}>Análise financeira e operacional da tua conta</p>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>Relatórios</h1>
+          <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.24)' }}>Análise financeira e operacional da tua conta</p>
         </div>
-        <div style={{ display: 'flex', gap: '0.375rem', background: 'rgba(255,255,255,0.04)', padding: '4px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ display: 'flex', gap: '0.375rem', background: 'rgba(240,236,228,0.04)', padding: '4px', borderRadius: '10px', border: '1px solid rgba(240,236,228,0.06)' }}>
           {(['3m', '6m', '12m'] as const).map((p) => (
             <motion.button key={p} type="button" onClick={() => setPeriod(p)} whileTap={{ scale: 0.95 }}
-              style={{ padding: '0.3rem 0.75rem', borderRadius: '7px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', transition: 'all 150ms ease', background: period === p ? 'rgba(77,163,255,0.18)' : 'transparent', color: period === p ? 'rgb(77,163,255)' : 'rgb(100,112,130)', border: 'none' }}>
+              style={{ padding: '0.3rem 0.75rem', borderRadius: '7px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', transition: 'all 150ms ease', background: period === p ? 'rgba(77,163,255,0.18)' : 'transparent', color: period === p ? '#d4b47a' : 'rgba(240,236,228,0.42)', border: 'none' }}>
               {p === '3m' ? '3 meses' : p === '6m' ? '6 meses' : '12 meses'}
             </motion.button>
           ))}
@@ -610,8 +610,8 @@ function ClientReports({ client, orders, quotes }: {
       </motion.div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem', marginBottom: '1.25rem' }}>
-        <KPICard label="Total gasto" value={fmtEur(animTotal)} sub="acumulado histórico" icon="💶" color="rgb(99,230,190)" delay={0.05} />
-        <KPICard label="Este mês" value={fmtEur(animThisMonth)} sub="mês corrente" icon="📅" color="rgb(77,163,255)" trend={analytics.monthTrend} delay={0.1} />
+        <KPICard label="Total gasto" value={fmtEur(animTotal)} sub="acumulado histórico" icon="💶" color="#b8975e" delay={0.05} />
+        <KPICard label="Este mês" value={fmtEur(animThisMonth)} sub="mês corrente" icon="📅" color="#d4b47a" trend={analytics.monthTrend} delay={0.1} />
         <KPICard label="Valor médio" value={fmtEur(animAvg)} sub="por encomenda" icon="📊" color="rgb(167,139,250)" delay={0.15} />
         <KPICard label="Conversão" value={`${analytics.conversionRate}%`} sub="orçamentos → pedidos" icon="🎯" color="rgb(245,158,11)" delay={0.2} />
       </div>
@@ -621,17 +621,17 @@ function ClientReports({ client, orders, quotes }: {
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
             className="yg-card" style={{ padding: '1rem 1.375rem', marginBottom: '1.25rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.625rem' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'rgb(120,130,150)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Budget anual utilizado</span>
-              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: analytics.budgetPct > 80 ? 'rgb(239,68,68)' : analytics.budgetPct > 60 ? 'rgb(245,158,11)' : 'rgb(99,230,190)' }}>{analytics.budgetPct}%</span>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'rgba(240,236,228,0.42)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Budget anual utilizado</span>
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: analytics.budgetPct > 80 ? 'rgb(239,68,68)' : analytics.budgetPct > 60 ? 'rgb(245,158,11)' : '#b8975e' }}>{analytics.budgetPct}%</span>
             </div>
-            <div style={{ height: '8px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
+            <div style={{ height: '8px', background: 'rgba(240,236,228,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
               <motion.div initial={{ width: 0 }} animate={{ width: `${analytics.budgetPct}%` }} transition={{ duration: 1.2, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                style={{ height: '100%', borderRadius: '9999px', background: analytics.budgetPct > 80 ? 'linear-gradient(90deg, rgb(245,158,11), rgb(239,68,68))' : 'linear-gradient(90deg, rgb(77,163,255), rgb(99,230,190))' }} />
+                style={{ height: '100%', borderRadius: '9999px', background: analytics.budgetPct > 80 ? 'linear-gradient(90deg, rgb(245,158,11), rgb(239,68,68))' : 'linear-gradient(90deg, #d4b47a, #b8975e)' }} />
             </div>
             {client.budget_limit && (
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.4rem' }}>
-                <span style={{ fontSize: '0.7rem', color: 'rgb(80,92,110)' }}>{fmtEurFull(analytics.totalSpend)} gastos</span>
-                <span style={{ fontSize: '0.7rem', color: 'rgb(80,92,110)' }}>Limite: {fmtEurFull(client.budget_limit)}</span>
+                <span style={{ fontSize: '0.7rem', color: 'rgba(240,236,228,0.24)' }}>{fmtEurFull(analytics.totalSpend)} gastos</span>
+                <span style={{ fontSize: '0.7rem', color: 'rgba(240,236,228,0.24)' }}>Limite: {fmtEurFull(client.budget_limit)}</span>
               </div>
             )}
           </motion.div>
@@ -642,34 +642,34 @@ function ClientReports({ client, orders, quotes }: {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.25, ease: [0.16, 1, 0.3, 1] }} className="yg-card" style={{ padding: '1.375rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
             <div>
-              <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>Gasto mensal</p>
-              <p style={{ fontSize: '1.1rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em' }}>{period === '3m' ? '3' : period === '6m' ? '6' : '12'} meses</p>
+              <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>Gasto mensal</p>
+              <p style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em' }}>{period === '3m' ? '3' : period === '6m' ? '6' : '12'} meses</p>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>Máximo</p>
-              <p style={{ fontSize: '0.875rem', fontWeight: 700, color: 'rgb(77,163,255)' }}>{fmtEur(Math.max(...analytics.monthlyData.map(d => d.value), 0))}</p>
+              <p style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)' }}>Máximo</p>
+              <p style={{ fontSize: '0.875rem', fontWeight: 700, color: '#d4b47a' }}>{fmtEur(Math.max(...analytics.monthlyData.map(d => d.value), 0))}</p>
             </div>
           </div>
           <AnimatePresence mode="wait">
             <motion.div key={period} initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={{ duration: 0.3 }} style={{ height: '140px' }}>
-              <BarChart data={analytics.monthlyData} color="rgb(77,163,255)" height={120} />
+              <BarChart data={analytics.monthlyData} color="#d4b47a" height={120} />
             </motion.div>
           </AnimatePresence>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.3, ease: [0.16, 1, 0.3, 1] }} className="yg-card" style={{ padding: '1.375rem' }}>
-          <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>Funil de orçamentos</p>
-          <p style={{ fontSize: '1.1rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '1.125rem' }}>{analytics.totalQuotes} total</p>
+          <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>Funil de orçamentos</p>
+          <p style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '1.125rem' }}>{analytics.totalQuotes} total</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
             {funnelSteps.map((step, i) => {
               const pct = funnelMax > 0 ? (step.value / funnelMax) * 100 : 0;
               return (
                 <div key={step.label}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                    <span style={{ fontSize: '0.72rem', color: 'rgb(120,130,150)' }}>{step.label}</span>
+                    <span style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.42)' }}>{step.label}</span>
                     <span style={{ fontSize: '0.72rem', fontWeight: 700, color: step.color }}>{step.value}</span>
                   </div>
-                  <div style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '9999px', overflow: 'hidden' }}>
+                  <div style={{ height: '6px', background: 'rgba(240,236,228,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
                     <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.9, delay: 0.4 + i * 0.1, ease: [0.16, 1, 0.3, 1] }}
                       style={{ height: '100%', borderRadius: '9999px', background: step.color }} />
                   </div>
@@ -682,16 +682,16 @@ function ClientReports({ client, orders, quotes }: {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.35, ease: [0.16, 1, 0.3, 1] }} className="yg-card" style={{ padding: '1.375rem' }}>
-          <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgb(80,92,110)', marginBottom: '0.2rem' }}>Pipeline de encomendas</p>
-          <p style={{ fontSize: '1.1rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '1.25rem' }}>{analytics.totalOrders} encomendas</p>
+          <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.24)', marginBottom: '0.2rem' }}>Pipeline de encomendas</p>
+          <p style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '1.25rem' }}>{analytics.totalOrders} encomendas</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {pipelineStages.map(stage => {
               const count = analytics.statusCounts[stage.key] ?? 0;
               const pct = analytics.totalOrders > 0 ? (count / analytics.totalOrders) * 100 : 0;
               return (
                 <div key={stage.key} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <span style={{ fontSize: '0.72rem', color: 'rgb(100,112,130)', width: '72px', flexShrink: 0 }}>{stage.label}</span>
-                  <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '9999px', overflow: 'hidden' }}>
+                  <span style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.42)', width: '72px', flexShrink: 0 }}>{stage.label}</span>
+                  <div style={{ flex: 1, height: '6px', background: 'rgba(240,236,228,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
                     <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
                       style={{ height: '100%', borderRadius: '9999px', background: stage.color }} />
                   </div>
@@ -704,24 +704,24 @@ function ClientReports({ client, orders, quotes }: {
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.4, ease: [0.16, 1, 0.3, 1] }} className="yg-card" style={{ padding: '1.375rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
-            <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgb(80,92,110)' }}>Tendência 30 dias</p>
-            <span style={{ fontSize: '0.65rem', color: 'rgb(80,92,110)' }}>diário</span>
+            <p style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.24)' }}>Tendência 30 dias</p>
+            <span style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.24)' }}>diário</span>
           </div>
-          <p style={{ fontSize: '1.1rem', fontWeight: 800, color: 'rgb(99,230,190)', letterSpacing: '-0.03em', marginBottom: '1rem' }}>
+          <p style={{ fontSize: '1.1rem', fontWeight: 800, color: '#b8975e', letterSpacing: '-0.03em', marginBottom: '1rem' }}>
             {fmtEur(analytics.sparklineData.reduce((s, v) => s + v, 0))}
           </p>
           <div style={{ height: '100px' }}>
-            <LineChart data={analytics.sparklineData} color="rgb(99,230,190)" height={100} width={340} />
+            <LineChart data={analytics.sparklineData} color="#b8975e" height={100} width={340} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.625rem' }}>
-            <span style={{ fontSize: '0.7rem', color: 'rgb(80,92,110)' }}>Há 30 dias</span>
-            <span style={{ fontSize: '0.7rem', color: 'rgb(80,92,110)' }}>Hoje</span>
+            <span style={{ fontSize: '0.7rem', color: 'rgba(240,236,228,0.24)' }}>Há 30 dias</span>
+            <span style={{ fontSize: '0.7rem', color: 'rgba(240,236,228,0.24)' }}>Hoje</span>
           </div>
         </motion.div>
       </div>
 
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.6 }}
-        style={{ marginTop: '0.75rem', padding: '0.875rem 1.375rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '14px', display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+        style={{ marginTop: '0.75rem', padding: '0.875rem 1.375rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '14px', display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
         {[
           { label: 'Encomendas ativas', value: analytics.activeOrders },
           { label: 'Entregues', value: analytics.deliveredOrders },
@@ -729,8 +729,8 @@ function ClientReports({ client, orders, quotes }: {
           { label: 'Orçamentos aprovados', value: analytics.approvedQuotes },
         ].map(s => (
           <div key={s.label} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.875rem', fontWeight: 800, color: 'rgb(245,247,251)' }}>{s.value}</span>
-            <span style={{ fontSize: '0.72rem', color: 'rgb(80,92,110)' }}>{s.label}</span>
+            <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#f0ece4' }}>{s.value}</span>
+            <span style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.24)' }}>{s.label}</span>
           </div>
         ))}
       </motion.div>
@@ -820,13 +820,13 @@ export default function ReportsPage() {
       <PortalLayout userName={undefined} companyName={undefined} tier={undefined}>
         <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
         <div style={{ padding: '2rem', maxWidth: '1100px' }}>
-          <div style={{ height: '32px', width: '200px', borderRadius: '8px', background: 'rgba(255,255,255,0.06)', animation: 'pulse 1.5s ease-in-out infinite', marginBottom: '2rem' }} />
+          <div style={{ height: '32px', width: '200px', borderRadius: '8px', background: 'rgba(240,236,228,0.06)', animation: 'pulse 1.5s ease-in-out infinite', marginBottom: '2rem' }} />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem', marginBottom: '1.5rem' }}>
-            {[0, 1, 2, 3].map(i => <div key={i} style={{ height: '100px', borderRadius: '16px', background: 'rgba(255,255,255,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
+            {[0, 1, 2, 3].map(i => <div key={i} style={{ height: '100px', borderRadius: '16px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '0.75rem' }}>
-            <div style={{ height: '280px', borderRadius: '16px', background: 'rgba(255,255,255,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />
-            <div style={{ height: '280px', borderRadius: '16px', background: 'rgba(255,255,255,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+            <div style={{ height: '280px', borderRadius: '16px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+            <div style={{ height: '280px', borderRadius: '16px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />
           </div>
         </div>
       </PortalLayout>
@@ -844,7 +844,7 @@ export default function ReportsPage() {
   if (!client) {
     return (
       <PortalLayout userName={undefined} companyName={undefined} tier={undefined}>
-        <div style={{ padding: '3rem', textAlign: 'center', color: 'rgb(80,92,110)' }}>Perfil não encontrado.</div>
+        <div style={{ padding: '3rem', textAlign: 'center', color: 'rgba(240,236,228,0.24)' }}>Perfil não encontrado.</div>
       </PortalLayout>
     );
   }

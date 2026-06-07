@@ -85,7 +85,7 @@ function ResilienceGauge({ score }: { score: number }) {
   const dash = (score / 100) * circ;
   return (
     <svg width="80" height="80" className="transform -rotate-90">
-      <circle cx="40" cy="40" r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="6" />
+      <circle cx="40" cy="40" r={r} fill="none" stroke="rgba(240,236,228,0.06)" strokeWidth="6" />
       <circle cx="40" cy="40" r={r} fill="none" stroke={color} strokeWidth="6"
         strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
         style={{ transition: 'stroke-dasharray 0.8s ease' }} />

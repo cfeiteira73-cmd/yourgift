@@ -42,7 +42,7 @@ interface ConfirmDialogProps {
 const CONFIRM_STYLES = {
   danger:  { bg: 'rgba(239,68,68,0.15)',   text: '#ef4444', border: 'rgba(239,68,68,0.3)',  hover: 'rgba(239,68,68,0.25)'  },
   warning: { bg: 'rgba(245,158,11,0.15)',  text: '#f59e0b', border: 'rgba(245,158,11,0.3)', hover: 'rgba(245,158,11,0.25)' },
-  primary: { bg: 'rgba(77,163,255,0.15)',  text: '#4da3ff', border: 'rgba(77,163,255,0.3)', hover: 'rgba(77,163,255,0.25)' },
+  primary: { bg: 'rgba(154,124,74,0.14)',  text: '#4da3ff', border: 'rgba(154,124,74,0.28)', hover: 'rgba(154,124,74,0.22)' },
 };
 
 export function ConfirmDialog({
@@ -130,7 +130,7 @@ export function ConfirmDialog({
             transition={{ type: 'spring', stiffness: 500, damping: 35 }}
             style={{
               background: 'rgb(12,22,42)',
-              border: '1px solid rgba(255,255,255,0.1)',
+              border: '1px solid rgba(240,236,228,0.10)',
               borderRadius: '16px',
               padding: '28px',
               width: '100%',
@@ -160,7 +160,7 @@ export function ConfirmDialog({
             {description && (
               <p
                 id="confirm-dialog-desc"
-                style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', margin: '0 0 24px', lineHeight: 1.6 }}
+                style={{ fontSize: 14, color: 'rgba(240,236,228,0.45)', margin: '0 0 24px', lineHeight: 1.6 }}
               >
                 {description}
               </p>
@@ -175,12 +175,12 @@ export function ConfirmDialog({
                 disabled={loading}
                 style={{
                   padding: '9px 18px', borderRadius: 9, fontSize: 13, fontWeight: 600,
-                  background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)',
-                  border: '1px solid rgba(255,255,255,0.1)', cursor: loading ? 'not-allowed' : 'pointer',
+                  background: 'rgba(240,236,228,0.06)', color: 'rgba(255,255,255,0.7)',
+                  border: '1px solid rgba(240,236,228,0.10)', cursor: loading ? 'not-allowed' : 'pointer',
                   transition: 'all 150ms',
                 }}
-                onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+                onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLElement).style.background = 'rgba(240,236,228,0.10)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(240,236,228,0.06)'; }}
               >
                 {cancelLabel}
               </button>

@@ -31,14 +31,14 @@ interface ClientProfile {
 // ── Status config ─────────────────────────────────────────────────────────────
 
 const STATUS_MAP: Record<string, { label: string; color: string; bg: string; border: string; icon: string }> = {
-  draft:     { label: 'Rascunho',    color: 'rgb(100,112,130)', bg: 'rgba(100,112,130,0.1)', border: 'rgba(100,112,130,0.2)', icon: '✏️' },
+  draft:     { label: 'Rascunho',    color: 'rgba(240,236,228,0.42)', bg: 'rgba(100,112,130,0.1)', border: 'rgba(100,112,130,0.2)', icon: '✏️' },
   submitted: { label: 'Submetido',   color: 'rgb(245,158,11)',  bg: 'rgba(245,158,11,0.1)',  border: 'rgba(245,158,11,0.25)', icon: '📤' },
-  pricing:   { label: 'A calcular',  color: 'rgb(116,231,255)', bg: 'rgba(116,231,255,0.1)', border: 'rgba(116,231,255,0.2)', icon: '⚙️' },
-  proposed:  { label: 'Proposta',    color: 'rgb(77,163,255)',  bg: 'rgba(77,163,255,0.1)',  border: 'rgba(77,163,255,0.2)',  icon: '📋' },
-  approved:  { label: 'Aprovado',    color: 'rgb(99,230,190)',  bg: 'rgba(99,230,190,0.1)',  border: 'rgba(99,230,190,0.2)',  icon: '✅' },
+  pricing:   { label: 'A calcular',  color: '#b8975e', bg: 'rgba(184,151,94,0.10)', border: 'rgba(184,151,94,0.18)', icon: '⚙️' },
+  proposed:  { label: 'Proposta',    color: '#d4b47a',  bg: 'rgba(154,124,74,0.10)',  border: 'rgba(154,124,74,0.18)',  icon: '📋' },
+  approved:  { label: 'Aprovado',    color: '#b8975e',  bg: 'rgba(184,151,94,0.10)',  border: 'rgba(184,151,94,0.18)',  icon: '✅' },
   rejected:  { label: 'Recusado',    color: 'rgb(239,68,68)',   bg: 'rgba(239,68,68,0.1)',   border: 'rgba(239,68,68,0.2)',   icon: '❌' },
   converted: { label: 'Convertido',  color: 'rgb(167,243,208)', bg: 'rgba(167,243,208,0.1)', border: 'rgba(167,243,208,0.2)', icon: '🎯' },
-  expired:   { label: 'Expirado',    color: 'rgb(80,92,110)',   bg: 'rgba(80,92,110,0.1)',   border: 'rgba(80,92,110,0.2)',   icon: '⏰' },
+  expired:   { label: 'Expirado',    color: 'rgba(240,236,228,0.24)',   bg: 'rgba(80,92,110,0.1)',   border: 'rgba(80,92,110,0.2)',   icon: '⏰' },
 };
 
 function StatusPill({ status }: { status: string }) {
@@ -86,7 +86,7 @@ function QuoteCard({ quote, index }: { quote: Quote; index: number }) {
         <div
           style={{
             background: 'linear-gradient(145deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.02) 100%)',
-            border: '1px solid rgba(255,255,255,0.07)',
+            border: '1px solid rgba(240,236,228,0.06)',
             borderRadius: '16px', padding: '1.25rem 1.5rem',
             transition: 'border-color 150ms, background 150ms',
             display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap',
@@ -96,7 +96,7 @@ function QuoteCard({ quote, index }: { quote: Quote; index: number }) {
             (e.currentTarget as HTMLElement).style.background = `linear-gradient(145deg, ${cfg.bg} 0%, rgba(255,255,255,0.015) 100%)`;
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)';
+            (e.currentTarget as HTMLElement).style.borderColor = 'rgba(240,236,228,0.06)';
             (e.currentTarget as HTMLElement).style.background = 'linear-gradient(145deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.02) 100%)';
           }}
         >
@@ -119,7 +119,7 @@ function QuoteCard({ quote, index }: { quote: Quote; index: number }) {
               <StatusPill status={quote.status} />
             </div>
             {quote.notes && (
-              <p style={{ fontSize: '0.78rem', color: 'rgb(100,112,130)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '340px' }}>
+              <p style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.42)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '340px' }}>
                 {quote.notes}
               </p>
             )}
@@ -129,7 +129,7 @@ function QuoteCard({ quote, index }: { quote: Quote; index: number }) {
           <div style={{ display: 'flex', gap: '1.5rem', flexShrink: 0, flexWrap: 'wrap' }}>
             {quote.delivery_date && (
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'rgb(80,92,110)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
+                <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
                   Entrega
                 </div>
                 <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'rgb(170,180,198)' }}>
@@ -138,10 +138,10 @@ function QuoteCard({ quote, index }: { quote: Quote; index: number }) {
               </div>
             )}
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'rgb(80,92,110)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
+              <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
                 Submetido
               </div>
-              <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'rgb(100,112,130)' }}>
+              <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'rgba(240,236,228,0.42)' }}>
                 {ageLabel}
               </div>
             </div>
@@ -151,16 +151,16 @@ function QuoteCard({ quote, index }: { quote: Quote; index: number }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
             <div style={{ textAlign: 'right' }}>
               {quote.total_amount != null && quote.total_amount > 0 ? (
-                <div style={{ fontSize: '1rem', fontWeight: 800, color: 'rgb(99,230,190)', letterSpacing: '-0.02em' }}>
+                <div style={{ fontSize: '1rem', fontWeight: 800, color: '#b8975e', letterSpacing: '-0.02em' }}>
                   {fmt(quote.total_amount)}
                 </div>
               ) : (
-                <div style={{ fontSize: '0.78rem', color: 'rgb(80,92,110)', fontStyle: 'italic' }}>
+                <div style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.24)', fontStyle: 'italic' }}>
                   Sob consulta
                 </div>
               )}
             </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgb(80,92,110)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(240,236,228,0.24)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M9 18l6-6-6-6" />
             </svg>
           </div>
@@ -182,8 +182,8 @@ function SummaryBar({ quotes }: { quotes: Quote[] }) {
   const stats = [
     { label: 'Total', value: String(total), color: 'rgb(170,180,198)' },
     { label: 'Pendentes', value: String(pending), color: 'rgb(245,158,11)' },
-    { label: 'Aprovados', value: String(approved), color: 'rgb(99,230,190)' },
-    { label: 'Valor total', value: totalValue > 0 ? fmt(totalValue) : '—', color: 'rgb(77,163,255)' },
+    { label: 'Aprovados', value: String(approved), color: '#b8975e' },
+    { label: 'Valor total', value: totalValue > 0 ? fmt(totalValue) : '—', color: '#d4b47a' },
   ];
 
   return (
@@ -198,10 +198,10 @@ function SummaryBar({ quotes }: { quotes: Quote[] }) {
     >
       {stats.map((stat) => (
         <div key={stat.label} style={{
-          background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
+          background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)',
           borderRadius: '12px', padding: '0.875rem 1rem',
         }}>
-          <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'rgb(70,82,100)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.3rem' }}>
+          <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'rgba(240,236,228,0.24)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.3rem' }}>
             {stat.label}
           </div>
           <div style={{ fontSize: '1.25rem', fontWeight: 800, color: stat.color, letterSpacing: '-0.03em', lineHeight: 1 }}>
@@ -282,19 +282,19 @@ export default function QuotesPage() {
           style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '1rem' }}
         >
           <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '0.25rem' }}>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '0.25rem' }}>
               Orçamentos
             </h1>
-            <p style={{ fontSize: '0.875rem', color: 'rgb(100,112,130)' }}>
+            <p style={{ fontSize: '0.875rem', color: 'rgba(240,236,228,0.42)' }}>
               {quotes.length} orçamento{quotes.length !== 1 ? 's' : ''} no total
             </p>
           </div>
           <Link href="/quotes/new" style={{
             display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-            background: 'rgb(77,163,255)', color: 'rgb(7,17,31)',
+            background: '#d4b47a', color: '#090907',
             padding: '0.625rem 1.125rem', borderRadius: '10px',
             fontWeight: 700, fontSize: '0.82rem', textDecoration: 'none',
-            boxShadow: '0 0 16px rgba(77,163,255,0.25)',
+            boxShadow: '0 0 16px rgba(154,124,74,0.22)',
           }}>
             + Novo Orçamento
           </Link>
@@ -310,7 +310,7 @@ export default function QuotesPage() {
           transition={{ delay: 0.15 }}
           style={{ position: 'relative', marginBottom: '1rem' }}
         >
-          <svg style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'rgb(80,92,110)', pointerEvents: 'none' }}
+          <svg style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(240,236,228,0.24)', pointerEvents: 'none' }}
             width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
           </svg>
@@ -321,13 +321,13 @@ export default function QuotesPage() {
             onChange={(e) => setSearch(e.target.value)}
             style={{
               width: '100%',
-              background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+              background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)',
               borderRadius: '10px', padding: '0.625rem 1rem 0.625rem 2.5rem',
               fontSize: '0.875rem', color: 'rgb(230,237,245)', outline: 'none',
               transition: 'border-color 150ms',
             }}
-            onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(77,163,255,0.4)')}
-            onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)')}
+            onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(154,124,74,0.35)')}
+            onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(240,236,228,0.06)')}
           />
         </motion.div>
 
@@ -347,9 +347,9 @@ export default function QuotesPage() {
                 padding: '0.4rem 0.875rem', borderRadius: '9999px',
                 fontSize: '0.8rem', fontWeight: filter === f.key ? 600 : 400,
                 cursor: 'pointer', transition: 'all 150ms',
-                background: filter === f.key ? 'rgba(77,163,255,0.15)' : 'rgba(255,255,255,0.04)',
-                color: filter === f.key ? 'rgb(77,163,255)' : 'rgb(100,112,130)',
-                border: filter === f.key ? '1px solid rgba(77,163,255,0.3)' : '1px solid rgba(255,255,255,0.06)',
+                background: filter === f.key ? 'rgba(154,124,74,0.14)' : 'rgba(240,236,228,0.04)',
+                color: filter === f.key ? '#d4b47a' : 'rgba(240,236,228,0.42)',
+                border: filter === f.key ? '1px solid rgba(154,124,74,0.28)' : '1px solid rgba(240,236,228,0.06)',
               }}
             >
               {f.label}
@@ -365,7 +365,7 @@ export default function QuotesPage() {
                 key={n}
                 animate={{ opacity: [0.3, 0.6, 0.3] }}
                 transition={{ duration: 1.5, repeat: Infinity, delay: n * 0.15 }}
-                style={{ height: '76px', borderRadius: '16px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.05)' }}
+                style={{ height: '76px', borderRadius: '16px', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)' }}
               />
             ))}
           </div>
@@ -375,21 +375,21 @@ export default function QuotesPage() {
             animate={{ opacity: 1, y: 0 }}
             style={{
               textAlign: 'center', padding: '4rem 2rem',
-              background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)',
+              background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(240,236,228,0.06)',
               borderRadius: '18px',
             }}
           >
             <div style={{ fontSize: '3rem', marginBottom: '0.875rem', opacity: 0.5 }}>📋</div>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'rgb(200,210,225)', marginBottom: '0.5rem' }}>
+            <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'rgba(240,236,228,0.72)', marginBottom: '0.5rem' }}>
               {search || filter !== 'all' ? 'Nenhum resultado encontrado' : 'Ainda não tens orçamentos'}
             </h3>
-            <p style={{ fontSize: '0.875rem', color: 'rgb(80,92,110)', marginBottom: '1.5rem', maxWidth: '320px', margin: '0 auto 1.5rem' }}>
+            <p style={{ fontSize: '0.875rem', color: 'rgba(240,236,228,0.24)', marginBottom: '1.5rem', maxWidth: '320px', margin: '0 auto 1.5rem' }}>
               {search || filter !== 'all' ? 'Tenta mudar os filtros.' : 'Pede o teu primeiro orçamento e recebe proposta em 24h.'}
             </p>
             {!search && filter === 'all' && (
               <Link href="/quotes/new" style={{
                 display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
-                background: 'rgb(77,163,255)', color: 'rgb(7,17,31)',
+                background: '#d4b47a', color: '#090907',
                 padding: '0.625rem 1.25rem', borderRadius: '10px',
                 fontWeight: 700, fontSize: '0.875rem', textDecoration: 'none',
               }}>
@@ -401,7 +401,7 @@ export default function QuotesPage() {
           <AnimatePresence mode="popLayout">
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {filtered.map((q, i) => <QuoteCard key={q.id} quote={q} index={i} />)}
-              <p style={{ textAlign: 'center', fontSize: '0.72rem', color: 'rgb(70,82,100)', marginTop: '0.5rem' }}>
+              <p style={{ textAlign: 'center', fontSize: '0.72rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.5rem' }}>
                 {filtered.length} orçamento{filtered.length !== 1 ? 's' : ''}
               </p>
             </div>

@@ -44,7 +44,7 @@ type SortKey = 'health_score' | 'churn_risk' | 'upsell_score' | 'ltv_estimate' |
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const CHURN_CFG: Record<string, { label: string; color: string; bg: string }> = {
-  low:      { label: 'Baixo',     color: 'rgb(99,230,190)',  bg: 'rgba(99,230,190,0.1)' },
+  low:      { label: 'Baixo',     color: '#b8975e',  bg: 'rgba(184,151,94,0.10)' },
   medium:   { label: 'Médio',     color: 'rgb(245,158,11)',  bg: 'rgba(245,158,11,0.1)' },
   high:     { label: 'Alto',      color: 'rgb(239,68,68)',   bg: 'rgba(239,68,68,0.1)' },
   critical: { label: 'Crítico',   color: 'rgb(220,38,38)',   bg: 'rgba(220,38,38,0.16)' },
@@ -60,7 +60,7 @@ const ACTION_ICONS: Record<string, string> = {
 };
 
 const PRIORITY_COLOR: Record<string, string> = {
-  low: 'rgb(80,92,110)', medium: 'rgb(77,163,255)', high: 'rgb(245,158,11)', critical: 'rgb(239,68,68)',
+  low: 'rgba(240,236,228,0.24)', medium: '#d4b47a', high: 'rgb(245,158,11)', critical: 'rgb(239,68,68)',
 };
 
 function fmtEur(n: number) {
@@ -69,9 +69,9 @@ function fmtEur(n: number) {
 function fmtDate(d?: string) { return d ? new Date(d).toLocaleDateString('pt-PT') : '—'; }
 
 function HealthBar({ score }: { score: number }) {
-  const color = score >= 70 ? 'rgb(99,230,190)' : score >= 50 ? 'rgb(245,158,11)' : 'rgb(239,68,68)';
+  const color = score >= 70 ? '#b8975e' : score >= 50 ? 'rgb(245,158,11)' : 'rgb(239,68,68)';
   return (
-    <div style={{ flex: 1, height: '5px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
+    <div style={{ flex: 1, height: '5px', background: 'rgba(240,236,228,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
       <motion.div
         initial={{ width: 0 }} animate={{ width: `${score}%` }}
         transition={{ duration: 0.6, ease: [0.16,1,0.3,1] }}
@@ -179,13 +179,13 @@ export default function SalesIntelligencePage() {
 
   return (
     <PortalLayout>
-      <div style={{ padding: '1.5rem', background: 'rgb(7,17,31)', minHeight: '100vh' }}>
+      <div style={{ padding: '1.5rem', background: '#090907', minHeight: '100vh' }}>
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.25rem', gap: '1rem', flexWrap: 'wrap' }}>
           <div>
             <h1 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'rgb(220,232,248)', margin: '0 0 0.2rem' }}>🎯 AI Sales Intelligence</h1>
-            <div style={{ fontSize: '0.72rem', color: 'rgb(80,92,110)' }}>
+            <div style={{ fontSize: '0.72rem', color: 'rgba(240,236,228,0.24)' }}>
               Saúde de clientes · Previsão de churn · Oportunidades de upsell · Ações automatizadas
             </div>
           </div>
@@ -195,7 +195,7 @@ export default function SalesIntelligencePage() {
               {computing ? '⏳ A calcular…' : '🧮 Recalcular Scores'}
             </motion.button>
             <motion.button whileTap={tapScale} onClick={generateActions} disabled={generating}
-              style={{ padding: '0.4rem 0.875rem', background: 'rgba(77,163,255,0.12)', border: '1px solid rgba(77,163,255,0.3)', borderRadius: '8px', color: 'rgb(77,163,255)', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}>
+              style={{ padding: '0.4rem 0.875rem', background: 'rgba(154,124,74,0.12)', border: '1px solid rgba(154,124,74,0.28)', borderRadius: '8px', color: '#d4b47a', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}>
               {generating ? '⏳ A gerar…' : '🤖 Gerar Ações AI'}
             </motion.button>
           </div>
@@ -203,7 +203,7 @@ export default function SalesIntelligencePage() {
 
         {actionSuccess && (
           <motion.div {...fadeUp}
-            style={{ marginBottom: '1rem', padding: '0.625rem 1rem', background: 'rgba(99,230,190,0.08)', border: '1px solid rgba(99,230,190,0.2)', borderRadius: '10px', color: 'rgb(99,230,190)', fontSize: '0.75rem', fontWeight: 600 }}>
+            style={{ marginBottom: '1rem', padding: '0.625rem 1rem', background: 'rgba(184,151,94,0.08)', border: '1px solid rgba(184,151,94,0.18)', borderRadius: '10px', color: '#b8975e', fontSize: '0.75rem', fontWeight: 600 }}>
             {actionSuccess}
           </motion.div>
         )}
@@ -212,16 +212,16 @@ export default function SalesIntelligencePage() {
         {summary && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0.625rem', marginBottom: '1.25rem' }}>
             {[
-              { label: 'Total Clientes', value: String(summary.total_clients), color: 'rgb(77,163,255)' },
-              { label: 'Health Score Médio', value: `${summary.avg_health_score.toFixed(0)}/100`, color: summary.avg_health_score >= 65 ? 'rgb(99,230,190)' : 'rgb(245,158,11)' },
-              { label: 'Em Risco', value: String(summary.at_risk), color: summary.at_risk > 0 ? 'rgb(239,68,68)' : 'rgb(99,230,190)' },
+              { label: 'Total Clientes', value: String(summary.total_clients), color: '#d4b47a' },
+              { label: 'Health Score Médio', value: `${summary.avg_health_score.toFixed(0)}/100`, color: summary.avg_health_score >= 65 ? '#b8975e' : 'rgb(245,158,11)' },
+              { label: 'Em Risco', value: String(summary.at_risk), color: summary.at_risk > 0 ? 'rgb(239,68,68)' : '#b8975e' },
               { label: 'Upsell Opps', value: String(summary.upsell_opportunities), color: 'rgb(245,158,11)' },
               { label: 'Clientes VIP', value: String(summary.vip_clients), color: 'rgb(167,139,250)' },
-              { label: 'LTV Total', value: fmtEur(summary.total_ltv), color: 'rgb(99,230,190)' },
+              { label: 'LTV Total', value: fmtEur(summary.total_ltv), color: '#b8975e' },
             ].map(k => (
-              <motion.div key={k.label} {...fadeUp} style={{ padding: '0.875rem', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <motion.div key={k.label} {...fadeUp} style={{ padding: '0.875rem', background: 'rgba(240,236,228,0.04)', borderRadius: '10px', border: '1px solid rgba(240,236,228,0.06)' }}>
                 <div style={{ fontSize: '1.1rem', fontWeight: 800, color: k.color, letterSpacing: '-0.02em', marginBottom: '0.15rem' }}>{k.value}</div>
-                <div style={{ fontSize: '0.58rem', color: 'rgb(80,92,110)' }}>{k.label}</div>
+                <div style={{ fontSize: '0.58rem', color: 'rgba(240,236,228,0.24)' }}>{k.label}</div>
               </motion.div>
             ))}
           </div>
@@ -231,7 +231,7 @@ export default function SalesIntelligencePage() {
         <div style={{ display: 'flex', gap: '0.375rem', marginBottom: '1rem' }}>
           {(['health','actions'] as ViewMode[]).map(m => (
             <button type="button" key={m} onClick={() => setViewMode(m)}
-              style={{ padding: '0.4rem 0.875rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', border: '1px solid transparent', background: viewMode === m ? 'rgba(77,163,255,0.15)' : 'rgba(255,255,255,0.04)', color: viewMode === m ? 'rgb(77,163,255)' : 'rgb(80,92,110)', borderColor: viewMode === m ? 'rgba(77,163,255,0.3)' : 'transparent' }}>
+              style={{ padding: '0.4rem 0.875rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', border: '1px solid transparent', background: viewMode === m ? 'rgba(154,124,74,0.14)' : 'rgba(240,236,228,0.04)', color: viewMode === m ? '#d4b47a' : 'rgba(240,236,228,0.24)', borderColor: viewMode === m ? 'rgba(154,124,74,0.28)' : 'transparent' }}>
               {m === 'health' ? `🏥 Saúde Clientes (${filteredHealth.length})` : `📋 Fila de Ações (${pendingActions.length})`}
             </button>
           ))}
@@ -245,25 +245,25 @@ export default function SalesIntelligencePage() {
 
               {/* Filters + sort */}
               <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.875rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)', fontWeight: 700 }}>CHURN:</span>
+                <span style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)', fontWeight: 700 }}>CHURN:</span>
                 {['all','low','medium','high','critical'].map(c => (
                   <button type="button" key={c} onClick={() => setChurnFilter(c)}
-                    style={{ padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.6rem', fontWeight: 700, cursor: 'pointer', border: '1px solid transparent', background: churnFilter === c ? 'rgba(77,163,255,0.15)' : 'rgba(255,255,255,0.04)', color: churnFilter === c ? 'rgb(77,163,255)' : 'rgb(80,92,110)', borderColor: churnFilter === c ? 'rgba(77,163,255,0.3)' : 'transparent' }}>
+                    style={{ padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.6rem', fontWeight: 700, cursor: 'pointer', border: '1px solid transparent', background: churnFilter === c ? 'rgba(154,124,74,0.14)' : 'rgba(240,236,228,0.04)', color: churnFilter === c ? '#d4b47a' : 'rgba(240,236,228,0.24)', borderColor: churnFilter === c ? 'rgba(154,124,74,0.28)' : 'transparent' }}>
                     {c === 'all' ? 'Todos' : CHURN_CFG[c]?.label ?? c}
                   </button>
                 ))}
-                <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.08)', margin: '0 0.25rem' }} />
-                <span style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)', fontWeight: 700 }}>ALERTA:</span>
+                <div style={{ width: '1px', height: '16px', background: 'rgba(240,236,228,0.06)', margin: '0 0.25rem' }} />
+                <span style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)', fontWeight: 700 }}>ALERTA:</span>
                 {['all','at_risk','win_back','upsell','vip_nurture'].map(a => (
                   <button type="button" key={a} onClick={() => setAlertFilter(a)}
-                    style={{ padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.6rem', fontWeight: 700, cursor: 'pointer', border: '1px solid transparent', background: alertFilter === a ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.04)', color: alertFilter === a ? 'rgb(245,158,11)' : 'rgb(80,92,110)', borderColor: alertFilter === a ? 'rgba(245,158,11,0.3)' : 'transparent' }}>
+                    style={{ padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.6rem', fontWeight: 700, cursor: 'pointer', border: '1px solid transparent', background: alertFilter === a ? 'rgba(245,158,11,0.15)' : 'rgba(240,236,228,0.04)', color: alertFilter === a ? 'rgb(245,158,11)' : 'rgba(240,236,228,0.24)', borderColor: alertFilter === a ? 'rgba(245,158,11,0.3)' : 'transparent' }}>
                     {a === 'all' ? 'Todos' : `${ALERT_ICONS[a] ?? ''} ${a.replace('_',' ')}`}
                   </button>
                 ))}
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)', fontWeight: 700 }}>SORT:</span>
+                  <span style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)', fontWeight: 700 }}>SORT:</span>
                   <select value={sortKey} onChange={e => setSortKey(e.target.value as SortKey)}
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '7px', padding: '0.2rem 0.5rem', color: 'rgb(150,165,185)', fontSize: '0.65rem' }}>
+                    style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '7px', padding: '0.2rem 0.5rem', color: 'rgb(150,165,185)', fontSize: '0.65rem' }}>
                     <option value="health_score" style={{ background: 'rgb(14,22,36)' }}>Health ↑</option>
                     <option value="churn_risk" style={{ background: 'rgb(14,22,36)' }}>Churn Risk ↓</option>
                     <option value="upsell_score" style={{ background: 'rgb(14,22,36)' }}>Upsell ↓</option>
@@ -276,18 +276,18 @@ export default function SalesIntelligencePage() {
               {loading ? (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '0.625rem' }}>
                   {[...Array(6)].map((_, i) => (
-                    <div key={i} style={{ padding: '1rem', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                      <div style={{ height: '3.5px', width: '60%', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', marginBottom: '0.75rem' }} />
-                      <div style={{ height: '3px', background: 'rgba(255,255,255,0.04)', borderRadius: '4px', marginBottom: '0.5rem' }} />
-                      <div style={{ height: '3px', width: '40%', background: 'rgba(255,255,255,0.04)', borderRadius: '4px' }} />
+                    <div key={i} style={{ padding: '1rem', borderRadius: '12px', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)' }}>
+                      <div style={{ height: '3.5px', width: '60%', background: 'rgba(240,236,228,0.06)', borderRadius: '4px', marginBottom: '0.75rem' }} />
+                      <div style={{ height: '3px', background: 'rgba(240,236,228,0.04)', borderRadius: '4px', marginBottom: '0.5rem' }} />
+                      <div style={{ height: '3px', width: '40%', background: 'rgba(240,236,228,0.04)', borderRadius: '4px' }} />
                     </div>
                   ))}
                 </div>
               ) : filteredHealth.length === 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '300px', color: 'rgb(80,92,110)', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '300px', color: 'rgba(240,236,228,0.24)', gap: '0.75rem' }}>
                   <div style={{ fontSize: '2rem' }}>🎯</div>
-                  <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'rgb(140,155,175)' }}>Nenhum cliente calculado ainda</div>
-                  <button type="button" onClick={computeAll} style={{ background: 'none', border: 'none', color: 'rgb(77,163,255)', cursor: 'pointer', fontSize: '0.75rem' }}>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'rgba(240,236,228,0.42)' }}>Nenhum cliente calculado ainda</div>
+                  <button type="button" onClick={computeAll} style={{ background: 'none', border: 'none', color: '#d4b47a', cursor: 'pointer', fontSize: '0.75rem' }}>
                     → Calcular scores agora
                   </button>
                 </div>
@@ -305,8 +305,8 @@ export default function SalesIntelligencePage() {
                           onClick={() => setSelected(isSelected ? null : h)}
                           style={{
                             padding: '1rem', borderRadius: '12px',
-                            background: isSelected ? 'rgba(77,163,255,0.06)' : 'rgba(255,255,255,0.03)',
-                            border: `1px solid ${isSelected ? 'rgba(77,163,255,0.25)' : 'rgba(255,255,255,0.06)'}`,
+                            background: isSelected ? 'rgba(77,163,255,0.06)' : 'rgba(240,236,228,0.04)',
+                            border: `1px solid ${isSelected ? 'rgba(154,124,74,0.22)' : 'rgba(240,236,228,0.06)'}`,
                             cursor: 'pointer', transition: 'all 120ms',
                           }}
                         >
@@ -317,7 +317,7 @@ export default function SalesIntelligencePage() {
                                 {h.alert_type && <span style={{ fontSize: '0.75rem' }}>{ALERT_ICONS[h.alert_type]}</span>}
                                 <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(200,215,235)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.client_name}</span>
                               </div>
-                              {h.client_email && <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.client_email}</div>}
+                              {h.client_email && <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.client_email}</div>}
                             </div>
                             <span style={{ padding: '0.18rem 0.45rem', borderRadius: '5px', background: churnCfg.bg, color: churnCfg.color, fontSize: '0.58rem', fontWeight: 700, flexShrink: 0, marginLeft: '0.5rem' }}>
                               {churnCfg.label}
@@ -326,9 +326,9 @@ export default function SalesIntelligencePage() {
 
                           {/* Health bar */}
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                            <span style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)', width: '32px' }}>Health</span>
+                            <span style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)', width: '32px' }}>Health</span>
                             <HealthBar score={h.health_score} />
-                            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: h.health_score >= 70 ? 'rgb(99,230,190)' : h.health_score >= 50 ? 'rgb(245,158,11)' : 'rgb(239,68,68)', width: '28px', textAlign: 'right' }}>
+                            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: h.health_score >= 70 ? '#b8975e' : h.health_score >= 50 ? 'rgb(245,158,11)' : 'rgb(239,68,68)', width: '28px', textAlign: 'right' }}>
                               {h.health_score}
                             </span>
                           </div>
@@ -341,9 +341,9 @@ export default function SalesIntelligencePage() {
                               { label: 'LTV', value: fmtEur(h.ltv_estimate) },
                               { label: 'Inativo', value: h.last_order_days != null ? `${h.last_order_days}d` : '—' },
                             ].map(m => (
-                              <div key={m.label} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '6px', padding: '0.3rem 0.375rem', textAlign: 'center' }}>
+                              <div key={m.label} style={{ background: 'rgba(240,236,228,0.04)', borderRadius: '6px', padding: '0.3rem 0.375rem', textAlign: 'center' }}>
                                 <div style={{ fontSize: '0.62rem', fontWeight: 700, color: 'rgb(150,165,185)' }}>{m.value}</div>
-                                <div style={{ fontSize: '0.5rem', color: 'rgb(60,72,90)', marginTop: '0.05rem' }}>{m.label}</div>
+                                <div style={{ fontSize: '0.5rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.05rem' }}>{m.label}</div>
                               </div>
                             ))}
                           </div>
@@ -355,19 +355,19 @@ export default function SalesIntelligencePage() {
                                 initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
                                 transition={{ duration: 0.2 }} style={{ overflow: 'hidden' }}
                               >
-                                <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                                <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(240,236,228,0.06)' }}>
                                   <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                    <div style={{ flex: 1, padding: '0.4rem', background: 'rgba(255,255,255,0.03)', borderRadius: '7px', textAlign: 'center' }}>
+                                    <div style={{ flex: 1, padding: '0.4rem', background: 'rgba(240,236,228,0.04)', borderRadius: '7px', textAlign: 'center' }}>
                                       <div style={{ fontSize: '0.72rem', fontWeight: 800, color: 'rgb(245,158,11)' }}>{h.upsell_score}/100</div>
-                                      <div style={{ fontSize: '0.55rem', color: 'rgb(80,92,110)' }}>Upsell Score</div>
+                                      <div style={{ fontSize: '0.55rem', color: 'rgba(240,236,228,0.24)' }}>Upsell Score</div>
                                     </div>
-                                    <div style={{ flex: 1, padding: '0.4rem', background: 'rgba(255,255,255,0.03)', borderRadius: '7px', textAlign: 'center' }}>
-                                      <div style={{ fontSize: '0.72rem', fontWeight: 800, color: 'rgb(77,163,255)' }}>{h.engagement_score}/100</div>
-                                      <div style={{ fontSize: '0.55rem', color: 'rgb(80,92,110)' }}>Engagement</div>
+                                    <div style={{ flex: 1, padding: '0.4rem', background: 'rgba(240,236,228,0.04)', borderRadius: '7px', textAlign: 'center' }}>
+                                      <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#d4b47a' }}>{h.engagement_score}/100</div>
+                                      <div style={{ fontSize: '0.55rem', color: 'rgba(240,236,228,0.24)' }}>Engagement</div>
                                     </div>
-                                    <div style={{ flex: 1, padding: '0.4rem', background: 'rgba(255,255,255,0.03)', borderRadius: '7px', textAlign: 'center' }}>
+                                    <div style={{ flex: 1, padding: '0.4rem', background: 'rgba(240,236,228,0.04)', borderRadius: '7px', textAlign: 'center' }}>
                                       <div style={{ fontSize: '0.72rem', fontWeight: 800, color: churnCfg.color }}>{(h.churn_probability * 100).toFixed(0)}%</div>
-                                      <div style={{ fontSize: '0.55rem', color: 'rgb(80,92,110)' }}>Prob. Churn</div>
+                                      <div style={{ fontSize: '0.55rem', color: 'rgba(240,236,228,0.24)' }}>Prob. Churn</div>
                                     </div>
                                   </div>
                                   {h.alert_type && (
@@ -392,10 +392,10 @@ export default function SalesIntelligencePage() {
           {viewMode === 'actions' && (
             <motion.div key="actions" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={springGentle}>
               {pendingActions.length === 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '300px', color: 'rgb(80,92,110)', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '300px', color: 'rgba(240,236,228,0.24)', gap: '0.75rem' }}>
                   <div style={{ fontSize: '2rem' }}>📋</div>
-                  <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'rgb(140,155,175)' }}>Sem ações pendentes</div>
-                  <button type="button" onClick={generateActions} style={{ background: 'none', border: 'none', color: 'rgb(77,163,255)', cursor: 'pointer', fontSize: '0.75rem' }}>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'rgba(240,236,228,0.42)' }}>Sem ações pendentes</div>
+                  <button type="button" onClick={generateActions} style={{ background: 'none', border: 'none', color: '#d4b47a', cursor: 'pointer', fontSize: '0.75rem' }}>
                     → Gerar ações com AI
                   </button>
                 </div>
@@ -406,18 +406,18 @@ export default function SalesIntelligencePage() {
                       key={act.id}
                       initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
                       transition={{ ...springSnappy, delay: idx * 0.04 }}
-                      style={{ padding: '1rem', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+                      style={{ padding: '1rem', borderRadius: '12px', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)' }}
                     >
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
                         <span style={{ fontSize: '1.2rem', flexShrink: 0, marginTop: '0.1rem' }}>{ACTION_ICONS[act.action_type] ?? '•'}</span>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
                             <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(200,215,235)' }}>{act.client_name}</span>
-                            <span style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)', background: 'rgba(255,255,255,0.04)', padding: '0.1rem 0.35rem', borderRadius: '5px' }}>{act.action_type.replace('_',' ')}</span>
-                            <span style={{ fontSize: '0.6rem', fontWeight: 700, color: PRIORITY_COLOR[act.priority] ?? 'rgb(80,92,110)' }}>● {act.priority}</span>
-                            {act.due_date && <span style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)' }}>📅 {fmtDate(act.due_date)}</span>}
+                            <span style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)', background: 'rgba(240,236,228,0.04)', padding: '0.1rem 0.35rem', borderRadius: '5px' }}>{act.action_type.replace('_',' ')}</span>
+                            <span style={{ fontSize: '0.6rem', fontWeight: 700, color: PRIORITY_COLOR[act.priority] ?? 'rgba(240,236,228,0.24)' }}>● {act.priority}</span>
+                            {act.due_date && <span style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)' }}>📅 {fmtDate(act.due_date)}</span>}
                           </div>
-                          {act.subject && <div style={{ fontSize: '0.68rem', color: 'rgb(140,155,175)', marginBottom: '0.25rem' }}>{act.subject}</div>}
+                          {act.subject && <div style={{ fontSize: '0.68rem', color: 'rgba(240,236,228,0.42)', marginBottom: '0.25rem' }}>{act.subject}</div>}
 
                           {/* AI Script (expandable) */}
                           {act.ai_script && (
@@ -442,7 +442,7 @@ export default function SalesIntelligencePage() {
                           )}
                         </div>
                         <motion.button whileTap={tapScale} onClick={() => completeAction(act.id)}
-                          style={{ padding: '0.35rem 0.625rem', background: 'rgba(99,230,190,0.12)', border: '1px solid rgba(99,230,190,0.25)', borderRadius: '7px', color: 'rgb(99,230,190)', fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                          style={{ padding: '0.35rem 0.625rem', background: 'rgba(184,151,94,0.12)', border: '1px solid rgba(99,230,190,0.25)', borderRadius: '7px', color: '#b8975e', fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
                           ✓ Feito
                         </motion.button>
                       </div>

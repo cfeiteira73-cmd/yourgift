@@ -49,20 +49,20 @@ export function OrderTimeline({ steps, currentStatus }: OrderTimelineProps) {
                   transition: 'all 200ms ease',
                   ...(isCompleted
                     ? {
-                        background: 'rgb(99,230,190)',
-                        color: 'rgb(7,17,31)',
-                        boxShadow: '0 0 0 4px rgba(99,230,190,0.15)',
+                        background: '#b8975e',
+                        color: '#090907',
+                        boxShadow: '0 0 0 4px rgba(184,151,94,0.14)',
                       }
                     : isCurrent
                     ? {
-                        background: 'rgb(77,163,255)',
-                        color: 'rgb(7,17,31)',
-                        boxShadow: '0 0 0 4px rgba(77,163,255,0.2)',
+                        background: '#d4b47a',
+                        color: '#090907',
+                        boxShadow: '0 0 0 4px rgba(154,124,74,0.18)',
                       }
                     : {
                         background: 'transparent',
                         color: 'rgba(170,180,198,0.5)',
-                        border: '2px solid rgba(255,255,255,0.1)',
+                        border: '2px solid rgba(240,236,228,0.10)',
                       }),
                 }}
               >
@@ -81,8 +81,8 @@ export function OrderTimeline({ steps, currentStatus }: OrderTimelineProps) {
                     flex: 1,
                     minHeight: '24px',
                     background: isCompleted
-                      ? 'linear-gradient(to bottom, rgb(99,230,190), rgba(99,230,190,0.3))'
-                      : 'rgba(255,255,255,0.06)',
+                      ? 'linear-gradient(to bottom, #b8975e, rgba(99,230,190,0.3))'
+                      : 'rgba(240,236,228,0.06)',
                     margin: '4px 0',
                   }}
                 />
@@ -96,9 +96,9 @@ export function OrderTimeline({ steps, currentStatus }: OrderTimelineProps) {
                   fontWeight: 600,
                   fontSize: '0.875rem',
                   color: isCompleted
-                    ? 'rgb(245,247,251)'
+                    ? '#f0ece4'
                     : isCurrent
-                    ? 'rgb(77,163,255)'
+                    ? '#d4b47a'
                     : 'rgba(170,180,198,0.5)',
                   marginBottom: '0.2rem',
                 }}
@@ -107,7 +107,7 @@ export function OrderTimeline({ steps, currentStatus }: OrderTimelineProps) {
               </p>
 
               {(step.timestamp || step.actor) && (
-                <p style={{ fontSize: '0.75rem', color: 'rgb(120,130,150)' }}>
+                <p style={{ fontSize: '0.75rem', color: 'rgba(240,236,228,0.42)' }}>
                   {step.timestamp &&
                     new Date(step.timestamp).toLocaleString('pt-PT', {
                       day: 'numeric',
@@ -122,7 +122,7 @@ export function OrderTimeline({ steps, currentStatus }: OrderTimelineProps) {
               )}
 
               {step.trackingNumber && (
-                <p style={{ fontSize: '0.75rem', color: 'rgb(116,231,255)', marginTop: '0.25rem' }}>
+                <p style={{ fontSize: '0.75rem', color: '#b8975e', marginTop: '0.25rem' }}>
                   Rastreio:{' '}
                   <a
                     href={`https://www.google.com/search?q=${encodeURIComponent(step.trackingNumber)}`}
@@ -136,7 +136,7 @@ export function OrderTimeline({ steps, currentStatus }: OrderTimelineProps) {
               )}
 
               {isCurrent && !step.timestamp && (
-                <p style={{ fontSize: '0.75rem', color: 'rgb(77,163,255)', opacity: 0.7, marginTop: '0.15rem' }}>
+                <p style={{ fontSize: '0.75rem', color: '#d4b47a', opacity: 0.7, marginTop: '0.15rem' }}>
                   Em curso...
                 </p>
               )}

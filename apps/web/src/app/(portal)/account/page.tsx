@@ -195,7 +195,7 @@ export default function AccountPage() {
               {sessions.map(s => (
                 <div key={s.id} className="flex items-start gap-3 p-3 rounded-xl bg-white/3 border border-white/5">
                   <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center flex-shrink-0">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgb(77,163,255)" strokeWidth="1.75">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d4b47a" strokeWidth="1.75">
                       <rect x="2" y="3" width="20" height="14" rx="2" />
                       <path d="M8 21h8M12 17v4" />
                     </svg>

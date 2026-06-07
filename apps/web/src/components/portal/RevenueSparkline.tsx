@@ -5,7 +5,7 @@
  *
  * Props:
  *   data    - array of { label, value } points
- *   color   - stroke color (default: rgb(99,230,190))
+ *   color   - stroke color (default: #b8975e)
  *   height  - SVG height in px (default: 40)
  *   width   - SVG width in px (default: 120)
  *   filled  - show area fill below the line (default: true)
@@ -36,7 +36,7 @@ function normalize(values: number[], min: number, max: number, toMin: number, to
 
 export function RevenueSparkline({
   data,
-  color = 'rgb(99,230,190)',
+  color = '#b8975e',
   height = 40,
   width = 120,
   filled = true,
@@ -55,7 +55,7 @@ export function RevenueSparkline({
   }, [data, height, width]);
 
   if (!points || !data.length) {
-    return <div className={className} style={{ width, height, opacity: 0.3, background: 'rgba(255,255,255,0.03)', borderRadius: 4 }} />;
+    return <div className={className} style={{ width, height, opacity: 0.3, background: 'rgba(240,236,228,0.04)', borderRadius: 4 }} />;
   }
 
   const { xs, ys } = points;
@@ -130,12 +130,12 @@ interface SparklineCardProps {
   width?: number;
 }
 
-export function SparklineCard({ title, value, subtitle, trend, data, color = 'rgb(99,230,190)', width = 100 }: SparklineCardProps) {
+export function SparklineCard({ title, value, subtitle, trend, data, color = '#b8975e', width = 100 }: SparklineCardProps) {
   const positive = (trend ?? 0) >= 0;
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.03)',
-      border: '1px solid rgba(255,255,255,0.06)',
+      background: 'rgba(240,236,228,0.04)',
+      border: '1px solid rgba(240,236,228,0.06)',
       borderRadius: '12px',
       padding: '1rem',
       display: 'flex',
@@ -144,7 +144,7 @@ export function SparklineCard({ title, value, subtitle, trend, data, color = 'rg
       gap: '1rem',
     }}>
       <div>
-        <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.25rem' }}>
+        <div style={{ fontSize: '0.7rem', color: 'rgba(240,236,228,0.35)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.25rem' }}>
           {title}
         </div>
         <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#fff', lineHeight: 1.1 }}>
@@ -156,8 +156,8 @@ export function SparklineCard({ title, value, subtitle, trend, data, color = 'rg
               <span style={{
                 fontSize: '0.65rem',
                 fontWeight: 700,
-                color: positive ? 'rgb(99,230,190)' : 'rgb(239,68,68)',
-                background: positive ? 'rgba(99,230,190,0.1)' : 'rgba(239,68,68,0.1)',
+                color: positive ? '#b8975e' : 'rgb(239,68,68)',
+                background: positive ? 'rgba(184,151,94,0.10)' : 'rgba(239,68,68,0.1)',
                 borderRadius: '6px',
                 padding: '0.1rem 0.35rem',
               }}>

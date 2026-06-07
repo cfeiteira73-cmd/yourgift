@@ -64,20 +64,20 @@ function getSlaHours(order: Order, slaMap: Record<string, SlaDefinition>): numbe
 }
 
 const SLA_STATUS_CFG = {
-  ok:       { color: 'rgb(99,230,190)',  bg: 'rgba(99,230,190,0.1)',  label: 'No prazo',  dot: '●' },
+  ok:       { color: '#b8975e',  bg: 'rgba(184,151,94,0.10)',  label: 'No prazo',  dot: '●' },
   warning:  { color: 'rgb(245,158,11)', bg: 'rgba(245,158,11,0.1)', label: 'Em risco',   dot: '◐' },
   critical: { color: 'rgb(239,68,68)',  bg: 'rgba(239,68,68,0.1)',  label: 'SLA violado', dot: '⚠' },
-  none:     { color: 'rgb(80,92,110)',  bg: 'rgba(80,92,110,0.08)', label: '—',           dot: '○' },
+  none:     { color: 'rgba(240,236,228,0.24)',  bg: 'rgba(80,92,110,0.08)', label: '—',           dot: '○' },
 };
 
 // ── Stage config ──────────────────────────────────────────────────────────────
 
 const STAGES = [
-  { key: 'pending',       label: 'Pendente',              color: 'rgb(120,130,150)', bg: 'rgba(120,130,150,0.08)', border: 'rgba(120,130,150,0.15)', icon: '⏳' },
-  { key: 'confirmed',     label: 'Confirmado',            color: 'rgb(77,163,255)',  bg: 'rgba(77,163,255,0.08)',  border: 'rgba(77,163,255,0.15)',  icon: '✅' },
+  { key: 'pending',       label: 'Pendente',              color: 'rgba(240,236,228,0.42)', bg: 'rgba(120,130,150,0.08)', border: 'rgba(120,130,150,0.15)', icon: '⏳' },
+  { key: 'confirmed',     label: 'Confirmado',            color: '#d4b47a',  bg: 'rgba(154,124,74,0.08)',  border: 'rgba(154,124,74,0.14)',  icon: '✅' },
   { key: 'producing',     label: 'Em Produção',           color: 'rgb(245,158,11)',  bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.15)',  icon: '🏭' },
   { key: 'quality',       label: 'Controlo QA',           color: 'rgb(239,68,68)',   bg: 'rgba(239,68,68,0.08)',  border: 'rgba(239,68,68,0.15)',   icon: '🔍' },
-  { key: 'shipped',       label: 'Em Trânsito',           color: 'rgb(99,230,190)',  bg: 'rgba(99,230,190,0.08)', border: 'rgba(99,230,190,0.15)',  icon: '🚚' },
+  { key: 'shipped',       label: 'Em Trânsito',           color: '#b8975e',  bg: 'rgba(184,151,94,0.08)', border: 'rgba(184,151,94,0.14)',  icon: '🚚' },
   { key: 'delivered',     label: 'Entregue',              color: 'rgb(167,243,208)', bg: 'rgba(167,243,208,0.08)',border: 'rgba(167,243,208,0.15)', icon: '🎉' },
 ];
 
@@ -144,31 +144,31 @@ function PipelineCard({
     >
       {/* SLA progress bar at bottom */}
       {sla && (
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px', background: 'rgba(255,255,255,0.04)' }}>
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px', background: 'rgba(240,236,228,0.04)' }}>
           <div style={{
             height: '100%',
             width: `${slaPct}%`,
-            background: slaStatus === 'critical' ? 'rgb(239,68,68)' : slaStatus === 'warning' ? 'rgb(245,158,11)' : 'rgb(99,230,190)',
+            background: slaStatus === 'critical' ? 'rgb(239,68,68)' : slaStatus === 'warning' ? 'rgb(245,158,11)' : '#b8975e',
             transition: 'width 0.5s ease',
           }} />
         </div>
       )}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.25rem' }}>
-        <span style={{ fontSize: '0.65rem', fontFamily: 'monospace', fontWeight: 700, color: 'rgb(200,210,225)' }}>{order.ref}</span>
-        <Link href={`/orders/${order.id}`} style={{ fontSize: '0.58rem', color: 'rgb(77,163,255)', textDecoration: 'none', flexShrink: 0, marginLeft: '0.3rem' }}>→</Link>
+        <span style={{ fontSize: '0.65rem', fontFamily: 'monospace', fontWeight: 700, color: 'rgba(240,236,228,0.72)' }}>{order.ref}</span>
+        <Link href={`/orders/${order.id}`} style={{ fontSize: '0.58rem', color: '#d4b47a', textDecoration: 'none', flexShrink: 0, marginLeft: '0.3rem' }}>→</Link>
       </div>
 
       <p style={{ fontSize: '0.68rem', color: 'rgb(150,165,185)', marginBottom: '0.3rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</p>
 
       {isAdmin && clientLabel && (
-        <p style={{ fontSize: '0.6rem', color: 'rgb(77,163,255)', marginBottom: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 600 }}>
+        <p style={{ fontSize: '0.6rem', color: '#d4b47a', marginBottom: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 600 }}>
           {clientLabel}
         </p>
       )}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
-        <span style={{ fontSize: '0.62rem', color: 'rgb(80,92,110)' }}>{qty} un. · {daysAgo(order.created_at)}</span>
+        <span style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)' }}>{qty} un. · {daysAgo(order.created_at)}</span>
         <span style={{ fontSize: '0.65rem', fontWeight: 700, color: stage.color }}>
           {order.total_amount ? `€${order.total_amount.toLocaleString('pt-PT')}` : '—'}
         </span>
@@ -185,7 +185,7 @@ function PipelineCard({
           }}>
             {slaCfg.dot} {slaCfg.label}
           </span>
-          <span style={{ fontSize: '0.56rem', color: 'rgb(70,82,100)' }}>
+          <span style={{ fontSize: '0.56rem', color: 'rgba(240,236,228,0.24)' }}>
             {fmtHours(hoursInStage)}{sla ? ` / ${fmtHours(sla.critical_hours)}` : ''}
           </span>
         </div>
@@ -304,16 +304,16 @@ export default function ProductionPage() {
           style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.15rem' }}>
-              <h1 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em' }}>
+              <h1 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em' }}>
                 Manufacturing OS
               </h1>
               {isAdmin && (
-                <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'rgb(116,231,255)', background: 'rgba(116,231,255,0.1)', border: '1px solid rgba(116,231,255,0.2)', borderRadius: '9999px', padding: '0.15rem 0.5rem' }}>
+                <span style={{ fontSize: '0.62rem', fontWeight: 700, color: '#b8975e', background: 'rgba(184,151,94,0.10)', border: '1px solid rgba(184,151,94,0.18)', borderRadius: '9999px', padding: '0.15rem 0.5rem' }}>
                   ADMIN — VISÃO GLOBAL
                 </span>
               )}
             </div>
-            <p style={{ fontSize: '0.75rem', color: 'rgb(80,92,110)' }}>
+            <p style={{ fontSize: '0.75rem', color: 'rgba(240,236,228,0.24)' }}>
               {totalActive} encomendas ativas · Atualizado {lastRefresh.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}
             </p>
           </div>
@@ -322,11 +322,11 @@ export default function ProductionPage() {
               type="button"
               onClick={() => { setLoading(true); load(); }}
               whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
-              style={{ fontSize: '0.72rem', color: 'rgb(77,163,255)', background: 'rgba(77,163,255,0.08)', border: '1px solid rgba(77,163,255,0.2)', borderRadius: '8px', padding: '0.35rem 0.75rem', cursor: 'pointer' }}
+              style={{ fontSize: '0.72rem', color: '#d4b47a', background: 'rgba(154,124,74,0.08)', border: '1px solid rgba(154,124,74,0.18)', borderRadius: '8px', padding: '0.35rem 0.75rem', cursor: 'pointer' }}
             >
               ↻ Atualizar
             </motion.button>
-            <Link href="/orders" style={{ fontSize: '0.72rem', color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600, padding: '0.35rem 0.75rem', background: 'rgba(77,163,255,0.08)', borderRadius: '8px', border: '1px solid rgba(77,163,255,0.2)' }}>
+            <Link href="/orders" style={{ fontSize: '0.72rem', color: '#d4b47a', textDecoration: 'none', fontWeight: 600, padding: '0.35rem 0.75rem', background: 'rgba(154,124,74,0.08)', borderRadius: '8px', border: '1px solid rgba(154,124,74,0.18)' }}>
               Ver todas as encomendas →
             </Link>
           </div>
@@ -336,17 +336,17 @@ export default function ProductionPage() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.08 }}
           style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0.5rem', marginBottom: '0.875rem' }}>
           {[
-            { label: 'Em produção',    value: String(totalActive),        color: 'rgb(77,163,255)',   icon: '🏭' },
-            { label: 'No prazo',       value: String(onTimeSla),           color: 'rgb(99,230,190)',   icon: '✅' },
+            { label: 'Em produção',    value: String(totalActive),        color: '#d4b47a',   icon: '🏭' },
+            { label: 'No prazo',       value: String(onTimeSla),           color: '#b8975e',   icon: '✅' },
             { label: 'Em risco',       value: String(warningSla),          color: 'rgb(245,158,11)',   icon: '⚡' },
-            { label: 'SLA violado',    value: String(criticalSla),         color: criticalSla > 0 ? 'rgb(239,68,68)' : 'rgb(99,230,190)', icon: '🚨' },
-            { label: 'Compliance SLA', value: `${slaCompliancePct}%`,      color: slaCompliancePct >= 90 ? 'rgb(99,230,190)' : slaCompliancePct >= 70 ? 'rgb(245,158,11)' : 'rgb(239,68,68)', icon: '📊' },
+            { label: 'SLA violado',    value: String(criticalSla),         color: criticalSla > 0 ? 'rgb(239,68,68)' : '#b8975e', icon: '🚨' },
+            { label: 'Compliance SLA', value: `${slaCompliancePct}%`,      color: slaCompliancePct >= 90 ? '#b8975e' : slaCompliancePct >= 70 ? 'rgb(245,158,11)' : 'rgb(239,68,68)', icon: '📊' },
             { label: 'Valor em curso', value: `€${Math.round(totalValue / 1000)}k`, color: 'rgb(167,139,250)', icon: '💶' },
           ].map((kpi, i) => (
             <motion.div key={kpi.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.04 }}
-              style={{ padding: '0.6rem 0.75rem', borderRadius: '10px', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.05)' }}>
+              style={{ padding: '0.6rem 0.75rem', borderRadius: '10px', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(240,236,228,0.06)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
-                <span style={{ fontSize: '0.55rem', color: 'rgb(80,92,110)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{kpi.label}</span>
+                <span style={{ fontSize: '0.55rem', color: 'rgba(240,236,228,0.24)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{kpi.label}</span>
                 <span style={{ fontSize: '0.75rem' }}>{kpi.icon}</span>
               </div>
               <div style={{ fontSize: '1.1rem', fontWeight: 800, color: kpi.color, letterSpacing: '-0.03em', lineHeight: 1 }}>{kpi.value}</div>
@@ -378,7 +378,7 @@ export default function ProductionPage() {
         {/* ── Stage filter pills ── */}
         <div style={{ display: 'flex', gap: '0.375rem', marginBottom: '0.875rem', flexWrap: 'wrap' }}>
           <button type="button" onClick={() => setStageFilter(null)}
-            style={{ fontSize: '0.68rem', fontWeight: 600, padding: '0.25rem 0.625rem', borderRadius: '9999px', border: `1px solid ${!stageFilter ? 'rgba(77,163,255,0.4)' : 'rgba(255,255,255,0.07)'}`, background: !stageFilter ? 'rgba(77,163,255,0.12)' : 'rgba(255,255,255,0.03)', color: !stageFilter ? 'rgb(77,163,255)' : 'rgb(80,92,110)', cursor: 'pointer' }}>
+            style={{ fontSize: '0.68rem', fontWeight: 600, padding: '0.25rem 0.625rem', borderRadius: '9999px', border: `1px solid ${!stageFilter ? 'rgba(154,124,74,0.35)' : 'rgba(240,236,228,0.06)'}`, background: !stageFilter ? 'rgba(154,124,74,0.12)' : 'rgba(240,236,228,0.04)', color: !stageFilter ? '#d4b47a' : 'rgba(240,236,228,0.24)', cursor: 'pointer' }}>
             Todos ({totalActive})
           </button>
           {STAGES.map(stage => {
@@ -386,14 +386,14 @@ export default function ProductionPage() {
             const isBottleneck = stage.key === bottleneck && count > 0;
             return (
               <button type="button" key={stage.key}  onClick={() => setStageFilter(stageFilter === stage.key ? null : stage.key)}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.68rem', fontWeight: count > 0 ? 700 : 400, padding: '0.25rem 0.625rem', borderRadius: '9999px', border: `1px solid ${stageFilter === stage.key ? stage.border : count > 0 ? stage.border : 'rgba(255,255,255,0.07)'}`, background: stageFilter === stage.key ? stage.bg : 'rgba(255,255,255,0.02)', color: count > 0 ? stage.color : 'rgb(60,72,90)', cursor: 'pointer' }}>
+                style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.68rem', fontWeight: count > 0 ? 700 : 400, padding: '0.25rem 0.625rem', borderRadius: '9999px', border: `1px solid ${stageFilter === stage.key ? stage.border : count > 0 ? stage.border : 'rgba(240,236,228,0.06)'}`, background: stageFilter === stage.key ? stage.bg : 'rgba(255,255,255,0.02)', color: count > 0 ? stage.color : 'rgba(240,236,228,0.24)', cursor: 'pointer' }}>
                 {stage.icon} {count}
                 {isBottleneck && <span style={{ fontSize: '0.52rem', color: 'rgb(245,158,11)', fontWeight: 700 }}>▲</span>}
               </button>
             );
           })}
           {Object.keys(slaMap).length > 0 && (
-            <span style={{ fontSize: '0.62rem', color: 'rgb(60,72,90)', alignSelf: 'center', marginLeft: '0.25rem' }}>
+            <span style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.24)', alignSelf: 'center', marginLeft: '0.25rem' }}>
               · {Object.keys(slaMap).length} estágios SLA definidos
             </span>
           )}
@@ -408,10 +408,10 @@ export default function ProductionPage() {
             style={{ marginBottom: '1rem' }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(240,236,228,0.35)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 Production Load Heatmap
               </span>
-              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>· calor = carga relativa</span>
+              <span style={{ fontSize: 10, color: 'rgba(240,236,228,0.18)' }}>· calor = carga relativa</span>
             </div>
             <ManufacturingHeatmap
               loading={loading}
@@ -470,7 +470,7 @@ export default function ProductionPage() {
                   transition={{ duration: 0.4, delay: si * 0.05, ease: [0.16, 1, 0.3, 1] }}
                   style={{
                     background: 'rgba(255,255,255,0.018)',
-                    border: `1px solid ${criticalInStage > 0 ? 'rgba(239,68,68,0.18)' : 'rgba(255,255,255,0.05)'}`,
+                    border: `1px solid ${criticalInStage > 0 ? 'rgba(239,68,68,0.18)' : 'rgba(240,236,228,0.06)'}`,
                     borderRadius: '12px', padding: '0.75rem 0.625rem',
                     overflowY: 'auto', display: 'flex', flexDirection: 'column', minWidth: '180px',
                   }}>

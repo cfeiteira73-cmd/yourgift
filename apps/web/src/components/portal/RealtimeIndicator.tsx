@@ -51,10 +51,10 @@ export function RealtimeIndicator() {
           height: '7px',
           borderRadius: '50%',
           background: isConnected
-            ? 'rgb(99,230,190)'
+            ? '#b8975e'
             : isReconnecting
             ? 'rgb(245,158,11)'
-            : 'rgb(80,92,110)',
+            : 'rgba(240,236,228,0.24)',
           boxShadow: isConnected
             ? '0 0 6px rgba(99,230,190,0.7)'
             : isReconnecting
@@ -68,7 +68,7 @@ export function RealtimeIndicator() {
           transition: 'background 300ms, box-shadow 300ms',
         }}
       />
-      <span style={{ fontSize: '0.58rem', color: isConnected ? 'rgb(99,230,190)' : 'rgb(80,92,110)', fontWeight: 600 }}>
+      <span style={{ fontSize: '0.58rem', color: isConnected ? '#b8975e' : 'rgba(240,236,228,0.24)', fontWeight: 600 }}>
         {isConnected ? 'LIVE' : isReconnecting ? '…' : 'OFF'}
       </span>
     </div>

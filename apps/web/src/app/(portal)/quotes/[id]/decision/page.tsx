@@ -135,22 +135,22 @@ export default function QuoteDecisionPage() {
 
         {/* Breadcrumb */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-          <Link href="/quotes" style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)', textDecoration: 'none' }}>
+          <Link href="/quotes" style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)', textDecoration: 'none' }}>
             Orçamentos
           </Link>
           <span style={{ color: 'rgb(80,90,110)' }}>›</span>
-          <Link href={`/quotes/${quoteId}`} style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)', textDecoration: 'none' }}>
+          <Link href={`/quotes/${quoteId}`} style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)', textDecoration: 'none' }}>
             {quote?.ref ?? quoteId}
           </Link>
           <span style={{ color: 'rgb(80,90,110)' }}>›</span>
-          <span style={{ fontSize: '0.8rem', color: 'rgb(77,163,255)' }}>Decisão de compra</span>
+          <span style={{ fontSize: '0.8rem', color: '#d4b47a' }}>Decisão de compra</span>
         </div>
 
         {/* Loading state */}
         {loading && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: '1.25rem' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '50%', border: '3px solid rgba(77,163,255,0.2)', borderTopColor: 'rgb(77,163,255)', animation: 'spin 0.8s linear infinite' }} />
-            <p style={{ fontSize: '0.875rem', color: 'rgb(120,130,150)' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '50%', border: '3px solid rgba(154,124,74,0.18)', borderTopColor: '#d4b47a', animation: 'spin 0.8s linear infinite' }} />
+            <p style={{ fontSize: '0.875rem', color: 'rgba(240,236,228,0.42)' }}>
               {generating ? 'A analisar custo landed, confiança do fornecedor e prazo…' : 'A carregar orçamento…'}
             </p>
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -161,12 +161,12 @@ export default function QuoteDecisionPage() {
         {!loading && error && (
           <div className="yg-card" style={{ padding: '2rem', textAlign: 'center', maxWidth: '480px', margin: '4rem auto' }}>
             <p style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>⚠️</p>
-            <p style={{ fontSize: '1rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '0.5rem' }}>Não foi possível gerar o cartão</p>
+            <p style={{ fontSize: '1rem', fontWeight: 700, color: '#f0ece4', marginBottom: '0.5rem' }}>Não foi possível gerar o cartão</p>
             <p style={{ fontSize: '0.875rem', color: 'rgb(170,180,198)', marginBottom: '1.5rem' }}>{error}</p>
             <button type="button"
               
               onClick={loadAndGenerate}
-              style={{ padding: '0.625rem 1.25rem', borderRadius: '8px', background: 'rgb(77,163,255)', color: 'rgb(7,17,31)', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.875rem' }}
+              style={{ padding: '0.625rem 1.25rem', borderRadius: '8px', background: '#d4b47a', color: '#090907', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.875rem' }}
             >
               Tentar novamente
             </button>
