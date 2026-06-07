@@ -1,17 +1,16 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 // ─── Cinematic Hero Video ─────────────────────────────────────────────────────
 //
-// React muted prop bug: React keeps resetting video.muted=true on every render.
-// useEffect fires OUTSIDE the user gesture call stack → browser blocks audio.
+// All previous attempts failed because React's reconciliation keeps resetting
+// video.muted = true no matter what we do via JSX props or effects.
 //
-// Solution:
-//   1. Track intended muted state in a ref (not React state)
-//   2. Click handler sets v.muted=false SYNCHRONOUSLY within user gesture stack
-//   3. useLayoutEffect (runs after reconciliation, before paint) enforces our ref
-//   4. React prop always says `muted` but useLayoutEffect overrides it every time
+// SOLUTION: Create the video element imperatively via document.createElement.
+// React never touches it. We control it 100% via direct DOM API.
+// The toggleMute click calls v.muted=false + v.play() synchronously,
+// inside the user gesture call stack → browser MUST allow audio.
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -26,57 +25,75 @@ export function HeroVideo({
   poster = '/images/hero-fallback.jpg',
   ariaLabel = 'YourGift Brand Video',
 }: HeroVideoProps) {
-  const videoRef       = useRef<HTMLVideoElement>(null);
-  const intendedMuted  = useRef(true);   // source of truth — never touched by React
-  const [isMuted,   setIsMuted]   = useState(true);
-  const [visible,   setVisible]   = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef     = useRef<HTMLVideoElement | null>(null);
+  const [isMuted,  setIsMuted]  = useState(true);
+  const [visible,  setVisible]  = useState(false);
 
-  // ── A. Autoplay muted on first mount ────────────────────────────────
+  // ── Create & manage the video element imperatively (bypasses React) ───
   useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.muted  = true;
-    v.volume = 1;
+    const container = containerRef.current;
+    if (!container) return;
+
+    const v = document.createElement('video');
+    v.setAttribute('aria-label', ariaLabel);
+    v.src      = src;
+    v.autoplay = true;
+    v.muted    = true;   // required for autoplay
+    v.loop     = true;
+    v.setAttribute('playsinline', '');
+    v.preload  = 'auto';
+    v.volume   = 1;
+    Object.assign(v.style, {
+      position: 'absolute', inset: '0',
+      width: '100%', height: '100%',
+      objectFit: 'cover', objectPosition: 'center center',
+      opacity: '0',
+      transition: 'opacity 800ms ease-out',
+    });
+
+    v.addEventListener('playing', () => {
+      v.style.opacity = '1';
+      setVisible(true);
+    });
+
+    container.appendChild(v);
+    videoRef.current = v;
+
     v.play().catch(() => {});
-  }, []);
 
-  // ── B. After EVERY React render: enforce intendedMuted via layout effect
-  //       useLayoutEffect fires synchronously after DOM mutations,
-  //       after React reconciliation → it WINS over the `muted` JSX prop ──
-  useLayoutEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.muted  = intendedMuted.current;
-    v.volume = 1;
-  });   // ← no dependency array = runs after every render
+    return () => {
+      v.pause();
+      if (container.contains(v)) container.removeChild(v);
+      videoRef.current = null;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [src]);
 
-  // ── C. Sound toggle ─────────────────────────────────────────────────
-  //  Call v.muted=false SYNCHRONOUSLY here (still in user gesture stack)
-  //  BEFORE React state update triggers re-render ──────────────────────
+  // ── Toggle: called directly from button click (user gesture) ─────────
   const toggleMute = () => {
     const v = videoRef.current;
     if (!v) return;
 
-    const next = !intendedMuted.current;
-    intendedMuted.current = next;   // update ref first
-
-    // SYNC within click → browser user gesture context ✓
-    v.muted  = next;
-    v.volume = 1;
-
-    // If video somehow paused, restart it
-    if (v.paused) {
-      v.play().catch(() => {});
+    if (isMuted) {
+      // ── UNMUTE within user gesture call stack ─────────────────────
+      v.muted  = false;
+      v.volume = 1;
+      v.play().catch(() => {}); // direct user-initiated play → always allowed
+      setIsMuted(false);
+    } else {
+      v.muted = true;
+      setIsMuted(true);
     }
-
-    setIsMuted(next);   // trigger re-render for button UI
   };
 
   return (
-    <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', background: '#080807' }}>
-
-      {/* Poster while video loads */}
-      {!visible && poster && (
+    <div
+      ref={containerRef}
+      style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', background: '#080807' }}
+    >
+      {/* Poster image while video loads (no black screen) */}
+      {!visible && (
         <img
           src={poster}
           alt=""
@@ -89,33 +106,16 @@ export function HeroVideo({
         />
       )}
 
-      {/* Video — `muted` JSX prop is overridden each render by useLayoutEffect */}
-      <video
-        ref={videoRef}
-        src={src}
-        aria-label={ariaLabel}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        onPlaying={() => setVisible(true)}
+      {/* Gradient overlay */}
+      <div
+        aria-hidden="true"
         style={{
-          position: 'absolute', inset: 0,
-          width: '100%', height: '100%',
-          objectFit: 'cover', objectPosition: 'center center',
-          opacity: visible ? 1 : 0,
-          transition: 'opacity 800ms ease-out',
+          position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
+          background: 'linear-gradient(180deg, rgba(0,0,0,.08) 0%, rgba(0,0,0,.52) 100%)',
         }}
       />
 
-      {/* Gradient overlay */}
-      <div aria-hidden="true" style={{
-        position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
-        background: 'linear-gradient(180deg, rgba(0,0,0,.08) 0%, rgba(0,0,0,.52) 100%)',
-      }} />
-
-      {/* Sound button — z-index 100, always above everything */}
+      {/* Sound button — z-index 100, always clickable */}
       <button
         type="button"
         onClick={toggleMute}
@@ -129,10 +129,10 @@ export function HeroVideo({
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
-          background: isMuted ? 'rgba(8,8,7,0.78)' : 'rgba(154,124,74,0.22)',
+          background: isMuted ? 'rgba(8,8,7,0.82)' : 'rgba(154,124,74,0.25)',
           border: isMuted
-            ? '1px solid rgba(212,180,122,0.55)'
-            : '1px solid rgba(212,180,122,0.9)',
+            ? '1px solid rgba(212,180,122,0.6)'
+            : '1px solid rgba(212,180,122,0.95)',
           color: 'rgba(240,236,228,0.95)',
           padding: '13px 28px',
           cursor: 'pointer',
@@ -145,7 +145,7 @@ export function HeroVideo({
           textTransform: 'uppercase',
           transition: 'all 0.25s ease',
           outline: 'none',
-          animation: isMuted ? 'yg-pulse-sound 2.4s ease-in-out infinite' : 'none',
+          animation: isMuted ? 'yg-ps 2.4s ease-in-out infinite' : 'none',
           whiteSpace: 'nowrap',
         }}
       >
@@ -173,7 +173,7 @@ export function HeroVideo({
       </button>
 
       <style>{`
-        @keyframes yg-pulse-sound {
+        @keyframes yg-ps {
           0%,100%{ opacity:.8;  transform:translateX(-50%) scale(1);    }
           50%    { opacity:1;   transform:translateX(-50%) scale(1.05); }
         }
