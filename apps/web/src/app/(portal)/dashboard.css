@@ -1,0 +1,187 @@
+/* ═══════════════════════════════════════════════════════════════════
+   YOURGIFT DASHBOARD — Sistema de Cores v2
+   Alinhado 100% com a homepage premium (bronze/warm-black)
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── BACKGROUNDS ─────────────────────────────────── */
+  --bg:   #090907;
+  --bg-2: #0f0f0c;
+  --bg-3: #141411;
+  --bg-4: #1a1a16;
+  --bg-5: #222220;
+
+  /* ── BRONZE / CHAMPAGNE ──────────────────────────── */
+  --bronze:        #9a7c4a;
+  --bronze-2:      #b8975e;
+  --bronze-3:      #d4b47a;
+  --bronze-4:      #e8d0a0;
+  --bronze-ghost:  rgba(154,124,74,0.08);
+  --bronze-border: rgba(154,124,74,0.18);
+  --bronze-border-2: rgba(154,124,74,0.28);
+
+  /* ── TEXTO ───────────────────────────────────────── */
+  --t1: #f0ece4;
+  --t2: rgba(240,236,228,0.72);
+  --t3: rgba(240,236,228,0.42);
+  --t4: rgba(240,236,228,0.24);
+  --t5: rgba(240,236,228,0.12);
+
+  /* ── BORDAS ──────────────────────────────────────── */
+  --border:      rgba(240,236,228,0.06);
+  --border-2:    rgba(240,236,228,0.10);
+  --border-gold: rgba(154,124,74,0.18);
+
+  /* ── STATUS ──────────────────────────────────────── */
+  --status-green:    #5a9e72;
+  --status-green-bg: rgba(90,158,114,0.12);
+  --status-amber:    #c49a3a;
+  --status-amber-bg: rgba(196,154,58,0.12);
+  --status-red:      #b85a4a;
+  --status-red-bg:   rgba(184,90,74,0.12);
+  --status-blue:     #4a7eb8;
+  --status-blue-bg:  rgba(74,126,184,0.12);
+
+  /* ── CHART ───────────────────────────────────────── */
+  --chart-1: #b8975e;
+  --chart-2: #7a9e6a;
+  --chart-3: #c49a3a;
+  --chart-4: #9a7a9e;
+
+  /* ── TIPOGRAFIA ──────────────────────────────────── */
+  --font-display: 'Libre Baskerville', serif;
+  --font-ui:      'Montserrat', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+}
+
+/* ── Base portal body ─────────────────────────────── */
+.portal-shell,
+.portal-shell * {
+  box-sizing: border-box;
+}
+
+/* ── Typography ───────────────────────────────────── */
+
+/* Headings / card titles → Libre Baskerville */
+.portal-shell h1,
+.portal-shell h2,
+.portal-shell h3,
+[data-portal] h1,
+[data-portal] h2,
+[data-portal] h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--t1);
+  letter-spacing: -0.015em;
+}
+
+/* Numbers, prices, codes → DM Mono */
+.mono,
+[data-mono],
+.portal-shell [data-mono] {
+  font-family: var(--font-mono) !important;
+  letter-spacing: 0.02em;
+}
+
+/* ── Dashboard card ───────────────────────────────── */
+.d-card {
+  background: var(--bg-3);
+  border: 1px solid var(--border-gold);
+  color: var(--t1);
+}
+
+.d-card:hover {
+  border-color: var(--bronze-border-2);
+}
+
+/* ── Buttons ──────────────────────────────────────── */
+.btn-primary {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--bronze-2);
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  padding: 10px 20px;
+  transition: background 0.25s;
+}
+
+.btn-primary:hover {
+  background: var(--bronze-3);
+}
+
+/* ── Tables ───────────────────────────────────────── */
+.d-table th {
+  font-family: var(--font-ui);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--t4);
+  border-bottom: 1px solid var(--border-gold);
+  padding: 10px 16px;
+}
+
+.d-table td {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--t2);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+}
+
+.d-table tr:hover td {
+  background: var(--bg-4);
+}
+
+/* ── Status badges ────────────────────────────────── */
+.badge-green { background: var(--status-green-bg); color: var(--status-green); }
+.badge-amber { background: var(--status-amber-bg); color: var(--status-amber); }
+.badge-red   { background: var(--status-red-bg);   color: var(--status-red);   }
+.badge-blue  { background: var(--status-blue-bg);  color: var(--status-blue);  }
+
+/* ── Inputs ───────────────────────────────────────── */
+.d-input {
+  background: var(--bg-4);
+  border: 1px solid var(--border);
+  color: var(--t1);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 300;
+  outline: none;
+  border-radius: 0;
+  padding: 10px 14px;
+  transition: border-color 0.25s;
+}
+
+.d-input:focus {
+  border-color: var(--bronze-border-2);
+}
+
+.d-input::placeholder {
+  color: var(--t4);
+}
+
+/* ── Scrollbar ────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-gold); border-radius: 0; }
+
+/* ── Sidebar nav items ────────────────────────────── */
+.nav-item-active {
+  background: rgba(154,124,74,0.12);
+  border-color: rgba(154,124,74,0.18);
+  color: var(--t1);
+}
+
+.nav-item-active .nav-icon {
+  color: var(--bronze-3);
+}
+
+/* ── Chart overrides ──────────────────────────────── */
+/* Replace blue/cyan chart fills with bronze palette */

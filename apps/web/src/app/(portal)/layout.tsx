@@ -1,4 +1,5 @@
 import { PortalLayout } from '@/components/portal/PortalLayout';
+import './dashboard.css';
 
 // ── Portal group layout ───────────────────────────────────────────────────────
 //

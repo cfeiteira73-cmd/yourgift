@@ -208,22 +208,22 @@ function NavItem({
           borderRadius: '8px',
           fontSize: '0.8rem',
           fontWeight: isActive ? 600 : 400,
-          color: isActive ? 'rgb(255,255,255)' : 'rgb(140,155,175)',
-          background: isActive ? 'rgba(77,163,255,0.14)' : 'transparent',
-          border: isActive ? '1px solid rgba(77,163,255,0.2)' : '1px solid transparent',
+          color: isActive ? 'rgb(255,255,255)' : 'rgba(240,236,228,0.42)',
+          background: isActive ? 'rgba(154,124,74,0.12)' : 'transparent',
+          border: isActive ? '1px solid rgba(154,124,74,0.18)' : '1px solid transparent',
           transition: 'all 120ms ease',
           cursor: 'pointer',
           position: 'relative',
         }}
         onMouseEnter={(e) => {
           if (!isActive) {
-            (e.currentTarget as HTMLElement).style.color = 'rgb(210,220,235)';
-            (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)';
+            (e.currentTarget as HTMLElement).style.color = 'rgba(240,236,228,0.72)';
+            (e.currentTarget as HTMLElement).style.background = 'rgba(240,236,228,0.04)';
           }
         }}
         onMouseLeave={(e) => {
           if (!isActive) {
-            (e.currentTarget as HTMLElement).style.color = 'rgb(140,155,175)';
+            (e.currentTarget as HTMLElement).style.color = 'rgba(240,236,228,0.42)';
             (e.currentTarget as HTMLElement).style.background = 'transparent';
           }
         }}
@@ -231,18 +231,18 @@ function NavItem({
         {isActive && (
           <motion.div layoutId="active-bar" style={{
             position: 'absolute', left: 0, top: '15%', bottom: '15%',
-            width: '2.5px', background: 'rgb(77,163,255)', borderRadius: '0 2px 2px 0',
-            boxShadow: '0 0 8px rgba(77,163,255,0.7)',
+            width: '2.5px', background: '#d4b47a', borderRadius: '0 2px 2px 0',
+            boxShadow: '0 0 8px rgba(184,151,94,0.5)',
           }} />
         )}
-        <span style={{ flexShrink: 0, opacity: isActive ? 1 : 0.7, color: isActive ? 'rgb(77,163,255)' : 'inherit' }}>
+        <span style={{ flexShrink: 0, opacity: isActive ? 1 : 0.7, color: isActive ? '#d4b47a' : 'inherit' }}>
           <Icon d={d} size={15} />
         </span>
         <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
         {badge && badge > 0 ? (
           <span style={{
             fontSize: '0.6rem', fontWeight: 700, lineHeight: 1,
-            background: 'rgb(77,163,255)', color: 'rgb(7,17,31)',
+            background: '#d4b47a', color: '#090907',
             borderRadius: '9999px', padding: '0.15rem 0.45rem', flexShrink: 0,
           }}>{badge}</span>
         ) : null}
@@ -371,7 +371,7 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
   return (
     <PortalLayoutContext.Provider value={true}>
     <ViewportContext.Provider value={viewportValue}>
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'rgb(7,17,31)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#090907' }}>
 
       {/* ════ COMMAND PALETTE (Cmd+K) ════ */}
       <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} />
@@ -392,8 +392,8 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
           width: '196px',
           flexShrink: 0,
           flexDirection: 'column',
-          background: 'rgb(8,15,28)',
-          borderRight: '1px solid rgba(255,255,255,0.06)',
+          background: '#0f0f0c',
+          borderRight: '1px solid rgba(240,236,228,0.06)',
           position: 'sticky',
           top: 0,
           height: '100vh',
@@ -402,22 +402,22 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
         }}
       >
         {/* Logo */}
-        <div style={{ padding: '1.125rem 1rem 0.875rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ padding: '1.125rem 1rem 0.875rem', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <div style={{
-              width: '28px', height: '28px', borderRadius: '7px', flexShrink: 0,
-              background: 'linear-gradient(135deg, rgb(77,163,255) 0%, rgb(99,230,190) 100%)',
+              width: '28px', height: '28px', flexShrink: 0,
+              background: 'linear-gradient(135deg, #d4b47a 0%, #b8975e 100%)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 0 10px rgba(77,163,255,0.3)',
+              boxShadow: '0 0 10px rgba(154,124,74,0.28)',
             }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgb(7,17,31)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#090907" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 12V22H4V12" /><path d="M22 7H2v5h20V7z" /><path d="M12 22V7" />
                 <path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z" />
                 <path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" />
               </svg>
             </div>
-            <span style={{ fontSize: '1.05rem', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.02em' }}>
-              your<span style={{ color: 'rgb(77,163,255)' }}>gift</span>
+            <span style={{ fontSize: '1.05rem', fontWeight: 900, color: '#f0ece4', letterSpacing: '-0.02em' }}>
+              your<span style={{ color: '#d4b47a' }}>gift</span>
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
               <NotificationCenter />
@@ -427,50 +427,50 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
         </div>
 
         {/* Company selector */}
-        <div style={{ padding: '0.625rem 0.875rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ padding: '0.625rem 0.875rem', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: '0.5rem',
             padding: '0.5rem 0.625rem', borderRadius: '8px',
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.07)', cursor: 'pointer',
+            background: '#1a1a16',
+            border: '1px solid rgba(154,124,74,0.18)', cursor: 'pointer',
           }}>
             <div style={{
-              width: '24px', height: '24px', borderRadius: '6px', flexShrink: 0,
-              background: 'rgba(77,163,255,0.2)',
-              border: '1px solid rgba(77,163,255,0.2)',
+              width: '24px', height: '24px', flexShrink: 0,
+              background: 'rgba(154,124,74,0.18)',
+              border: '1px solid rgba(154,124,74,0.18)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.6rem', fontWeight: 800, color: 'rgb(77,163,255)',
+              fontSize: '0.6rem', fontWeight: 800, color: '#d4b47a',
             }}>
               {initials.charAt(0)}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: '0.55rem', color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Empresa</div>
-              <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'rgb(200,210,225)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{company}</div>
+              <div style={{ fontSize: '0.55rem', color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Empresa</div>
+              <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'rgba(240,236,228,0.72)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{company}</div>
             </div>
-            <span style={{ color: 'rgb(80,92,110)', flexShrink: 0 }}>
+            <span style={{ color: 'rgba(240,236,228,0.24)', flexShrink: 0 }}>
               <Icon d={ICONS.chevronDown} size={12} />
             </span>
           </div>
         </div>
 
         {/* ⌘K Search trigger */}
-        <div style={{ padding: '0.5rem 0.875rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ padding: '0.5rem 0.875rem', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
             style={{
               display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%',
               padding: '0.4rem 0.625rem', borderRadius: '8px',
-              background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)',
-              cursor: 'pointer', color: 'rgb(100,112,130)', transition: 'all 150ms',
+              background: '#1a1a16', border: '1px solid rgba(154,124,74,0.12)',
+              cursor: 'pointer', color: 'rgba(240,236,228,0.42)', transition: 'all 150ms',
               fontSize: '0.75rem',
             }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(77,163,255,0.3)'; (e.currentTarget as HTMLElement).style.color = 'rgb(77,163,255)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'; (e.currentTarget as HTMLElement).style.color = 'rgb(100,112,130)'; }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(154,124,74,0.45)'; (e.currentTarget as HTMLElement).style.color = '#d4b47a'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(240,236,228,0.06)'; (e.currentTarget as HTMLElement).style.color = 'rgba(240,236,228,0.42)'; }}
           >
             <Icon d={ICONS.search} size={13} />
             <span style={{ flex: 1, textAlign: 'left', fontSize: '0.72rem' }}>Pesquisar...</span>
-            <kbd style={{ fontSize: '0.58rem', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', padding: '0.1rem 0.35rem', fontFamily: 'monospace', letterSpacing: '0.02em' }}>⌘K</kbd>
+            <kbd style={{ fontSize: '0.58rem', background: 'rgba(240,236,228,0.06)', borderRadius: '4px', padding: '0.1rem 0.35rem', fontFamily: 'monospace', letterSpacing: '0.02em' }}>⌘K</kbd>
           </button>
         </div>
 
@@ -481,7 +481,7 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
               return (
                 <div key={i} style={{
                   fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.1em',
-                  textTransform: 'uppercase', color: 'rgb(60,72,90)',
+                  textTransform: 'uppercase', color: 'rgba(240,236,228,0.24)',
                   padding: '0.75rem 0.625rem 0.25rem',
                 }}>
                   {item.divider}
@@ -502,49 +502,48 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
         </nav>
 
         {/* Bottom section */}
-        <div style={{ padding: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ padding: '0.75rem', borderTop: '1px solid rgba(240,236,228,0.06)' }}>
           {/* Plan info */}
           <div style={{ marginBottom: '0.625rem', padding: '0 0.125rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
               <div>
-                <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Plano Empresarial</div>
-                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(99,230,190)' }}>Enterprise</div>
+                <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Plano Empresarial</div>
+                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#d4b47a' }}>Enterprise</div>
               </div>
-              <span style={{ fontSize: '0.65rem', color: 'rgb(120,130,150)' }}>Utilização</span>
+              <span style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.42)' }}>Utilização</span>
             </div>
-            <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
+            <div style={{ height: '4px', background: 'rgba(240,236,228,0.06)', borderRadius: '9999px', overflow: 'hidden' }}>
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${usagePct}%` }}
                 transition={{ duration: 1.2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                style={{ height: '100%', borderRadius: '9999px', background: 'linear-gradient(90deg, rgb(77,163,255), rgb(99,230,190))' }}
+                style={{ height: '100%', borderRadius: '9999px', background: 'linear-gradient(90deg, #d4b47a, #b8975e)' }}
               />
             </div>
-            <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', marginTop: '0.2rem', textAlign: 'right' }}>{usagePct}%</div>
+            <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.2rem', textAlign: 'right' }}>{usagePct}%</div>
           </div>
 
           {/* User */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: '0.5rem',
             padding: '0.5rem 0.5rem',
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.06)',
-            borderRadius: '10px',
+            background: '#141411',
+            border: '1px solid rgba(154,124,74,0.14)',
           }}>
             <div style={{
-              width: '30px', height: '30px', borderRadius: '8px', flexShrink: 0,
-              background: 'linear-gradient(135deg, rgb(77,163,255), rgb(116,231,255))',
+              width: '30px', height: '30px', flexShrink: 0,
+              background: 'linear-gradient(135deg, #d4b47a, rgb(116,231,255))',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.7rem', fontWeight: 800, color: 'rgb(7,17,31)',
-              boxShadow: '0 0 8px rgba(77,163,255,0.25)',
+              fontSize: '0.7rem', fontWeight: 800, color: '#090907',
+              boxShadow: '0 0 8px rgba(154,124,74,0.22)',
             }}>
               {initials}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'rgb(220,230,245)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'rgba(240,236,228,0.72)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {displayEmail}
               </div>
-              <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)' }}>Administrador</div>
+              <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)' }}>Administrador</div>
             </div>
           </div>
 
@@ -557,11 +556,11 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
               display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center',
               width: '100%', marginTop: '0.5rem',
               background: 'none', border: 'none', cursor: 'pointer',
-              fontSize: '0.72rem', color: 'rgb(70,82,100)', padding: '0.3rem',
+              fontSize: '0.72rem', color: 'rgba(240,236,228,0.24)', padding: '0.3rem',
               transition: 'color 150ms', borderRadius: '6px',
             }}
             onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgb(239,68,68)'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = loggingOut ? 'rgb(239,68,68)' : 'rgb(70,82,100)'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = loggingOut ? 'rgb(239,68,68)' : 'rgba(240,236,228,0.24)'; }}
           >
             {loggingOut ? (
               <svg className="animate-spin" width="12" height="12" viewBox="0 0 24 24" fill="none">
@@ -597,18 +596,18 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
             onClick={e => e.stopPropagation()}
             style={{
               width: 240, height: '100%',
-              background: 'rgb(8,15,28)',
-              borderRight: '1px solid rgba(255,255,255,0.08)',
+              background: '#0f0f0c',
+              borderRight: '1px solid rgba(240,236,228,0.06)',
               overflowY: 'auto', overflowX: 'hidden',
               display: 'flex', flexDirection: 'column',
             }}
           >
             {/* Drawer header */}
-            <div style={{ padding: '16px 16px 12px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '1rem', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.02em' }}>
-                your<span style={{ color: 'rgb(77,163,255)' }}>gift</span>
+            <div style={{ padding: '16px 16px 12px', borderBottom: '1px solid rgba(240,236,228,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '1rem', fontWeight: 900, color: '#f0ece4', letterSpacing: '-0.02em' }}>
+                your<span style={{ color: '#d4b47a' }}>gift</span>
               </span>
-              <button type="button" onClick={() => setMobileMenuOpen(false)} style={{ padding: 6, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer' }}>
+              <button type="button" onClick={() => setMobileMenuOpen(false)} style={{ padding: 6, borderRadius: 8, background: 'rgba(240,236,228,0.06)', border: '1px solid rgba(240,236,228,0.06)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer' }}>
                 <Icon d={ICONS.close} size={14} />
               </button>
             </div>
@@ -617,7 +616,7 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
               {NAV_ITEMS.map((item, i) => {
                 if ('divider' in item) {
                   return (
-                    <div key={i} style={{ fontSize: '0.55rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(60,72,90)', padding: '12px 8px 4px' }}>
+                    <div key={i} style={{ fontSize: '0.55rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.24)', padding: '12px 8px 4px' }}>
                       {item.divider}
                     </div>
                   );
@@ -635,7 +634,7 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
               })}
             </nav>
             {/* Drawer footer */}
-            <div style={{ padding: 12, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ padding: 12, borderTop: '1px solid rgba(240,236,228,0.06)' }}>
               <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>{displayEmail}</div>
             </div>
           </motion.div>
@@ -645,8 +644,8 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
       {/* ════ MOBILE TOP BAR ════ */}
       <div className="flex md:hidden" style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, height: '52px',
-        background: 'rgba(8,15,28,0.97)', backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        background: 'rgba(15,15,12,0.97)', backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(240,236,228,0.06)',
         alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -657,17 +656,17 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               width: 32, height: 32, borderRadius: 8, cursor: 'pointer',
-              background: mobileMenuOpen ? 'rgba(77,163,255,0.12)' : 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              color: mobileMenuOpen ? 'rgb(77,163,255)' : 'rgb(140,155,175)',
+              background: mobileMenuOpen ? 'rgba(154,124,74,0.12)' : 'rgba(240,236,228,0.06)',
+              border: '1px solid rgba(240,236,228,0.06)',
+              color: mobileMenuOpen ? '#d4b47a' : 'rgba(240,236,228,0.42)',
             }}
             aria-label="Abrir menu de navegação"
             aria-expanded={mobileMenuOpen}
           >
             <Icon d={mobileMenuOpen ? ICONS.close : ICONS.menu} size={15} />
           </button>
-          <span style={{ fontSize: '1rem', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.02em' }}>
-            your<span style={{ color: 'rgb(77,163,255)' }}>gift</span>
+          <span style={{ fontSize: '1rem', fontWeight: 900, color: '#f0ece4', letterSpacing: '-0.02em' }}>
+            your<span style={{ color: '#d4b47a' }}>gift</span>
           </span>
         </div>
         <button
@@ -675,9 +674,9 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
           onClick={() => setSearchOpen(true)}
           style={{
             display: 'flex', alignItems: 'center', gap: '0.5rem',
-            background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+            background: '#1a1a16', border: '1px solid rgba(154,124,74,0.18)',
             borderRadius: '10px', padding: '0.4rem 0.75rem', cursor: 'pointer',
-            color: 'rgb(140,155,175)', fontSize: '0.75rem',
+            color: 'rgba(240,236,228,0.42)', fontSize: '0.75rem',
           }}
         >
           <Icon d={ICONS.search} size={14} />
@@ -688,8 +687,8 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
           <Link href="/quotes/new" style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             width: '32px', height: '32px', borderRadius: '9px',
-            background: 'rgba(77,163,255,0.15)', border: '1px solid rgba(77,163,255,0.3)',
-            color: 'rgb(77,163,255)',
+            background: 'rgba(154,124,74,0.14)', border: '1px solid rgba(154,124,74,0.35)',
+            color: '#d4b47a',
           }}>
             <Icon d={ICONS.plus} size={16} />
           </Link>
@@ -700,8 +699,8 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
       <nav className="flex md:hidden" style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
         height: '64px',
-        background: 'rgba(8,15,28,0.97)', backdropFilter: 'blur(20px)',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
+        background: 'rgba(15,15,12,0.97)', backdropFilter: 'blur(20px)',
+        borderTop: '1px solid rgba(240,236,228,0.06)',
         alignItems: 'center', justifyContent: 'space-around', padding: '0 0.5rem',
       }}>
         {MOBILE_NAV.map((item) => {
@@ -715,8 +714,8 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
               style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
                 gap: '0.2rem', padding: '0.5rem 0.75rem', borderRadius: '12px',
-                color: isActive ? 'rgb(77,163,255)' : 'rgb(100,112,130)',
-                background: isActive ? 'rgba(77,163,255,0.1)' : 'transparent',
+                color: isActive ? '#d4b47a' : 'rgba(240,236,228,0.38)',
+                background: isActive ? 'rgba(154,124,74,0.12)' : 'transparent',
                 transition: 'all 150ms', textDecoration: 'none', position: 'relative',
                 minWidth: '52px', flexShrink: 0,
               }}
@@ -729,9 +728,9 @@ export function PortalLayout({ children, userName, userEmail, companyName, tier 
                 <div style={{
                   position: 'absolute', top: '4px', right: '8px',
                   width: '14px', height: '14px', borderRadius: '50%',
-                  background: 'rgb(77,163,255)', border: '2px solid rgb(8,15,28)',
+                  background: '#d4b47a', border: '2px solid rgb(8,15,28)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '0.45rem', fontWeight: 800, color: 'rgb(7,17,31)',
+                  fontSize: '0.45rem', fontWeight: 800, color: '#090907',
                 }}>{badge > 9 ? '9+' : badge}</div>
               )}
             </Link>
