@@ -22,7 +22,6 @@ export default function HomePage() {
         {/* Cinematic video hero — replaces static image */}
         <HeroVideo
           src="/videos/hero.mp4"
-          poster="/images/hero-fallback.jpg"
           ariaLabel="YourGift — Cinematic Master Brand Film"
         />
         <div className="yg-hero-content">
