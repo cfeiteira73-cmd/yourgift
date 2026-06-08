@@ -77,7 +77,7 @@ export default function ClientBillingPage() {
       <div style={{ padding: '1.5rem 2rem 3rem', maxWidth: '860px' }}>
 
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '1.5rem' }}>
-          <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>Faturação</h1>
+          <h1 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>Faturação</h1>
           <p style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.28)' }}>Consulta e descarrega as tuas faturas</p>
         </motion.div>
 
@@ -90,12 +90,12 @@ export default function ClientBillingPage() {
               { label: 'Total Pago', value: `€${totalPaid.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`, color: '#b8975e', icon: '✅' },
               { label: 'Faturas em Atraso', value: String(overdueCount), color: overdueCount > 0 ? 'rgb(239,68,68)' : 'rgba(240,236,228,0.28)', icon: overdueCount > 0 ? '🚨' : '🟢' },
             ].map(kpi => (
-              <div key={kpi.label} style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '12px', padding: '0.875rem' }}>
+              <div key={kpi.label} style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '0px', padding: '0.875rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.375rem' }}>
                   <span style={{ fontSize: '1rem' }}>{kpi.icon}</span>
                   <span style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.28)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{kpi.label}</span>
                 </div>
-                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: kpi.color }}>{kpi.value}</div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 700, color: kpi.color }}>{kpi.value}</div>
               </div>
             ))}
           </motion.div>
@@ -104,7 +104,7 @@ export default function ClientBillingPage() {
         {/* Overdue alert */}
         {overdueCount > 0 && (
           <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}
-            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '12px', padding: '0.875rem 1rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '0px', padding: '0.875rem 1rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <span style={{ fontSize: '1.25rem' }}>🚨</span>
             <div>
               <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgb(239,68,68)' }}>Tens {overdueCount} fatura{overdueCount !== 1 ? 's' : ''} em atraso</div>
@@ -124,7 +124,7 @@ export default function ClientBillingPage() {
 
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-            {[1,2,3].map(i => <div key={i} style={{ height: '80px', borderRadius: '12px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
+            {[1,2,3].map(i => <div key={i} style={{ height: '80px', borderRadius: '0px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
           </div>
         ) : filtered.length === 0 ? (
           <div style={{ padding: '3rem', textAlign: 'center', color: 'rgba(240,236,228,0.28)' }}>
@@ -143,7 +143,7 @@ export default function ClientBillingPage() {
               const isOverdue = inv.status === 'overdue';
               return (
                 <motion.div key={inv.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-                  style={{ background: 'rgba(240,236,228,0.04)', border: `1px solid ${isOverdue ? 'rgba(239,68,68,0.2)' : 'rgba(240,236,228,0.06)'}`, borderRadius: '12px', padding: '0.875rem 1rem', borderLeft: `3px solid ${st.color}` }}>
+                  style={{ background: 'rgba(240,236,228,0.04)', border: `1px solid ${isOverdue ? 'rgba(239,68,68,0.2)' : 'rgba(240,236,228,0.06)'}`, borderRadius: '0px', padding: '0.875rem 1rem', borderLeft: `3px solid ${st.color}` }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
@@ -157,7 +157,7 @@ export default function ClientBillingPage() {
                       </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
-                      <span style={{ fontSize: '0.95rem', fontWeight: 800, color: inv.status === 'paid' ? '#b8975e' : 'rgb(225,235,250)' }}>
+                      <span style={{ fontSize: '0.95rem', fontWeight: 700, color: inv.status === 'paid' ? '#b8975e' : '#f0ece4' }}>
                         €{inv.amount.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}
                       </span>
                       <span style={{ fontSize: '0.62rem', fontWeight: 700, color: st.color, background: st.bg, borderRadius: '9999px', padding: '0.2rem 0.6rem' }}>{st.label}</span>
@@ -183,7 +183,7 @@ export default function ClientBillingPage() {
         {/* Contact note */}
         {!loading && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
-            style={{ marginTop: '1.5rem', padding: '0.875rem 1rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+            style={{ marginTop: '1.5rem', padding: '0.875rem 1rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '0px', display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
             <span style={{ fontSize: '1rem' }}>💬</span>
             <div style={{ fontSize: '0.68rem', color: 'rgba(240,236,228,0.28)', lineHeight: 1.5 }}>
               Questões sobre faturação? Contacta a nossa equipa em{' '}

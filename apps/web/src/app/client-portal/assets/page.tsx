@@ -223,12 +223,12 @@ Formato: usa secções claras. Responde em Português de Portugal.`,
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>Maquetes & Assets</h1>
+            <h1 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>Maquetes & Assets</h1>
             <p style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.28)' }}>Envia os teus logótipos e artes. Formatos aceites: SVG, PDF, AI, EPS, PNG, JPG (máx. 50MB)</p>
           </div>
           {/* AI Design Studio toggle */}
           <motion.button type="button" onClick={() => setStudioOpen(s => !s)} whileTap={{ scale: 0.96 }}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.875rem', borderRadius: '10px', border: '1px solid rgba(167,139,250,0.3)', background: studioOpen ? 'rgba(167,139,250,0.18)' : 'rgba(167,139,250,0.08)', color: 'rgb(167,139,250)', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.875rem', borderRadius: '0px', border: '1px solid rgba(167,139,250,0.3)', background: studioOpen ? 'rgba(167,139,250,0.18)' : 'rgba(167,139,250,0.08)', color: '#d4b47a', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
             ✦ AI Design Studio
           </motion.button>
         </motion.div>
@@ -241,7 +241,7 @@ Formato: usa secções claras. Responde em Português de Portugal.`,
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                   <span style={{ fontSize: '1.1rem' }}>✦</span>
                   <div>
-                    <p style={{ fontSize: '0.82rem', fontWeight: 800, color: 'rgba(240,236,228,0.72)' }}>AI Design Studio</p>
+                    <p style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgba(240,236,228,0.72)' }}>AI Design Studio</p>
                     <p style={{ fontSize: '0.68rem', color: 'rgba(240,236,228,0.28)' }}>Descreve o teu briefing e recebe um conceito completo com paleta, tipografia e técnica de impressão</p>
                   </div>
                 </div>
@@ -252,7 +252,7 @@ Formato: usa secções claras. Responde em Português de Portugal.`,
                     onChange={e => setStudioPrompt(e.target.value)}
                     placeholder="Ex: Kit de boas-vindas para 200 novos colaboradores. Empresa tech B2B, tom moderno e minimalista, tons de azul e branco..."
                     rows={3}
-                    style={{ flex: 1, background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.10)', borderRadius: '10px', padding: '0.75rem', color: 'rgba(240,236,228,0.72)', fontSize: '0.78rem', resize: 'vertical', lineHeight: 1.5, outline: 'none', fontFamily: 'inherit' }}
+                    style={{ flex: 1, background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.10)', borderRadius: '0px', padding: '0.75rem', color: 'rgba(240,236,228,0.72)', fontSize: '0.78rem', resize: 'vertical', lineHeight: 1.5, outline: 'none', fontFamily: 'inherit' }}
                   />
                 </div>
 
@@ -260,7 +260,7 @@ Formato: usa secções claras. Responde em Português de Portugal.`,
                   {['Kit corporativo minimalista', 'Evento desportivo vibrante', 'Linha eco-friendly premium', 'Natal & festividades'].map(suggestion => (
                     <button key={suggestion} type="button" onClick={() => setStudioPrompt(suggestion)}
                       style={{ padding: '0.25rem 0.625rem', borderRadius: '9999px', fontSize: '0.68rem', fontWeight: 500, cursor: 'pointer', background: 'rgba(240,236,228,0.06)', border: '1px solid rgba(240,236,228,0.10)', color: 'rgba(240,236,228,0.42)', transition: 'all 150ms' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(167,139,250,0.4)'; (e.currentTarget as HTMLElement).style.color = 'rgb(167,139,250)'; }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(167,139,250,0.4)'; (e.currentTarget as HTMLElement).style.color = '#d4b47a'; }}
                       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(240,236,228,0.10)'; (e.currentTarget as HTMLElement).style.color = 'rgba(240,236,228,0.42)'; }}>
                       {suggestion}
                     </button>
@@ -268,7 +268,7 @@ Formato: usa secções claras. Responde em Português de Portugal.`,
                 </div>
 
                 <motion.button type="button" onClick={handleStudioGenerate} disabled={!studioPrompt.trim() || studioLoading} whileTap={{ scale: 0.97 }}
-                  style={{ padding: '0.55rem 1.25rem', borderRadius: '9px', fontSize: '0.78rem', fontWeight: 700, cursor: studioPrompt.trim() && !studioLoading ? 'pointer' : 'not-allowed', background: studioPrompt.trim() && !studioLoading ? 'linear-gradient(135deg, rgb(167,139,250), #d4b47a)' : 'rgba(240,236,228,0.06)', color: studioPrompt.trim() && !studioLoading ? '#fff' : 'rgba(240,236,228,0.28)', border: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', transition: 'all 200ms', marginBottom: '0.875rem' }}>
+                  style={{ padding: '0.55rem 1.25rem', borderRadius: '0px', fontSize: '0.78rem', fontWeight: 700, cursor: studioPrompt.trim() && !studioLoading ? 'pointer' : 'not-allowed', background: studioPrompt.trim() && !studioLoading ? '#b8975e' : 'rgba(240,236,228,0.06)', color: studioPrompt.trim() && !studioLoading ? '#fff' : 'rgba(240,236,228,0.28)', border: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', transition: 'all 200ms', marginBottom: '0.875rem' }}>
                   {studioLoading ? (
                     <><span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid rgba(240,236,228,0.28)', borderTop: '2px solid #fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> A gerar conceito...</>
                   ) : '✦ Gerar Conceito de Design'}
@@ -277,8 +277,8 @@ Formato: usa secções claras. Responde em Português de Portugal.`,
                 <AnimatePresence>
                   {studioResult && (
                     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}
-                      style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '10px', padding: '1rem 1.125rem' }}>
-                      <p style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgb(167,139,250)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.625rem' }}>Conceito gerado</p>
+                      style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '0px', padding: '1rem 1.125rem' }}>
+                      <p style={{ fontSize: '0.65rem', fontWeight: 700, color: '#d4b47a', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.625rem' }}>Conceito gerado</p>
                       <pre style={{ fontSize: '0.76rem', color: 'rgb(195,210,230)', lineHeight: 1.65, whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontFamily: 'inherit', margin: 0 }}>{studioResult}</pre>
                     </motion.div>
                   )}
@@ -313,9 +313,9 @@ Formato: usa secções claras. Responde em Português de Portugal.`,
             { icon: '📐', title: 'Resolução', desc: 'PNG/JPG: mínimo 300dpi para impressão de qualidade' },
             { icon: '📋', title: 'Briefing', desc: 'Inclui um PDF com instruções de cor e uso de marca' },
           ].map(tip => (
-            <div key={tip.title} style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '12px', padding: '0.875rem' }}>
+            <div key={tip.title} style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '0px', padding: '0.875rem' }}>
               <div style={{ fontSize: '1.25rem', marginBottom: '0.375rem' }}>{tip.icon}</div>
-              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgb(200,215,235)', marginBottom: '0.2rem' }}>{tip.title}</div>
+              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgba(240,236,228,0.72)', marginBottom: '0.2rem' }}>{tip.title}</div>
               <div style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.28)', lineHeight: 1.45 }}>{tip.desc}</div>
             </div>
           ))}
@@ -333,10 +333,10 @@ Formato: usa secções claras. Responde em Português de Portugal.`,
 
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            {[1, 2, 3].map(i => <div key={i} style={{ height: '60px', borderRadius: '10px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
+            {[1, 2, 3].map(i => <div key={i} style={{ height: '60px', borderRadius: '0px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
           </div>
         ) : assets.length === 0 ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: 'rgba(240,236,228,0.28)', fontSize: '0.82rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '12px' }}>
+          <div style={{ padding: '2rem', textAlign: 'center', color: 'rgba(240,236,228,0.28)', fontSize: '0.82rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '0px' }}>
             Nenhum ficheiro enviado ainda. Começa por carregar o teu logótipo.
           </div>
         ) : (

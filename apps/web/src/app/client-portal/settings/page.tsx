@@ -80,7 +80,7 @@ export default function ClientSettingsPage() {
     width: '100%',
     background: 'rgba(240,236,228,0.06)',
     border: '1px solid rgba(240,236,228,0.10)',
-    borderRadius: '9px',
+    borderRadius: '0px',
     padding: '0.5rem 0.75rem',
     fontSize: '0.8rem',
     color: 'rgba(240,236,228,0.75)',
@@ -100,7 +100,7 @@ export default function ClientSettingsPage() {
           onChange={e => onChange?.(e.target.value)}
           placeholder={placeholder}
           style={{ ...inputStyle, opacity: readOnly ? 0.5 : 1, cursor: readOnly ? 'not-allowed' : 'text' }}
-          onFocus={e => !readOnly && (e.currentTarget.style.borderColor = 'rgba(77,163,255,0.4)')}
+          onFocus={e => !readOnly && (e.currentTarget.style.borderColor = 'rgba(154,124,74,0.45)')}
           onBlur={e => (e.currentTarget.style.borderColor = 'rgba(240,236,228,0.10)')}
         />
         {readOnly && <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.24)', marginTop: '0.2rem' }}>Gerido pela conta de autenticação</div>}
@@ -112,7 +112,7 @@ export default function ClientSettingsPage() {
     return (
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
         <div>
-          <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'rgb(200,215,235)' }}>{label}</div>
+          <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'rgba(240,236,228,0.72)' }}>{label}</div>
           <div style={{ fontSize: '0.62rem', color: 'rgba(240,236,228,0.28)', marginTop: '0.1rem' }}>{desc}</div>
         </div>
         <button type="button" onClick={() => onChange(!checked)}
@@ -129,24 +129,24 @@ export default function ClientSettingsPage() {
       <div style={{ padding: '1.5rem 2rem 3rem', maxWidth: '620px' }}>
 
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '1.75rem' }}>
-          <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>Definições</h1>
+          <h1 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>Definições</h1>
           <p style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.28)' }}>Gere o teu perfil e preferências</p>
         </motion.div>
 
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {[1,2,3,4].map(i => <div key={i} style={{ height: '52px', borderRadius: '10px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
+            {[1,2,3,4].map(i => <div key={i} style={{ height: '52px', borderRadius: '0px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
           </div>
         ) : (
           <>
             {/* Account info */}
             <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.04 }}
-              style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '14px', padding: '1.25rem', marginBottom: '1rem' }}>
+              style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '0px', padding: '1.25rem', marginBottom: '1rem' }}>
               <h2 style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(160,175,195)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '1rem' }}>Conta & Autenticação</h2>
 
               {/* Avatar */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
-                <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: 'linear-gradient(135deg,#d4b47a,rgb(116,100,255))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', fontWeight: 800, color: '#fff', flexShrink: 0 }}>
+                <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: '#b8975e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', fontWeight: 700, color: '#fff', flexShrink: 0 }}>
                   {(client?.name ?? userEmail).slice(0, 1).toUpperCase()}
                 </div>
                 <div>
@@ -165,7 +165,7 @@ export default function ClientSettingsPage() {
 
             {/* Profile */}
             <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.07 }}
-              style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '14px', padding: '1.25rem', marginBottom: '1rem' }}>
+              style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '0px', padding: '1.25rem', marginBottom: '1rem' }}>
               <h2 style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(160,175,195)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '1rem' }}>Dados de Perfil</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <Field label="Nome Completo" value={name} onChange={setName} placeholder="O teu nome" />
@@ -178,7 +178,7 @@ export default function ClientSettingsPage() {
 
             {/* Notifications */}
             <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-              style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '14px', padding: '1.25rem', marginBottom: '1rem' }}>
+              style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '0px', padding: '1.25rem', marginBottom: '1rem' }}>
               <h2 style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(160,175,195)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.75rem' }}>Notificações por Email</h2>
               <Toggle label="Actualizações de Encomendas" desc="Recebe notificações quando o estado das encomendas muda" checked={notifOrders} onChange={setNotifOrders} />
               <Toggle label="Respostas a Orçamentos" desc="Notificação quando um orçamento for respondido" checked={notifQuotes} onChange={setNotifQuotes} />
@@ -188,7 +188,7 @@ export default function ClientSettingsPage() {
 
             {/* Support */}
             <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.13 }}
-              style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '14px', padding: '1.25rem', marginBottom: '1.25rem' }}>
+              style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '0px', padding: '1.25rem', marginBottom: '1.25rem' }}>
               <h2 style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(160,175,195)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.875rem' }}>Suporte & Contacto</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {[
@@ -196,7 +196,7 @@ export default function ClientSettingsPage() {
                   { icon: '📱', label: 'WhatsApp', value: '+351 912 345 678', href: 'https://wa.me/351912345678' },
                 ].map(item => (
                   <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.625rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', textDecoration: 'none', transition: 'background 150ms' }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.625rem', background: 'rgba(255,255,255,0.02)', borderRadius: '0px', textDecoration: 'none', transition: 'background 150ms' }}
                     onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(240,236,228,0.06)'}
                     onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.02)'}>
                     <span style={{ fontSize: '1rem' }}>{item.icon}</span>
@@ -213,11 +213,11 @@ export default function ClientSettingsPage() {
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }}
               style={{ display: 'flex', gap: '0.75rem', justifyContent: 'space-between', alignItems: 'center' }}>
               <button type="button" onClick={handleSignOut}
-                style={{ padding: '0.5rem 1rem', borderRadius: '9px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: 'rgb(239,68,68)', fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600 }}>
+                style={{ padding: '0.5rem 1rem', borderRadius: '0px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: 'rgb(239,68,68)', fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600 }}>
                 Terminar Sessão
               </button>
               <motion.button type="button" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleSave} disabled={saving}
-                style={{ padding: '0.5rem 1.25rem', borderRadius: '9px', background: saved ? '#b8975e' : 'linear-gradient(135deg,#d4b47a,rgb(116,100,255))', border: 'none', color: saved ? '#090907' : '#fff', fontSize: '0.82rem', cursor: 'pointer', fontWeight: 700, opacity: saving ? 0.7 : 1, transition: 'background 300ms' }}>
+                style={{ padding: '0.5rem 1.25rem', borderRadius: '0px', background: saved ? '#b8975e' : '#b8975e', border: 'none', color: saved ? '#090907' : '#fff', fontSize: '0.82rem', cursor: 'pointer', fontWeight: 700, opacity: saving ? 0.7 : 1, transition: 'background 300ms' }}>
                 {saving ? 'A guardar...' : saved ? '✓ Guardado!' : 'Guardar Alterações'}
               </motion.button>
             </motion.div>

@@ -70,7 +70,7 @@ function NavItem({ href, label, iconKey, exact, badge, badges }: {
         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
         style={{
           display: 'flex', alignItems: 'center', gap: '0.5rem',
-          padding: '0.425rem 0.625rem', borderRadius: '8px',
+          padding: '0.425rem 0.625rem', borderRadius: '0px',
           fontSize: '0.8rem', fontWeight: isActive ? 600 : 400,
           color: isActive ? 'rgb(255,255,255)' : 'rgba(240,236,228,0.45)',
           background: isActive ? 'rgba(77,163,255,0.14)' : 'transparent',
@@ -160,8 +160,8 @@ export function ClientPortalLayout({ children, userName, userEmail, companyName 
 
         {/* Client info */}
         <div style={{ padding: '0.75rem 0.875rem', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.625rem', borderRadius: '10px', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)' }}>
-            <div style={{ width: '30px', height: '30px', borderRadius: '8px', flexShrink: 0, background: 'linear-gradient(135deg, #d4b47a, #b8975e)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 800, color: '#090907' }}>{initials}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.625rem', borderRadius: '0px', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)' }}>
+            <div style={{ width: '30px', height: '30px', borderRadius: '0px', flexShrink: 0, background: 'linear-gradient(135deg, #d4b47a, #b8975e)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, color: '#090907' }}>{initials}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(210,225,245)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displayName}</div>
               <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.28)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{companyName || userEmail}</div>
@@ -177,7 +177,7 @@ export function ClientPortalLayout({ children, userName, userEmail, companyName 
           ))}
           <div style={{ margin: '0.75rem 0', height: '1px', background: 'rgba(240,236,228,0.06)' }} />
           <Link href="mailto:geral@yourgift.pt" style={{ textDecoration: 'none', display: 'block' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.425rem 0.625rem', borderRadius: '8px', fontSize: '0.8rem', color: 'rgba(240,236,228,0.45)', cursor: 'pointer', transition: 'all 120ms' }}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.425rem 0.625rem', borderRadius: '0px', fontSize: '0.8rem', color: 'rgba(240,236,228,0.45)', cursor: 'pointer', transition: 'all 120ms' }}
               onMouseEnter={(e: React.MouseEvent) => { (e.currentTarget as HTMLElement).style.color = 'rgba(240,236,228,0.72)'; (e.currentTarget as HTMLElement).style.background = 'rgba(240,236,228,0.04)'; }}
               onMouseLeave={(e: React.MouseEvent) => { (e.currentTarget as HTMLElement).style.color = 'rgba(240,236,228,0.45)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
               <span style={{ opacity: 0.7 }}><Icon d={ICONS.support} size={15} /></span>
@@ -207,7 +207,7 @@ export function ClientPortalLayout({ children, userName, userEmail, companyName 
           your<span style={{ color: '#d4b47a' }}>gift</span>
           <span style={{ fontSize: '0.55rem', color: 'rgba(240,236,228,0.28)', marginLeft: '0.375rem', background: 'rgba(240,236,228,0.06)', borderRadius: '4px', padding: '0.1rem 0.4rem', verticalAlign: 'middle' }}>Cliente</span>
         </span>
-        <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'linear-gradient(135deg, #d4b47a, #b8975e)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 800, color: '#090907' }}>{initials}</div>
+        <div style={{ width: '32px', height: '32px', borderRadius: '0px', background: 'linear-gradient(135deg, #d4b47a, #b8975e)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, color: '#090907' }}>{initials}</div>
       </div>
 
       {/* ── MOBILE BOTTOM NAV ── */}
@@ -217,10 +217,10 @@ export function ClientPortalLayout({ children, userName, userEmail, companyName 
           const d = ICONS[item.icon as keyof typeof ICONS];
           const count = item.icon === 'orders' ? badges.orders ?? 0 : item.icon === 'quotes' ? badges.quotes ?? 0 : 0;
           return (
-            <Link key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem', padding: '0.5rem 0.75rem', borderRadius: '12px', color: isActive ? '#d4b47a' : 'rgba(240,236,228,0.42)', background: isActive ? 'rgba(154,124,74,0.10)' : 'transparent', textDecoration: 'none', position: 'relative', minWidth: '52px', flexShrink: 0 }}>
+            <Link key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem', padding: '0.5rem 0.75rem', borderRadius: '0px', color: isActive ? '#d4b47a' : 'rgba(240,236,228,0.42)', background: isActive ? 'rgba(154,124,74,0.10)' : 'transparent', textDecoration: 'none', position: 'relative', minWidth: '52px', flexShrink: 0 }}>
               <Icon d={d} size={20} />
               <span style={{ fontSize: '0.55rem', fontWeight: isActive ? 700 : 400 }}>{item.label}</span>
-              {count > 0 && <div style={{ position: 'absolute', top: '4px', right: '8px', width: '14px', height: '14px', borderRadius: '50%', background: '#d4b47a', border: '2px solid #0f0f0c', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.45rem', fontWeight: 800, color: '#090907' }}>{count > 9 ? '9+' : count}</div>}
+              {count > 0 && <div style={{ position: 'absolute', top: '4px', right: '8px', width: '14px', height: '14px', borderRadius: '50%', background: '#d4b47a', border: '2px solid #0f0f0c', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.45rem', fontWeight: 700, color: '#090907' }}>{count > 9 ? '9+' : count}</div>}
             </Link>
           );
         })}

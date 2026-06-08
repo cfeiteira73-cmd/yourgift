@@ -33,7 +33,7 @@ function StatusTimeline({ status }: { status: string }) {
         return (
           <div key={step} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem', flexShrink: 0 }}>
-              <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: done || active ? s.color : 'rgba(240,236,228,0.10)', border: `2px solid ${done || active ? s.color : 'rgba(240,236,228,0.14)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', color: done || active ? '#090907' : 'rgba(240,236,228,0.28)', fontWeight: 800, transition: 'all 300ms' }}>
+              <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: done || active ? s.color : 'rgba(240,236,228,0.10)', border: `2px solid ${done || active ? s.color : 'rgba(240,236,228,0.14)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', color: done || active ? '#090907' : 'rgba(240,236,228,0.28)', fontWeight: 700, transition: 'all 300ms' }}>
                 {done ? '✓' : i + 1}
               </div>
               <span style={{ fontSize: '0.5rem', color: done || active ? s.color : 'rgba(240,236,228,0.24)', whiteSpace: 'nowrap', fontWeight: active ? 700 : 400 }}>{step}</span>
@@ -90,7 +90,7 @@ export default function ClientOrdersPage() {
       <div style={{ padding: '1.5rem 2rem 3rem', maxWidth: '860px' }}>
 
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '1.5rem' }}>
-          <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>As minhas Encomendas</h1>
+          <h1 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>As minhas Encomendas</h1>
           <p style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.28)' }}>{orders.length} encomenda{orders.length !== 1 ? 's' : ''} no total</p>
         </motion.div>
 
@@ -105,7 +105,7 @@ export default function ClientOrdersPage() {
 
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {[1,2,3].map(i => <div key={i} style={{ height: '130px', borderRadius: '14px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
+            {[1,2,3].map(i => <div key={i} style={{ height: '130px', borderRadius: '0px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
           </div>
         ) : filtered.length === 0 ? (
           <div style={{ padding: '3rem', textAlign: 'center', color: 'rgba(240,236,228,0.28)' }}>
@@ -119,14 +119,14 @@ export default function ClientOrdersPage() {
                 const st = s(o.status);
                 return (
                   <motion.div key={o.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.97 }} transition={{ delay: i * 0.04 }}
-                    style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '14px', padding: '1.125rem', borderLeft: `3px solid ${st.color}` }}>
+                    style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '0px', padding: '1.125rem', borderLeft: `3px solid ${st.color}` }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.375rem' }}>
                       <div>
-                        <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'rgb(225,235,250)', marginBottom: '0.15rem' }}>{o.ref}</div>
+                        <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#f0ece4', marginBottom: '0.15rem' }}>{o.ref}</div>
                         <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.28)' }}>Criado em {new Date(o.created_at).toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric' })}</div>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        {o.total_amount && <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#b8975e' }}>€{o.total_amount.toLocaleString('pt-PT')}</span>}
+                        {o.total_amount && <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#b8975e' }}>€{o.total_amount.toLocaleString('pt-PT')}</span>}
                         <span style={{ fontSize: '0.62rem', fontWeight: 700, color: st.color, background: st.bg, borderRadius: '9999px', padding: '0.2rem 0.6rem' }}>{st.label}</span>
                       </div>
                     </div>

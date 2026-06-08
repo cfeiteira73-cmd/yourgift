@@ -77,14 +77,14 @@ export default function ClientDashboard() {
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '1.75rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
-              <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
+              <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.2rem' }}>
                 {greeting}, {firstName} 👋
               </h1>
               <p style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.28)' }}>
                 {client?.company ? `${client.company} · ` : ''}Bem-vindo ao teu portal YourGift
               </p>
             </div>
-            <Link href="/client-portal/quotes" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', background: 'linear-gradient(135deg,#d4b47a,rgb(116,100,255))', color: '#fff', padding: '0.5rem 1.125rem', borderRadius: '10px', fontSize: '0.82rem', fontWeight: 700, textDecoration: 'none', boxShadow: '0 4px 14px rgba(77,163,255,0.25)' }}>
+            <Link href="/client-portal/quotes" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', background: '#b8975e', color: '#fff', padding: '0.5rem 1.125rem', borderRadius: '0px', fontSize: '0.82rem', fontWeight: 700, textDecoration: 'none', boxShadow: '0 4px 14px rgba(77,163,255,0.25)' }}>
               + Pedir Orçamento
             </Link>
           </div>
@@ -92,7 +92,7 @@ export default function ClientDashboard() {
 
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {[1, 2, 3].map(i => <div key={i} style={{ height: '100px', borderRadius: '14px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
+            {[1, 2, 3].map(i => <div key={i} style={{ height: '100px', borderRadius: '0px', background: 'rgba(240,236,228,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
           </div>
         ) : (<>
 
@@ -106,11 +106,11 @@ export default function ClientDashboard() {
             ].map((kpi, i) => (
               <motion.div key={kpi.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 + i * 0.05 }}>
                 <Link href={kpi.href} style={{ textDecoration: 'none', display: 'block' }}>
-                  <div style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '14px', padding: '1rem 1.125rem', transition: 'border-color 150ms', cursor: 'pointer' }}
+                  <div style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '0px', padding: '1rem 1.125rem', transition: 'border-color 150ms', cursor: 'pointer' }}
                     onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(77,163,255,0.25)'}
                     onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(240,236,228,0.06)'}>
                     <div style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{kpi.icon}</div>
-                    <div style={{ fontSize: typeof kpi.value === 'string' ? '1.1rem' : '1.75rem', fontWeight: 800, color: kpi.color, letterSpacing: '-0.04em', lineHeight: 1 }}>{kpi.value}</div>
+                    <div style={{ fontSize: typeof kpi.value === 'string' ? '1.1rem' : '1.75rem', fontWeight: 700, color: kpi.color, letterSpacing: '-0.04em', lineHeight: 1 }}>{kpi.value}</div>
                     <div style={{ fontSize: '0.65rem', color: 'rgba(240,236,228,0.28)', marginTop: '0.3rem' }}>{kpi.label}</div>
                   </div>
                 </Link>
@@ -127,7 +127,7 @@ export default function ClientDashboard() {
                 <h2 style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgb(160,175,195)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Encomendas Recentes</h2>
                 <Link href="/client-portal/orders" style={{ fontSize: '0.68rem', color: '#d4b47a', textDecoration: 'none', fontWeight: 600 }}>Ver todas →</Link>
               </div>
-              <div style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '14px', overflow: 'hidden' }}>
+              <div style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '0px', overflow: 'hidden' }}>
                 {orders.length === 0 ? (
                   <div style={{ padding: '1.5rem', textAlign: 'center', color: 'rgba(240,236,228,0.28)', fontSize: '0.78rem' }}>Nenhuma encomenda ainda</div>
                 ) : orders.map((o, i) => (
@@ -151,7 +151,7 @@ export default function ClientDashboard() {
                 <h2 style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgb(160,175,195)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Orçamentos Recentes</h2>
                 <Link href="/client-portal/quotes" style={{ fontSize: '0.68rem', color: '#d4b47a', textDecoration: 'none', fontWeight: 600 }}>Ver todos →</Link>
               </div>
-              <div style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '14px', overflow: 'hidden' }}>
+              <div style={{ background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '0px', overflow: 'hidden' }}>
                 {quotes.length === 0 ? (
                   <div style={{ padding: '1.5rem', textAlign: 'center', color: 'rgba(240,236,228,0.28)', fontSize: '0.78rem' }}>Nenhum orçamento ainda</div>
                 ) : quotes.map((q, i) => (
@@ -178,10 +178,10 @@ export default function ClientDashboard() {
                 { icon: '📋', label: 'Novo Orçamento', desc: 'Pede um orçamento personalizado', href: '/client-portal/quotes', color: '#d4b47a' },
                 { icon: '🎨', label: 'Upload de Logo', desc: 'Envia os teus ficheiros de arte', href: '/client-portal/assets', color: '#b8975e' },
                 { icon: '🛍️', label: 'Ver Catálogo', desc: 'Explora os nossos produtos', href: '/client-portal/products', color: '#b8975e' },
-                { icon: '🧾', label: 'Faturas', desc: 'Consulta os teus pagamentos', href: '/client-portal/billing', color: 'rgb(167,139,250)' },
+                { icon: '🧾', label: 'Faturas', desc: 'Consulta os teus pagamentos', href: '/client-portal/billing', color: '#d4b47a' },
               ].map((a, i) => (
                 <motion.div key={a.label} whileHover={{ y: -2 }}>
-                  <Link href={a.href} style={{ textDecoration: 'none', display: 'block', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '12px', padding: '1rem', transition: 'border-color 150ms', cursor: 'pointer' }}
+                  <Link href={a.href} style={{ textDecoration: 'none', display: 'block', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '0px', padding: '1rem', transition: 'border-color 150ms', cursor: 'pointer' }}
                     onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = `${a.color}40`}
                     onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(240,236,228,0.06)'}>
                     <div style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{a.icon}</div>
@@ -195,12 +195,12 @@ export default function ClientDashboard() {
 
           {/* Support banner */}
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-            style={{ marginTop: '1rem', padding: '1rem 1.25rem', background: 'rgba(77,163,255,0.05)', border: '1px solid rgba(154,124,74,0.12)', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            style={{ marginTop: '1rem', padding: '1rem 1.25rem', background: 'rgba(77,163,255,0.05)', border: '1px solid rgba(154,124,74,0.12)', borderRadius: '0px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
             <div>
               <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#d4b47a' }}>Precisas de ajuda?</div>
               <div style={{ fontSize: '0.7rem', color: 'rgba(240,236,228,0.42)' }}>Resposta garantida em menos de 2 horas úteis — Seg. a Sex. 9h-18h</div>
             </div>
-            <a href="mailto:geral@yourgift.pt" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', background: 'rgba(154,124,74,0.12)', border: '1px solid rgba(77,163,255,0.25)', borderRadius: '8px', padding: '0.45rem 0.875rem', fontSize: '0.75rem', fontWeight: 700, color: '#d4b47a', textDecoration: 'none' }}>
+            <a href="mailto:geral@yourgift.pt" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', background: 'rgba(154,124,74,0.12)', border: '1px solid rgba(77,163,255,0.25)', borderRadius: '0px', padding: '0.45rem 0.875rem', fontSize: '0.75rem', fontWeight: 700, color: '#d4b47a', textDecoration: 'none' }}>
               ✉️ Contactar equipa
             </a>
           </motion.div>
