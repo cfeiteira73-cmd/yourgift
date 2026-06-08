@@ -61,13 +61,13 @@ export function orderConfirmationEmail(opts: {
 <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;background:#0d1117;color:#e6edf3;padding:32px;border-radius:12px">
   <div style="text-align:center;margin-bottom:32px">
     <img src="${APP_URL}/logo.png" alt="YourGift" height="40" style="height:40px" onerror="this.style.display='none'"/>
-    <h1 style="color:#4da3ff;font-size:24px;margin:16px 0 8px">Encomenda Confirmada!</h1>
+    <h1 style="color:#b8975e;font-size:24px;margin:16px 0 8px">Encomenda Confirmada!</h1>
     <p style="color:#8b949e;margin:0">Referência: <strong style="color:#e6edf3">${opts.orderRef}</strong></p>
   </div>
   <p>Olá ${opts.clientName},</p>
   <p>A tua encomenda foi confirmada e o pagamento processado com sucesso.</p>
   <div style="background:#161b22;border-radius:8px;padding:20px;margin:24px 0">
-    <h3 style="margin:0 0 12px;color:#4da3ff">Produtos</h3>
+    <h3 style="margin:0 0 12px;color:#b8975e">Produtos</h3>
     ${opts.products.map(p => `
       <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #21262d">
         <span>${p.title} × ${p.qty}</span>
@@ -76,11 +76,11 @@ export function orderConfirmationEmail(opts: {
     `).join('')}
     <div style="display:flex;justify-content:space-between;padding-top:12px;font-weight:700;font-size:18px">
       <span>Total</span>
-      <span style="color:#4da3ff">€${opts.totalAmount.toFixed(2)}</span>
+      <span style="color:#b8975e">€${opts.totalAmount.toFixed(2)}</span>
     </div>
   </div>
   <div style="text-align:center;margin-top:24px">
-    <a href="${opts.orderUrl}" style="background:#4da3ff;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block">
+    <a href="${opts.orderUrl}" style="background:#b8975e;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block">
       Ver Encomenda →
     </a>
   </div>
@@ -103,7 +103,7 @@ export function paymentConfirmationEmail(opts: {
 <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;background:#0d1117;color:#e6edf3;padding:32px;border-radius:12px">
   <h1 style="color:#63e6be">Pagamento confirmado</h1>
   <p>Olá ${opts.clientName},</p>
-  <p>Recebemos o teu pagamento de <strong style="color:#4da3ff">€${opts.amount.toFixed(2)}</strong> para a encomenda <strong>${opts.orderRef}</strong>.</p>
+  <p>Recebemos o teu pagamento de <strong style="color:#b8975e">€${opts.amount.toFixed(2)}</strong> para a encomenda <strong>${opts.orderRef}</strong>.</p>
   <p style="color:#8b949e">A tua encomenda está agora em processamento. Receberás uma atualização quando entrar em produção.</p>
   <p style="color:#8b949e;font-size:12px;margin-top:32px">YourGift · yourgift.pt</p>
 </div>`,
@@ -122,14 +122,14 @@ export function trackingEmail(opts: {
     subject: `📦 Encomenda expedida — ${opts.orderRef}`,
     html: `
 <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;background:#0d1117;color:#e6edf3;padding:32px;border-radius:12px">
-  <h1 style="color:#4da3ff">A tua encomenda foi expedida!</h1>
+  <h1 style="color:#b8975e">A tua encomenda foi expedida!</h1>
   <p>Olá ${opts.clientName},</p>
   <p>A tua encomenda <strong>${opts.orderRef}</strong> foi expedida por <strong>${opts.carrier}</strong>.</p>
   <div style="background:#161b22;border-radius:8px;padding:20px;margin:24px 0">
-    <p style="margin:0 0 8px">Número de rastreamento: <strong style="color:#4da3ff">${opts.trackingNumber}</strong></p>
+    <p style="margin:0 0 8px">Número de rastreamento: <strong style="color:#b8975e">${opts.trackingNumber}</strong></p>
     ${opts.estimatedDelivery ? `<p style="margin:0;color:#8b949e">Entrega estimada: ${opts.estimatedDelivery}</p>` : ''}
   </div>
-  ${opts.trackingUrl ? `<div style="text-align:center"><a href="${opts.trackingUrl}" style="background:#4da3ff;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">Rastrear Encomenda →</a></div>` : ''}
+  ${opts.trackingUrl ? `<div style="text-align:center"><a href="${opts.trackingUrl}" style="background:#b8975e;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">Rastrear Encomenda →</a></div>` : ''}
   <p style="color:#8b949e;font-size:12px;margin-top:32px">YourGift · yourgift.pt</p>
 </div>`,
   };
