@@ -72,27 +72,27 @@ function NavItem({ href, label, iconKey, exact, badge, badges }: {
           display: 'flex', alignItems: 'center', gap: '0.5rem',
           padding: '0.425rem 0.625rem', borderRadius: '8px',
           fontSize: '0.8rem', fontWeight: isActive ? 600 : 400,
-          color: isActive ? 'rgb(255,255,255)' : 'rgb(140,155,175)',
+          color: isActive ? 'rgb(255,255,255)' : 'rgba(240,236,228,0.45)',
           background: isActive ? 'rgba(77,163,255,0.14)' : 'transparent',
-          border: isActive ? '1px solid rgba(77,163,255,0.2)' : '1px solid transparent',
+          border: isActive ? '1px solid rgba(154,124,74,0.18)' : '1px solid transparent',
           transition: 'all 120ms', cursor: 'pointer', position: 'relative',
         }}
-        onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.color = 'rgb(210,220,235)'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}}
-        onMouseLeave={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.color = 'rgb(140,155,175)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}}
+        onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.color = 'rgba(240,236,228,0.72)'; (e.currentTarget as HTMLElement).style.background = 'rgba(240,236,228,0.04)'; }}}
+        onMouseLeave={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.color = 'rgba(240,236,228,0.45)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}}
       >
         {isActive && (
           <motion.div layoutId="client-active-bar" style={{
             position: 'absolute', left: 0, top: '15%', bottom: '15%',
-            width: '2.5px', background: 'rgb(77,163,255)', borderRadius: '0 2px 2px 0',
+            width: '2.5px', background: '#d4b47a', borderRadius: '0 2px 2px 0',
             boxShadow: '0 0 8px rgba(77,163,255,0.7)',
           }} />
         )}
-        <span style={{ flexShrink: 0, opacity: isActive ? 1 : 0.7, color: isActive ? 'rgb(77,163,255)' : 'inherit' }}>
+        <span style={{ flexShrink: 0, opacity: isActive ? 1 : 0.7, color: isActive ? '#d4b47a' : 'inherit' }}>
           <Icon d={d} size={15} />
         </span>
         <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
         {count > 0 && (
-          <span style={{ fontSize: '0.6rem', fontWeight: 700, background: 'rgb(77,163,255)', color: 'rgb(7,17,31)', borderRadius: '9999px', padding: '0.15rem 0.45rem', flexShrink: 0 }}>{count}</span>
+          <span style={{ fontSize: '0.6rem', fontWeight: 700, background: '#d4b47a', color: '#090907', borderRadius: '9999px', padding: '0.15rem 0.45rem', flexShrink: 0 }}>{count}</span>
         )}
       </motion.div>
     </Link>
@@ -132,54 +132,54 @@ export function ClientPortalLayout({ children, userName, userEmail, companyName 
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'rgb(7,17,31)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#090907' }}>
 
       {/* ── DESKTOP SIDEBAR ── */}
       <aside className="hidden md:flex" style={{
         width: '196px', flexShrink: 0, flexDirection: 'column',
-        background: 'rgb(8,15,28)', borderRight: '1px solid rgba(255,255,255,0.06)',
+        background: '#0f0f0c', borderRight: '1px solid rgba(240,236,228,0.06)',
         position: 'sticky', top: 0, height: '100vh', overflowY: 'auto',
       }}>
         {/* Logo */}
-        <div style={{ padding: '1.125rem 1rem 0.875rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ padding: '1.125rem 1rem 0.875rem', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <div style={{ width: '28px', height: '28px', borderRadius: '7px', flexShrink: 0, background: 'linear-gradient(135deg, rgb(77,163,255), rgb(99,230,190))', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 10px rgba(77,163,255,0.3)' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgb(7,17,31)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <div style={{ width: '28px', height: '28px', borderRadius: '7px', flexShrink: 0, background: 'linear-gradient(135deg, #d4b47a, #b8975e)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 10px rgba(154,124,74,0.28)' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#090907" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 12V22H4V12" /><path d="M22 7H2v5h20V7z" /><path d="M12 22V7" />
                 <path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z" /><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" />
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: '1rem', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.02em', lineHeight: 1 }}>
-                your<span style={{ color: 'rgb(77,163,255)' }}>gift</span>
+              <div style={{ fontSize: '1rem', fontWeight: 900, color: '#f0ece4', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                your<span style={{ color: '#d4b47a' }}>gift</span>
               </div>
-              <div style={{ fontSize: '0.55rem', color: 'rgb(80,92,110)', letterSpacing: '0.06em', textTransform: 'uppercase', marginTop: '1px' }}>Portal Cliente</div>
+              <div style={{ fontSize: '0.55rem', color: 'rgba(240,236,228,0.28)', letterSpacing: '0.06em', textTransform: 'uppercase', marginTop: '1px' }}>Portal Cliente</div>
             </div>
           </div>
         </div>
 
         {/* Client info */}
-        <div style={{ padding: '0.75rem 0.875rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.625rem', borderRadius: '10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <div style={{ width: '30px', height: '30px', borderRadius: '8px', flexShrink: 0, background: 'linear-gradient(135deg, rgb(77,163,255), rgb(116,231,255))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 800, color: 'rgb(7,17,31)' }}>{initials}</div>
+        <div style={{ padding: '0.75rem 0.875rem', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.625rem', borderRadius: '10px', background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)' }}>
+            <div style={{ width: '30px', height: '30px', borderRadius: '8px', flexShrink: 0, background: 'linear-gradient(135deg, #d4b47a, #b8975e)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 800, color: '#090907' }}>{initials}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'rgb(210,225,245)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displayName}</div>
-              <div style={{ fontSize: '0.6rem', color: 'rgb(80,92,110)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{companyName || userEmail}</div>
+              <div style={{ fontSize: '0.6rem', color: 'rgba(240,236,228,0.28)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{companyName || userEmail}</div>
             </div>
           </div>
         </div>
 
         {/* Nav */}
         <nav style={{ flex: 1, padding: '0.5rem 0.625rem', overflowY: 'auto' }}>
-          <div style={{ fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(60,72,90)', padding: '0.75rem 0.625rem 0.25rem' }}>Menu</div>
+          <div style={{ fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.24)', padding: '0.75rem 0.625rem 0.25rem' }}>Menu</div>
           {NAV.map(item => (
             <NavItem key={item.href} href={item.href} label={item.label} iconKey={item.icon} exact={item.exact} badge={item.badge} badges={badges} />
           ))}
-          <div style={{ margin: '0.75rem 0', height: '1px', background: 'rgba(255,255,255,0.05)' }} />
+          <div style={{ margin: '0.75rem 0', height: '1px', background: 'rgba(240,236,228,0.06)' }} />
           <Link href="mailto:geral@yourgift.pt" style={{ textDecoration: 'none', display: 'block' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.425rem 0.625rem', borderRadius: '8px', fontSize: '0.8rem', color: 'rgb(140,155,175)', cursor: 'pointer', transition: 'all 120ms' }}
-              onMouseEnter={(e: React.MouseEvent) => { (e.currentTarget as HTMLElement).style.color = 'rgb(210,220,235)'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
-              onMouseLeave={(e: React.MouseEvent) => { (e.currentTarget as HTMLElement).style.color = 'rgb(140,155,175)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.425rem 0.625rem', borderRadius: '8px', fontSize: '0.8rem', color: 'rgba(240,236,228,0.45)', cursor: 'pointer', transition: 'all 120ms' }}
+              onMouseEnter={(e: React.MouseEvent) => { (e.currentTarget as HTMLElement).style.color = 'rgba(240,236,228,0.72)'; (e.currentTarget as HTMLElement).style.background = 'rgba(240,236,228,0.04)'; }}
+              onMouseLeave={(e: React.MouseEvent) => { (e.currentTarget as HTMLElement).style.color = 'rgba(240,236,228,0.45)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
               <span style={{ opacity: 0.7 }}><Icon d={ICONS.support} size={15} /></span>
               <span>Suporte</span>
             </div>
@@ -187,14 +187,14 @@ export function ClientPortalLayout({ children, userName, userEmail, companyName 
         </nav>
 
         {/* Logout */}
-        <div style={{ padding: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ padding: '0.75rem', borderTop: '1px solid rgba(240,236,228,0.06)' }}>
           <button type="button" onClick={handleLogout} disabled={loggingOut} style={{
             display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center',
             width: '100%', background: 'none', border: 'none', cursor: 'pointer',
-            fontSize: '0.72rem', color: 'rgb(70,82,100)', padding: '0.375rem', borderRadius: '6px', transition: 'color 150ms',
+            fontSize: '0.72rem', color: 'rgba(240,236,228,0.24)', padding: '0.375rem', borderRadius: '6px', transition: 'color 150ms',
           }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'rgb(239,68,68)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgb(70,82,100)'; }}>
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(240,236,228,0.24)'; }}>
             <Icon d={ICONS.logout} size={12} />
             {loggingOut ? 'A sair...' : 'Terminar sessão'}
           </button>
@@ -202,25 +202,25 @@ export function ClientPortalLayout({ children, userName, userEmail, companyName 
       </aside>
 
       {/* ── MOBILE TOP BAR ── */}
-      <div className="flex md:hidden" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, height: '52px', background: 'rgba(8,15,28,0.97)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem' }}>
-        <span style={{ fontSize: '1rem', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.02em' }}>
-          your<span style={{ color: 'rgb(77,163,255)' }}>gift</span>
-          <span style={{ fontSize: '0.55rem', color: 'rgb(80,92,110)', marginLeft: '0.375rem', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', padding: '0.1rem 0.4rem', verticalAlign: 'middle' }}>Cliente</span>
+      <div className="flex md:hidden" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, height: '52px', background: 'rgba(8,15,28,0.97)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(240,236,228,0.06)', alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem' }}>
+        <span style={{ fontSize: '1rem', fontWeight: 900, color: '#f0ece4', letterSpacing: '-0.02em' }}>
+          your<span style={{ color: '#d4b47a' }}>gift</span>
+          <span style={{ fontSize: '0.55rem', color: 'rgba(240,236,228,0.28)', marginLeft: '0.375rem', background: 'rgba(240,236,228,0.06)', borderRadius: '4px', padding: '0.1rem 0.4rem', verticalAlign: 'middle' }}>Cliente</span>
         </span>
-        <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'linear-gradient(135deg, rgb(77,163,255), rgb(116,231,255))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 800, color: 'rgb(7,17,31)' }}>{initials}</div>
+        <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'linear-gradient(135deg, #d4b47a, #b8975e)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 800, color: '#090907' }}>{initials}</div>
       </div>
 
       {/* ── MOBILE BOTTOM NAV ── */}
-      <nav className="flex md:hidden" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50, height: '64px', background: 'rgba(8,15,28,0.97)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'space-around', padding: '0 0.25rem' }}>
+      <nav className="flex md:hidden" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50, height: '64px', background: 'rgba(8,15,28,0.97)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(240,236,228,0.06)', alignItems: 'center', justifyContent: 'space-around', padding: '0 0.25rem' }}>
         {MOBILE_NAV.map(item => {
           const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
           const d = ICONS[item.icon as keyof typeof ICONS];
           const count = item.icon === 'orders' ? badges.orders ?? 0 : item.icon === 'quotes' ? badges.quotes ?? 0 : 0;
           return (
-            <Link key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem', padding: '0.5rem 0.75rem', borderRadius: '12px', color: isActive ? 'rgb(77,163,255)' : 'rgb(100,112,130)', background: isActive ? 'rgba(77,163,255,0.1)' : 'transparent', textDecoration: 'none', position: 'relative', minWidth: '52px', flexShrink: 0 }}>
+            <Link key={item.href} href={item.href} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem', padding: '0.5rem 0.75rem', borderRadius: '12px', color: isActive ? '#d4b47a' : 'rgba(240,236,228,0.42)', background: isActive ? 'rgba(154,124,74,0.10)' : 'transparent', textDecoration: 'none', position: 'relative', minWidth: '52px', flexShrink: 0 }}>
               <Icon d={d} size={20} />
               <span style={{ fontSize: '0.55rem', fontWeight: isActive ? 700 : 400 }}>{item.label}</span>
-              {count > 0 && <div style={{ position: 'absolute', top: '4px', right: '8px', width: '14px', height: '14px', borderRadius: '50%', background: 'rgb(77,163,255)', border: '2px solid rgb(8,15,28)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.45rem', fontWeight: 800, color: 'rgb(7,17,31)' }}>{count > 9 ? '9+' : count}</div>}
+              {count > 0 && <div style={{ position: 'absolute', top: '4px', right: '8px', width: '14px', height: '14px', borderRadius: '50%', background: '#d4b47a', border: '2px solid #0f0f0c', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.45rem', fontWeight: 800, color: '#090907' }}>{count > 9 ? '9+' : count}</div>}
             </Link>
           );
         })}
