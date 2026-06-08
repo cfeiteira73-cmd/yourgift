@@ -126,8 +126,8 @@ export default async function OrderDetailPage({
   } | null;
 
   const supplierLabels: Record<string, string> = {
-    midocean: 'Midocean',
-    pf_concept: 'PF Concept',
+    midocean: 'Fornecedor Certificado',
+    pf_concept: 'Fornecedor Certificado',
     stricker: 'Stricker',
   };
 

@@ -63,7 +63,7 @@ export default async function PublicCatalogPage({
             </p>
           </div>
           <Link
-            href="/rfq"
+            href="/auth/register"
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               fontFamily: "'Montserrat',sans-serif",
@@ -72,7 +72,7 @@ export default async function PublicCatalogPage({
               padding: '12px 24px', textDecoration: 'none', flexShrink: 0,
             }}
           >
-            Pedir Orçamento →
+            Criar Conta &amp; Pedir →
           </Link>
         </div>
 
@@ -171,7 +171,7 @@ export default async function PublicCatalogPage({
                 return (
                   <Link
                     key={product.id}
-                    href={`/rfq?product=${encodeURIComponent(product.title)}&ref=${encodeURIComponent(product.supplierRef ?? '')}`}
+                    href={`/auth/register?next=/client-portal/quotes/new&product=${encodeURIComponent(product.title)}&ref=${encodeURIComponent(product.supplierRef ?? '')}`}
                     className="pub-prod-card"
                     style={{
                       display: 'block', textDecoration: 'none',

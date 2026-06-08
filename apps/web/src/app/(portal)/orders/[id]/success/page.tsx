@@ -8,7 +8,7 @@ export default function OrderSuccessPage({ params }: { params: { id: string } })
         <h1 className="text-2xl font-black text-gray-900 mb-3">Encomenda confirmada!</h1>
         <p className="text-gray-500 mb-2">Referência: <span className="font-semibold text-gray-900">{params.id}</span></p>
         <p className="text-sm text-gray-400 mb-8">
-          O pagamento foi processado e a tua encomenda foi enviada para produção na Midocean.
+          O pagamento foi processado e a tua encomenda foi enviada para produção.
           Receberás atualizações por email.
         </p>
         <div className="flex flex-col gap-3">

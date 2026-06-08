@@ -40,7 +40,7 @@ const PAGES: SearchResult[] = [
   { id:'p6', type:'page', title:'Relatórios & Analytics',  subtitle:'Métricas e finanças',        href:'/reports',      icon:'📈' },
   { id:'p7', type:'page', title:'Fornecedores',            subtitle:'Parceiros e catálogos',      href:'/suppliers',    icon:'🌊' },
   { id:'p8', type:'page', title:'Marketing & Promoções',   subtitle:'Campanhas e ideias',         href:'/marketing',    icon:'📣' },
-  { id:'p9', type:'page', title:'Integrações',             subtitle:'Stripe, Midocean, APIs',     href:'/integrations', icon:'⚡' },
+  { id:'p9', type:'page', title:'Integrações',             subtitle:'Stripe, Pagamentos, APIs',     href:'/integrations', icon:'⚡' },
   { id:'p10',type:'page', title:'Definições',              subtitle:'Conta e notificações',       href:'/settings',     icon:'⚙️' },
   { id:'p11',type:'page', title:'Faturação',               subtitle:'Faturas e pagamentos',       href:'/billing',      icon:'🧾' },
   { id:'p12',type:'page', title:'Assets & Ficheiros',      subtitle:'Logótipos e maquetes',       href:'/assets',       icon:'🎨' },

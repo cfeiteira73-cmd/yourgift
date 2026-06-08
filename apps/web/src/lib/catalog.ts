@@ -128,6 +128,7 @@ export async function getProducts(filters: ProductFilters = {}): Promise<Paginat
 
   const url = new URL(`${SUPABASE_URL}/rest/v1/products`);
   url.searchParams.set('select', PRODUCT_SELECT);
+  url.searchParams.set('is_active', 'eq.true');   // only show active products (no deactivated catalog PDFs)
   url.searchParams.set('limit', String(limit));
   url.searchParams.set('offset', String(offset));
 
