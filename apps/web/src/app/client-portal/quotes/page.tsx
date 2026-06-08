@@ -90,7 +90,7 @@ export default function ClientQuotesPage() {
             <p style={{ fontSize: '0.78rem', color: 'rgba(240,236,228,0.28)' }}>{quotes.length} orçamento{quotes.length !== 1 ? 's' : ''} no total</p>
           </div>
           <motion.button type="button" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => setShowForm(true)}
-            style={{ background: '#b8975e', color: '#fff', border: 'none', borderRadius: '0px', padding: '0.5rem 1.125rem', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px rgba(77,163,255,0.25)' }}>
+            style={{ background: '#b8975e', color: '#fff', border: 'none', borderRadius: '0px', padding: '0.5rem 1.125rem', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px rgba(154,124,74,0.22)' }}>
             + Pedir Orçamento
           </motion.button>
         </motion.div>
@@ -135,7 +135,7 @@ export default function ClientQuotesPage() {
         {/* Filters */}
         <div style={{ display: 'flex', gap: '0.375rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
           {FILTERS.map(f => (
-            <button key={f} type="button" onClick={() => setFilter(f)} style={{ padding: '0.35rem 0.875rem', borderRadius: '9999px', fontSize: '0.72rem', fontWeight: filter === f ? 600 : 400, cursor: 'pointer', background: filter === f ? 'rgba(77,163,255,0.14)' : 'rgba(240,236,228,0.04)', color: filter === f ? '#d4b47a' : 'rgba(240,236,228,0.42)', border: filter === f ? '1px solid rgba(154,124,74,0.28)' : '1px solid rgba(240,236,228,0.06)', transition: 'all 150ms' }}>
+            <button key={f} type="button" onClick={() => setFilter(f)} style={{ padding: '0.35rem 0.875rem', borderRadius: '9999px', fontSize: '0.72rem', fontWeight: filter === f ? 600 : 400, cursor: 'pointer', background: filter === f ? 'rgba(154,124,74,0.12)' : 'rgba(240,236,228,0.04)', color: filter === f ? '#d4b47a' : 'rgba(240,236,228,0.42)', border: filter === f ? '1px solid rgba(154,124,74,0.28)' : '1px solid rgba(240,236,228,0.06)', transition: 'all 150ms' }}>
               {f}
             </button>
           ))}
@@ -158,7 +158,7 @@ export default function ClientQuotesPage() {
               const isProposed = q.status === 'proposed';
               return (
                 <motion.div key={q.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
-                  style={{ background: 'rgba(240,236,228,0.04)', border: `1px solid ${isProposed ? 'rgba(77,163,255,0.25)' : 'rgba(240,236,228,0.06)'}`, borderRadius: '0px', padding: '1.125rem', borderLeft: `3px solid ${st.color}` }}>
+                  style={{ background: 'rgba(240,236,228,0.04)', border: `1px solid ${isProposed ? 'rgba(154,124,74,0.22)' : 'rgba(240,236,228,0.06)'}`, borderRadius: '0px', padding: '1.125rem', borderLeft: `3px solid ${st.color}` }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
                       <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#f0ece4', marginBottom: '0.15rem' }}>{q.ref}</div>
@@ -172,7 +172,7 @@ export default function ClientQuotesPage() {
                   {q.notes && <div style={{ fontSize: '0.68rem', color: 'rgba(240,236,228,0.42)', marginTop: '0.5rem', padding: '0.5rem 0.75rem', background: 'rgba(240,236,228,0.04)', borderRadius: '0px' }}>{q.notes}</div>}
                   {isProposed && (
                     <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
-                      <a href="mailto:geral@yourgift.pt?subject=Aprovação Orçamento" style={{ flex: 1, textAlign: 'center', padding: '0.45rem', borderRadius: '0px', background: 'rgba(184,151,94,0.12)', border: '1px solid rgba(99,230,190,0.25)', color: '#b8975e', fontSize: '0.72rem', fontWeight: 700, textDecoration: 'none' }}>✓ Aprovar</a>
+                      <a href="mailto:geral@yourgift.pt?subject=Aprovação Orçamento" style={{ flex: 1, textAlign: 'center', padding: '0.45rem', borderRadius: '0px', background: 'rgba(184,151,94,0.12)', border: '1px solid rgba(184,151,94,0.22)', color: '#b8975e', fontSize: '0.72rem', fontWeight: 700, textDecoration: 'none' }}>✓ Aprovar</a>
                       <a href="mailto:geral@yourgift.pt?subject=Revisão Orçamento" style={{ flex: 1, textAlign: 'center', padding: '0.45rem', borderRadius: '0px', background: 'rgba(240,236,228,0.06)', border: '1px solid rgba(240,236,228,0.10)', color: 'rgba(240,236,228,0.45)', fontSize: '0.72rem', fontWeight: 600, textDecoration: 'none' }}>Pedir revisão</a>
                     </div>
                   )}

@@ -116,7 +116,7 @@ export default function ClientBillingPage() {
         {/* Filters */}
         <div style={{ display: 'flex', gap: '0.375rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
           {FILTERS.map(f => (
-            <button key={f} type="button" onClick={() => setFilter(f)} style={{ padding: '0.35rem 0.875rem', borderRadius: '9999px', fontSize: '0.72rem', fontWeight: filter === f ? 600 : 400, cursor: 'pointer', background: filter === f ? 'rgba(77,163,255,0.14)' : 'rgba(240,236,228,0.04)', color: filter === f ? '#d4b47a' : 'rgba(240,236,228,0.42)', border: filter === f ? '1px solid rgba(154,124,74,0.28)' : '1px solid rgba(240,236,228,0.06)', transition: 'all 150ms' }}>
+            <button key={f} type="button" onClick={() => setFilter(f)} style={{ padding: '0.35rem 0.875rem', borderRadius: '9999px', fontSize: '0.72rem', fontWeight: filter === f ? 600 : 400, cursor: 'pointer', background: filter === f ? 'rgba(154,124,74,0.12)' : 'rgba(240,236,228,0.04)', color: filter === f ? '#d4b47a' : 'rgba(240,236,228,0.42)', border: filter === f ? '1px solid rgba(154,124,74,0.28)' : '1px solid rgba(240,236,228,0.06)', transition: 'all 150ms' }}>
               {f}
             </button>
           ))}
