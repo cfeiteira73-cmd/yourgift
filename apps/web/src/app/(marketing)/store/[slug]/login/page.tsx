@@ -88,7 +88,7 @@ export default async function StoreLoginPage({
     );
   }
 
-  const accent = store.primaryColor ?? '#4da3ff';
+  const accent = store.primaryColor ?? '#d4b47a';
 
   return (
     <div

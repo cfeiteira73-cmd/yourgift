@@ -17,40 +17,40 @@ const types = [
 
 export default function PackagingPage() {
   return (
-    <div style={{ minHeight: '100vh', background: 'rgb(7,17,31)', paddingTop: '5rem' }}>
+    <div style={{ minHeight: '100vh', background: '#090907', paddingTop: '5rem' }}>
       <section style={{ padding: '5rem 1.5rem 4rem', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(116,231,255,0.08)', border: '1px solid rgba(116,231,255,0.2)', borderRadius: '100px', padding: '0.375rem 1rem', marginBottom: '1.5rem', fontSize: '0.8rem', color: 'rgb(116,231,255)', fontWeight: 600 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(154,124,74,0.08)', border: '1px solid rgba(154,124,74,0.18)', borderRadius: '100px', padding: '0.375rem 1rem', marginBottom: '1.5rem', fontSize: '0.8rem', color: '#b8975e', fontWeight: 600 }}>
           Packaging Premium
         </div>
-        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1.25rem' }}>
-          Embalagens que<br /><span style={{ color: 'rgb(116,231,255)' }}>comunicam a tua marca</span>
+        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontFamily: "'Libre Baskerville', serif", fontWeight: 400, color: '#f0ece4', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1.25rem' }}>
+          Embalagens que<br /><span style={{ color: '#b8975e' }}>comunicam a tua marca</span>
         </h1>
         <p style={{ fontSize: '1.125rem', color: 'rgb(170,180,198)', lineHeight: 1.7, marginBottom: '2.5rem' }}>
           A primeira impressão começa na embalagem. Packaging personalizado que eleva a percepção de valor da tua marca.
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link href="/quote" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgb(116,231,255)', color: 'rgb(7,17,31)', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none' }}>
+          <Link href="/quote" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#b8975e', color: '#090907', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none' }}>
             Pedir Orçamento →
           </Link>
-          <Link href="/how-it-works" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.06)', color: 'rgb(245,247,251)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 600, fontSize: '0.95rem', textDecoration: 'none' }}>
+          <Link href="/how-it-works" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(240,236,228,0.06)', color: '#f0ece4', border: '1px solid rgba(240,236,228,0.10)', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 600, fontSize: '0.95rem', textDecoration: 'none' }}>
             Como Funciona
           </Link>
         </div>
       </section>
 
       <section style={{ padding: '2rem 1.5rem 6rem', maxWidth: '1000px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '2rem', textAlign: 'center' }}>Tipos de packaging</h2>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '2rem', textAlign: 'center' }}>Tipos de packaging</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
           {types.map((t) => (
-            <div key={t.label} style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '18px', padding: '1.75rem' }}>
+            <div key={t.label} style={{ background: 'linear-gradient(180deg, rgba(240,236,228,0.06) 0%, rgba(255,255,255,0.02) 100%)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '18px', padding: '1.75rem' }}>
               <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>{t.emoji}</div>
-              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '0.375rem' }}>{t.label}</h3>
-              <p style={{ fontSize: '0.83rem', color: 'rgb(120,130,150)', lineHeight: 1.6 }}>{t.desc}</p>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f0ece4', marginBottom: '0.375rem' }}>{t.label}</h3>
+              <p style={{ fontSize: '0.83rem', color: 'rgba(240,236,228,0.42)', lineHeight: 1.6 }}>{t.desc}</p>
             </div>
           ))}
         </div>
         <div style={{ textAlign: 'center', marginTop: '3.5rem' }}>
-          <Link href="/quote" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgb(116,231,255)', color: 'rgb(7,17,31)', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none' }}>
+          <Link href="/quote" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#b8975e', color: '#090907', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none' }}>
             Criar o meu packaging →
           </Link>
         </div>

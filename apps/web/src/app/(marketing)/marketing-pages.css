@@ -1,0 +1,214 @@
+/* ═══════════════════════════════════════════════════════════════════
+   YOURGIFT MARKETING PAGES — Typography & Color System
+   Applies to: /catalog /how-it-works /about /blog and all marketing routes
+   Same premium system as homepage v2
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Base for all marketing pages ─────────────────────────────────── */
+body {
+  font-family: var(--font-montserrat, 'Montserrat'), sans-serif;
+  background: var(--bg, #090907);
+  color: var(--t1, #f0ece4);
+  -webkit-font-smoothing: antialiased;
+  font-weight: 300;
+}
+
+/* ── Headings → Libre Baskerville ─────────────────────────────────── */
+h1, h2, h3, h4 {
+  font-family: var(--font-baskerville, 'Libre Baskerville'), serif !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.015em;
+}
+
+/* ── Numbers, prices, codes → DM Mono ────────────────────────────── */
+.mono, [data-mono],
+.price, .stat-value,
+.kpi-value, .kpi-num {
+  font-family: var(--font-dm-mono, 'DM Mono'), monospace !important;
+}
+
+/* ── Marketing page wrapper ────────────────────────────────────────── */
+.mkt-page {
+  min-height: 100vh;
+  background: #090907;
+  color: #f0ece4;
+}
+
+/* ── Section containers ────────────────────────────────────────────── */
+.mkt-section {
+  padding: 5rem 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.mkt-section-dark {
+  background: #0f0f0c;
+}
+
+.mkt-section-card {
+  background: #141411;
+}
+
+/* ── Section eyebrow (like homepage) ──────────────────────────────── */
+.mkt-eyebrow {
+  font-family: var(--font-montserrat, 'Montserrat'), sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.36em;
+  text-transform: uppercase;
+  color: var(--bronze, #9a7c4a);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.mkt-eyebrow::before {
+  content: '';
+  width: 28px;
+  height: 1px;
+  background: var(--bronze, #9a7c4a);
+  flex-shrink: 0;
+}
+
+/* ── Cards ────────────────────────────────────────────────────────── */
+.mkt-card {
+  background: #141411;
+  border: 1px solid rgba(154,124,74,0.18);
+  padding: 2rem;
+}
+
+.mkt-card:hover {
+  border-color: rgba(154,124,74,0.32);
+}
+
+/* ── Primary button ────────────────────────────────────────────────── */
+.mkt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-montserrat, 'Montserrat'), sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #090907;
+  background: #b8975e;
+  padding: 14px 32px;
+  text-decoration: none;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+
+.mkt-btn:hover { background: #d4b47a; }
+
+.mkt-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-montserrat, 'Montserrat'), sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #f0ece4;
+  background: transparent;
+  padding: 13px 32px;
+  text-decoration: none;
+  border: 1px solid rgba(240,236,228,0.25);
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.mkt-btn-outline:hover {
+  border-color: #d4b47a;
+  color: #d4b47a;
+}
+
+/* ── Steps / How It Works numbers ─────────────────────────────────── */
+.mkt-step-num {
+  font-family: var(--font-baskerville, 'Libre Baskerville'), serif;
+  font-size: 3rem;
+  font-weight: 400;
+  color: rgba(154,124,74,0.25);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+/* ── Stats ─────────────────────────────────────────────────────────── */
+.mkt-stat-value {
+  font-family: var(--font-baskerville, 'Libre Baskerville'), serif;
+  font-size: clamp(2.5rem, 4vw, 4rem);
+  font-weight: 400;
+  color: #f0ece4;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.mkt-stat-value em {
+  font-style: italic;
+  color: #d4b47a;
+}
+
+.mkt-stat-label {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(240,236,228,0.42);
+  font-weight: 400;
+  margin-top: 6px;
+}
+
+/* ── Dividers ──────────────────────────────────────────────────────── */
+.mkt-divider {
+  border: none;
+  border-top: 1px solid rgba(154,124,74,0.14);
+  margin: 3rem 0;
+}
+
+/* ── Tags / badges ────────────────────────────────────────────────── */
+.mkt-tag {
+  display: inline-block;
+  font-family: var(--font-montserrat, 'Montserrat'), sans-serif;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #d4b47a;
+  background: rgba(154,124,74,0.10);
+  border: 1px solid rgba(154,124,74,0.22);
+  padding: 4px 10px;
+}
+
+/* ── Inputs / Forms ────────────────────────────────────────────────── */
+input, textarea, select {
+  background: #1a1a16 !important;
+  border-color: rgba(154,124,74,0.18) !important;
+  color: #f0ece4 !important;
+  font-family: var(--font-montserrat, 'Montserrat'), sans-serif;
+}
+
+input:focus, textarea:focus {
+  border-color: rgba(154,124,74,0.42) !important;
+  outline: none !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: rgba(240,236,228,0.28) !important;
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(154,124,74,0.28); border-radius: 0; }
+
+/* ── Links ─────────────────────────────────────────────────────────── */
+a.mkt-link {
+  color: #d4b47a;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+a.mkt-link:hover { color: #b8975e; }

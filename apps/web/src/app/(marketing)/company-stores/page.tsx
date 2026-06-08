@@ -36,62 +36,62 @@ const plans = [
 
 export default function CompanyStoresPage() {
   return (
-    <div style={{ minHeight: '100vh', background: 'rgb(7,17,31)', paddingTop: '5rem' }}>
+    <div style={{ minHeight: '100vh', background: '#090907', paddingTop: '5rem' }}>
       <section style={{ padding: '5rem 1.5rem 4rem', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(99,230,190,0.08)', border: '1px solid rgba(99,230,190,0.2)', borderRadius: '100px', padding: '0.375rem 1rem', marginBottom: '1.5rem', fontSize: '0.8rem', color: 'rgb(99,230,190)', fontWeight: 600 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(184,151,94,0.08)', border: '1px solid rgba(184,151,94,0.18)', borderRadius: '100px', padding: '0.375rem 1rem', marginBottom: '1.5rem', fontSize: '0.8rem', color: '#b8975e', fontWeight: 600 }}>
           Company Stores
         </div>
-        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1.25rem' }}>
-          A loja da tua empresa.<br /><span style={{ color: 'rgb(99,230,190)' }}>Para a tua equipa.</span>
+        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontFamily: "'Libre Baskerville', serif", fontWeight: 400, color: '#f0ece4', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1.25rem' }}>
+          A loja da tua empresa.<br /><span style={{ color: '#b8975e' }}>Para a tua equipa.</span>
         </h1>
         <p style={{ fontSize: '1.125rem', color: 'rgb(170,180,198)', lineHeight: 1.7, marginBottom: '2.5rem' }}>
           Uma plataforma privada com o teu branding onde colaboradores encomendatm os seus próprios produtos.
           Stock gerido por ti, entrega directa para eles.
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link href="/enterprise" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgb(99,230,190)', color: 'rgb(7,17,31)', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none' }}>
+          <Link href="/enterprise" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#b8975e', color: '#090907', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none' }}>
             Falar com a equipa →
           </Link>
-          <Link href="/quote" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.06)', color: 'rgb(245,247,251)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 600, fontSize: '0.95rem', textDecoration: 'none' }}>
+          <Link href="/quote" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(240,236,228,0.06)', color: '#f0ece4', border: '1px solid rgba(240,236,228,0.10)', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 600, fontSize: '0.95rem', textDecoration: 'none' }}>
             Pedir Demo
           </Link>
         </div>
       </section>
 
       <section style={{ padding: '2rem 1.5rem 4rem', maxWidth: '1000px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '2rem', textAlign: 'center' }}>Tudo o que precisas</h2>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '2rem', textAlign: 'center' }}>Tudo o que precisas</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
           {features.map((f) => (
-            <div key={f.title} style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '18px', padding: '1.75rem' }}>
+            <div key={f.title} style={{ background: 'linear-gradient(180deg, rgba(240,236,228,0.06) 0%, rgba(255,255,255,0.02) 100%)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '18px', padding: '1.75rem' }}>
               <div style={{ fontSize: '1.75rem', marginBottom: '0.75rem' }}>{f.emoji}</div>
-              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '0.375rem' }}>{f.title}</h3>
-              <p style={{ fontSize: '0.83rem', color: 'rgb(120,130,150)', lineHeight: 1.6 }}>{f.description}</p>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f0ece4', marginBottom: '0.375rem' }}>{f.title}</h3>
+              <p style={{ fontSize: '0.83rem', color: 'rgba(240,236,228,0.42)', lineHeight: 1.6 }}>{f.description}</p>
             </div>
           ))}
         </div>
       </section>
 
       <section style={{ padding: '2rem 1.5rem 6rem', maxWidth: '1000px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '2rem', textAlign: 'center' }}>Planos</h2>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '2rem', textAlign: 'center' }}>Planos</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem' }}>
           {plans.map((plan) => (
             <div key={plan.name} style={{
-              background: plan.highlight ? 'rgba(99,230,190,0.06)' : 'linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)',
-              border: plan.highlight ? '1px solid rgba(99,230,190,0.3)' : '1px solid rgba(255,255,255,0.08)',
+              background: plan.highlight ? 'rgba(184,151,94,0.08)' : 'linear-gradient(180deg, rgba(240,236,228,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+              border: plan.highlight ? '1px solid rgba(184,151,94,0.28)' : '1px solid rgba(240,236,228,0.06)',
               borderRadius: '20px', padding: '2rem',
             }}>
-              {plan.highlight && <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgb(99,230,190)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Mais popular</div>}
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'rgb(245,247,251)', marginBottom: '0.25rem' }}>{plan.name}</h3>
-              <p style={{ fontSize: '0.85rem', color: 'rgb(120,130,150)', marginBottom: '1.5rem' }}>{plan.desc}</p>
+              {plan.highlight && <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#b8975e', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Mais popular</div>}
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f0ece4', marginBottom: '0.25rem' }}>{plan.name}</h3>
+              <p style={{ fontSize: '0.85rem', color: 'rgba(240,236,228,0.42)', marginBottom: '1.5rem' }}>{plan.desc}</p>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
                 {plan.items.map((item) => (
                   <li key={item} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', fontSize: '0.875rem', color: 'rgb(170,180,198)' }}>
-                    <span style={{ color: 'rgb(99,230,190)', flexShrink: 0 }}>✓</span>
+                    <span style={{ color: '#b8975e', flexShrink: 0 }}>✓</span>
                     {item}
                   </li>
                 ))}
               </ul>
-              <Link href="/enterprise" style={{ display: 'block', textAlign: 'center', marginTop: '1.75rem', background: plan.highlight ? 'rgb(99,230,190)' : 'rgba(255,255,255,0.06)', color: plan.highlight ? 'rgb(7,17,31)' : 'rgb(245,247,251)', border: plan.highlight ? 'none' : '1px solid rgba(255,255,255,0.1)', padding: '0.75rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.875rem', textDecoration: 'none' }}>
+              <Link href="/enterprise" style={{ display: 'block', textAlign: 'center', marginTop: '1.75rem', background: plan.highlight ? '#b8975e' : 'rgba(240,236,228,0.06)', color: plan.highlight ? '#090907' : '#f0ece4', border: plan.highlight ? 'none' : '1px solid rgba(240,236,228,0.10)', padding: '0.75rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.875rem', textDecoration: 'none' }}>
                 Falar connosco
               </Link>
             </div>

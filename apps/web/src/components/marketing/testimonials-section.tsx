@@ -88,13 +88,13 @@ function StarRating({ count }: { count: number }) {
 
 export function TestimonialsSection() {
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden bg-[#07111F]">
+    <section className="py-24 md:py-32 relative overflow-hidden bg-[#090907]">
       {/* Background orb */}
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] rounded-full opacity-10 blur-[140px] pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse, rgba(77,163,255,0.5) 0%, rgba(99,230,190,0.3) 50%, transparent 70%)",
+            "radial-gradient(ellipse, rgba(154,124,74,0.45) 0%, rgba(184,151,94,0.28) 50%, transparent 70%)",
         }}
       />
 
@@ -107,7 +107,7 @@ export function TestimonialsSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#4DA3FF] mb-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#d4b47a] mb-4">
             Clientes satisfeitos
           </p>
           <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-white mb-4">
@@ -115,7 +115,7 @@ export function TestimonialsSection() {
             <span
               className="bg-clip-text text-transparent"
               style={{
-                backgroundImage: "linear-gradient(90deg, #4DA3FF, #74E7FF, #63E6BE)",
+                backgroundImage: "linear-gradient(90deg, #d4b47a, #b8975e, #b8975e)",
               }}
             >
               empresas reais
@@ -138,7 +138,7 @@ export function TestimonialsSection() {
               className="group relative p-6 rounded-2xl border border-white/[0.07] bg-white/[0.03] hover:border-white/[0.13] hover:bg-white/[0.05] transition-all duration-300"
             >
               {/* Quote icon */}
-              <Quote className="absolute top-5 right-5 h-6 w-6 text-white/[0.07] group-hover:text-[#4DA3FF]/20 transition-colors" />
+              <Quote className="absolute top-5 right-5 h-6 w-6 text-white/[0.07] group-hover:text-[#d4b47a]/20 transition-colors" />
 
               {/* Stars */}
               <StarRating count={t.stars} />
@@ -149,9 +149,9 @@ export function TestimonialsSection() {
               </p>
 
               {/* Result badge */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#63E6BE]/10 border border-[#63E6BE]/20 mb-5">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#63E6BE]" />
-                <span className="text-[11px] font-semibold text-[#63E6BE]">{t.result}</span>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#b8975e]/10 border border-[#b8975e]/20 mb-5">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#b8975e]" />
+                <span className="text-[11px] font-semibold text-[#b8975e]">{t.result}</span>
               </div>
 
               {/* Author */}

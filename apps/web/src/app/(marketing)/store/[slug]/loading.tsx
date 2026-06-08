@@ -105,12 +105,12 @@ export default function StoreLoading() {
             width: '80px',
             height: '80px',
             borderRadius: '16px',
-            background: 'rgba(255,255,255,0.1)',
+            background: 'rgba(240,236,228,0.10)',
           }}
         />
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', width: '320px' }}>
-          <div style={{ height: '32px', width: '200px', borderRadius: '6px', background: 'rgba(255,255,255,0.12)' }} />
-          <div style={{ height: '15px', width: '280px', borderRadius: '6px', background: 'rgba(255,255,255,0.08)' }} />
+          <div style={{ height: '32px', width: '200px', borderRadius: '6px', background: 'rgba(240,236,228,0.12)' }} />
+          <div style={{ height: '15px', width: '280px', borderRadius: '6px', background: 'rgba(240,236,228,0.06)' }} />
         </div>
       </div>
 

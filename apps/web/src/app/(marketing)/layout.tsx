@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { WhatsAppFloat } from '@/components/ui/whatsapp-float';
 import { Footer } from '@/components/layout/footer';
+import './home-v2.css';
+import './marketing-pages.css';
 
 // ── v2 Nav with scroll behavior ───────────────────────────────────────────────
 function NavV2() {

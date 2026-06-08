@@ -114,7 +114,7 @@ export function FeaturedCatalog() {
           transition={{ duration: 0.55 }}
           className="text-center max-w-xl mx-auto mb-12"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#74E7FF] mb-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#b8975e] mb-4">
             Catálogo
           </p>
           <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-white mb-4">
@@ -141,7 +141,7 @@ export function FeaturedCatalog() {
               onClick={() => setFilter(f.id)}
               className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all border ${
                 filter === f.id
-                  ? "bg-white text-[#07111F] border-white"
+                  ? "bg-white text-[#090907] border-white"
                   : "bg-white/[0.04] border-white/[0.1] text-white/58 hover:text-white hover:border-white/[0.2]"
               }`}
             >
@@ -183,13 +183,13 @@ export function FeaturedCatalog() {
                     />
                     <div className="absolute top-3 left-3 flex gap-1.5">
                       {product.popular && (
-                        <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-[#07111F]/80 backdrop-blur-sm text-[#74E7FF] text-[10px] font-semibold border border-[#74E7FF]/20">
+                        <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-[#090907]/80 backdrop-blur-sm text-[#b8975e] text-[10px] font-semibold border border-[#b8975e]/20">
                           <Star className="h-2.5 w-2.5 fill-current" />
                           Popular
                         </span>
                       )}
                       {product.sustainable && (
-                        <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-[#07111F]/80 backdrop-blur-sm text-[#63E6BE] text-[10px] font-semibold border border-[#63E6BE]/20">
+                        <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-[#090907]/80 backdrop-blur-sm text-[#b8975e] text-[10px] font-semibold border border-[#b8975e]/20">
                           <Leaf className="h-2.5 w-2.5" />
                           Eco
                         </span>
@@ -199,7 +199,7 @@ export function FeaturedCatalog() {
 
                   {/* Info */}
                   <div className="p-5">
-                    <p className="text-xs text-[#4DA3FF] font-medium mb-1.5">
+                    <p className="text-xs text-[#d4b47a] font-medium mb-1.5">
                       {product.categoryLabel}
                     </p>
                     <h3 className="text-base font-semibold text-white/90 group-hover:text-white transition-colors mb-3">

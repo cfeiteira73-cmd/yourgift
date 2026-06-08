@@ -107,7 +107,7 @@ export function AIProjectBuilder() {
         className="absolute inset-0 opacity-25"
         style={{
           background:
-            "radial-gradient(ellipse 70% 70% at 50% 50%, rgba(77,163,255,0.12), transparent)",
+            "radial-gradient(ellipse 70% 70% at 50% 50%, rgba(154,124,74,0.12), transparent)",
         }}
       />
 
@@ -121,7 +121,7 @@ export function AIProjectBuilder() {
             transition={{ duration: 0.5 }}
             className="text-center mb-10"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#4DA3FF]/10 border border-[#4DA3FF]/20 text-[#4DA3FF] text-xs font-semibold uppercase tracking-[0.12em] mb-5">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#d4b47a]/10 border border-[#d4b47a]/20 text-[#d4b47a] text-xs font-semibold uppercase tracking-[0.12em] mb-5">
               <Sparkles className="h-3.5 w-3.5" />
               AI Project Builder
             </div>
@@ -151,8 +151,8 @@ export function AIProjectBuilder() {
                     style={{
                       backgroundColor:
                         ["objective", "sector", "quantity", "budget"].indexOf(step) >= i
-                          ? "#4DA3FF"
-                          : "rgba(255,255,255,0.1)",
+                          ? "#d4b47a"
+                          : "rgba(240,236,228,0.10)",
                     }}
                   />
                 ))}
@@ -176,7 +176,7 @@ export function AIProjectBuilder() {
                       <button
                         key={obj.id}
                         onClick={() => handleSelect("objective", obj.id)}
-                        className="flex flex-col items-start gap-2 p-4 rounded-xl border border-white/[0.08] hover:border-[#4DA3FF]/40 bg-white/[0.03] hover:bg-[#4DA3FF]/08 transition-all text-left group"
+                        className="flex flex-col items-start gap-2 p-4 rounded-xl border border-white/[0.08] hover:border-[#d4b47a]/40 bg-white/[0.03] hover:bg-[#d4b47a]/08 transition-all text-left group"
                       >
                         <span className="text-xl">{obj.emoji}</span>
                         <span className="text-sm font-medium text-white/80 group-hover:text-white transition-colors leading-snug">
@@ -204,7 +204,7 @@ export function AIProjectBuilder() {
                       <button
                         key={s.id}
                         onClick={() => handleSelect("sector", s.id)}
-                        className="flex items-center justify-between p-4 rounded-xl border border-white/[0.08] hover:border-[#4DA3FF]/40 bg-white/[0.03] hover:bg-[#4DA3FF]/08 transition-all text-sm font-medium text-white/80 hover:text-white"
+                        className="flex items-center justify-between p-4 rounded-xl border border-white/[0.08] hover:border-[#d4b47a]/40 bg-white/[0.03] hover:bg-[#d4b47a]/08 transition-all text-sm font-medium text-white/80 hover:text-white"
                       >
                         {s.label}
                         <ChevronRight className="h-3.5 w-3.5 opacity-40" />
@@ -230,7 +230,7 @@ export function AIProjectBuilder() {
                       <button
                         key={q.id}
                         onClick={() => handleSelect("quantity", q.id)}
-                        className="p-5 rounded-xl border border-white/[0.08] hover:border-[#4DA3FF]/40 bg-white/[0.03] hover:bg-[#4DA3FF]/08 transition-all text-base font-semibold text-white/80 hover:text-white text-center"
+                        className="p-5 rounded-xl border border-white/[0.08] hover:border-[#d4b47a]/40 bg-white/[0.03] hover:bg-[#d4b47a]/08 transition-all text-base font-semibold text-white/80 hover:text-white text-center"
                       >
                         {q.label}
                       </button>
@@ -255,7 +255,7 @@ export function AIProjectBuilder() {
                       <button
                         key={b.id}
                         onClick={() => handleSelect("budget", b.id)}
-                        className="p-4 rounded-xl border border-white/[0.08] hover:border-[#4DA3FF]/40 bg-white/[0.03] hover:bg-[#4DA3FF]/08 transition-all text-sm font-semibold text-white/80 hover:text-white text-center"
+                        className="p-4 rounded-xl border border-white/[0.08] hover:border-[#d4b47a]/40 bg-white/[0.03] hover:bg-[#d4b47a]/08 transition-all text-sm font-semibold text-white/80 hover:text-white text-center"
                       >
                         {b.label}
                       </button>
@@ -272,7 +272,7 @@ export function AIProjectBuilder() {
                   transition={{ duration: 0.35 }}
                 >
                   <div className="text-center mb-8">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#63E6BE]/12 text-[#63E6BE] text-xs font-semibold mb-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#b8975e]/12 text-[#b8975e] text-xs font-semibold mb-4">
                       <Sparkles className="h-3 w-3" />
                       Recomendação gerada
                     </div>
@@ -285,7 +285,7 @@ export function AIProjectBuilder() {
                     {rec.products.map((p) => (
                       <div
                         key={p}
-                        className="p-3 rounded-xl border border-[#4DA3FF]/18 bg-[#4DA3FF]/05 text-center"
+                        className="p-3 rounded-xl border border-[#d4b47a]/18 bg-[#d4b47a]/05 text-center"
                       >
                         <span className="text-xs font-medium text-white/70 leading-snug">
                           {p}
@@ -298,7 +298,7 @@ export function AIProjectBuilder() {
                     <Link
                       href="/rfq"
                       onClick={() => trackEvent(ANALYTICS_EVENTS.AI_BUILDER_TO_RFQ)}
-                      className="flex-1 flex items-center justify-center gap-2 bg-white text-[#07111F] py-3.5 rounded-xl font-semibold text-sm hover:bg-white/90 transition-all"
+                      className="flex-1 flex items-center justify-center gap-2 bg-white text-[#090907] py-3.5 rounded-xl font-semibold text-sm hover:bg-white/90 transition-all"
                     >
                       Transformar em proposta
                       <ArrowRight className="h-4 w-4" />

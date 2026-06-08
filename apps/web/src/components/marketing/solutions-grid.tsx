@@ -11,7 +11,7 @@ const solutions = [
     description:
       "Presentes premium para clientes, parceiros e equipas. Curated selections que comunicam a sua marca com sofisticação.",
     href: "/corporate-gifts",
-    accent: "#4DA3FF",
+    accent: "#d4b47a",
     tags: ["Welcome kits", "Holiday gifts", "Client appreciation"],
   },
   {
@@ -20,7 +20,7 @@ const solutions = [
     description:
       "Merch de marca com qualidade internacional. Desde apparel a acessórios tech, com branding de precisão.",
     href: "/branded-merch",
-    accent: "#74E7FF",
+    accent: "#b8975e",
     tags: ["Apparel", "Tech & Gadgets", "Drinkware"],
     featured: true,
   },
@@ -30,7 +30,7 @@ const solutions = [
     description:
       "Embalagens personalizadas que elevam a experiência de unboxing e reforçam a identidade visual da marca.",
     href: "/packaging",
-    accent: "#63E6BE",
+    accent: "#b8975e",
     tags: ["Caixas custom", "Tissue paper", "Bags premium"],
   },
   {
@@ -39,7 +39,7 @@ const solutions = [
     description:
       "Lojas privadas para equipas e departamentos — catálogo próprio, preços personalizados, branding dedicado.",
     href: "/company-stores",
-    accent: "#4DA3FF",
+    accent: "#d4b47a",
     tags: ["Loja privada", "Permissões por equipa", "Reorder fácil"],
   },
   {
@@ -48,14 +48,14 @@ const solutions = [
     description:
       "Gestão completa de produção, armazenagem e envio — unitário ou em lote, nacional ou internacional.",
     href: "/fulfillment",
-    accent: "#74E7FF",
+    accent: "#b8975e",
     tags: ["Drop shipping", "Bulk shipping", "Stock management"],
   },
 ];
 
 export function SolutionsGrid() {
   return (
-    <section className="py-20 md:py-28 bg-[#0B1526]/50">
+    <section className="py-20 md:py-28 bg-[#0f0f0c]/50">
       <div className="max-w-7xl mx-auto px-6 md:px-8">
         {/* Header */}
         <motion.div
@@ -65,7 +65,7 @@ export function SolutionsGrid() {
           transition={{ duration: 0.5 }}
           className="text-center mb-14"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#63E6BE] mb-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#b8975e] mb-3">
             Soluções
           </p>
           <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-white mb-4">

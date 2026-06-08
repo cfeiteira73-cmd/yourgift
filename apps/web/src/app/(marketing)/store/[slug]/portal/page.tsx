@@ -514,7 +514,7 @@ export default function EmployeePortalPage() {
           <button
             type="button"
             onClick={() => { if (token) fetchPortalData(token); }}
-            style={{ padding: '10px 24px', borderRadius: '10px', border: 'none', background: '#4da3ff', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '14px' }}
+            style={{ padding: '10px 24px', borderRadius: '10px', border: 'none', background: '#d4b47a', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '14px' }}
           >
             Tentar novamente
           </button>
@@ -524,7 +524,7 @@ export default function EmployeePortalPage() {
   }
 
   const { employee, store, remainingAllowance, products } = data;
-  const accent = store.primaryColor ?? '#4da3ff';
+  const accent = store.primaryColor ?? '#d4b47a';
   const spentPct = employee.allowance > 0
     ? Math.min(100, (employee.spent / employee.allowance) * 100)
     : 0;

@@ -33,7 +33,7 @@ const TIERS: PricingTier[] = [
       "Resposta em 48h garantida",
       "Envio nacional rastreado",
     ],
-    accent: "#74E7FF",
+    accent: "#b8975e",
   },
   {
     name: "Growth",
@@ -53,7 +53,7 @@ const TIERS: PricingTier[] = [
       "Reorder em 1 clique",
       "Tracking em tempo real",
     ],
-    accent: "#4DA3FF",
+    accent: "#d4b47a",
     featured: true,
   },
   {
@@ -74,7 +74,7 @@ const TIERS: PricingTier[] = [
       "Relatórios de impacto e sustentabilidade",
       "Account manager sénior",
     ],
-    accent: "#63E6BE",
+    accent: "#b8975e",
   },
 ];
 
@@ -87,13 +87,13 @@ function TierCard({ tier, index }: { tier: PricingTier; index: number }) {
       transition={{ duration: 0.55, delay: index * 0.1 }}
       className={`relative flex flex-col rounded-2xl border p-7 transition-all duration-300 ${
         tier.featured
-          ? "border-[#4DA3FF]/40 bg-[#4DA3FF]/[0.06]"
+          ? "border-[#d4b47a]/40 bg-[#d4b47a]/[0.06]"
           : "border-white/[0.07] bg-white/[0.03] hover:border-white/[0.13] hover:bg-white/[0.05]"
       }`}
       style={
         tier.featured
           ? {
-              boxShadow: "0 0 40px rgba(77,163,255,0.12), 0 0 80px rgba(77,163,255,0.06)",
+              boxShadow: "0 0 40px rgba(154,124,74,0.12), 0 0 80px rgba(154,124,74,0.08)",
             }
           : undefined
       }
@@ -101,8 +101,8 @@ function TierCard({ tier, index }: { tier: PricingTier; index: number }) {
       {tier.featured && (
         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
           <div
-            className="px-4 py-1 rounded-full text-xs font-semibold text-[#07111F] tracking-wide"
-            style={{ background: "linear-gradient(90deg, #4DA3FF, #74E7FF)" }}
+            className="px-4 py-1 rounded-full text-xs font-semibold text-[#090907] tracking-wide"
+            style={{ background: "linear-gradient(90deg, #d4b47a, #b8975e)" }}
           >
             Mais escolhido
           </div>
@@ -169,7 +169,7 @@ function TierCard({ tier, index }: { tier: PricingTier; index: number }) {
         href="/contact"
         className={`group flex items-center justify-center gap-2 w-full py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
           tier.featured
-            ? "bg-[#4DA3FF] text-[#07111F] hover:bg-[#74E7FF]"
+            ? "bg-[#d4b47a] text-[#090907] hover:bg-[#b8975e]"
             : "border border-white/[0.12] bg-white/[0.05] text-white/80 hover:border-white/[0.22] hover:bg-white/[0.09] hover:text-white"
         }`}
       >
@@ -182,11 +182,11 @@ function TierCard({ tier, index }: { tier: PricingTier; index: number }) {
 
 export function PricingTransparencySection() {
   return (
-    <section className="py-24 md:py-32 bg-[#0B1526]/60 relative overflow-hidden">
+    <section className="py-24 md:py-32 bg-[#0f0f0c]/60 relative overflow-hidden">
       {/* Background orb */}
       <div
         className="absolute top-0 right-1/4 w-[500px] h-[400px] rounded-full opacity-[0.06] blur-[100px] pointer-events-none"
-        style={{ background: "radial-gradient(ellipse, #4DA3FF 0%, transparent 70%)" }}
+        style={{ background: "radial-gradient(ellipse, #d4b47a 0%, transparent 70%)" }}
       />
 
       <div className="relative max-w-7xl mx-auto px-6 md:px-8">
@@ -198,7 +198,7 @@ export function PricingTransparencySection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#4DA3FF] mb-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#d4b47a] mb-4">
             Investimento
           </p>
           <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-white mb-4">
@@ -206,7 +206,7 @@ export function PricingTransparencySection() {
             <span
               className="bg-clip-text text-transparent"
               style={{
-                backgroundImage: "linear-gradient(90deg, #4DA3FF, #74E7FF, #63E6BE)",
+                backgroundImage: "linear-gradient(90deg, #d4b47a, #b8975e, #b8975e)",
               }}
             >
               para empresas
@@ -234,7 +234,7 @@ export function PricingTransparencySection() {
           className="mt-12 text-center"
         >
           <div className="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-white/[0.08] bg-white/[0.03]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#63E6BE] animate-pulse" />
+            <span className="h-1.5 w-1.5 rounded-full bg-[#b8975e] animate-pulse" />
             <span className="text-sm text-white/55">
               Proposta personalizada em{" "}
               <strong className="text-white/80">24h</strong> — sem compromisso

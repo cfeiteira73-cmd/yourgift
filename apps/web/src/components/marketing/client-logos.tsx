@@ -39,7 +39,7 @@ function LogoItem({ client }: { client: typeof CLIENTS[0] }) {
 
 export function ClientLogos() {
   return (
-    <section className="py-14 border-y border-white/[0.05] bg-[#07111F] overflow-hidden">
+    <section className="py-14 border-y border-white/[0.05] bg-[#090907] overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-8 mb-8">
         <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-white/30">
           Confiado pelas maiores empresas de Portugal
@@ -49,9 +49,9 @@ export function ClientLogos() {
       {/* Marquee track */}
       <div className="relative">
         {/* Left fade */}
-        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#07111F] to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#090907] to-transparent z-10 pointer-events-none" />
         {/* Right fade */}
-        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#07111F] to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#090907] to-transparent z-10 pointer-events-none" />
 
         <motion.div
           className="flex gap-3 w-max"

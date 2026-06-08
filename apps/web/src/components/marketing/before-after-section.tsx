@@ -35,7 +35,7 @@ export function BeforeAfterSection() {
           transition={{ duration: 0.55 }}
           className="text-center mb-14"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#4DA3FF] mb-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d4b47a] mb-3">
             A mudança
           </p>
           <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-white mb-4">
@@ -72,17 +72,17 @@ export function BeforeAfterSection() {
           </div>
 
           {/* AFTER */}
-          <div className="rounded-2xl border border-[#63E6BE]/22 bg-[#63E6BE]/[0.05] p-7">
+          <div className="rounded-2xl border border-[#b8975e]/22 bg-[#b8975e]/[0.05] p-7">
             <div className="flex items-center gap-2.5 mb-6">
-              <div className="h-8 w-8 rounded-full bg-[#63E6BE]/12 border border-[#63E6BE]/22 flex items-center justify-center">
-                <span className="text-[#63E6BE] text-sm font-bold">✓</span>
+              <div className="h-8 w-8 rounded-full bg-[#b8975e]/12 border border-[#b8975e]/22 flex items-center justify-center">
+                <span className="text-[#b8975e] text-sm font-bold">✓</span>
               </div>
               <h3 className="text-base font-semibold text-white">yourgift.pt</h3>
             </div>
             <ul className="space-y-3.5">
               {AFTER.map((item) => (
                 <li key={item} className="flex items-start gap-3">
-                  <span className="text-[#63E6BE] text-xs font-bold flex-shrink-0 mt-1">✓</span>
+                  <span className="text-[#b8975e] text-xs font-bold flex-shrink-0 mt-1">✓</span>
                   <span className="text-sm text-white/78 leading-relaxed">{item}</span>
                 </li>
               ))}
@@ -99,7 +99,7 @@ export function BeforeAfterSection() {
         >
           <Link
             href="/rfq"
-            className="inline-flex items-center gap-2 bg-white text-[#07111F] px-7 py-3.5 rounded-xl font-semibold text-sm hover:bg-white/90 transition-all hover:scale-[1.02]"
+            className="inline-flex items-center gap-2 bg-white text-[#090907] px-7 py-3.5 rounded-xl font-semibold text-sm hover:bg-white/90 transition-all hover:scale-[1.02]"
           >
             Fazer a mudança — proposta gratuita
             <ArrowRight className="h-4 w-4" />

@@ -36,7 +36,7 @@ export function FAQSection() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section className="py-20 md:py-28 bg-[#0B1526]/40">
+    <section className="py-20 md:py-28 bg-[#0f0f0c]/40">
       <div className="max-w-7xl mx-auto px-6 md:px-8">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
@@ -47,7 +47,7 @@ export function FAQSection() {
             transition={{ duration: 0.5 }}
             className="text-center mb-12"
           >
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#4DA3FF] mb-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d4b47a] mb-3">
               FAQ
             </p>
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-white mb-4">
@@ -69,7 +69,7 @@ export function FAQSection() {
                 transition={{ duration: 0.4, delay: i * 0.05 }}
                 className={`rounded-xl border transition-all duration-200 ${
                   open === i
-                    ? "border-[#4DA3FF]/22 bg-[#4DA3FF]/05"
+                    ? "border-[#d4b47a]/22 bg-[#d4b47a]/05"
                     : "border-white/[0.07] bg-white/[0.03] hover:border-white/[0.12]"
                 }`}
               >
@@ -81,7 +81,7 @@ export function FAQSection() {
                     {faq.q}
                   </span>
                   <ChevronDown
-                    className={`h-4 w-4 text-[#4DA3FF] flex-shrink-0 transition-transform duration-200 ${
+                    className={`h-4 w-4 text-[#d4b47a] flex-shrink-0 transition-transform duration-200 ${
                       open === i ? "rotate-180" : ""
                     }`}
                   />
@@ -119,7 +119,7 @@ export function FAQSection() {
             </p>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 text-sm text-[#4DA3FF] hover:text-[#74E7FF] transition-colors font-medium"
+              className="inline-flex items-center gap-2 text-sm text-[#d4b47a] hover:text-[#b8975e] transition-colors font-medium"
             >
               Fala connosco
               <ArrowRight className="h-4 w-4" />

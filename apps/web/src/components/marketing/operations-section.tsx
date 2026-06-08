@@ -8,31 +8,31 @@ const ops = [
     icon: <FileCheck className="h-5 w-5" />,
     title: "Aprovação de mockup",
     desc: "Revê e aprova digitalmente antes de qualquer produção.",
-    accent: "#4DA3FF",
+    accent: "#d4b47a",
   },
   {
     icon: <Boxes className="h-5 w-5" />,
     title: "Produção controlada",
     desc: "Parceiros certificados. Qualidade auditada em cada etapa.",
-    accent: "#74E7FF",
+    accent: "#b8975e",
   },
   {
     icon: <Globe className="h-5 w-5" />,
     title: "Envio global",
     desc: "Entregas unitárias ou em lote, Portugal e internacional.",
-    accent: "#63E6BE",
+    accent: "#b8975e",
   },
   {
     icon: <Clock className="h-5 w-5" />,
     title: "Tracking em tempo real",
     desc: "Acompanha o estado da produção e entrega no dashboard.",
-    accent: "#4DA3FF",
+    accent: "#d4b47a",
   },
   {
     icon: <Repeat className="h-5 w-5" />,
     title: "Reorder em 1 clique",
     desc: "Configurações guardadas. Repetir é instantâneo.",
-    accent: "#74E7FF",
+    accent: "#b8975e",
   },
 ];
 
@@ -55,31 +55,31 @@ export function OperationsSection() {
                   label: "Proposta aprovada",
                   time: "Hoje, 09:14",
                   status: "done",
-                  accent: "#63E6BE",
+                  accent: "#b8975e",
                 },
                 {
                   label: "Mockup enviado para aprovação",
                   time: "Amanhã",
                   status: "active",
-                  accent: "#4DA3FF",
+                  accent: "#d4b47a",
                 },
                 {
                   label: "Produção iniciada",
                   time: "Semana 2",
                   status: "pending",
-                  accent: "#74E7FF",
+                  accent: "#b8975e",
                 },
                 {
                   label: "QC e expedição",
                   time: "Semana 3",
                   status: "pending",
-                  accent: "#74E7FF",
+                  accent: "#b8975e",
                 },
                 {
                   label: "Entrega confirmada",
                   time: "Semana 4",
                   status: "pending",
-                  accent: "#74E7FF",
+                  accent: "#b8975e",
                 },
               ].map((item, i) => (
                 <motion.div
@@ -90,9 +90,9 @@ export function OperationsSection() {
                   transition={{ duration: 0.4, delay: i * 0.08 }}
                   className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${
                     item.status === "active"
-                      ? "border-[#4DA3FF]/30 bg-[#4DA3FF]/06"
+                      ? "border-[#d4b47a]/30 bg-[#d4b47a]/06"
                       : item.status === "done"
-                      ? "border-[#63E6BE]/20 bg-[#63E6BE]/04"
+                      ? "border-[#b8975e]/20 bg-[#b8975e]/04"
                       : "border-white/[0.06] bg-white/[0.02]"
                   }`}
                 >
@@ -101,7 +101,7 @@ export function OperationsSection() {
                     style={{
                       backgroundColor:
                         item.status === "pending"
-                          ? "rgba(255,255,255,0.2)"
+                          ? "rgba(240,236,228,0.18)"
                           : item.accent,
                     }}
                   />
@@ -129,7 +129,7 @@ export function OperationsSection() {
             viewport={{ once: true, amount: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#74E7FF] mb-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#b8975e] mb-3">
               Operações
             </p>
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-white mb-5">

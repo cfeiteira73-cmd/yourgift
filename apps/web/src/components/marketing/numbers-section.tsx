@@ -8,42 +8,42 @@ const NUMBERS = [
     suffix: "+",
     label: "Clientes activos em Portugal",
     description: "Desde startups a multinacionais",
-    accent: "#4DA3FF",
+    accent: "#d4b47a",
   },
   {
     value: "20.000",
     suffix: "+",
     label: "Produtos personalizáveis",
     description: "Em 10 categorias principais",
-    accent: "#74E7FF",
+    accent: "#b8975e",
   },
   {
     value: "98",
     suffix: "%",
     label: "Taxa de satisfação",
     description: "Medida após entrega de cada projeto",
-    accent: "#63E6BE",
+    accent: "#b8975e",
   },
   {
     value: "48",
     suffix: "h",
     label: "Resposta garantida",
     description: "A todos os briefings submetidos",
-    accent: "#4DA3FF",
+    accent: "#d4b47a",
   },
   {
     value: "50.000",
     suffix: "+",
     label: "Artigos entregues por ano",
     description: "Nacional e internacional",
-    accent: "#74E7FF",
+    accent: "#b8975e",
   },
   {
     value: "15",
     suffix: "+",
     label: "Países de entrega",
     description: "Europa e mercados globais",
-    accent: "#63E6BE",
+    accent: "#b8975e",
   },
 ];
 
@@ -54,13 +54,13 @@ const INDUSTRIES = [
 
 export function NumbersSection() {
   return (
-    <section className="py-20 md:py-28 bg-[#0B1526]/50 relative overflow-hidden">
+    <section className="py-20 md:py-28 bg-[#0f0f0c]/50 relative overflow-hidden">
       {/* Background */}
       <div
         className="absolute inset-0 opacity-[0.06] pointer-events-none"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)",
+            "linear-gradient(rgba(240,236,228,0.28) 1px, transparent 1px), linear-gradient(90deg, rgba(240,236,228,0.28) 1px, transparent 1px)",
           backgroundSize: "60px 60px",
         }}
       />
@@ -74,7 +74,7 @@ export function NumbersSection() {
           transition={{ duration: 0.55 }}
           className="text-center mb-14"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#74E7FF] mb-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#b8975e] mb-3">
             Em números
           </p>
           <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-white mb-4">

@@ -17,7 +17,7 @@ const MINI_TRACK = [...MINI_LOGOS, ...MINI_LOGOS];
 
 export function TrustStrip() {
   return (
-    <section className="border-y border-white/[0.06] bg-[#0B1526]/70 overflow-hidden">
+    <section className="border-y border-white/[0.06] bg-[#0f0f0c]/70 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-8 py-5">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-center">
           {/* Left: credibility statement */}
@@ -28,8 +28,8 @@ export function TrustStrip() {
             transition={{ duration: 0.5 }}
             className="flex items-center gap-3"
           >
-            <div className="h-8 w-8 rounded-full bg-[#63E6BE]/10 border border-[#63E6BE]/20 flex items-center justify-center flex-shrink-0">
-              <span className="text-[#63E6BE] text-xs font-bold">✓</span>
+            <div className="h-8 w-8 rounded-full bg-[#b8975e]/10 border border-[#b8975e]/20 flex items-center justify-center flex-shrink-0">
+              <span className="text-[#b8975e] text-xs font-bold">✓</span>
             </div>
             <p className="text-sm font-semibold text-white/80 leading-snug">
               Confiado por{" "}
@@ -46,8 +46,8 @@ export function TrustStrip() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="relative overflow-hidden"
           >
-            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#0B1526] to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#0B1526] to-transparent z-10 pointer-events-none" />
+            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#0f0f0c] to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#0f0f0c] to-transparent z-10 pointer-events-none" />
             <motion.div
               className="flex gap-3 w-max"
               animate={{ x: ["0%", "-50%"] }}

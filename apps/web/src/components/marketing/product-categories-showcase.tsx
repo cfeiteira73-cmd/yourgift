@@ -106,15 +106,15 @@ function CategoryCard({
         />
 
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#07111F]/90 via-[#07111F]/30 to-transparent" />
-        <div className="absolute inset-0 bg-[#07111F]/20 group-hover:bg-[#07111F]/10 transition-colors duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#090907]/90 via-[#090907]/30 to-transparent" />
+        <div className="absolute inset-0 bg-[#090907]/20 group-hover:bg-[#090907]/10 transition-colors duration-500" />
 
         {/* Ring border */}
-        <div className="absolute inset-0 rounded-2xl ring-1 ring-white/10 group-hover:ring-[#4DA3FF]/40 transition-all duration-500" />
+        <div className="absolute inset-0 rounded-2xl ring-1 ring-white/10 group-hover:ring-[#d4b47a]/40 transition-all duration-500" />
 
         {/* Content */}
         <div className="absolute bottom-0 left-0 right-0 p-5">
-          <p className="text-[11px] font-semibold text-[#74E7FF] uppercase tracking-wider mb-1">
+          <p className="text-[11px] font-semibold text-[#b8975e] uppercase tracking-wider mb-1">
             {category.productCount}
           </p>
           <div className="flex items-center justify-between">
@@ -133,13 +133,13 @@ function CategoryCard({
 
 export function ProductCategoriesShowcase() {
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden bg-[#07111F]">
+    <section className="py-24 md:py-32 relative overflow-hidden bg-[#090907]">
       {/* Background accent */}
       <div
         className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full opacity-8 blur-[150px] pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse, rgba(77,163,255,0.3) 0%, transparent 70%)",
+            "radial-gradient(ellipse, rgba(154,124,74,0.28) 0%, transparent 70%)",
         }}
       />
 
@@ -153,7 +153,7 @@ export function ProductCategoriesShowcase() {
           className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-10"
         >
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#4DA3FF] mb-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#d4b47a] mb-3">
               Catálogo completo
             </p>
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-white mb-3">
@@ -161,7 +161,7 @@ export function ProductCategoriesShowcase() {
               <span
                 className="bg-clip-text text-transparent"
                 style={{
-                  backgroundImage: "linear-gradient(90deg, #4DA3FF, #74E7FF, #63E6BE)",
+                  backgroundImage: "linear-gradient(90deg, #d4b47a, #b8975e, #b8975e)",
                 }}
               >
                 10 categorias
@@ -173,7 +173,7 @@ export function ProductCategoriesShowcase() {
           </div>
           <Link
             href="/catalog"
-            className="flex items-center gap-2 text-sm font-semibold text-[#4DA3FF] hover:text-[#74E7FF] transition-colors flex-shrink-0"
+            className="flex items-center gap-2 text-sm font-semibold text-[#d4b47a] hover:text-[#b8975e] transition-colors flex-shrink-0"
           >
             Ver catálogo completo
             <ArrowRight className="h-4 w-4" />
@@ -201,7 +201,7 @@ export function ProductCategoriesShowcase() {
           </p>
           <Link
             href="/rfq"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-[#63E6BE] hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[#b8975e] hover:text-white transition-colors"
           >
             Pedir produto específico
             <ArrowRight className="h-3.5 w-3.5" />

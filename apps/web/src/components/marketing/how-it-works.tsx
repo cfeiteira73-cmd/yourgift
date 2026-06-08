@@ -8,7 +8,7 @@ const steps = [
   {
     number: "01",
     icon: Target,
-    accent: "#4DA3FF",
+    accent: "#d4b47a",
     title: "Define o objetivo",
     description:
       "Partilha o contexto do projeto — evento, onboarding, cliente VIP ou campanha interna. Quanto mais soubermos, mais precisa é a nossa proposta. O formulário demora menos de 5 minutos.",
@@ -17,7 +17,7 @@ const steps = [
   {
     number: "02",
     icon: Lightbulb,
-    accent: "#74E7FF",
+    accent: "#b8975e",
     title: "Recebe proposta personalizada",
     description:
       "A nossa equipa analisa o teu briefing e apresenta uma seleção de produtos com mockups digitais, preços e prazos. Sem compromisso, sem surpresas. Podes também usar o AI Project Builder.",
@@ -26,7 +26,7 @@ const steps = [
   {
     number: "03",
     icon: CheckCircle,
-    accent: "#63E6BE",
+    accent: "#b8975e",
     title: "Aprovas branding e detalhes",
     description:
       "Partilhas logo, brandbook e preferências de personalização. Aprovação escrita antes de qualquer produção. Zero suposições — cada detalhe é confirmado contigo antes de avançar.",
@@ -35,7 +35,7 @@ const steps = [
   {
     number: "04",
     icon: PackageCheck,
-    accent: "#4DA3FF",
+    accent: "#d4b47a",
     title: "Produção, entrega e reorder",
     description:
       "Gerimos toda a produção, controlo de qualidade e logística. Tracking em tempo real. Histórico e ficheiros guardados para reorders instantâneos — sem repetir o processo de raiz.",
@@ -76,7 +76,7 @@ export function HowItWorks() {
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#4DA3FF] mb-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d4b47a] mb-3">
             Processo
           </p>
           <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-white mb-4">
@@ -191,7 +191,7 @@ export function HowItWorks() {
         >
           <Link
             href="/how-it-works"
-            className="inline-flex items-center gap-2 text-sm text-[#4DA3FF] hover:text-[#74E7FF] transition-colors font-medium"
+            className="inline-flex items-center gap-2 text-sm text-[#d4b47a] hover:text-[#b8975e] transition-colors font-medium"
           >
             Ver processo completo
             <ArrowRight className="h-4 w-4" />

@@ -28,20 +28,20 @@ const techniques = [
 
 export default function CatalogPage() {
   return (
-    <div style={{ minHeight: '100vh', background: 'rgb(7,17,31)', paddingTop: '5rem' }}>
+    <div style={{ minHeight: '100vh', background: '#090907', paddingTop: '5rem' }}>
       {/* Hero */}
       <section style={{ padding: '5rem 1.5rem 4rem', textAlign: 'center', maxWidth: '860px', margin: '0 auto' }}>
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-          background: 'rgba(77,163,255,0.08)', border: '1px solid rgba(77,163,255,0.2)',
+          background: 'rgba(154,124,74,0.08)', border: '1px solid rgba(154,124,74,0.18)',
           borderRadius: '100px', padding: '0.375rem 1rem', marginBottom: '1.5rem',
-          fontSize: '0.8rem', color: 'rgb(77,163,255)', fontWeight: 600,
+          fontSize: '0.8rem', color: '#d4b47a', fontWeight: 600,
         }}>
           2.400+ produtos disponíveis
         </div>
-        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1.25rem' }}>
+        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontFamily: "'Libre Baskerville', serif", fontWeight: 400, color: '#f0ece4', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1.25rem' }}>
           Catálogo Midocean<br />
-          <span style={{ color: 'rgb(77,163,255)' }}>para o teu negócio</span>
+          <span style={{ color: '#d4b47a' }}>para o teu negócio</span>
         </h1>
         <p style={{ fontSize: '1.125rem', color: 'rgb(170,180,198)', lineHeight: 1.7, marginBottom: '2.5rem' }}>
           Acesso a todo o catálogo Midocean + PF Concept com personalização completa.
@@ -50,7 +50,7 @@ export default function CatalogPage() {
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link href="/quote" style={{
             display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-            background: 'rgb(77,163,255)', color: 'rgb(7,17,31)',
+            background: '#d4b47a', color: '#090907',
             padding: '0.875rem 1.75rem', borderRadius: '14px',
             fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none',
           }}>
@@ -58,8 +58,8 @@ export default function CatalogPage() {
           </Link>
           <Link href="/auth/login" style={{
             display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-            background: 'rgba(255,255,255,0.06)', color: 'rgb(245,247,251)',
-            border: '1px solid rgba(255,255,255,0.1)',
+            background: 'rgba(240,236,228,0.06)', color: '#f0ece4',
+            border: '1px solid rgba(240,236,228,0.10)',
             padding: '0.875rem 1.75rem', borderRadius: '14px',
             fontWeight: 600, fontSize: '0.95rem', textDecoration: 'none',
           }}>
@@ -70,24 +70,24 @@ export default function CatalogPage() {
 
       {/* Categories */}
       <section style={{ padding: '4rem 1.5rem', maxWidth: '1100px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '0.5rem', textAlign: 'center' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.5rem', textAlign: 'center' }}>
           Categorias de Produto
         </h2>
-        <p style={{ color: 'rgb(120,130,150)', textAlign: 'center', marginBottom: '2.5rem' }}>
+        <p style={{ color: 'rgba(240,236,228,0.42)', textAlign: 'center', marginBottom: '2.5rem' }}>
           Do vestuário ao tech, encontras tudo aqui.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem' }}>
           {categories.map((cat) => (
             <Link key={cat.label} href="/quote" style={{ textDecoration: 'none' }}>
               <div style={{
-                background: 'linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)',
-                border: '1px solid rgba(255,255,255,0.08)',
+                background: 'linear-gradient(180deg, rgba(240,236,228,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+                border: '1px solid rgba(240,236,228,0.06)',
                 borderRadius: '18px', padding: '1.5rem',
                 cursor: 'pointer', transition: 'border-color 0.2s',
               }}>
                 <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>{cat.emoji}</div>
-                <p style={{ fontSize: '0.95rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '0.25rem' }}>{cat.label}</p>
-                <p style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)' }}>{cat.description}</p>
+                <p style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f0ece4', marginBottom: '0.25rem' }}>{cat.label}</p>
+                <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)' }}>{cat.description}</p>
               </div>
             </Link>
           ))}
@@ -96,23 +96,23 @@ export default function CatalogPage() {
 
       {/* Techniques */}
       <section style={{ padding: '4rem 1.5rem', maxWidth: '1100px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '0.5rem', textAlign: 'center' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '0.5rem', textAlign: 'center' }}>
           Técnicas de Personalização
         </h2>
-        <p style={{ color: 'rgb(120,130,150)', textAlign: 'center', marginBottom: '2.5rem' }}>
+        <p style={{ color: 'rgba(240,236,228,0.42)', textAlign: 'center', marginBottom: '2.5rem' }}>
           A técnica certa para cada produto e orçamento.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
           {techniques.map((t) => (
             <div key={t.label} style={{
-              background: 'rgba(77,163,255,0.04)', border: '1px solid rgba(77,163,255,0.1)',
+              background: 'rgba(154,124,74,0.04)', border: '1px solid rgba(154,124,74,0.10)',
               borderRadius: '14px', padding: '1.25rem 1.5rem',
               display: 'flex', gap: '1rem', alignItems: 'flex-start',
             }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'rgb(77,163,255)', marginTop: '6px', flexShrink: 0 }} />
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#d4b47a', marginTop: '6px', flexShrink: 0 }} />
               <div>
-                <p style={{ fontSize: '0.9rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '0.2rem' }}>{t.label}</p>
-                <p style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)' }}>{t.description}</p>
+                <p style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f0ece4', marginBottom: '0.2rem' }}>{t.label}</p>
+                <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)' }}>{t.description}</p>
               </div>
             </div>
           ))}
@@ -121,7 +121,7 @@ export default function CatalogPage() {
 
       {/* CTA */}
       <section style={{ padding: '5rem 1.5rem', textAlign: 'center' }}>
-        <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '1rem' }}>
+        <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '1rem' }}>
           Pronto para começar?
         </h2>
         <p style={{ color: 'rgb(170,180,198)', marginBottom: '2rem' }}>
@@ -129,7 +129,7 @@ export default function CatalogPage() {
         </p>
         <Link href="/quote" style={{
           display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-          background: 'rgb(77,163,255)', color: 'rgb(7,17,31)',
+          background: '#d4b47a', color: '#090907',
           padding: '1rem 2rem', borderRadius: '14px',
           fontWeight: 700, fontSize: '1rem', textDecoration: 'none',
         }}>

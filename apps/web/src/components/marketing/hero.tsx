@@ -92,21 +92,21 @@ export function HeroSection() {
   return (
     <section className="relative min-h-[100svh] flex items-center overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-[#07111F]" />
+      <div className="absolute inset-0 bg-[#090907]" />
 
       {/* Gradient orbs */}
       <div
         className="absolute top-0 left-0 w-[700px] h-[600px] rounded-full opacity-25 blur-[130px] pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse, rgba(77,163,255,0.4) 0%, rgba(116,231,255,0.15) 50%, transparent 70%)",
+            "radial-gradient(ellipse, rgba(154,124,74,0.35) 0%, rgba(154,124,74,0.14) 50%, transparent 70%)",
         }}
       />
       <div
         className="absolute bottom-0 right-0 w-[600px] h-[500px] rounded-full opacity-20 blur-[120px] pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse, rgba(99,230,190,0.35) 0%, transparent 70%)",
+            "radial-gradient(ellipse, rgba(184,151,94,0.32) 0%, transparent 70%)",
         }}
       />
 
@@ -150,7 +150,7 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="inline-flex items-center gap-2 mb-6"
             >
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#4DA3FF]/22 bg-[#4DA3FF]/8 text-[#74E7FF] text-xs font-semibold uppercase tracking-[0.14em]">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#d4b47a]/22 bg-[#d4b47a]/8 text-[#b8975e] text-xs font-semibold uppercase tracking-[0.14em]">
                 <Star className="h-3.5 w-3.5 fill-current" />
                 Plataforma B2B premium · Portugal
               </div>
@@ -169,7 +169,7 @@ export function HeroSection() {
                 className="bg-clip-text text-transparent"
                 style={{
                   backgroundImage:
-                    "linear-gradient(135deg, #4DA3FF 0%, #74E7FF 50%, #63E6BE 100%)",
+                    "linear-gradient(135deg, #d4b47a 0%, #b8975e 50%, #b8975e 100%)",
                 }}
               >
                 vai querer usar.
@@ -218,7 +218,7 @@ export function HeroSection() {
                   key={badge.label}
                   className="flex items-center gap-2 text-xs text-white/60 bg-white/[0.04] border border-white/[0.07] rounded-lg px-3 py-2"
                 >
-                  <span className="text-[#63E6BE]">{badge.icon}</span>
+                  <span className="text-[#b8975e]">{badge.icon}</span>
                   {badge.label}
                 </div>
               ))}
@@ -237,7 +237,7 @@ export function HeroSection() {
                 onClick={() =>
                   trackEvent(ANALYTICS_EVENTS.CLICK_HERO_CTA, { cta: "pedir_proposta" })
                 }
-                className="flex items-center gap-2.5 bg-white text-[#07111F] px-7 py-3.5 rounded-xl font-semibold text-sm hover:bg-white/92 transition-all hover:scale-[1.02] shadow-[0_4px_20px_rgba(255,255,255,0.15)] w-full sm:w-auto justify-center"
+                className="flex items-center gap-2.5 bg-white text-[#090907] px-7 py-3.5 rounded-xl font-semibold text-sm hover:bg-white/92 transition-all hover:scale-[1.02] shadow-[0_4px_20px_rgba(240,236,228,0.14)] w-full sm:w-auto justify-center"
               >
                 Pedir proposta gratuita
                 <ArrowRight className="h-4 w-4" />
@@ -281,8 +281,8 @@ export function HeroSection() {
                       <div
                         className="h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-bold"
                         style={{
-                          background: "linear-gradient(135deg, #4DA3FF, #63E6BE)",
-                          color: "#07111F",
+                          background: "linear-gradient(135deg, #d4b47a, #b8975e)",
+                          color: "#090907",
                         }}
                       >
                         {i + 1}
@@ -319,14 +319,14 @@ export function HeroSection() {
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#07111F]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#090907]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute bottom-0 left-0 right-0 p-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                    <span className="text-[10px] font-semibold text-white/90 bg-[#07111F]/70 backdrop-blur-sm px-2 py-1 rounded-md">
+                    <span className="text-[10px] font-semibold text-white/90 bg-[#090907]/70 backdrop-blur-sm px-2 py-1 rounded-md">
                       {item.label}
                     </span>
                   </div>
                   {/* Glow border on hover */}
-                  <div className="absolute inset-0 rounded-xl ring-1 ring-white/10 group-hover:ring-[#4DA3FF]/40 transition-all duration-300" />
+                  <div className="absolute inset-0 rounded-xl ring-1 ring-white/10 group-hover:ring-[#d4b47a]/40 transition-all duration-300" />
                 </motion.div>
               ))}
             </div>
@@ -336,10 +336,10 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.9 }}
-              className="absolute -bottom-4 -left-4 bg-[#0B1526] border border-white/[0.1] rounded-2xl px-4 py-3 shadow-xl backdrop-blur-md"
+              className="absolute -bottom-4 -left-4 bg-[#0f0f0c] border border-white/[0.1] rounded-2xl px-4 py-3 shadow-xl backdrop-blur-md"
             >
               <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#4DA3FF] to-[#63E6BE] flex items-center justify-center text-[#07111F] font-bold text-xs">
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#d4b47a] to-[#b8975e] flex items-center justify-center text-[#090907] font-bold text-xs">
                   20K
                 </div>
                 <div>
@@ -354,10 +354,10 @@ export function HeroSection() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 1.0 }}
-              className="absolute -top-4 -right-4 bg-[#0B1526] border border-[#63E6BE]/20 rounded-2xl px-4 py-3 shadow-xl backdrop-blur-md"
+              className="absolute -top-4 -right-4 bg-[#0f0f0c] border border-[#b8975e]/20 rounded-2xl px-4 py-3 shadow-xl backdrop-blur-md"
             >
               <div className="flex items-center gap-2">
-                <div className="text-[#63E6BE] text-lg">✓</div>
+                <div className="text-[#b8975e] text-lg">✓</div>
                 <div>
                   <div className="text-xs font-semibold text-white">312 clientes activos</div>
                   <div className="text-[10px] text-white/40">em Portugal</div>
@@ -379,7 +379,7 @@ export function HeroSection() {
               <span
                 className="text-2xl md:text-3xl font-bold tracking-tight bg-clip-text text-transparent"
                 style={{
-                  backgroundImage: "linear-gradient(135deg, #4DA3FF, #74E7FF)",
+                  backgroundImage: "linear-gradient(135deg, #d4b47a, #b8975e)",
                 }}
               >
                 {stat.value}
@@ -398,8 +398,8 @@ export function HeroSection() {
         >
           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.07]">
             <span className="relative flex h-2 w-2 flex-shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#63E6BE] opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#63E6BE]" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#b8975e] opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#b8975e]" />
             </span>
             <AnimatePresence mode="wait">
               <motion.span

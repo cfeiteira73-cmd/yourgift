@@ -26,52 +26,52 @@ const products = [
 
 export default function CorporateGiftsPage() {
   return (
-    <div style={{ minHeight: '100vh', background: 'rgb(7,17,31)', paddingTop: '5rem' }}>
+    <div style={{ minHeight: '100vh', background: '#090907', paddingTop: '5rem' }}>
       <section style={{ padding: '5rem 1.5rem 4rem', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(99,230,190,0.08)', border: '1px solid rgba(99,230,190,0.2)', borderRadius: '100px', padding: '0.375rem 1rem', marginBottom: '1.5rem', fontSize: '0.8rem', color: 'rgb(99,230,190)', fontWeight: 600 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(184,151,94,0.08)', border: '1px solid rgba(184,151,94,0.18)', borderRadius: '100px', padding: '0.375rem 1rem', marginBottom: '1.5rem', fontSize: '0.8rem', color: '#b8975e', fontWeight: 600 }}>
           Corporate Gifts
         </div>
-        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1.25rem' }}>
-          Presentes que criam<br /><span style={{ color: 'rgb(99,230,190)' }}>relações duradouras</span>
+        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontFamily: "'Libre Baskerville', serif", fontWeight: 400, color: '#f0ece4', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1.25rem' }}>
+          Presentes que criam<br /><span style={{ color: '#b8975e' }}>relações duradouras</span>
         </h1>
         <p style={{ fontSize: '1.125rem', color: 'rgb(170,180,198)', lineHeight: 1.7, marginBottom: '2.5rem' }}>
           Presentes corporativos personalizados com a tua marca. Do briefing à entrega, tratamos de tudo — com qualidade que impressiona.
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link href="/quote" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgb(99,230,190)', color: 'rgb(7,17,31)', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none' }}>
+          <Link href="/quote" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#b8975e', color: '#090907', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none' }}>
             Pedir Proposta →
           </Link>
-          <Link href="/catalog" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.06)', color: 'rgb(245,247,251)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 600, fontSize: '0.95rem', textDecoration: 'none' }}>
+          <Link href="/catalog" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(240,236,228,0.06)', color: '#f0ece4', border: '1px solid rgba(240,236,228,0.10)', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 600, fontSize: '0.95rem', textDecoration: 'none' }}>
             Ver Catálogo
           </Link>
         </div>
       </section>
 
       <section style={{ padding: '2rem 1.5rem 4rem', maxWidth: '1000px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '2rem', textAlign: 'center' }}>Casos de uso</h2>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '2rem', textAlign: 'center' }}>Casos de uso</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem' }}>
           {useCases.map((u) => (
-            <div key={u.title} style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '18px', padding: '1.75rem' }}>
+            <div key={u.title} style={{ background: 'linear-gradient(180deg, rgba(240,236,228,0.06) 0%, rgba(255,255,255,0.02) 100%)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '18px', padding: '1.75rem' }}>
               <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>{u.emoji}</div>
-              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '0.5rem' }}>{u.title}</h3>
-              <p style={{ fontSize: '0.85rem', color: 'rgb(120,130,150)', lineHeight: 1.6 }}>{u.description}</p>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f0ece4', marginBottom: '0.5rem' }}>{u.title}</h3>
+              <p style={{ fontSize: '0.85rem', color: 'rgba(240,236,228,0.42)', lineHeight: 1.6 }}>{u.description}</p>
             </div>
           ))}
         </div>
       </section>
 
       <section style={{ padding: '2rem 1.5rem 6rem', maxWidth: '760px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '2rem', textAlign: 'center' }}>Produtos populares</h2>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '2rem', textAlign: 'center' }}>Produtos populares</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '0.75rem' }}>
           {products.map((p) => (
-            <div key={p} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'rgba(99,230,190,0.04)', border: '1px solid rgba(99,230,190,0.1)', borderRadius: '12px', padding: '0.875rem 1.25rem' }}>
-              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgb(99,230,190)', flexShrink: 0 }} />
+            <div key={p} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'rgba(184,151,94,0.04)', border: '1px solid rgba(184,151,94,0.10)', borderRadius: '12px', padding: '0.875rem 1.25rem' }}>
+              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#b8975e', flexShrink: 0 }} />
               <span style={{ fontSize: '0.875rem', color: 'rgb(170,180,198)' }}>{p}</span>
             </div>
           ))}
         </div>
         <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-          <Link href="/quote" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgb(99,230,190)', color: 'rgb(7,17,31)', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none' }}>
+          <Link href="/quote" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#b8975e', color: '#090907', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none' }}>
             Começar o meu projeto →
           </Link>
         </div>

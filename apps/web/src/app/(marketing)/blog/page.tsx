@@ -52,20 +52,20 @@ const articles = [
 ];
 
 const categoryColors: Record<string, string> = {
-  Merchandising: 'rgb(77,163,255)',
-  Branding: 'rgb(99,230,190)',
-  Tendências: 'rgb(116,231,255)',
+  Merchandising: '#d4b47a',
+  Branding: '#b8975e',
+  Tendências: '#b8975e',
   Guia: 'rgb(167,243,208)',
 };
 
 export default function BlogPage() {
   return (
-    <div style={{ minHeight: '100vh', background: 'rgb(7,17,31)', paddingTop: '5rem' }}>
+    <div style={{ minHeight: '100vh', background: '#090907', paddingTop: '5rem' }}>
       {/* Hero */}
       <section style={{ padding: '5rem 1.5rem 4rem', textAlign: 'center', maxWidth: '760px', margin: '0 auto' }}>
-        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1.25rem' }}>
+        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, color: '#f0ece4', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1.25rem' }}>
           Insights sobre<br />
-          <span style={{ color: 'rgb(77,163,255)' }}>merchandising B2B</span>
+          <span style={{ color: '#d4b47a' }}>merchandising B2B</span>
         </h1>
         <p style={{ fontSize: '1.1rem', color: 'rgb(170,180,198)', lineHeight: 1.7 }}>
           Tudo o que precisas de saber sobre personalização, branding corporativo e tendências do setor.
@@ -77,26 +77,26 @@ export default function BlogPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
           {articles.map((article) => (
             <div key={article.title} style={{
-              background: 'linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)',
-              border: '1px solid rgba(255,255,255,0.08)',
+              background: 'linear-gradient(180deg, rgba(240,236,228,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+              border: '1px solid rgba(240,236,228,0.06)',
               borderRadius: '20px', padding: '2rem',
               display: 'flex', flexDirection: 'column', gap: '0.75rem',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <span style={{
                   fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em',
-                  textTransform: 'uppercase', color: categoryColors[article.category] ?? 'rgb(77,163,255)',
-                  background: `${categoryColors[article.category] ?? 'rgb(77,163,255)'}14`,
+                  textTransform: 'uppercase', color: categoryColors[article.category] ?? '#d4b47a',
+                  background: `${categoryColors[article.category] ?? '#d4b47a'}14`,
                   padding: '0.25rem 0.625rem', borderRadius: '100px',
                 }}>
                   {article.category}
                 </span>
-                <span style={{ fontSize: '0.75rem', color: 'rgb(120,130,150)', marginLeft: 'auto' }}>
+                <span style={{ fontSize: '0.75rem', color: 'rgba(240,236,228,0.42)', marginLeft: 'auto' }}>
                   {article.date} · {article.readTime}
                 </span>
               </div>
 
-              <h2 style={{ fontSize: '1rem', fontWeight: 700, color: 'rgb(245,247,251)', lineHeight: 1.4 }}>
+              <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#f0ece4', lineHeight: 1.4 }}>
                 {article.title}
               </h2>
               <p style={{ fontSize: '0.875rem', color: 'rgb(170,180,198)', lineHeight: 1.6, flex: 1 }}>
@@ -104,7 +104,7 @@ export default function BlogPage() {
               </p>
 
               <div style={{
-                fontSize: '0.8rem', color: 'rgb(77,163,255)', fontWeight: 600,
+                fontSize: '0.8rem', color: '#d4b47a', fontWeight: 600,
                 display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.5rem',
               }}>
                 Ler artigo →
@@ -116,12 +116,12 @@ export default function BlogPage() {
         {/* Coming soon note */}
         <div style={{
           marginTop: '3rem', textAlign: 'center',
-          background: 'rgba(77,163,255,0.05)', border: '1px solid rgba(77,163,255,0.12)',
+          background: 'rgba(154,124,74,0.06)', border: '1px solid rgba(154,124,74,0.12)',
           borderRadius: '16px', padding: '2rem',
         }}>
-          <p style={{ color: 'rgb(120,130,150)', fontSize: '0.9rem' }}>
+          <p style={{ color: 'rgba(240,236,228,0.42)', fontSize: '0.9rem' }}>
             📝 Novos artigos todos os meses.{' '}
-            <Link href="/quote" style={{ color: 'rgb(77,163,255)', textDecoration: 'none', fontWeight: 600 }}>
+            <Link href="/quote" style={{ color: '#d4b47a', textDecoration: 'none', fontWeight: 600 }}>
               Fala connosco
             </Link>{' '}
             para sugerir um tema.

@@ -21,31 +21,31 @@ const GUARANTEES = [
     icon: <Shield className="h-4 w-4" />,
     label: "30 dias de satisfação garantida",
     desc: "ou devolvemos",
-    color: "#63E6BE",
+    color: "#b8975e",
   },
   {
     icon: <Clock className="h-4 w-4" />,
     label: "Resposta em 48h",
     desc: "garantida por contrato",
-    color: "#4DA3FF",
+    color: "#d4b47a",
   },
   {
     icon: <Star className="h-4 w-4" />,
     label: "Mockup gratuito",
     desc: "sem compromisso",
-    color: "#74E7FF",
+    color: "#b8975e",
   },
 ];
 
 export function CTAFinal() {
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden bg-gradient-to-br from-[#0B1526] via-[#07111F] to-[#0B1526]">
+    <section className="py-24 md:py-32 relative overflow-hidden bg-gradient-to-br from-[#0f0f0c] via-[#090907] to-[#0f0f0c]">
       {/* Animated gradient orb */}
       <div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] rounded-full pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse, rgba(77,163,255,0.14) 0%, rgba(99,230,190,0.08) 40%, transparent 70%)",
+            "radial-gradient(ellipse, rgba(154,124,74,0.12) 0%, rgba(184,151,94,0.08) 40%, transparent 70%)",
           filter: "blur(60px)",
         }}
       />
@@ -63,7 +63,7 @@ export function CTAFinal() {
         className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-px"
         style={{
           background:
-            "linear-gradient(90deg, transparent, rgba(77,163,255,0.5), rgba(116,231,255,0.5), rgba(99,230,190,0.5), transparent)",
+            "linear-gradient(90deg, transparent, rgba(154,124,74,0.45), rgba(116,231,255,0.5), rgba(184,151,94,0.45), transparent)",
         }}
       />
 
@@ -89,7 +89,7 @@ export function CTAFinal() {
           viewport={{ once: true, amount: 0 }}
           transition={{ duration: 0.6, delay: 0.05 }}
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#63E6BE] mb-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#b8975e] mb-5">
             Prontos para começar?
           </p>
           <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-white mb-5 leading-[1.12]">
@@ -97,7 +97,7 @@ export function CTAFinal() {
             <span
               className="bg-clip-text text-transparent"
               style={{
-                backgroundImage: "linear-gradient(90deg, #4DA3FF, #74E7FF, #63E6BE)",
+                backgroundImage: "linear-gradient(90deg, #d4b47a, #b8975e, #b8975e)",
               }}
             >
               do que merch genérico.
@@ -121,7 +121,7 @@ export function CTAFinal() {
               onClick={() =>
                 trackEvent(ANALYTICS_EVENTS.CTA_CLICK, { location: "footer_cta_primary" })
               }
-              className="flex items-center gap-2 bg-white text-[#07111F] px-8 py-4 rounded-xl font-semibold text-base hover:bg-white/92 transition-all hover:scale-[1.02] shadow-[0_4px_28px_rgba(255,255,255,0.18)] w-full sm:w-auto justify-center"
+              className="flex items-center gap-2 bg-white text-[#090907] px-8 py-4 rounded-xl font-semibold text-base hover:bg-white/92 transition-all hover:scale-[1.02] shadow-[0_4px_28px_rgba(255,255,255,0.18)] w-full sm:w-auto justify-center"
             >
               Pedir proposta gratuita
               <ArrowRight className="h-4 w-4" />

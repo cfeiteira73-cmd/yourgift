@@ -77,9 +77,9 @@ const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '0.625rem 0.875rem',
   borderRadius: '10px',
-  border: '1px solid rgba(255,255,255,0.1)',
-  background: 'rgba(255,255,255,0.04)',
-  color: 'rgb(245,247,251)',
+  border: '1px solid rgba(240,236,228,0.10)',
+  background: 'rgba(240,236,228,0.04)',
+  color: '#f0ece4',
   fontSize: '0.9rem',
   outline: 'none',
   transition: 'border-color 0.15s',
@@ -97,10 +97,10 @@ const sectionHeading: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '0.12em',
   textTransform: 'uppercase',
-  color: 'rgb(77,163,255)',
+  color: '#d4b47a',
   marginBottom: '1rem',
   paddingBottom: '0.5rem',
-  borderBottom: '1px solid rgba(77,163,255,0.15)',
+  borderBottom: '1px solid rgba(154,124,74,0.14)',
 };
 
 // ── Main page ────────────────────────────────────────────────────────────────
@@ -174,34 +174,34 @@ export default function QuotePage() {
           alignItems: 'center',
           justifyContent: 'center',
           padding: '2rem',
-          background: 'rgb(7,17,31)',
+          background: '#090907',
         }}
       >
         <div
           style={{
             maxWidth: '480px',
             width: '100%',
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(99,230,190,0.25)',
+            background: 'rgba(240,236,228,0.04)',
+            border: '1px solid rgba(184,151,94,0.22)',
             borderRadius: '20px',
             padding: '2.5rem',
             textAlign: 'center',
           }}
         >
           <CheckCircle
-            style={{ width: 48, height: 48, color: 'rgb(99,230,190)', margin: '0 auto 1.25rem' }}
+            style={{ width: 48, height: 48, color: '#b8975e', margin: '0 auto 1.25rem' }}
           />
           <h1
             style={{
               fontSize: '1.5rem',
               fontWeight: 700,
-              color: 'rgb(245,247,251)',
+              color: '#f0ece4',
               marginBottom: '0.75rem',
             }}
           >
             {lang === 'en' ? 'Request received!' : 'Pedido recebido!'}
           </h1>
-          <p style={{ color: 'rgb(120,130,150)', lineHeight: 1.6, fontSize: '0.95rem' }}>
+          <p style={{ color: 'rgba(240,236,228,0.42)', lineHeight: 1.6, fontSize: '0.95rem' }}>
             {t(lang, 'quote.success')}
           </p>
           <p style={{ color: 'rgb(100,110,130)', fontSize: '0.82rem', marginTop: '0.75rem' }}>
@@ -216,9 +216,9 @@ export default function QuotePage() {
               marginTop: '2rem',
               padding: '0.625rem 1.375rem',
               borderRadius: '10px',
-              background: 'rgba(77,163,255,0.12)',
+              background: 'rgba(154,124,74,0.12)',
               border: '1px solid rgba(77,163,255,0.22)',
-              color: 'rgb(77,163,255)',
+              color: '#d4b47a',
               fontWeight: 600,
               fontSize: '0.875rem',
               textDecoration: 'none',
@@ -235,7 +235,7 @@ export default function QuotePage() {
     <div
       style={{
         minHeight: '100vh',
-        background: 'rgb(7,17,31)',
+        background: '#090907',
         paddingTop: '6rem',
         paddingBottom: '4rem',
       }}
@@ -249,9 +249,9 @@ export default function QuotePage() {
               display: 'inline-block',
               padding: '0.3rem 0.85rem',
               borderRadius: '99px',
-              background: 'rgba(77,163,255,0.1)',
+              background: 'rgba(154,124,74,0.10)',
               border: '1px solid rgba(77,163,255,0.22)',
-              color: 'rgb(77,163,255)',
+              color: '#d4b47a',
               fontSize: '0.75rem',
               fontWeight: 700,
               letterSpacing: '0.1em',
@@ -265,7 +265,7 @@ export default function QuotePage() {
             style={{
               fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
               fontWeight: 800,
-              color: 'rgb(245,247,251)',
+              color: '#f0ece4',
               letterSpacing: '-0.02em',
               lineHeight: 1.15,
               marginBottom: '0.75rem',
@@ -275,7 +275,7 @@ export default function QuotePage() {
           </h1>
           <p
             style={{
-              color: 'rgb(120,130,150)',
+              color: 'rgba(240,236,228,0.42)',
               fontSize: '1rem',
               lineHeight: 1.6,
               maxWidth: '520px',
@@ -291,8 +291,8 @@ export default function QuotePage() {
         <form
           onSubmit={handleSubmit}
           style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.07)',
+            background: 'rgba(240,236,228,0.04)',
+            border: '1px solid rgba(240,236,228,0.06)',
             borderRadius: '20px',
             padding: 'clamp(1.5rem, 4vw, 2.5rem)',
             display: 'flex',
@@ -469,7 +469,7 @@ export default function QuotePage() {
                 <Label htmlFor="artwork-stub">Upload de arte / logotipo</Label>
                 <div
                   style={{
-                    border: '1px dashed rgba(255,255,255,0.15)',
+                    border: '1px dashed rgba(240,236,228,0.14)',
                     borderRadius: '10px',
                     padding: '1.25rem 1rem',
                     display: 'flex',
@@ -481,10 +481,10 @@ export default function QuotePage() {
                   }}
                   title="Em breve"
                 >
-                  <Upload style={{ width: 18, height: 18, color: 'rgb(120,130,150)', flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.85rem', color: 'rgb(120,130,150)' }}>
+                  <Upload style={{ width: 18, height: 18, color: 'rgba(240,236,228,0.42)', flexShrink: 0 }} />
+                  <span style={{ fontSize: '0.85rem', color: 'rgba(240,236,228,0.42)' }}>
                     Upload de ficheiros (imagem / PDF) —{' '}
-                    <span style={{ color: 'rgb(77,163,255)' }}>Em breve</span>
+                    <span style={{ color: '#d4b47a' }}>Em breve</span>
                   </span>
                 </div>
               </div>
@@ -537,9 +537,9 @@ export default function QuotePage() {
               cursor: loading ? 'not-allowed' : 'pointer',
               opacity: loading ? 0.7 : 1,
               background: loading
-                ? 'rgba(255,255,255,0.08)'
-                : 'linear-gradient(135deg, rgb(77,163,255), rgb(116,231,255))',
-              color: loading ? 'rgb(120,130,150)' : 'rgb(7,17,31)',
+                ? 'rgba(240,236,228,0.06)'
+                : 'linear-gradient(135deg, #d4b47a, #b8975e)',
+              color: loading ? 'rgba(240,236,228,0.42)' : '#090907',
               border: 'none',
               transition: 'all 0.2s',
               width: '100%',

@@ -78,19 +78,19 @@ const COMPARISON = [
 
 export default function EnterprisePage() {
   return (
-    <div style={{ background: 'rgb(7,17,31)', minHeight: '100vh', color: 'rgb(245,247,251)', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div style={{ background: '#090907', minHeight: '100vh', color: '#f0ece4', fontFamily: "'Montserrat', sans-serif" }}>
 
       {/* Nav */}
-      <nav style={{ maxWidth: '1200px', margin: '0 auto', padding: '1.5rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <nav style={{ maxWidth: '1200px', margin: '0 auto', padding: '1.5rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
         <Link href="/" style={{ textDecoration: 'none' }}>
-          <span style={{ fontSize: '1.25rem', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.02em' }}>
-            your<span style={{ color: 'rgb(77,163,255)' }}>gift</span>
+          <span style={{ fontSize: '1.25rem', fontWeight: 700, color: '#f0ece4', letterSpacing: '-0.02em' }}>
+            your<span style={{ color: '#d4b47a' }}>gift</span>
           </span>
         </Link>
         <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-          <Link href="/products" style={{ fontSize: '0.875rem', color: 'rgb(120,130,150)', textDecoration: 'none' }}>Catálogo</Link>
-          <Link href="/rfq" style={{ fontSize: '0.875rem', color: 'rgb(120,130,150)', textDecoration: 'none' }}>RFQ</Link>
-          <Link href="/auth/login" style={{ fontSize: '0.875rem', fontWeight: 600, color: 'rgb(7,17,31)', background: 'rgb(77,163,255)', padding: '0.5rem 1.25rem', borderRadius: '8px', textDecoration: 'none' }}>
+          <Link href="/products" style={{ fontSize: '0.875rem', color: 'rgba(240,236,228,0.42)', textDecoration: 'none' }}>Catálogo</Link>
+          <Link href="/rfq" style={{ fontSize: '0.875rem', color: 'rgba(240,236,228,0.42)', textDecoration: 'none' }}>RFQ</Link>
+          <Link href="/auth/login" style={{ fontSize: '0.875rem', fontWeight: 600, color: '#090907', background: '#d4b47a', padding: '0.5rem 1.25rem', borderRadius: '8px', textDecoration: 'none' }}>
             Entrar
           </Link>
         </div>
@@ -100,35 +100,35 @@ export default function EnterprisePage() {
 
         {/* Hero */}
         <section style={{ textAlign: 'center', padding: '5rem 0 4rem' }}>
-          <div style={{ display: 'inline-block', background: 'rgba(77,163,255,0.08)', border: '1px solid rgba(77,163,255,0.2)', borderRadius: '9999px', padding: '0.375rem 1rem', marginBottom: '1.5rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(77,163,255)' }}>
+          <div style={{ display: 'inline-block', background: 'rgba(154,124,74,0.08)', border: '1px solid rgba(154,124,74,0.18)', borderRadius: '9999px', padding: '0.375rem 1rem', marginBottom: '1.5rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#d4b47a' }}>
               Infraestrutura de Procurement Empresarial
             </span>
           </div>
 
-          <h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.05, marginBottom: '1.5rem', maxWidth: '900px', margin: '0 auto 1.5rem' }}>
+          <h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontFamily: "'Libre Baskerville', serif", fontWeight: 400, letterSpacing: '-0.04em', lineHeight: 1.05, marginBottom: '1.5rem', maxWidth: '900px', margin: '0 auto 1.5rem' }}>
             Tudo o que o procurement empresarial precisa.{' '}
-            <span style={{ color: 'rgb(99,230,190)' }}>Num único sistema.</span>
+            <span style={{ color: '#b8975e' }}>Num único sistema.</span>
           </h1>
 
-          <p style={{ fontSize: '1.125rem', color: 'rgb(120,130,150)', maxWidth: '640px', margin: '0 auto 2.5rem', lineHeight: 1.7 }}>
+          <p style={{ fontSize: '1.125rem', color: 'rgba(240,236,228,0.42)', maxWidth: '640px', margin: '0 auto 2.5rem', lineHeight: 1.7 }}>
             YourGift OS substituiu processos manuais de procurement — RFQ, aprovações,
             gestão de fornecedores, custo landed e relatórios CFO — com infraestrutura
             construída para empresas do €1M ao €100M.
           </p>
 
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/rfq" style={{ fontSize: '1rem', fontWeight: 700, color: 'rgb(7,17,31)', background: 'rgb(99,230,190)', padding: '0.875rem 2rem', borderRadius: '10px', textDecoration: 'none' }}>
+            <Link href="/rfq" style={{ fontSize: '1rem', fontWeight: 700, color: '#090907', background: '#b8975e', padding: '0.875rem 2rem', borderRadius: '10px', textDecoration: 'none' }}>
               Iniciar RFQ →
             </Link>
-            <a href="mailto:enterprise@yourgift.pt" style={{ fontSize: '1rem', fontWeight: 600, color: 'rgb(77,163,255)', background: 'rgba(77,163,255,0.08)', border: '1px solid rgba(77,163,255,0.25)', padding: '0.875rem 2rem', borderRadius: '10px', textDecoration: 'none' }}>
+            <a href="mailto:enterprise@yourgift.pt" style={{ fontSize: '1rem', fontWeight: 600, color: '#d4b47a', background: 'rgba(154,124,74,0.08)', border: '1px solid rgba(154,124,74,0.22)', padding: '0.875rem 2rem', borderRadius: '10px', textDecoration: 'none' }}>
               Falar com vendas
             </a>
           </div>
         </section>
 
         {/* Stats strip */}
-        <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1px', background: 'rgba(255,255,255,0.06)', borderRadius: '16px', overflow: 'hidden', marginBottom: '5rem' }}>
+        <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1px', background: 'rgba(240,236,228,0.06)', borderRadius: '16px', overflow: 'hidden', marginBottom: '5rem' }}>
           {[
             { value: '< 30s', label: 'Tempo de decisão' },
             { value: '8.5%', label: 'Poupança média' },
@@ -138,8 +138,8 @@ export default function EnterprisePage() {
             { value: '0', label: 'Erros TypeScript' },
           ].map(({ value, label }) => (
             <div key={label} style={{ background: 'rgb(11,21,38)', padding: '1.75rem', textAlign: 'center' }}>
-              <p style={{ fontSize: '1.75rem', fontWeight: 900, color: 'rgb(99,230,190)', letterSpacing: '-0.03em', marginBottom: '0.375rem' }}>{value}</p>
-              <p style={{ fontSize: '0.75rem', color: 'rgb(120,130,150)', fontWeight: 500 }}>{label}</p>
+              <p style={{ fontSize: '1.75rem', fontWeight: 700, color: '#b8975e', letterSpacing: '-0.03em', marginBottom: '0.375rem' }}>{value}</p>
+              <p style={{ fontSize: '0.75rem', color: 'rgba(240,236,228,0.42)', fontWeight: 500 }}>{label}</p>
             </div>
           ))}
         </section>
@@ -149,15 +149,15 @@ export default function EnterprisePage() {
           <h2 style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.03em', textAlign: 'center', marginBottom: '0.75rem' }}>
             Capacidades da plataforma
           </h2>
-          <p style={{ fontSize: '1rem', color: 'rgb(120,130,150)', textAlign: 'center', marginBottom: '3rem' }}>
+          <p style={{ fontSize: '1rem', color: 'rgba(240,236,228,0.42)', textAlign: 'center', marginBottom: '3rem' }}>
             Cada módulo foi construído para eliminar um problema real de procurement empresarial.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
             {CAPABILITIES.map(({ icon, title, desc }) => (
-              <div key={title} style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', padding: '1.5rem' }}>
+              <div key={title} style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '14px', padding: '1.5rem' }}>
                 <p style={{ fontSize: '1.75rem', marginBottom: '0.75rem' }}>{icon}</p>
-                <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '0.5rem' }}>{title}</h3>
-                <p style={{ fontSize: '0.8rem', color: 'rgb(120,130,150)', lineHeight: 1.6 }}>{desc}</p>
+                <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f0ece4', marginBottom: '0.5rem' }}>{title}</h3>
+                <p style={{ fontSize: '0.8rem', color: 'rgba(240,236,228,0.42)', lineHeight: 1.6 }}>{desc}</p>
               </div>
             ))}
           </div>
@@ -168,26 +168,26 @@ export default function EnterprisePage() {
           <h2 style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.03em', textAlign: 'center', marginBottom: '3rem' }}>
             Manual vs. YourGift OS
           </h2>
-          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', overflow: 'hidden' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', background: 'rgba(255,255,255,0.04)', padding: '0.875rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-              <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(120,130,150)' }}>Métrica</p>
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(240,236,228,0.06)', borderRadius: '16px', overflow: 'hidden' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', background: 'rgba(240,236,228,0.04)', padding: '0.875rem 1.5rem', borderBottom: '1px solid rgba(240,236,228,0.06)' }}>
+              <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(240,236,228,0.42)' }}>Métrica</p>
               <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(239,68,68)', textAlign: 'center' }}>Processo manual</p>
-              <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(99,230,190)', textAlign: 'center' }}>YourGift OS</p>
+              <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#b8975e', textAlign: 'center' }}>YourGift OS</p>
             </div>
             {COMPARISON.map(({ metric, manual, platform }) => (
-              <div key={metric} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.04)', alignItems: 'center' }}>
+              <div key={metric} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', padding: '1rem 1.5rem', borderBottom: '1px solid rgba(240,236,228,0.04)', alignItems: 'center' }}>
                 <p style={{ fontSize: '0.875rem', color: 'rgb(170,180,198)' }}>{metric}</p>
                 <p style={{ fontSize: '0.875rem', color: 'rgb(239,68,68)', textAlign: 'center' }}>{manual}</p>
-                <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'rgb(99,230,190)', textAlign: 'center' }}>{platform}</p>
+                <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#b8975e', textAlign: 'center' }}>{platform}</p>
               </div>
             ))}
           </div>
         </section>
 
         {/* Tech stack for IT */}
-        <section style={{ background: 'rgba(77,163,255,0.04)', border: '1px solid rgba(77,163,255,0.12)', borderRadius: '20px', padding: '2.5rem 3rem', marginBottom: '5rem' }}>
+        <section style={{ background: 'rgba(154,124,74,0.04)', border: '1px solid rgba(154,124,74,0.12)', borderRadius: '20px', padding: '2.5rem 3rem', marginBottom: '5rem' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.5rem' }}>Para as equipas de IT</h2>
-          <p style={{ fontSize: '0.875rem', color: 'rgb(120,130,150)', marginBottom: '2rem' }}>Stack construída para escala e segurança empresarial.</p>
+          <p style={{ fontSize: '0.875rem', color: 'rgba(240,236,228,0.42)', marginBottom: '2rem' }}>Stack construída para escala e segurança empresarial.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
             {[
               { label: 'API', value: 'NestJS 10 · TypeScript · Prisma ORM' },
@@ -200,7 +200,7 @@ export default function EnterprisePage() {
               { label: 'Backup', value: 'AWS Backup diário · S3 replicação cross-region' },
             ].map(({ label, value }) => (
               <div key={label}>
-                <p style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(77,163,255)', marginBottom: '0.3rem' }}>{label}</p>
+                <p style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#d4b47a', marginBottom: '0.3rem' }}>{label}</p>
                 <p style={{ fontSize: '0.8rem', color: 'rgb(170,180,198)', lineHeight: 1.5 }}>{value}</p>
               </div>
             ))}
@@ -209,17 +209,17 @@ export default function EnterprisePage() {
 
         {/* CTA */}
         <section style={{ textAlign: 'center', padding: '3rem 0 5rem' }}>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-0.04em', marginBottom: '1rem' }}>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: 700, letterSpacing: '-0.04em', marginBottom: '1rem' }}>
             Pronto para modernizar o procurement?
           </h2>
-          <p style={{ fontSize: '1rem', color: 'rgb(120,130,150)', marginBottom: '2.5rem', maxWidth: '500px', margin: '0 auto 2.5rem' }}>
+          <p style={{ fontSize: '1rem', color: 'rgba(240,236,228,0.42)', marginBottom: '2.5rem', maxWidth: '500px', margin: '0 auto 2.5rem' }}>
             Fala com a nossa equipa. Demonstração em 30 minutos, implementação em 2 semanas.
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="mailto:enterprise@yourgift.pt?subject=Enterprise Demo Request" style={{ fontSize: '1rem', fontWeight: 700, color: 'rgb(7,17,31)', background: 'rgb(99,230,190)', padding: '1rem 2.5rem', borderRadius: '12px', textDecoration: 'none', letterSpacing: '0.01em' }}>
+            <a href="mailto:enterprise@yourgift.pt?subject=Enterprise Demo Request" style={{ fontSize: '1rem', fontWeight: 700, color: '#090907', background: '#b8975e', padding: '1rem 2.5rem', borderRadius: '12px', textDecoration: 'none', letterSpacing: '0.01em' }}>
               Pedir demonstração →
             </a>
-            <Link href="/auth/register" style={{ fontSize: '1rem', fontWeight: 600, color: 'rgb(245,247,251)', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem 2.5rem', borderRadius: '12px', textDecoration: 'none' }}>
+            <Link href="/auth/register" style={{ fontSize: '1rem', fontWeight: 600, color: '#f0ece4', background: 'rgba(240,236,228,0.06)', border: '1px solid rgba(240,236,228,0.10)', padding: '1rem 2.5rem', borderRadius: '12px', textDecoration: 'none' }}>
               Criar conta gratuita
             </Link>
           </div>
@@ -230,10 +230,10 @@ export default function EnterprisePage() {
       </main>
 
       {/* Footer */}
-      <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '2rem', textAlign: 'center' }}>
+      <footer style={{ borderTop: '1px solid rgba(240,236,228,0.06)', padding: '2rem', textAlign: 'center' }}>
         <p style={{ fontSize: '0.75rem', color: 'rgb(80,90,110)' }}>
           © {new Date().getFullYear()} YourGift OS · Infraestrutura de Procurement Empresarial ·{' '}
-          <a href="mailto:enterprise@yourgift.pt" style={{ color: 'rgb(77,163,255)' }}>enterprise@yourgift.pt</a>
+          <a href="mailto:enterprise@yourgift.pt" style={{ color: '#d4b47a' }}>enterprise@yourgift.pt</a>
         </p>
       </footer>
     </div>

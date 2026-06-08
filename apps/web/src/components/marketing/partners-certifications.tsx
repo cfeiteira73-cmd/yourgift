@@ -6,27 +6,27 @@ const CERTIFICATIONS = [
   {
     name: "ISO 9001",
     label: "Quality Management",
-    color: "#4DA3FF",
+    color: "#d4b47a",
   },
   {
     name: "SEDEX",
     label: "Ethical Supply Chain",
-    color: "#74E7FF",
+    color: "#b8975e",
   },
   {
     name: "FSC®",
     label: "Responsible Forestry",
-    color: "#63E6BE",
+    color: "#b8975e",
   },
   {
     name: "OEKO-TEX®",
     label: "Tested for Harmful Substances",
-    color: "#4DA3FF",
+    color: "#d4b47a",
   },
   {
     name: "B Corp",
     label: "Certified B Corporation",
-    color: "#74E7FF",
+    color: "#b8975e",
   },
 ];
 
@@ -80,7 +80,7 @@ function CountryPill({ flag, name }: { flag: string; name: string }) {
 
 export function PartnersCertifications() {
   return (
-    <section className="py-20 md:py-28 bg-[#07111F] border-y border-white/[0.05]">
+    <section className="py-20 md:py-28 bg-[#090907] border-y border-white/[0.05]">
       <div className="max-w-7xl mx-auto px-6 md:px-8">
         {/* Header */}
         <motion.div
@@ -90,7 +90,7 @@ export function PartnersCertifications() {
           transition={{ duration: 0.6 }}
           className="text-center mb-14"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#63E6BE] mb-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#b8975e] mb-4">
             Confiança e alcance
           </p>
           <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-white mb-4">
@@ -98,7 +98,7 @@ export function PartnersCertifications() {
             <span
               className="bg-clip-text text-transparent"
               style={{
-                backgroundImage: "linear-gradient(90deg, #63E6BE, #74E7FF)",
+                backgroundImage: "linear-gradient(90deg, #b8975e, #b8975e)",
               }}
             >
               alcance que surpreende

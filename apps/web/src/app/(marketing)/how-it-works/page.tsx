@@ -11,19 +11,19 @@ const steps = [
     number: '01',
     title: 'Pedes um orçamento',
     description: 'Descreves o teu projeto — produto, quantidade, técnica de personalização e prazo. O formulário leva menos de 2 minutos.',
-    color: 'rgb(77,163,255)',
+    color: '#d4b47a',
   },
   {
     number: '02',
     title: 'Receves proposta em 24h',
     description: 'A nossa equipa analisa o teu pedido e envia uma proposta detalhada com preços, mockups e opções de personalização.',
-    color: 'rgb(116,231,255)',
+    color: '#b8975e',
   },
   {
     number: '03',
     title: 'Aprovação e produção',
     description: 'Aprovas a proposta, enviamos a arte-final, e a produção arranca. Podes acompanhar tudo em tempo real no portal.',
-    color: 'rgb(99,230,190)',
+    color: '#b8975e',
   },
   {
     number: '04',
@@ -42,12 +42,12 @@ const faqs = [
 
 export default function HowItWorksPage() {
   return (
-    <div style={{ minHeight: '100vh', background: 'rgb(7,17,31)', paddingTop: '5rem' }}>
+    <div style={{ minHeight: '100vh', background: '#090907', paddingTop: '5rem' }}>
       {/* Hero */}
       <section style={{ padding: '5rem 1.5rem 4rem', textAlign: 'center', maxWidth: '760px', margin: '0 auto' }}>
-        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900, color: 'rgb(245,247,251)', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1.25rem' }}>
+        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, color: '#f0ece4', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1.25rem' }}>
           Do briefing à entrega<br />
-          <span style={{ color: 'rgb(77,163,255)' }}>em 4 passos simples</span>
+          <span style={{ color: '#d4b47a' }}>em 4 passos simples</span>
         </h1>
         <p style={{ fontSize: '1.1rem', color: 'rgb(170,180,198)', lineHeight: 1.7 }}>
           Merchandising B2B sem complicações. Tu fogas no teu negócio, nós tratamos do resto.
@@ -61,21 +61,21 @@ export default function HowItWorksPage() {
             <div key={step.number} style={{
               display: 'grid', gridTemplateColumns: '80px 1fr',
               gap: '1.5rem', alignItems: 'flex-start',
-              background: 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
-              border: '1px solid rgba(255,255,255,0.08)',
+              background: 'linear-gradient(180deg, rgba(240,236,228,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+              border: '1px solid rgba(240,236,228,0.06)',
               borderRadius: '20px', padding: '2rem',
             }}>
               <div style={{
                 width: '64px', height: '64px', borderRadius: '16px',
                 background: `${step.color}18`, border: `1px solid ${step.color}30`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '1.5rem', fontWeight: 900, color: step.color,
+                fontSize: '1.5rem', fontWeight: 700, color: step.color,
                 flexShrink: 0,
               }}>
                 {step.number}
               </div>
               <div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#f0ece4', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>
                   {step.title}
                 </h3>
                 <p style={{ color: 'rgb(170,180,198)', lineHeight: 1.7, fontSize: '0.95rem' }}>
@@ -89,7 +89,7 @@ export default function HowItWorksPage() {
         <div style={{ textAlign: 'center', marginTop: '3rem' }}>
           <Link href="/quote" style={{
             display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-            background: 'rgb(77,163,255)', color: 'rgb(7,17,31)',
+            background: '#d4b47a', color: '#090907',
             padding: '0.875rem 1.75rem', borderRadius: '14px',
             fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none',
           }}>
@@ -100,16 +100,16 @@ export default function HowItWorksPage() {
 
       {/* FAQ */}
       <section style={{ padding: '4rem 1.5rem 6rem', maxWidth: '760px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'rgb(245,247,251)', letterSpacing: '-0.03em', marginBottom: '2rem', textAlign: 'center' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0ece4', letterSpacing: '-0.03em', marginBottom: '2rem', textAlign: 'center' }}>
           Perguntas frequentes
         </h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {faqs.map((faq) => (
             <div key={faq.q} style={{
-              background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)',
+              background: 'rgba(240,236,228,0.04)', border: '1px solid rgba(240,236,228,0.06)',
               borderRadius: '14px', padding: '1.25rem 1.5rem',
             }}>
-              <p style={{ fontSize: '0.9rem', fontWeight: 700, color: 'rgb(245,247,251)', marginBottom: '0.5rem' }}>{faq.q}</p>
+              <p style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f0ece4', marginBottom: '0.5rem' }}>{faq.q}</p>
               <p style={{ fontSize: '0.875rem', color: 'rgb(170,180,198)', lineHeight: 1.6 }}>{faq.a}</p>
             </div>
           ))}

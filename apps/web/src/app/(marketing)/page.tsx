@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import './home-v2.css';
 import { HeroVideo } from '@/components/marketing/HeroVideo';
 
 export const metadata: Metadata = {

@@ -50,17 +50,17 @@ const MOCK_PRODUCTS = [
   {
     name: "Welcome Kit",
     price: "€45",
-    color: "from-[#4DA3FF]/20 to-[#4DA3FF]/5",
+    color: "from-[#d4b47a]/20 to-[#d4b47a]/5",
   },
   {
     name: "Branded Tee",
     price: "Incluído",
-    color: "from-[#63E6BE]/20 to-[#63E6BE]/5",
+    color: "from-[#b8975e]/20 to-[#b8975e]/5",
   },
   {
     name: "ACME Tumbler",
     price: "€18",
-    color: "from-[#74E7FF]/20 to-[#74E7FF]/5",
+    color: "from-[#b8975e]/20 to-[#b8975e]/5",
   },
   {
     name: "Backpack Pro",
@@ -71,13 +71,13 @@ const MOCK_PRODUCTS = [
 
 export function CompanyStoresShowcase() {
   return (
-    <section className="py-20 md:py-28 bg-[#0B1526]/50 relative overflow-hidden">
+    <section className="py-20 md:py-28 bg-[#0f0f0c]/50 relative overflow-hidden">
       {/* Background orb */}
       <div
         className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-[0.12] blur-[120px] pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse, rgba(99,230,190,0.6), rgba(77,163,255,0.3), transparent)",
+            "radial-gradient(ellipse, rgba(99,230,190,0.6), rgba(154,124,74,0.28), transparent)",
         }}
       />
 
@@ -90,7 +90,7 @@ export function CompanyStoresShowcase() {
             viewport={{ once: true, amount: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#63E6BE]/10 border border-[#63E6BE]/20 text-[#63E6BE] text-xs font-semibold uppercase tracking-[0.12em] mb-6">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#b8975e]/10 border border-[#b8975e]/20 text-[#b8975e] text-xs font-semibold uppercase tracking-[0.12em] mb-6">
               <Store className="h-3.5 w-3.5" />
               Company Stores
             </div>
@@ -115,7 +115,7 @@ export function CompanyStoresShowcase() {
                   transition={{ duration: 0.4, delay: 0.08 + i * 0.07 }}
                   className="flex items-start gap-3.5"
                 >
-                  <div className="mt-0.5 p-1.5 rounded-lg bg-[#63E6BE]/[0.1] text-[#63E6BE] flex-shrink-0 border border-[#63E6BE]/[0.15]">
+                  <div className="mt-0.5 p-1.5 rounded-lg bg-[#b8975e]/[0.1] text-[#b8975e] flex-shrink-0 border border-[#b8975e]/[0.15]">
                     {f.icon}
                   </div>
                   <div>
@@ -130,7 +130,7 @@ export function CompanyStoresShowcase() {
 
             <Link
               href="/company-stores"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#63E6BE]/[0.1] border border-[#63E6BE]/25 text-[#63E6BE] text-sm font-semibold hover:bg-[#63E6BE]/[0.18] hover:border-[#63E6BE]/40 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#b8975e]/[0.1] border border-[#b8975e]/25 text-[#b8975e] text-sm font-semibold hover:bg-[#b8975e]/[0.18] hover:border-[#b8975e]/40 transition-all"
             >
               Criar a minha loja
               <ArrowRight className="h-4 w-4" />
@@ -146,7 +146,7 @@ export function CompanyStoresShowcase() {
             className="relative"
           >
             {/* Browser chrome card */}
-            <div className="rounded-2xl border border-white/[0.1] bg-[#0B1526] overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.5)]">
+            <div className="rounded-2xl border border-white/[0.1] bg-[#0f0f0c] overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.5)]">
               {/* Browser bar */}
               <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06] bg-white/[0.025]">
                 <div className="flex gap-1.5">
@@ -156,7 +156,7 @@ export function CompanyStoresShowcase() {
                 </div>
                 <div className="flex-1 mx-4">
                   <div className="h-6 rounded-lg bg-white/[0.05] border border-white/[0.06] px-3 flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-[#63E6BE]/60" />
+                    <div className="w-2 h-2 rounded-full bg-[#b8975e]/60" />
                     <span className="text-[11px] text-white/28 font-mono">
                       store.yourgift.pt/acme-corp
                     </span>
@@ -173,7 +173,7 @@ export function CompanyStoresShowcase() {
                       className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-[13px] text-white flex-shrink-0"
                       style={{
                         background:
-                          "linear-gradient(135deg, #4DA3FF 0%, #63E6BE 100%)",
+                          "linear-gradient(135deg, #d4b47a 0%, #b8975e 100%)",
                       }}
                     >
                       AC
@@ -187,9 +187,9 @@ export function CompanyStoresShowcase() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#63E6BE]/10 border border-[#63E6BE]/20">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#63E6BE]" />
-                    <span className="text-[10px] text-[#63E6BE] font-semibold">
+                  <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#b8975e]/10 border border-[#b8975e]/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#b8975e]" />
+                    <span className="text-[10px] text-[#b8975e] font-semibold">
                       Ativo
                     </span>
                   </div>
@@ -202,7 +202,7 @@ export function CompanyStoresShowcase() {
                       key={c}
                       className={`px-3 py-1 rounded-full text-[11px] font-medium border ${
                         i === 0
-                          ? "bg-white text-[#07111F] border-white"
+                          ? "bg-white text-[#090907] border-white"
                           : "bg-white/[0.04] border-white/[0.1] text-white/50"
                       }`}
                     >
@@ -223,7 +223,7 @@ export function CompanyStoresShowcase() {
                         {p.name}
                       </div>
                       <div className="flex items-center justify-between mt-1.5">
-                        <div className="text-xs text-[#63E6BE] font-medium">
+                        <div className="text-xs text-[#b8975e] font-medium">
                           {p.price}
                         </div>
                         <div className="px-2 py-0.5 rounded-full bg-white/[0.08] text-[10px] text-white/44">
@@ -239,7 +239,7 @@ export function CompanyStoresShowcase() {
                   <span className="text-[11px] text-white/30">
                     4 produtos disponíveis
                   </span>
-                  <span className="text-[11px] text-[#4DA3FF]">
+                  <span className="text-[11px] text-[#d4b47a]">
                     Ver encomendas →
                   </span>
                 </div>
@@ -252,9 +252,9 @@ export function CompanyStoresShowcase() {
               whileInView={{ opacity: 1, scale: 1, y: 0 }}
               viewport={{ once: true, amount: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="absolute -bottom-4 -right-4 flex items-center gap-2 px-4 py-2.5 rounded-full border border-[#63E6BE]/22 bg-[#07111F] shadow-[0_8px_32px_rgba(0,0,0,0.4)] text-sm font-semibold text-[#63E6BE]"
+              className="absolute -bottom-4 -right-4 flex items-center gap-2 px-4 py-2.5 rounded-full border border-[#b8975e]/22 bg-[#090907] shadow-[0_8px_32px_rgba(0,0,0,0.4)] text-sm font-semibold text-[#b8975e]"
             >
-              <span className="w-2 h-2 rounded-full bg-[#63E6BE] animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[#b8975e] animate-pulse" />
               Ativo em 2 dias úteis
             </motion.div>
 
@@ -264,7 +264,7 @@ export function CompanyStoresShowcase() {
               whileInView={{ opacity: 1, scale: 1, y: 0 }}
               viewport={{ once: true, amount: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
-              className="absolute -top-4 -left-4 flex items-center gap-2 px-4 py-2.5 rounded-full border border-[#4DA3FF]/22 bg-[#07111F] shadow-[0_8px_32px_rgba(0,0,0,0.4)] text-sm font-semibold text-[#4DA3FF]"
+              className="absolute -top-4 -left-4 flex items-center gap-2 px-4 py-2.5 rounded-full border border-[#d4b47a]/22 bg-[#090907] shadow-[0_8px_32px_rgba(0,0,0,0.4)] text-sm font-semibold text-[#d4b47a]"
             >
               SSO incluído
             </motion.div>

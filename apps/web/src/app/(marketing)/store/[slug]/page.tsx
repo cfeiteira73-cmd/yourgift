@@ -90,7 +90,7 @@ export default async function StoreSlugPage({
     return <StoreUnavailable storeName={store.name} />;
   }
 
-  const accent = store.primaryColor ?? '#4da3ff';
+  const accent = store.primaryColor ?? '#d4b47a';
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', fontFamily: "'Segoe UI', Helvetica, Arial, sans-serif" }}>
