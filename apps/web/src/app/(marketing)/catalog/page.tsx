@@ -57,7 +57,7 @@ export default function CatalogPage() {
           }}>
             Pedir Orçamento Grátis &nbsp;→
           </Link>
-          <Link href="/products" style={{
+          <Link href="/catalog/produtos" style={{
             display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
             fontFamily: "'Montserrat', sans-serif",
             fontSize: '10px', fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase',
