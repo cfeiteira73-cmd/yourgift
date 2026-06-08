@@ -71,7 +71,7 @@ export default function AboutPage() {
             com preços justos, qualidade garantida e entrega rápida.
           </p>
           <p style={{ color: 'rgb(170,180,198)', lineHeight: 1.8, fontSize: '1rem', marginTop: '1rem' }}>
-            Trabalhamos exclusivamente com fornecedores certificados como a Midocean e PF Concept,
+            Trabalhamos exclusivamente com fornecedores certificados internacionalmente,
             líderes europeus em merchandising sustentável e de qualidade.
           </p>
         </div>

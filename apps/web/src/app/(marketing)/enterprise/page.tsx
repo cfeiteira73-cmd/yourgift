@@ -133,7 +133,7 @@ export default function EnterprisePage() {
             { value: '< 30s', label: 'Tempo de decisão' },
             { value: '8.5%', label: 'Poupança média' },
             { value: '16', label: 'Filas de trabalho BullMQ' },
-            { value: '50K+', label: 'Produtos Midocean + PF Concept' },
+            { value: '50K+', label: 'Referências de produto disponíveis' },
             { value: 'SCIM 2.0', label: 'Aprovisionamento automático' },
             { value: '0', label: 'Erros TypeScript' },
           ].map(({ value, label }) => (

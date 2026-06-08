@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Branded Merchandise — Merch de Marca Premium',
-  description: 'Branded merchandise com qualidade internacional. Vestuário, acessórios e gadgets com a tua marca. Midocean + PF Concept.',
+  description: 'Branded merchandise com qualidade internacional. Vestuário, acessórios e gadgets com a tua marca. 20.000+ referências disponíveis.',
 };
 
 const items = [
@@ -32,7 +32,7 @@ export default function BrandedMerchPage() {
           A tua marca em<br /><span style={{ color: '#d4b47a' }}>cada produto</span>
         </h1>
         <p style={{ fontSize: '1.125rem', color: 'rgb(170,180,198)', lineHeight: 1.7, marginBottom: '2.5rem' }}>
-          Vestuário, acessórios e gadgets com qualidade internacional. Midocean + PF Concept — os maiores fornecedores europeus de branded merch.
+          Vestuário, acessórios e gadgets com qualidade internacional. Parceiros europeus certificados com os mais altos padrões de qualidade.
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link href="/quote" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#d4b47a', color: '#090907', padding: '0.875rem 1.75rem', borderRadius: '14px', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none' }}>

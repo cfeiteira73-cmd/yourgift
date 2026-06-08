@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 const steps = [
-  { num: '01', title: 'Produção', desc: 'Fabricamos os teus produtos com os fornecedores certificados Midocean e PF Concept. Controlo de qualidade em cada etapa.' },
+  { num: '01', title: 'Produção', desc: 'Fabricamos os teus produtos com fornecedores certificados internacionalmente. Controlo de qualidade em cada etapa.' },
   { num: '02', title: 'Armazenagem', desc: 'O teu stock fica guardado nos nossos armazéns. Gerido digitalmente, acessível no portal em tempo real.' },
   { num: '03', title: 'Picking & Packing', desc: 'Quando recebes um pedido, preparamos o envio com o packaging da tua marca. Sem intervenção da tua parte.' },
   { num: '04', title: 'Entrega Europa', desc: 'Envio para qualquer país da UE em 2–5 dias úteis. Tracking incluído, sem surpresas.' },

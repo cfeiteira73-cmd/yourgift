@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Catálogo',
-  description: '2.400+ produtos Midocean para personalização — bordado, DTF, laser, pad printing. Pede o teu orçamento B2B.',
+  description: '20.000+ produtos premium para personalização — bordado, DTF, laser, pad printing. Pede o teu orçamento B2B.',
 };
 
 const categories = [
@@ -39,31 +39,33 @@ export default function CatalogPage() {
         }}>
           2.400+ produtos disponíveis
         </div>
-        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontFamily: "'Libre Baskerville', serif", fontWeight: 400, color: '#f0ece4', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1.25rem' }}>
-          Catálogo Midocean<br />
-          <span style={{ color: '#d4b47a' }}>para o teu negócio</span>
+        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontFamily: "'Libre Baskerville', serif", fontWeight: 400, color: '#f0ece4', letterSpacing: '-0.02em', lineHeight: 1.1, marginBottom: '1.25rem' }}>
+          Catálogo Premium<br />
+          <em style={{ fontStyle: 'italic', color: '#d4b47a' }}>para o teu negócio</em>
         </h1>
-        <p style={{ fontSize: '1.125rem', color: 'rgb(170,180,198)', lineHeight: 1.7, marginBottom: '2.5rem' }}>
-          Acesso a todo o catálogo Midocean + PF Concept com personalização completa.
+        <p style={{ fontSize: '1.125rem', color: 'rgba(240,236,228,0.62)', lineHeight: 1.7, marginBottom: '2.5rem', fontFamily: "'Montserrat', sans-serif", fontWeight: 300 }}>
+          Acesso a mais de 20.000 produtos premium com personalização completa.
           Pede um orçamento e recebe proposta em 24h.
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link href="/quote" style={{
+          <Link href="/rfq" style={{
             display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-            background: '#d4b47a', color: '#090907',
-            padding: '0.875rem 1.75rem', borderRadius: '14px',
-            fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none',
+            fontFamily: "'Montserrat', sans-serif",
+            fontSize: '10px', fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase',
+            background: '#b8975e', color: '#090907',
+            padding: '14px 32px', textDecoration: 'none',
           }}>
-            Pedir Orçamento Grátis →
+            Pedir Orçamento Grátis &nbsp;→
           </Link>
-          <Link href="/auth/login" style={{
+          <Link href="/products" style={{
             display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-            background: 'rgba(240,236,228,0.06)', color: '#f0ece4',
-            border: '1px solid rgba(240,236,228,0.10)',
-            padding: '0.875rem 1.75rem', borderRadius: '14px',
-            fontWeight: 600, fontSize: '0.95rem', textDecoration: 'none',
+            fontFamily: "'Montserrat', sans-serif",
+            fontSize: '10px', fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase',
+            background: 'transparent', color: '#f0ece4',
+            border: '1px solid rgba(154,124,74,0.28)',
+            padding: '13px 32px', textDecoration: 'none',
           }}>
-            Aceder ao Portal B2B
+            Ver Catálogo Completo &nbsp;→
           </Link>
         </div>
       </section>
