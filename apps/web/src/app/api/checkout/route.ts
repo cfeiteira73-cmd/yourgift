@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
   // ── Fetch order (RLS ensures client can only see their own orders) ─────────
   const { data: order, error: orderErr } = await supabase
     .from('orders')
-    .select('id, ref, total_amount, status, payment_status, client_id, stripe_checkout_session_id')
+    .select('id, ref, total_amount, status, payment_status, client_id, stripe_checkout_session_id, shipping_address')
     .eq('id', orderId)
     .single();
 
@@ -141,6 +141,25 @@ export async function POST(req: NextRequest) {
           yourgift_order_id: orderId,
           user_id: user.id,
         },
+        // Safety net: if order has no shipping address, collect it at checkout
+        // This ensures supplier dispatch always has a valid address
+        shipping_address_collection: {
+          allowed_countries: [
+            'PT', 'ES', 'FR', 'DE', 'GB', 'IT', 'NL', 'BE', 'AT', 'CH',
+            'SE', 'NO', 'DK', 'FI', 'PL', 'IE', 'LU', 'US', 'CA', 'AU',
+            'AE', 'BR',
+          ],
+        },
+        // Pre-fill shipping if we already have it
+        ...(() => {
+          const addr = order.shipping_address as Record<string, string> | null;
+          if (addr?.name && addr?.street) {
+            return {
+              shipping_options: [],
+            };
+          }
+          return {};
+        })(),
         success_url: `${appUrl}/orders/${orderId}?payment=success`,
         cancel_url: `${appUrl}/orders/${orderId}?payment=cancelled`,
         client_reference_id: orderId,

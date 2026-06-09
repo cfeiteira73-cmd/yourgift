@@ -308,11 +308,26 @@ async function handleCheckoutCompleted(
   if (!db) return;
   const orderId = extractOrderId(session.metadata as Record<string, string>);
   if (orderId && session.payment_status === 'paid') {
-    await db.from('orders').update({
+    // Save shipping address from Stripe if collected there (safety net)
+    const stripeAddr = session.shipping_details?.address ?? session.customer_details?.address;
+    const shippingUpdate: Record<string, unknown> = {
       payment_status: 'paid',
       stripe_checkout_session_id: session.id,
+      stripe_payment_id: (session.payment_intent as string) ?? null,
       paid_at: new Date().toISOString(),
-    }).eq('id', orderId);
+    };
+    if (stripeAddr) {
+      shippingUpdate.shipping_address = {
+        name:       session.shipping_details?.name ?? session.customer_details?.name ?? '',
+        street:     stripeAddr.line1 ?? '',
+        city:       stripeAddr.city ?? '',
+        postalCode: stripeAddr.postal_code ?? '',
+        country:    stripeAddr.country ?? '',
+        phone:      session.customer_details?.phone ?? '',
+        company:    '',
+      };
+    }
+    await db.from('orders').update(shippingUpdate).eq('id', orderId);
     await auditLog(db, 'payment_confirmed', {
       stripe_checkout_session_id: session.id,
       amount_total: session.amount_total,
