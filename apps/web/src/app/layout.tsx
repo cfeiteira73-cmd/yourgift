@@ -8,6 +8,13 @@ const libreBaskerville = Libre_Baskerville({ subsets: ['latin'], weight: ['400',
 const montserrat = Montserrat({ subsets: ['latin'], weight: ['300', '400', '500', '600'], variable: '--font-montserrat' });
 const dmMono = DM_Mono({ subsets: ['latin'], weight: ['300', '400'], variable: '--font-dm-mono' });
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#090907',
+};
+
 export const metadata: Metadata = {
   title: { default: 'YourGift — Merchandising B2B Premium', template: '%s | YourGift' },
   description: 'Plataforma B2B de merchandising personalizado. 2.400+ produtos Midocean com bordado, DTF, laser e pad printing. Entrega em toda a Europa.',

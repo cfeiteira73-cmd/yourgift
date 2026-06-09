@@ -320,6 +320,33 @@ async function handleCheckoutCompleted(
       order_id: orderId,
     });
 
+    // ── Notify NestJS API to trigger supplier routing ─────────────────────
+    // NestJS SuppliersService listens for 'payment.confirmed' event.
+    // We call the NestJS payments webhook endpoint so it processes the same
+    // Stripe event through its own event bus → supplier dispatch.
+    // This is non-blocking: if NestJS is cold-starting (Render free tier),
+    // the order stays 'paid' and the admin can manually trigger via /production.
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'https://yourgift-api.onrender.com';
+      const adminToken = process.env.YOURGIFT_ADMIN_TOKEN;
+      if (adminToken) {
+        await fetch(`${apiUrl}/api/v1/admin/fulfillment/dispatch`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${adminToken}`,
+          },
+          body: JSON.stringify({ orderId, stripeSessionId: session.id }),
+          signal: AbortSignal.timeout(15_000), // non-blocking: 15s max
+        }).catch(err => {
+          // Log but never fail the webhook — Stripe will retry if we return 5xx
+          console.warn('[stripe-webhook] NestJS dispatch call failed (non-blocking):', err);
+        });
+      }
+    } catch {
+      // Intentionally non-blocking — admin can re-trigger via portal
+    }
+
     // Send payment confirmation email to customer
     try {
       const clientEmail = session.customer_email ?? session.customer_details?.email;

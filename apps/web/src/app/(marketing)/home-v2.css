@@ -255,3 +255,37 @@
   .yg-faq-sticky{position:static}
   .yg-footer-top{grid-template-columns:1fr 1fr}
 }
+/* ── Tablet ──────────────────────────────────────────────────────────────── */
+@media(max-width:768px){
+  .yg-urgency{padding-left:20px;padding-right:20px;font-size:9px}
+  .yg-catalog,.yg-testimonials,.yg-solutions,.yg-pricing,.yg-clients,.yg-footer,.yg-faq{padding-left:20px;padding-right:20px}
+  .yg-nav{padding:0 20px}
+  .yg-hero-content{padding-left:20px;padding-right:20px;padding-bottom:64px}
+  .yg-hero-badge{display:none}
+  .yg-stats{grid-template-columns:1fr 1fr;gap:1px}
+  .yg-product-grid{grid-template-columns:repeat(2,1fr);gap:1px}
+  .yg-sol-grid{grid-template-columns:1fr}
+  .yg-test-grid{grid-template-columns:1fr}
+  .yg-footer-top{grid-template-columns:1fr}
+  .yg-footer-bottom{flex-direction:column;gap:16px;text-align:center}
+  .yg-wa{bottom:20px;right:20px;padding:12px 18px;font-size:9px}
+  .yg-pricing-card{padding:32px 24px}
+  .yg-comp-header{padding:48px 20px 32px}
+  .yg-comp-col{padding:32px 20px}
+  .yg-store-content{padding:48px 20px}
+  .yg-store-visual{height:280px}
+}
+/* ── Mobile ──────────────────────────────────────────────────────────────── */
+@media(max-width:480px){
+  .yg-nav-links,.yg-nav-cta{display:none}
+  .yg-hero-content h1{font-size:clamp(2rem,9vw,3.5rem)}
+  .yg-stats{grid-template-columns:1fr 1fr}
+  .yg-product-grid{grid-template-columns:1fr 1fr}
+  .yg-catalog-header h2{font-size:clamp(1.75rem,7vw,2.5rem)}
+  .yg-section-label{font-size:8px}
+  .yg-btn-gold,.yg-btn-ghost{padding:14px 24px;font-size:9px;min-height:48px;display:inline-flex;align-items:center;justify-content:center}
+  .yg-trust{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;padding-bottom:8px}
+  .yg-trust-item{flex-shrink:0;min-width:120px}
+  .yg-footer-top{gap:32px}
+  .yg-faq{padding-left:16px;padding-right:16px}
+}
