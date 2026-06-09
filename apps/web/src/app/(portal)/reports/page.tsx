@@ -1,4 +1,5 @@
 'use client';
+import { isAdminEmail } from '@/lib/constants';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useMemo, useRef } from 'react';
@@ -10,7 +11,6 @@ import { PortalLayout } from '@/components/portal/PortalLayout';
 // Admin: global revenue view (all clients, tier breakdown, top clients)
 // Client: full personal analytics (unchanged)
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -756,7 +756,7 @@ export default function ReportsPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push('/auth/login?next=/reports'); return; }
 
-      const admin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+      const admin = isAdminEmail(user.email);
       setIsAdmin(admin);
 
       if (admin) {

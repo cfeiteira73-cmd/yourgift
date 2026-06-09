@@ -1,3 +1,4 @@
+import { isAdminEmail } from '@/lib/constants';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
@@ -24,7 +25,6 @@ export const dynamic = 'force-dynamic';
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY ?? '';
 
 function getAdminDb() {
@@ -172,7 +172,7 @@ export async function GET(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const db = getAdminDb() ?? supabase;
-  const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+  const isAdmin = isAdminEmail(user.email);
   const mode = req.nextUrl.searchParams.get('mode') ?? 'client';
   const { searchParams } = req.nextUrl;
 

@@ -1,10 +1,10 @@
 'use client';
+import { isAdminEmail } from '@/lib/constants';
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 interface AuditEntry {
   id: string;
@@ -94,7 +94,7 @@ export default function ActivityPage() {
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) setIsAdmin(ADMIN_EMAILS.includes((user.email ?? '').toLowerCase()));
+      if (user) setIsAdmin(isAdminEmail(user.email));
     });
   }, []);
 

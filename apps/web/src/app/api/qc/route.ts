@@ -1,5 +1,8 @@
+import { isAdminEmail } from '@/lib/constants';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+
+export const dynamic = 'force-dynamic';
 
 // ── OMEGA X — S5: Computer Vision Quality Control ────────────────────────────
 //
@@ -17,7 +20,6 @@ import { createClient } from '@/lib/supabase/server';
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY ?? '';
 const CLAUDE_HAIKU    = 'claude-3-haiku-20240307';
 const CLAUDE_SONNET   = 'claude-3-5-sonnet-20241022';
@@ -100,7 +102,7 @@ export async function GET(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+  const isAdmin = isAdminEmail(user.email);
   if (!isAdmin) return NextResponse.json({ error: 'Admin only' }, { status: 403 });
 
   const { searchParams } = req.nextUrl;
@@ -194,7 +196,7 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+  const isAdmin = isAdminEmail(user.email);
   if (!isAdmin) return NextResponse.json({ error: 'Admin only' }, { status: 403 });
 
   const body = await req.json().catch(() => ({}));

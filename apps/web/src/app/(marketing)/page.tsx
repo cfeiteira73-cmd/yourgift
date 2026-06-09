@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { HeroVideo } from '@/components/marketing/HeroVideo';
 
+// Homepage is static — revalidate once per hour
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: 'Corporate Gifts, Branded Merch & Company Stores — 20.000+ Produtos | yourgift.pt',
   description:

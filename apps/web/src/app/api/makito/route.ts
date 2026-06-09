@@ -1,3 +1,4 @@
+import { isAdminEmail } from '@/lib/constants';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
@@ -27,7 +28,6 @@ export const dynamic = 'force-dynamic';
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 function getAdminDb() {
@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+  const isAdmin = isAdminEmail(user.email);
   if (!isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const db = getAdminDb() ?? supabase;
@@ -240,7 +240,7 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+  const isAdmin = isAdminEmail(user.email);
   if (!isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   let rawBody: unknown;

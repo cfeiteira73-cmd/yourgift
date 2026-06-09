@@ -1,5 +1,8 @@
+import { isAdminEmail } from '@/lib/constants';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+
+export const dynamic = 'force-dynamic';
 
 // ── OMEGA PROTOCOL — S4: Artwork Intelligence — Approval Engine ───────────────
 //
@@ -17,7 +20,6 @@ import { createClient } from '@/lib/supabase/server';
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 const STATUS_TRANSITIONS: Record<string, string[]> = {
   draft:             ['submitted'],
@@ -40,7 +42,7 @@ export async function GET(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+  const isAdmin = isAdminEmail(user.email);
   const { searchParams } = req.nextUrl;
   const mode = searchParams.get('mode') ?? 'list';
   const id   = searchParams.get('id');
@@ -101,7 +103,7 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+  const isAdmin = isAdminEmail(user.email);
   const body = await req.json().catch(() => ({}));
   const { action } = body;
 

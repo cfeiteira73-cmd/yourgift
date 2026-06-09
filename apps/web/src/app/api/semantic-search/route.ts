@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 // ── Semantic Search — AI Operating Brain (Phase 9) ────────────────────────────
 //
 // Uses Anthropic API to:

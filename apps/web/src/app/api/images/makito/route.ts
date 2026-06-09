@@ -103,7 +103,7 @@ export async function GET(req: NextRequest) {
         status: 200,
         headers: {
           'Content-Type': inferContentType(url),
-          'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+          'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
           'X-Supplier': 'makito',
         },
       });
@@ -119,7 +119,7 @@ export async function GET(req: NextRequest) {
       headers: {
         // Override octet-stream with correct image type
         'Content-Type': inferContentType(url),
-        'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+        'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
         'X-Supplier': 'makito',
         ...(imgRes.headers.get('content-length')
           ? { 'Content-Length': imgRes.headers.get('content-length')! }

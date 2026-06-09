@@ -1,11 +1,7 @@
+import { isAdminEmail } from '@/lib/constants';
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-// ── Admin-only emails — the full enterprise portal is restricted to these ──────
-const ADMIN_EMAILS = [
-  'geral@yourgift.pt',
-  'geral@agencygroup.pt',
-];
 
 // ── Admin portal routes (full enterprise dashboard) ───────────────────────────
 const ADMIN_ROUTES = [
@@ -99,7 +95,7 @@ export async function middleware(request: NextRequest) {
   const isProtected = PROTECTED.some((p) => pathname.startsWith(p));
   const isAdminRoute = ADMIN_ROUTES.some((p) => pathname.startsWith(p));
   const isClientRoute = CLIENT_ROUTES.some((p) => pathname.startsWith(p));
-  const isAdmin = user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase());
+  const isAdmin = user?.email && isAdminEmail(user.email.toLowerCase());
 
   // ── 6. Auth gate — redirect unauthenticated users to login ───────────────
   if (isProtected && !user) {

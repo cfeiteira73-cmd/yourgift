@@ -16,7 +16,6 @@ import { createClient } from '@/lib/supabase/client';
 import { PortalLayout } from '@/components/portal/PortalLayout';
 import { springSnappy, tapScale } from '@/lib/motion';
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 interface ClientProfile { id: string; name: string | null; company: string | null; tier: string | null; }
 interface ActivityEvent { id: string; type: string; description: string; amount?: number; status?: string; timestamp: string; }

@@ -1,5 +1,8 @@
+import { isAdminEmail } from '@/lib/constants';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+
+export const dynamic = 'force-dynamic';
 
 // ── OMEGA PROTOCOL — S12: Security + Governance — Immutable Audit Log ────────
 //
@@ -14,7 +17,6 @@ import { createClient } from '@/lib/supabase/server';
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 // Allowed action types — strict allowlist prevents injection
 const ALLOWED_ACTIONS = new Set([
@@ -47,7 +49,7 @@ export async function GET(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+    const isAdmin = isAdminEmail(user.email);
     const params  = request.nextUrl.searchParams;
     const mode    = params.get('mode') ?? 'list';
 

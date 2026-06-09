@@ -3,6 +3,9 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import { getProducts, getCategories, CATEGORY_GROUP_LABELS } from '@/lib/catalog';
 
+// Catalog revalidates every 60s — products update infrequently
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: 'Catálogo de Produtos — YourGift',
   description: '20.000+ produtos premium para personalização. Vestuário, tech, drinkware, kits de oferta e muito mais.',

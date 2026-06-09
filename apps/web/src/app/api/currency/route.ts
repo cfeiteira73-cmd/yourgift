@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { checkRateLimitFast } from '@/lib/rate-limit';
 
+export const dynamic = 'force-dynamic';
+
 // ── OMEGA PROTOCOL — S17: Global Scale — Multi-currency + VAT Intelligence ───
 //
 // Real-time currency conversion · VAT matrix by country · Price normalisation

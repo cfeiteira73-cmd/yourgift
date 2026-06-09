@@ -1,6 +1,9 @@
+import { isAdminEmail } from '@/lib/constants';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { checkRateLimitFast } from '@/lib/rate-limit';
+
+export const dynamic = 'force-dynamic';
 
 // ── OMEGA PROTOCOL — S9: AI Operating Brain ──────────────────────────────────
 //
@@ -13,7 +16,6 @@ import { checkRateLimitFast } from '@/lib/rate-limit';
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
 
@@ -49,7 +51,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429, headers: { 'Retry-After': '60' } });
     }
 
-    const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+    const isAdmin = isAdminEmail(user.email);
     const mode = request.nextUrl.searchParams.get('mode') ?? 'insights';
 
     // Resolve client context
@@ -118,7 +120,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429, headers: { 'Retry-After': '60' } });
     }
 
-    const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+    const isAdmin = isAdminEmail(user.email);
     const body = await request.json() as { action: string; query?: string; context?: string; data?: Record<string, unknown>; limit?: number };
 
     if (body.action === 'generate_insight') {

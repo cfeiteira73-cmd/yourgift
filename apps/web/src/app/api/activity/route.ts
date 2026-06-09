@@ -1,5 +1,8 @@
+import { isAdminEmail } from '@/lib/constants';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+
+export const dynamic = 'force-dynamic';
 
 // ── Phase 12: Activity Feed / Audit Trail ─────────────────────────────────────
 //
@@ -9,7 +12,6 @@ import { createClient } from '@/lib/supabase/server';
 // GET /api/activity?limit=20&since=ISO-datetime
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 interface ActivityEvent {
   id: string;
@@ -50,7 +52,7 @@ export async function GET(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+    const isAdmin = isAdminEmail(user.email);
     const limit = Math.min(parseInt(request.nextUrl.searchParams.get('limit') ?? '20'), 50);
     const since = request.nextUrl.searchParams.get('since') ?? new Date(Date.now() - 30 * 86400000).toISOString();
 

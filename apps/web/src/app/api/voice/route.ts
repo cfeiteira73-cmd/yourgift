@@ -1,5 +1,8 @@
+import { isAdminEmail } from '@/lib/constants';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+
+export const dynamic = 'force-dynamic';
 
 // ── OMEGA X — S14: Voice Command Engine ───────────────────────────────────────
 //
@@ -14,7 +17,6 @@ import { createClient } from '@/lib/supabase/server';
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY ?? '';
 const CLAUDE_HAIKU = 'claude-3-haiku-20240307';
 
@@ -66,7 +68,7 @@ export async function GET(req: NextRequest) {
   }
 
   if (mode === 'history') {
-    const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+    const isAdmin = isAdminEmail(user.email);
     let q = supabase.from('omega_x_voice_commands')
       .select('id, utterance, intent, entities, confidence, action_taken, status, latency_ms, created_at')
       .order('created_at', { ascending: false })

@@ -1,4 +1,5 @@
 'use client';
+import { isAdminEmail } from '@/lib/constants';
 
 // ── OMEGA PROTOCOL — S8: Financial Intelligence Supremacy — UI ────────────────
 //
@@ -16,7 +17,6 @@ import { PortalLayout } from '@/components/portal/PortalLayout';
 import { fadeUp, delayedFadeUp, tapScale, springSnappy } from '@/lib/motion';
 import { SparklineCard } from '@/components/portal/RevenueSparkline';
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 interface ClientProfile { id: string; name: string | null; company: string | null; tier: string | null; }
 
 interface FinancialSummary {
@@ -73,7 +73,7 @@ export default function FinancialsPage() {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { router.push('/auth/login?next=/financials'); return; }
-        const admin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+        const admin = isAdminEmail(user.email);
         setIsAdmin(admin);
         const { data: c } = await supabase.from('clients').select('id,name,company,tier').eq('auth_user_id', user.id).single();
         setClient(c as ClientProfile | null);

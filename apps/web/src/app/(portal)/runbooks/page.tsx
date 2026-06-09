@@ -1,4 +1,5 @@
 'use client';
+import { isAdminEmail } from '@/lib/constants';
 
 // ── OMEGA PROTOCOL — S15: Human Operations Layer ──────────────────────────────
 //
@@ -14,7 +15,6 @@ import { createClient } from '@/lib/supabase/client';
 import { PortalLayout } from '@/components/portal/PortalLayout';
 import { springSnappy, fadeUp, delayedFadeUp, tapScale } from '@/lib/motion';
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 interface ClientProfile { id: string; name: string | null; company: string | null; tier: string | null; }
 
@@ -161,7 +161,7 @@ export default function RunbooksPage() {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push('/auth/login?next=/runbooks'); return; }
-      const admin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+      const admin = isAdminEmail(user.email);
       setIsAdmin(admin);
       const { data: c } = await supabase.from('clients').select('id,name,company,tier').eq('auth_user_id', user.id).single();
       setClient(c as ClientProfile | null);

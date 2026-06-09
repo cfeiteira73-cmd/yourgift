@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 // ── OMEGA PROTOCOL — S3: Visual Product Builder — Catalog API ─────────────────
 //
 // Lightweight catalog proxy for client-side pages.

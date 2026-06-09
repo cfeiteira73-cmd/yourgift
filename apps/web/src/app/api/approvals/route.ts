@@ -1,5 +1,8 @@
+import { isAdminEmail } from '@/lib/constants';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+
+export const dynamic = 'force-dynamic';
 
 // ── OMEGA PROTOCOL — S7: Client Portal Supremacy — Approval Chains ─────────────
 //
@@ -18,7 +21,6 @@ import { createClient } from '@/lib/supabase/server';
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 const BUDGET_THRESHOLDS = {
   standard:   1000,   // standard tier: require approval above €1K
@@ -33,7 +35,7 @@ export async function GET(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+    const isAdmin = isAdminEmail(user.email);
     const params = request.nextUrl.searchParams;
     const mode = params.get('mode') ?? 'list';
     const entityType = params.get('entityType');
@@ -94,7 +96,7 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+    const isAdmin = isAdminEmail(user.email);
     const body = await request.json() as {
       action: 'request' | 'approve' | 'reject' | 'cancel';
       entity_type?: string;
@@ -127,7 +129,7 @@ export async function POST(request: NextRequest) {
         entity_ref: body.entity_ref ?? null,
         requester_id: user.id,
         requester_email: user.email ?? '',
-        approver_email: body.approver_email ?? ADMIN_EMAILS[0], // default to admin
+        approver_email: body.approver_email ?? 'geral@yourgift.pt', // default to admin
         status: 'pending',
         amount: body.amount ?? 0,
         note: body.note ?? null,

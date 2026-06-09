@@ -1,5 +1,8 @@
+import { isAdminEmail } from '@/lib/constants';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+
+export const dynamic = 'force-dynamic';
 
 // ── OMEGA PROTOCOL — S8: Financial Intelligence Supremacy ────────────────────
 //
@@ -10,7 +13,6 @@ import { createClient } from '@/lib/supabase/server';
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 // ── Margin assumptions (configurable per product category in future) ──────────
 const ASSUMED_COGS_RATE = 0.62; // 62% cost of goods sold → 38% gross margin
@@ -23,7 +25,7 @@ export async function GET(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+    const isAdmin = isAdminEmail(user.email);
     const params = request.nextUrl.searchParams;
     const period = params.get('period') ?? '30d';
     const mode = params.get('mode') ?? 'overview';

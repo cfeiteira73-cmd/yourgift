@@ -1,4 +1,5 @@
 'use client';
+import { isAdminEmail } from '@/lib/constants';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useCallback } from 'react';
@@ -11,7 +12,6 @@ import { DragDropProductionBoard } from '@/components/portal/DragDropProductionB
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -212,7 +212,7 @@ export default function ProductionPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push('/auth/login?next=/production'); return; }
 
-      const admin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+      const admin = isAdminEmail(user.email);
       setIsAdmin(admin);
 
       // Fetch SLA definitions

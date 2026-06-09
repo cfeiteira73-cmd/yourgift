@@ -1,5 +1,8 @@
+import { isAdminEmail } from '@/lib/constants';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+
+export const dynamic = 'force-dynamic';
 
 // ── Phase 12: Advanced Analytics API ─────────────────────────────────────────
 //
@@ -14,7 +17,6 @@ import { createClient } from '@/lib/supabase/server';
 // GET /api/analytics?period=30d|90d|12m&scope=platform|client
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,7 +28,7 @@ export async function GET(request: NextRequest) {
     const period = params.get('period') ?? '30d';
     const scope = params.get('scope') ?? 'auto';
 
-    const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+    const isAdmin = isAdminEmail(user.email);
     const effectiveScope = scope === 'auto' ? (isAdmin ? 'platform' : 'client') : scope;
 
     // Non-admin cannot request platform scope

@@ -8,6 +8,8 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
+export const dynamic = 'force-dynamic';
+
 const CANONICAL_HOST = 'yourgift.pt';
 
 export async function GET(request: NextRequest) {

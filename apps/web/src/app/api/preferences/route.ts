@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 // ── OMEGA X — S18: UX Preferences & Command History ──────────────────────────
 //
 // Per-user UX preferences (theme, density, pinned pages, shortcuts, dashboard

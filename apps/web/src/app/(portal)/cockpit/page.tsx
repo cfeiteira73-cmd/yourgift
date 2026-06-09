@@ -1,4 +1,5 @@
 'use client';
+import { isAdminEmail } from '@/lib/constants';
 
 // ── OMEGA PROTOCOL — S2: Executive Cockpit ────────────────────────────────────
 //
@@ -80,7 +81,6 @@ interface ClientProfile {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 const STATUS_LABELS: Record<string, string> = {
   pending: 'Pendente', confirmed: 'Confirmado', producing: 'Em produção',
@@ -341,7 +341,7 @@ export default function CockpitPage() {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { router.push('/auth/login?next=/cockpit'); return; }
-        const admin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+        const admin = isAdminEmail(user.email);
         setIsAdmin(admin);
         const { data: c } = await supabase.from('clients').select('id,name,company,tier').eq('auth_user_id', user.id).single();
         setClient(c as ClientProfile | null);

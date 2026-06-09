@@ -42,7 +42,7 @@ export function HeroVideo({
     v.muted    = true;   // required for autoplay
     v.loop     = true;
     v.setAttribute('playsinline', '');
-    v.preload  = 'auto';
+    v.preload  = 'metadata'; // 'auto' downloads entire 40MB; 'metadata' is enough to start play
     v.volume   = 1;
     Object.assign(v.style, {
       position: 'absolute', inset: '0',
@@ -92,19 +92,21 @@ export function HeroVideo({
       ref={containerRef}
       style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', background: '#080807' }}
     >
-      {/* Poster image while video loads (no black screen) */}
-      {!visible && (
-        <img
-          src={poster}
-          alt=""
-          aria-hidden="true"
-          style={{
-            position: 'absolute', inset: 0,
-            width: '100%', height: '100%',
-            objectFit: 'cover', objectPosition: 'center',
-          }}
-        />
-      )}
+      {/* Poster image while video loads — LCP element, must load fast */}
+      <img
+        src={poster}
+        alt=""
+        aria-hidden="true"
+        fetchPriority="high"
+        decoding="sync"
+        style={{
+          position: 'absolute', inset: 0,
+          width: '100%', height: '100%',
+          objectFit: 'cover', objectPosition: 'center',
+          opacity: visible ? 0 : 1,
+          transition: 'opacity 800ms ease-out',
+        }}
+      />
 
       {/* Gradient overlay */}
       <div

@@ -1,3 +1,4 @@
+import { isAdminEmail } from '@/lib/constants';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -16,7 +17,6 @@ import { createClient } from '@/lib/supabase/server';
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 const ALLOWED_EVENTS = [
   'order.created', 'order.status_changed', 'order.cancelled',
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+    const isAdmin = isAdminEmail(user.email);
 
     let query = supabase
       .from('webhook_endpoints')
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
 
       const { data: ep } = await supabase.from('webhook_endpoints').select('url, secret, owner_id').eq('id', endpointId).single();
       if (!ep) return NextResponse.json({ error: 'Endpoint not found' }, { status: 404 });
-      if (ep.owner_id !== user.id && !ADMIN_EMAILS.includes((user.email ?? '').toLowerCase())) {
+      if (ep.owner_id !== user.id && !isAdminEmail(user.email)) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
@@ -191,7 +191,7 @@ export async function DELETE(request: NextRequest) {
     const id = request.nextUrl.searchParams.get('id');
     if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
 
-    const isAdmin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+    const isAdmin = isAdminEmail(user.email);
 
     // Verify ownership
     let query = supabase.from('webhook_endpoints').delete().eq('id', id);

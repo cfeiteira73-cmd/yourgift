@@ -1,4 +1,5 @@
 'use client';
+import { isAdminEmail } from '@/lib/constants';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
@@ -8,7 +9,6 @@ import { PortalLayout } from '@/components/portal/PortalLayout';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const ADMIN_EMAILS = ['geral@yourgift.pt', 'geral@agencygroup.pt'];
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -226,7 +226,7 @@ export default function ClientsPage() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { router.push('/auth/login?next=/clients'); return; }
         setUserEmail(user.email ?? '');
-        const admin = ADMIN_EMAILS.includes((user.email ?? '').toLowerCase());
+        const admin = isAdminEmail(user.email);
         setIsAdmin(admin);
 
         const { data: c } = await supabase.from('clients').select('*').eq('auth_user_id', user.id).single();
