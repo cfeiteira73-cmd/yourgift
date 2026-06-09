@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Libre_Baskerville, Montserrat, DM_Mono } from 'next/font/google';
 import './globals.css';
+import CookieConsent from '@/components/CookieConsent';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const libreBaskerville = Libre_Baskerville({ subsets: ['latin'], weight: ['400', '700'], style: ['normal', 'italic'], variable: '--font-baskerville' });
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${inter.variable} ${libreBaskerville.variable} ${montserrat.variable} ${dmMono.variable}`}>
         {children}
+        <CookieConsent />
       </body>
     </html>
   );
