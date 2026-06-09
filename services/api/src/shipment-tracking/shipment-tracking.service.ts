@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventBusService } from '../events/event-bus.service';
 import { Prisma, ShipmentEvent } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
 
 export interface ShipmentEventInput {
   orderId: string;
@@ -28,9 +29,12 @@ export interface ActiveShipmentSummary {
 
 @Injectable()
 export class ShipmentTrackingService {
+  private readonly logger = new Logger(ShipmentTrackingService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly eventBus: EventBusService,
+    private readonly config: ConfigService,
   ) {}
 
   async recordEvent(input: ShipmentEventInput): Promise<ShipmentEvent> {
@@ -67,6 +71,10 @@ export class ShipmentTrackingService {
             : {}),
         },
       });
+      // Notify client via email (non-blocking)
+      void this.sendTrackingEmail(input.orderId, input).catch(err =>
+        this.logger.warn(`Tracking email failed for order ${input.orderId}: ${err}`),
+      );
     }
 
     if (input.event === 'delivered') {
@@ -77,6 +85,10 @@ export class ShipmentTrackingService {
           status: 'delivered',
         },
       });
+      // Notify client via delivery email (non-blocking)
+      void this.sendDeliveredEmail(input.orderId).catch(err =>
+        this.logger.warn(`Delivered email failed for order ${input.orderId}: ${err}`),
+      );
     }
 
     if (input.event === 'failed_delivery') {
@@ -102,6 +114,86 @@ export class ShipmentTrackingService {
     });
 
     return shipmentEvent;
+  }
+
+  // ── Email helpers ────────────────────────────────────────────────────────────
+
+  private async sendTrackingEmail(orderId: string, input: ShipmentEventInput): Promise<void> {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: { client: { select: { name: true, email: true } } },
+    });
+    if (!order || !(order as any).client?.email) return;
+
+    const webUrl = this.config.get<string>('APP_URL') ?? 'https://www.yourgift.pt';
+    const resendKey = this.config.get<string>('RESEND_API_KEY');
+    if (!resendKey) return;
+
+    const client = (order as any).client;
+    const body = {
+      clientName:     client.name ?? 'Cliente',
+      orderRef:       (order as any).ref ?? orderId,
+      trackingNumber: input.trackingNumber ?? '—',
+      carrier:        input.carrier ?? 'Transportadora',
+      trackingUrl:    input.metadata?.trackingUrl as string | undefined,
+      estimatedDelivery: input.metadata?.estimatedDelivery as string | undefined,
+    };
+
+    // Build inline email HTML (mirrors apps/web/src/lib/email.ts trackingEmail)
+    const subject = `Encomenda expedida — ${body.orderRef} | YourGift`;
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/></head><body style="background:#090907;font-family:'Helvetica Neue',sans-serif;color:#f0ece4;padding:32px">
+<h2 style="font-size:22px;font-weight:400;color:#f0ece4">${body.clientName}, a tua encomenda está a caminho.</h2>
+<p>Expedida por <strong>${body.carrier}</strong>. Rastreio: <strong style="font-family:monospace;color:#d4b47a">${body.trackingNumber}</strong></p>
+${body.trackingUrl ? `<p><a href="${body.trackingUrl}" style="color:#d4b47a">Rastrear encomenda →</a></p>` : ''}
+<p><a href="${webUrl}/client-portal" style="color:#b8975e">Ver portal →</a></p>
+<p style="font-size:11px;color:rgba(240,236,228,0.3)">© ${new Date().getFullYear()} YourGift · yourgift.pt</p>
+</body></html>`;
+
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: 'YourGift <noreply@yourgift.pt>',
+        to: [client.email],
+        subject,
+        html,
+        reply_to: 'geral@yourgift.pt',
+      }),
+    });
+  }
+
+  private async sendDeliveredEmail(orderId: string): Promise<void> {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: { client: { select: { name: true, email: true } } },
+    });
+    if (!order || !(order as any).client?.email) return;
+
+    const webUrl = this.config.get<string>('APP_URL') ?? 'https://www.yourgift.pt';
+    const resendKey = this.config.get<string>('RESEND_API_KEY');
+    if (!resendKey) return;
+
+    const client = (order as any).client;
+    const ref = (order as any).ref ?? orderId;
+    const subject = `Entregue com sucesso — ${ref} | YourGift`;
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/></head><body style="background:#090907;font-family:'Helvetica Neue',sans-serif;color:#f0ece4;padding:32px">
+<h2 style="font-size:22px;font-weight:400;color:#f0ece4">${client.name ?? 'Cliente'}, chegou.</h2>
+<p>A tua encomenda <strong style="color:#d4b47a">${ref}</strong> foi entregue com sucesso.</p>
+<p><a href="${webUrl}/client-portal" style="display:inline-block;background:#b8975e;color:#090907;padding:12px 24px;text-decoration:none;font-size:11px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase">Ver Portal →</a></p>
+<p style="font-size:11px;color:rgba(240,236,228,0.3)">© ${new Date().getFullYear()} YourGift · yourgift.pt</p>
+</body></html>`;
+
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: 'YourGift <noreply@yourgift.pt>',
+        to: [client.email],
+        subject,
+        html,
+        reply_to: 'geral@yourgift.pt',
+      }),
+    });
   }
 
   async getTimeline(orderId: string): Promise<{
